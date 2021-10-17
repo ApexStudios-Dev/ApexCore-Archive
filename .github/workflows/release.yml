@@ -1,0 +1,52 @@
+# GitHub Action to auto-magically publish versions
+# for tagged commits
+name: release
+
+# Run on every push (with version tag)
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-18.04
+
+    # Required for publishing to GH Packages
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      # Obtain tag name (version number)
+      - uses: olegtarasov/get-tag@v2.1
+        id: tagName
+
+      # Checkout repository, Validate Gradle Wrapper & Setup JDK
+      - uses: actions/checkout@v2
+      - uses: gradle/wrapper-validation-action@v1
+      - uses: actions/setup-java@v2
+        with:
+          distribution: adopt
+          java-version: 8
+      - run: chmod +x ./gradlew
+
+      # Build package
+      - run: ./gradlew build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE: ${{ steps.tagName.outputs.tag }}
+
+      # Publish to GitHub Packages
+      - run: ./gradlew publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE: ${{ steps.tagName.outputs.tag }}
+
+      # Publish GH release
+      - uses: softprops/action-gh-release@v1
+        id: ghRelease
+        with:
+          body: Auto-Generated GitHub Release - ${{ steps.tagName.outputs.tag }}
+          name: ${{ steps.tagName.outputs.tag }}
+          files: ./build/libs/*.jar
