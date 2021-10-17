@@ -1,0 +1,29 @@
+modLoader="javafml"
+loaderVersion="[36,)"
+license="GNU"
+issueTrackerURL="https://github.com/ApexModder/ApexCore/issues"
+
+[[mods]]
+modId="apexcore"
+version="${file.jarVersion}"
+displayName="ApexCore"
+# updateJSONURL="https://raw.githubusercontent.com/ApexModder/ApexCore/main/update.json"
+# displayURL="https://www.curseforge.com/minecraft/mc-mods/apexcore"
+# logoFile="logo.png"
+credits="ApexSPG (ApexModder) - Programming\nTTerrag - Registrate\n\n"
+authors="ApexModder"
+description="Utility mod for all of Apex's mods."
+
+[[dependencies.apexcore]]
+modId="forge"
+mandatory=true
+versionRange="[36,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.apexcore]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.16.5,1.17]"
+ordering="NONE"
+side="BOTH"
