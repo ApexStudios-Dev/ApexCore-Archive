@@ -29,7 +29,7 @@ import net.minecraftforge.event.village.WandererTradesEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.RegistryObject;
 import org.apache.commons.lang3.Validate;
-import xyz.apex.forge.apexcore.lib.registrate.BetterRegistrate;
+import xyz.apex.forge.apexcore.lib.registrate.CustomRegistrate;
 import xyz.apex.forge.apexcore.lib.registrate.entry.VillagerProfessionEntry;
 
 import javax.annotation.Nullable;
@@ -76,8 +76,8 @@ public class VillagerProfessionBuilder<T extends VillagerProfession, P> extends 
 
 	public <POI extends PointOfInterestType> PointOfInterestTypeBuilder<POI, VillagerProfessionBuilder<T, P>> poi(PointOfInterestTypeBuilder.PointOfInterestTypeFactory<POI> factory)
 	{
-		Validate.isInstanceOf(BetterRegistrate.class, getOwner());
-		return ((BetterRegistrate<?>) getOwner()).pointOfInterestType(this, getName(), factory);
+		Validate.isInstanceOf(CustomRegistrate.class, getOwner());
+		return ((CustomRegistrate<?>) getOwner()).pointOfInterestType(this, getName(), factory);
 	}
 
 	// region: Secondary POI

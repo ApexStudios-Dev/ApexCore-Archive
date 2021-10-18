@@ -15,9 +15,9 @@ import xyz.apex.forge.apexcore.lib.registrate.builders.PointOfInterestTypeBuilde
 import xyz.apex.forge.apexcore.lib.registrate.builders.StructureBuilder;
 import xyz.apex.forge.apexcore.lib.registrate.builders.VillagerProfessionBuilder;
 
-public class BetterRegistrate<R extends BetterRegistrate<R>> extends AbstractRegistrate<R>
+public class CustomRegistrate<R extends CustomRegistrate<R>> extends AbstractRegistrate<R>
 {
-	protected BetterRegistrate(String modId)
+	protected CustomRegistrate(String modId)
 	{
 		super(modId);
 	}
@@ -148,7 +148,7 @@ public class BetterRegistrate<R extends BetterRegistrate<R>> extends AbstractReg
 		return entry(name, callback -> VillagerProfessionBuilder.create(self(), parent, name, callback, factory));
 	}
 
-	protected static <R extends BetterRegistrate<R>> NonNullLazyValue<R> create(String modId, NonNullFunction<String, R> builder)
+	protected static <R extends CustomRegistrate<R>> NonNullLazyValue<R> create(String modId, NonNullFunction<String, R> builder)
 	{
 		return new NonNullLazyValue<>(() -> builder.apply(modId).registerEventListeners(FMLJavaModLoadingContext.get().getModEventBus()));
 	}
