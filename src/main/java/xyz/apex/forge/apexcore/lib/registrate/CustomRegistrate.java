@@ -148,7 +148,7 @@ public class CustomRegistrate<R extends CustomRegistrate<R>> extends AbstractReg
 		return entry(name, callback -> VillagerProfessionBuilder.create(self(), parent, name, callback, factory));
 	}
 
-	protected static <R extends CustomRegistrate<R>> NonNullLazyValue<R> create(String modId, NonNullFunction<String, R> builder)
+	public static <R extends CustomRegistrate<R>> NonNullLazyValue<R> create(String modId, NonNullFunction<String, R> builder)
 	{
 		return new NonNullLazyValue<>(() -> builder.apply(modId).registerEventListeners(FMLJavaModLoadingContext.get().getModEventBus()));
 	}
