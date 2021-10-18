@@ -6,6 +6,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.GenericEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
+import net.minecraftforge.fml.event.lifecycle.ParallelDispatchEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 public final class ModEventBusHelper
@@ -93,5 +94,50 @@ public final class ModEventBusHelper
 	public static <T extends GenericEvent<? extends F> & IModBusEvent, F> void addGenericListener(Class<F> genericClassFilter, NonNullConsumer<T> consumer)
 	{
 		EventBusHelper.addGenericListener(getModEventBus(), genericClassFilter, consumer);
+	}
+
+	private static <T extends ParallelDispatchEvent> NonNullConsumer<T> enqueueListener(NonNullConsumer<T> consumer)
+	{
+		return (T event) -> event.enqueueWork(() -> consumer.accept(event));
+	}
+
+	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(EventPriority priority, boolean receiveCancelled, Class<T> eventType, NonNullConsumer<T> consumer)
+	{
+		addListener(priority, receiveCancelled, eventType, enqueueListener(consumer));
+	}
+
+	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(EventPriority priority, boolean receiveCancelled, NonNullConsumer<T> consumer)
+	{
+		addListener(priority, receiveCancelled, enqueueListener(consumer));
+	}
+
+	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(EventPriority priority, NonNullConsumer<T> consumer)
+	{
+		addListener(priority, enqueueListener(consumer));
+	}
+
+	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(EventPriority priority, Class<T> eventType, NonNullConsumer<T> consumer)
+	{
+		addListener(priority, eventType, enqueueListener(consumer));
+	}
+
+	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(boolean receiveCancelled, Class<T> eventType, NonNullConsumer<T> consumer)
+	{
+		addListener(receiveCancelled, eventType, enqueueListener(consumer));
+	}
+
+	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(boolean receiveCancelled, NonNullConsumer<T> consumer)
+	{
+		addListener(receiveCancelled, enqueueListener(consumer));
+	}
+
+	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(Class<T> eventType, NonNullConsumer<T> consumer)
+	{
+		addListener(eventType, enqueueListener(consumer));
+	}
+
+	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(NonNullConsumer<T> consumer)
+	{
+		addListener(enqueueListener(consumer));
 	}
 }
