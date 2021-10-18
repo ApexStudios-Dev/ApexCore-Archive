@@ -1,8 +1,13 @@
 package xyz.apex.forge.apexcore.lib.constants;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.versions.forge.ForgeVersion;
 import xyz.apex.forge.apexcore.core.ApexCore;
+
+import java.util.concurrent.ExecutionException;
 
 public enum Mods
 {
@@ -20,6 +25,7 @@ public enum Mods
 	;
 
 	public final String modId;
+	private final Cache<String, ResourceLocation> resourceLocationCache = CacheBuilder.newBuilder().weakValues().build();
 
 	Mods(String modId)
 	{
@@ -39,5 +45,17 @@ public enum Mods
 	public boolean isLoaded()
 	{
 		return ModList.get().isLoaded(modId);
+	}
+
+	public ResourceLocation id(String name)
+	{
+		try
+		{
+			return resourceLocationCache.get(name, () -> new ResourceLocation(modId, name));
+		}
+		catch(ExecutionException e)
+		{
+			return new ResourceLocation(modId, name);
+		}
 	}
 }

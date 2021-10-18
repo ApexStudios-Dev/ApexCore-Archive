@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    "#forge:carpets/white",
+    "#forge:carpets/orange",
+    "#forge:carpets/magenta",
+    "#forge:carpets/light_blue",
+    "#forge:carpets/yellow",
+    "#forge:carpets/lime",
+    "#forge:carpets/pink",
+    "#forge:carpets/gray",
+    "#forge:carpets/light_gray",
+    "#forge:carpets/cyan",
+    "#forge:carpets/purple",
+    "#forge:carpets/blue",
+    "#forge:carpets/brown",
+    "#forge:carpets/green",
+    "#forge:carpets/red",
+    "#forge:carpets/black"
+  ]
+}
