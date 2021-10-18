@@ -209,9 +209,9 @@ if(System.getenv('GITHUB_TOKEN') != null) {
 				version = "${mc_version}-${mod_version}"
 
 				artifact jar
-				artifact javadocJar
 				artifact sourcesJar
 				artifact deobfJar
+				artifact shadowJar
 			}
 		}
 		repositories {
