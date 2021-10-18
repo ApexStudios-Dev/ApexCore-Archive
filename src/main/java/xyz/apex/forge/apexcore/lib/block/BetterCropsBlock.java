@@ -41,7 +41,6 @@ public class BetterCropsBlock extends CropsBlock
 		this(properties, null);
 	}
 
-	@SuppressWarnings("ConstantConditions")
 	protected Item getBaseSeedIdRaw()
 	{
 		// no overridden type specified
