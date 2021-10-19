@@ -19,8 +19,32 @@ public class ItemInventoryContainer extends BaseContainer
 
 		this.itemInventory = itemInventory;
 
+		addSlots();
+		addPlayerSlots();
 		itemInventory.startOpen(playerInventory.player);
 	}
+
+	protected void addSlots()
+	{
+		super.addContainerSlots();
+	}
+
+	protected void addPlayerSlots()
+	{
+		super.addPlayerInventorySlots();
+	}
+
+	/**
+	 * @deprecated use {@link #addSlots()}
+	 */
+	@Override @Deprecated
+	protected final void addContainerSlots() { }
+
+	/**
+	 * @deprecated use {@link #addSlots()}
+	 */
+	@Override @Deprecated
+	protected final void addPlayerInventorySlots() { }
 
 	@Override
 	public boolean stillValid(PlayerEntity player)
