@@ -26,7 +26,26 @@ archivesBaseName = "${mod_name}-${mc_version}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
+sourceSets {
+	testmod {
+		compileClasspath += sourceSets.main.output
+		runtimeClasspath += sourceSets.main.output
+
+		java {
+			srcDir 'src/testmod/java'
+		}
+
+		resources {
+			srcDir 'src/testmod/resources'
+		}
+	}
+}
+
 configurations {
+	testmodCompile.extendsFrom(compile)
+	testmodCompileOnly.extendsFrom(compileOnly)
+	testmodRuntimeOnly.extendsFrom(runtimeOnly)
+
 	shade
 }
 
@@ -104,6 +123,45 @@ minecraft {
 				}
 			}
 		}
+
+		testClient {
+			parent runs.client
+			ideaModule "${project.name}.testmod"
+
+			mods {
+				TestMod {
+					source sourceSets.testmod
+				}
+			}
+		}
+
+		testClientAuthed {
+			parent runs.testClient
+		}
+
+		testServer {
+			parent runs.server
+			ideaModule "${project.name}.testmod"
+
+			mods {
+				TestMod {
+					source sourceSets.testmod
+				}
+			}
+		}
+
+		testData {
+			parent runs.data
+			ideaModule "${project.name}.testmod"
+
+			args '--mod', mod_id, '--all', '--output', file('src/generated-testmod/resources/'), '--existing', file('src/testmod/resources/'), '--existing-mod', 'apexcore'
+
+			mods {
+				TestMod {
+					source sourceSets.testmod
+				}
+			}
+		}
 	}
 }
 
@@ -113,6 +171,16 @@ minecraft {
 
 sourceSets.main.resources {
 	srcDir 'src/generated/resources'
+}
+
+sourceSets.testmod.resources {
+	srcDir 'src/generated-testmod/resources'
+}
+
+processResources {
+	from(sourceSets.testmod.resources.srcDirs) {
+		include 'META-INF/mods.toml'
+	}
 }
 
 repositories {
@@ -139,6 +207,7 @@ dependencies {
 	// Registrate
 	compileOnly fg.deobf("com.tterrag.registrate:Registrate:MC${mc_version}-${registrate_version}")
 	runtimeOnly fg.deobf("com.tterrag.registrate:Registrate:MC${mc_version}-${registrate_version}")
+	testCompileOnly fg.deobf("com.tterrag.registrate:Registrate:MC${mc_version}-${registrate_version}")
 	shade "com.tterrag.registrate:Registrate:MC${mc_version}-${registrate_version}"
 
 	// CurseForge
