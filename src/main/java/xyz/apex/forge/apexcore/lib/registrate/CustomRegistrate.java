@@ -6,12 +6,16 @@ import com.tterrag.registrate.util.NonNullLazyValue;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import net.minecraft.entity.merchant.villager.VillagerProfession;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.village.PointOfInterestType;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import xyz.apex.forge.apexcore.lib.registrate.builders.PointOfInterestTypeBuilder;
+import xyz.apex.forge.apexcore.lib.registrate.builders.RecipeSerializerBuilder;
 import xyz.apex.forge.apexcore.lib.registrate.builders.StructureBuilder;
 import xyz.apex.forge.apexcore.lib.registrate.builders.VillagerProfessionBuilder;
 
@@ -146,6 +150,27 @@ public class CustomRegistrate<R extends CustomRegistrate<R>> extends AbstractReg
 	public <T extends VillagerProfession, P> VillagerProfessionBuilder<T, P> villagerProfession(P parent, String name, VillagerProfessionBuilder.VillagerProfessionFactory<T> factory)
 	{
 		return entry(name, callback -> VillagerProfessionBuilder.create(self(), parent, name, callback, factory));
+	}
+
+	// Recipe Serializers
+	public <T extends IRecipeSerializer<RECIPE>, RECIPE extends IRecipe<I>, I extends IInventory> RecipeSerializerBuilder<T, R, RECIPE, I> recipeSerializer(RecipeSerializerBuilder.RecipeSerializerFactory<T, RECIPE, I> factory)
+	{
+		return recipeSerializer(self(), currentName(), factory);
+	}
+
+	public <T extends IRecipeSerializer<RECIPE>, P, RECIPE extends IRecipe<I>, I extends IInventory> RecipeSerializerBuilder<T, P, RECIPE, I> recipeSerializer(P parent, RecipeSerializerBuilder.RecipeSerializerFactory<T, RECIPE, I> factory)
+	{
+		return recipeSerializer(parent, currentName(), factory);
+	}
+
+	public <T extends IRecipeSerializer<RECIPE>, RECIPE extends IRecipe<I>, I extends IInventory> RecipeSerializerBuilder<T, R, RECIPE, I> recipeSerializer(String name, RecipeSerializerBuilder.RecipeSerializerFactory<T, RECIPE, I> factory)
+	{
+		return recipeSerializer(self(), name, factory);
+	}
+
+	public <T extends IRecipeSerializer<RECIPE>, P, RECIPE extends IRecipe<I>, I extends IInventory> RecipeSerializerBuilder<T, P, RECIPE, I> recipeSerializer(P parent, String name, RecipeSerializerBuilder.RecipeSerializerFactory<T, RECIPE, I> factory)
+	{
+		return entry(name, callback -> RecipeSerializerBuilder.create(self(), parent, name, callback, factory));
 	}
 
 	public static <R extends CustomRegistrate<R>> NonNullLazyValue<R> create(String modId, NonNullFunction<String, R> builder)

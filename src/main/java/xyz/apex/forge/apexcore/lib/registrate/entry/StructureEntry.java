@@ -22,15 +22,15 @@ import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.settings.DimensionStructuresSettings;
 import net.minecraft.world.gen.settings.StructureSeparationSettings;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.commons.lang3.Validate;
 import xyz.apex.forge.apexcore.lib.constants.Mods;
+import xyz.apex.forge.apexcore.lib.util.ForgeEventBusHelper;
+import xyz.apex.forge.apexcore.lib.util.ModEventBusHelper;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -50,8 +50,8 @@ public class StructureEntry<T extends Structure<C>, C extends IFeatureConfig> ex
 
 		lazyStructureFeature = new NonNullLazyValue<>(() -> get().configured(configSupplier.get()));
 
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(EventPriority.HIGH, false, FMLCommonSetupEvent.class, event -> event.enqueueWork(this::registerStructureFeature));
-		MinecraftForge.EVENT_BUS.addListener(this::onLevelLoad);
+		ModEventBusHelper.addEnqueuedListener(EventPriority.HIGH, this::registerStructureFeature);
+		ForgeEventBusHelper.addListener(this::onLevelLoad);
 	}
 
 	public StructureFeature<C, ? extends Structure<C>> configured()
@@ -59,7 +59,7 @@ public class StructureEntry<T extends Structure<C>, C extends IFeatureConfig> ex
 		return lazyStructureFeature.get();
 	}
 
-	private void registerStructureFeature()
+	private void registerStructureFeature(FMLCommonSetupEvent event)
 	{
 		StructureFeature<C, ? extends Structure<C>> structureFeature = configured();
 
