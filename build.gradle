@@ -154,7 +154,7 @@ minecraft {
 			parent runs.data
 			ideaModule "${project.name}.testmod"
 
-			args '--mod', mod_id, '--all', '--output', file('src/generated-testmod/resources/'), '--existing', file('src/testmod/resources/'), '--existing-mod', 'apexcore'
+			args '--mod', 'testmod', '--all', '--output', file('src/generated-testmod/resources/'), '--existing', file('src/testmod/resources/'), '--existing-mod', mod_id
 
 			mods {
 				TestMod {
