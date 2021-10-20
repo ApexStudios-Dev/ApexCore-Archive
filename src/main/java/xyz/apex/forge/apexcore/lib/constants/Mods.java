@@ -1,61 +1,72 @@
 package xyz.apex.forge.apexcore.lib.constants;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.versions.forge.ForgeVersion;
-import xyz.apex.forge.apexcore.core.ApexCore;
+import net.minecraftforge.fml.ModContainer;
+import xyz.apex.forge.apexcore.lib.util.IMod;
 
-import java.util.concurrent.ExecutionException;
+import java.util.Optional;
 
-public enum Mods
+/**
+ * @deprecated use {@link IMod}
+ */
+@Deprecated
+public enum Mods implements IMod
 {
-	APEX_CORE(ApexCore.ID),
+	APEX_CORE(IMod.APEX_CORE),
 
-	FANTASY_COTTAGE("fantasycottage"),
+	FANTASY_COTTAGE(IMod.FANTASY_COTTAGE),
 
-	FORGE(ForgeVersion.MOD_ID),
-	MINECRAFT("minecraft"),
+	FORGE(IMod.FORGE),
+	MINECRAFT(IMod.MINECRAFT),
 
-	JEI("jei"),
-	TOP("theoneprobe"),
+	JEI(IMod.JEI),
+	TOP(IMod.TOP),
 
-	TERRAFORGED("terraforged"),
+	TERRAFORGED(IMod.TERRAFORGED),
 	;
 
 	public final String modId;
-	private final Cache<String, ResourceLocation> resourceLocationCache = CacheBuilder.newBuilder().weakValues().build();
+	public final IMod mod;
 
-	Mods(String modId)
+	Mods(IMod mod)
 	{
-		this.modId = modId;
+		this.mod = mod;
+		modId = mod.getModId();
 	}
 
+	@Override
 	public String getModId()
 	{
-		return modId;
+		return mod.getModId();
 	}
 
-	public String getDisplayName()
-	{
-		return ModList.get().getModContainerById(modId).map(mc -> mc.getModInfo().getDisplayName()).orElse(modId);
-	}
-
+	@Override
 	public boolean isLoaded()
 	{
-		return ModList.get().isLoaded(modId);
+		return mod.isLoaded();
 	}
 
-	public ResourceLocation id(String name)
+	@Override
+	public Optional<? extends ModContainer> getModContainer()
 	{
-		try
-		{
-			return resourceLocationCache.get(name, () -> new ResourceLocation(modId, name));
-		}
-		catch(ExecutionException e)
-		{
-			return new ResourceLocation(modId, name);
-		}
+		return mod.getModContainer();
+	}
+
+	@Override
+	public String getDisplayName()
+	{
+		return mod.getDisplayName();
+	}
+
+	@Override
+	public ResourceLocation id(String path)
+	{
+		return mod.id(path);
+	}
+
+	@Override
+	public String prefix(String path)
+	{
+		return mod.prefix(path);
 	}
 }

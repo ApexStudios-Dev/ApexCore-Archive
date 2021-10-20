@@ -9,8 +9,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xyz.apex.forge.apexcore.core.init.ALootFunctionTypes;
 import xyz.apex.forge.apexcore.core.init.ATags;
-import xyz.apex.forge.apexcore.lib.constants.Mods;
 import xyz.apex.forge.apexcore.lib.registrate.SimpleRegistrate;
+import xyz.apex.forge.apexcore.lib.util.IMod;
 import xyz.apex.forge.apexcore.lib.util.ModEventBusHelper;
 
 @Mod(ApexCore.ID)
@@ -49,9 +49,9 @@ public final class ApexCore
 		return REGISTRATE.get();
 	}
 
-	public static Mods mod()
+	public static IMod mod()
 	{
-		return Mods.APEX_CORE;
+		return IMod.APEX_CORE;
 	}
 
 	public static ResourceLocation id(String name)

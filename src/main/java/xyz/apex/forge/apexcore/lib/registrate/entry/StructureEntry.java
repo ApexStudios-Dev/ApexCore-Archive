@@ -28,8 +28,8 @@ import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.commons.lang3.Validate;
-import xyz.apex.forge.apexcore.lib.constants.Mods;
 import xyz.apex.forge.apexcore.lib.util.ForgeEventBusHelper;
+import xyz.apex.forge.apexcore.lib.util.IMod;
 import xyz.apex.forge.apexcore.lib.util.ModEventBusHelper;
 
 import java.lang.reflect.Method;
@@ -114,7 +114,7 @@ public class StructureEntry<T extends Structure<C>, C extends IFeatureConfig> ex
 			Codec<? extends ChunkGenerator> codec = (Codec<? extends ChunkGenerator>) getCodec_Method.invoke(level.getChunkSource().getGenerator());
 			ResourceLocation generatorName = Registry.CHUNK_GENERATOR.getKey(codec);
 
-			if(generatorName != null && generatorName.getNamespace().equals(Mods.TERRAFORGED.modId))
+			if(generatorName != null && generatorName.getNamespace().equals(IMod.TERRAFORGED.getModId()))
 				return true;
 		}
 		catch(Exception e)

@@ -12,7 +12,7 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.Tags;
-import xyz.apex.forge.apexcore.lib.constants.Mods;
+import xyz.apex.forge.apexcore.lib.util.IMod;
 
 public final class ATags
 {
@@ -452,73 +452,73 @@ public final class ATags
 	{
 		// region: Forge / Vanilla Missing
 		// Some of these should maybe be PR'd into Forge itself
-		public static final ResourceLocation PAPER = Mods.FORGE.id("paper");
-		public static final ResourceLocation CROPS = Mods.FORGE.id("crops");
-		public static final ResourceLocation COWS = Mods.FORGE.id("cows");
-		public static final ResourceLocation CHICKENS = Mods.FORGE.id("chickens");
-		public static final ResourceLocation APPLES = Mods.FORGE.id("apples");
-		public static final ResourceLocation SUGAR = Mods.FORGE.id("sugar");
-		public static final ResourceLocation GLASS_BOTTLES = Mods.FORGE.id("glass_bottles");
-		public static final ResourceLocation SWEET_BERRIES = Mods.FORGE.id("sweet_berries");
-		public static final ResourceLocation MILK_BUCKET = Mods.FORGE.id("milk_bucket");
-		public static final ResourceLocation BREAD = Mods.FORGE.id("bread");
+		public static final ResourceLocation PAPER = IMod.FORGE.id("paper");
+		public static final ResourceLocation CROPS = IMod.FORGE.id("crops");
+		public static final ResourceLocation COWS = IMod.FORGE.id("cows");
+		public static final ResourceLocation CHICKENS = IMod.FORGE.id("chickens");
+		public static final ResourceLocation APPLES = IMod.FORGE.id("apples");
+		public static final ResourceLocation SUGAR = IMod.FORGE.id("sugar");
+		public static final ResourceLocation GLASS_BOTTLES = IMod.FORGE.id("glass_bottles");
+		public static final ResourceLocation SWEET_BERRIES = IMod.FORGE.id("sweet_berries");
+		public static final ResourceLocation MILK_BUCKET = IMod.FORGE.id("milk_bucket");
+		public static final ResourceLocation BREAD = IMod.FORGE.id("bread");
 
 		// region: Flowers
-		public static final ResourceLocation FLOWERS_WHITE = Mods.FORGE.id("flowers/white");
-		public static final ResourceLocation FLOWERS_ORANGE = Mods.FORGE.id("flowers/orange");
-		public static final ResourceLocation FLOWERS_MAGENTA = Mods.FORGE.id("flowers/magenta");
-		public static final ResourceLocation FLOWERS_LIGHT_BLUE = Mods.FORGE.id("flowers/light_blue");
-		public static final ResourceLocation FLOWERS_YELLOW = Mods.FORGE.id("flowers/yellow");
-		public static final ResourceLocation FLOWERS_LIME = Mods.FORGE.id("flowers/lime");
-		public static final ResourceLocation FLOWERS_PINK = Mods.FORGE.id("flowers/pink");
-		public static final ResourceLocation FLOWERS_GRAY = Mods.FORGE.id("flowers/gray");
-		public static final ResourceLocation FLOWERS_LIGHT_GRAY = Mods.FORGE.id("flowers/light_gray");
-		public static final ResourceLocation FLOWERS_CYAN = Mods.FORGE.id("flowers/cyan");
-		public static final ResourceLocation FLOWERS_PURPLE = Mods.FORGE.id("flowers/purple");
-		public static final ResourceLocation FLOWERS_BLUE = Mods.FORGE.id("flowers/blue");
-		public static final ResourceLocation FLOWERS_BROWN = Mods.FORGE.id("flowers/brown");
-		public static final ResourceLocation FLOWERS_GREEN = Mods.FORGE.id("flowers/green");
-		public static final ResourceLocation FLOWERS_RED = Mods.FORGE.id("flowers/red");
-		public static final ResourceLocation FLOWERS_BLACK = Mods.FORGE.id("flowers/black");
+		public static final ResourceLocation FLOWERS_WHITE = IMod.FORGE.id("flowers/white");
+		public static final ResourceLocation FLOWERS_ORANGE = IMod.FORGE.id("flowers/orange");
+		public static final ResourceLocation FLOWERS_MAGENTA = IMod.FORGE.id("flowers/magenta");
+		public static final ResourceLocation FLOWERS_LIGHT_BLUE = IMod.FORGE.id("flowers/light_blue");
+		public static final ResourceLocation FLOWERS_YELLOW = IMod.FORGE.id("flowers/yellow");
+		public static final ResourceLocation FLOWERS_LIME = IMod.FORGE.id("flowers/lime");
+		public static final ResourceLocation FLOWERS_PINK = IMod.FORGE.id("flowers/pink");
+		public static final ResourceLocation FLOWERS_GRAY = IMod.FORGE.id("flowers/gray");
+		public static final ResourceLocation FLOWERS_LIGHT_GRAY = IMod.FORGE.id("flowers/light_gray");
+		public static final ResourceLocation FLOWERS_CYAN = IMod.FORGE.id("flowers/cyan");
+		public static final ResourceLocation FLOWERS_PURPLE = IMod.FORGE.id("flowers/purple");
+		public static final ResourceLocation FLOWERS_BLUE = IMod.FORGE.id("flowers/blue");
+		public static final ResourceLocation FLOWERS_BROWN = IMod.FORGE.id("flowers/brown");
+		public static final ResourceLocation FLOWERS_GREEN = IMod.FORGE.id("flowers/green");
+		public static final ResourceLocation FLOWERS_RED = IMod.FORGE.id("flowers/red");
+		public static final ResourceLocation FLOWERS_BLACK = IMod.FORGE.id("flowers/black");
 		// endregion
 
 		// region: Carpets
-		public static final ResourceLocation CARPETS_WHITE = Mods.FORGE.id("carpets/white");
-		public static final ResourceLocation CARPETS_ORANGE = Mods.FORGE.id("carpets/orange");
-		public static final ResourceLocation CARPETS_MAGENTA = Mods.FORGE.id("carpets/magenta");
-		public static final ResourceLocation CARPETS_LIGHT_BLUE = Mods.FORGE.id("carpets/light_blue");
-		public static final ResourceLocation CARPETS_YELLOW = Mods.FORGE.id("carpets/yellow");
-		public static final ResourceLocation CARPETS_LIME = Mods.FORGE.id("carpets/lime");
-		public static final ResourceLocation CARPETS_PINK = Mods.FORGE.id("carpets/pink");
-		public static final ResourceLocation CARPETS_GRAY = Mods.FORGE.id("carpets/gray");
-		public static final ResourceLocation CARPETS_LIGHT_GRAY = Mods.FORGE.id("carpets/light_gray");
-		public static final ResourceLocation CARPETS_CYAN = Mods.FORGE.id("carpets/cyan");
-		public static final ResourceLocation CARPETS_PURPLE = Mods.FORGE.id("carpets/purple");
-		public static final ResourceLocation CARPETS_BLUE = Mods.FORGE.id("carpets/blue");
-		public static final ResourceLocation CARPETS_BROWN = Mods.FORGE.id("carpets/brown");
-		public static final ResourceLocation CARPETS_GREEN = Mods.FORGE.id("carpets/green");
-		public static final ResourceLocation CARPETS_RED = Mods.FORGE.id("carpets/red");
-		public static final ResourceLocation CARPETS_BLACK = Mods.FORGE.id("carpets/black");
+		public static final ResourceLocation CARPETS_WHITE = IMod.FORGE.id("carpets/white");
+		public static final ResourceLocation CARPETS_ORANGE = IMod.FORGE.id("carpets/orange");
+		public static final ResourceLocation CARPETS_MAGENTA = IMod.FORGE.id("carpets/magenta");
+		public static final ResourceLocation CARPETS_LIGHT_BLUE = IMod.FORGE.id("carpets/light_blue");
+		public static final ResourceLocation CARPETS_YELLOW = IMod.FORGE.id("carpets/yellow");
+		public static final ResourceLocation CARPETS_LIME = IMod.FORGE.id("carpets/lime");
+		public static final ResourceLocation CARPETS_PINK = IMod.FORGE.id("carpets/pink");
+		public static final ResourceLocation CARPETS_GRAY = IMod.FORGE.id("carpets/gray");
+		public static final ResourceLocation CARPETS_LIGHT_GRAY = IMod.FORGE.id("carpets/light_gray");
+		public static final ResourceLocation CARPETS_CYAN = IMod.FORGE.id("carpets/cyan");
+		public static final ResourceLocation CARPETS_PURPLE = IMod.FORGE.id("carpets/purple");
+		public static final ResourceLocation CARPETS_BLUE = IMod.FORGE.id("carpets/blue");
+		public static final ResourceLocation CARPETS_BROWN = IMod.FORGE.id("carpets/brown");
+		public static final ResourceLocation CARPETS_GREEN = IMod.FORGE.id("carpets/green");
+		public static final ResourceLocation CARPETS_RED = IMod.FORGE.id("carpets/red");
+		public static final ResourceLocation CARPETS_BLACK = IMod.FORGE.id("carpets/black");
 		// endregion
 
 		// region: Wools
-		public static final ResourceLocation WOOLS = Mods.FORGE.id("wools");
-		public static final ResourceLocation WOOLS_WHITE = Mods.FORGE.id("wools/white");
-		public static final ResourceLocation WOOLS_ORANGE = Mods.FORGE.id("wools/orange");
-		public static final ResourceLocation WOOLS_MAGENTA = Mods.FORGE.id("wools/magenta");
-		public static final ResourceLocation WOOLS_LIGHT_BLUE = Mods.FORGE.id("wools/light_blue");
-		public static final ResourceLocation WOOLS_YELLOW = Mods.FORGE.id("wools/yellow");
-		public static final ResourceLocation WOOLS_LIME = Mods.FORGE.id("wools/lime");
-		public static final ResourceLocation WOOLS_PINK = Mods.FORGE.id("wools/pink");
-		public static final ResourceLocation WOOLS_GRAY = Mods.FORGE.id("wools/gray");
-		public static final ResourceLocation WOOLS_LIGHT_GRAY = Mods.FORGE.id("wools/light_gray");
-		public static final ResourceLocation WOOLS_CYAN = Mods.FORGE.id("wools/cyan");
-		public static final ResourceLocation WOOLS_PURPLE = Mods.FORGE.id("wools/purple");
-		public static final ResourceLocation WOOLS_BLUE = Mods.FORGE.id("wools/blue");
-		public static final ResourceLocation WOOLS_BROWN = Mods.FORGE.id("wools/brown");
-		public static final ResourceLocation WOOLS_GREEN = Mods.FORGE.id("wools/green");
-		public static final ResourceLocation WOOLS_RED = Mods.FORGE.id("wools/red");
-		public static final ResourceLocation WOOLS_BLACK = Mods.FORGE.id("wools/black");
+		public static final ResourceLocation WOOLS = IMod.FORGE.id("wools");
+		public static final ResourceLocation WOOLS_WHITE = IMod.FORGE.id("wools/white");
+		public static final ResourceLocation WOOLS_ORANGE = IMod.FORGE.id("wools/orange");
+		public static final ResourceLocation WOOLS_MAGENTA = IMod.FORGE.id("wools/magenta");
+		public static final ResourceLocation WOOLS_LIGHT_BLUE = IMod.FORGE.id("wools/light_blue");
+		public static final ResourceLocation WOOLS_YELLOW = IMod.FORGE.id("wools/yellow");
+		public static final ResourceLocation WOOLS_LIME = IMod.FORGE.id("wools/lime");
+		public static final ResourceLocation WOOLS_PINK = IMod.FORGE.id("wools/pink");
+		public static final ResourceLocation WOOLS_GRAY = IMod.FORGE.id("wools/gray");
+		public static final ResourceLocation WOOLS_LIGHT_GRAY = IMod.FORGE.id("wools/light_gray");
+		public static final ResourceLocation WOOLS_CYAN = IMod.FORGE.id("wools/cyan");
+		public static final ResourceLocation WOOLS_PURPLE = IMod.FORGE.id("wools/purple");
+		public static final ResourceLocation WOOLS_BLUE = IMod.FORGE.id("wools/blue");
+		public static final ResourceLocation WOOLS_BROWN = IMod.FORGE.id("wools/brown");
+		public static final ResourceLocation WOOLS_GREEN = IMod.FORGE.id("wools/green");
+		public static final ResourceLocation WOOLS_RED = IMod.FORGE.id("wools/red");
+		public static final ResourceLocation WOOLS_BLACK = IMod.FORGE.id("wools/black");
 		// endregion
 		// endregion
 	}

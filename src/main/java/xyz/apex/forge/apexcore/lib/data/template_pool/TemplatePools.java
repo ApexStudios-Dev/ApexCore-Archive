@@ -2,7 +2,7 @@ package xyz.apex.forge.apexcore.lib.data.template_pool;
 
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.ResourceLocation;
-import xyz.apex.forge.apexcore.lib.constants.Mods;
+import xyz.apex.forge.apexcore.lib.util.IMod;
 
 import javax.annotation.Nullable;
 
@@ -317,6 +317,6 @@ public final class TemplatePools implements IStringSerializable, Comparable<Temp
 
 	private static TemplatePools of(String poolPath)
 	{
-		return of(Mods.MINECRAFT.modId, poolPath);
+		return of(IMod.MINECRAFT.id(poolPath));
 	}
 }
