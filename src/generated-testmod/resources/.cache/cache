@@ -1,0 +1,7 @@
+63f4e1e75fd2b64bbed53cde77ce17696cdc1df6 assets/testmod/blockstates/test_block.json
+58c2ac185655a3b90cf6e795d3ce6f30aae493bb assets/testmod/lang/en_ud.json
+65ac484934123cd8c8fbfcde61a178f793b6ebc2 assets/testmod/lang/en_us.json
+5181e561c52800f4c004751df4e4efcbeb9d0872 assets/testmod/models/block/test_block.json
+09616b61199a71f1a2b5c36a67d11cf5c3544e60 assets/testmod/models/item/test_block.json
+988665cd18ee48b78ff3ca3bc84501010d29bcb5 assets/testmod/models/item/test_item.json
+ee11e72b1d05f896ecb7ed8e7baefe9247da1014 data/testmod/loot_tables/blocks/test_block.json
