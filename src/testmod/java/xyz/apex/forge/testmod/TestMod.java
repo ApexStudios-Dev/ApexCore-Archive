@@ -11,6 +11,7 @@ import xyz.apex.forge.apexcore.lib.registrate.SimpleRegistrate;
 import xyz.apex.forge.apexcore.lib.util.IMod;
 import xyz.apex.forge.testmod.init.TBlocks;
 import xyz.apex.forge.testmod.init.TItems;
+import xyz.apex.forge.testmod.init.TPaintings;
 
 import javax.annotation.Nullable;
 
@@ -31,6 +32,7 @@ public final class TestMod implements IMod
 
 		TItems.register();
 		TBlocks.register();
+		TPaintings.register();
 	}
 
 	private void setupRegistrate()
