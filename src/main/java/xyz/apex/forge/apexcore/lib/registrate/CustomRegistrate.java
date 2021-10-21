@@ -5,6 +5,7 @@ import com.tterrag.registrate.AbstractRegistrate;
 import com.tterrag.registrate.util.NonNullLazyValue;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
+import net.minecraft.entity.item.PaintingType;
 import net.minecraft.entity.merchant.villager.VillagerProfession;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.crafting.IRecipe;
@@ -14,10 +15,9 @@ import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import xyz.apex.forge.apexcore.lib.registrate.builders.PointOfInterestTypeBuilder;
-import xyz.apex.forge.apexcore.lib.registrate.builders.RecipeSerializerBuilder;
-import xyz.apex.forge.apexcore.lib.registrate.builders.StructureBuilder;
-import xyz.apex.forge.apexcore.lib.registrate.builders.VillagerProfessionBuilder;
+import xyz.apex.forge.apexcore.lib.registrate.builders.*;
+
+import java.util.function.IntSupplier;
 
 public class CustomRegistrate<R extends CustomRegistrate<R>> extends AbstractRegistrate<R>
 {
@@ -171,6 +171,67 @@ public class CustomRegistrate<R extends CustomRegistrate<R>> extends AbstractReg
 	public <T extends IRecipeSerializer<RECIPE>, P, RECIPE extends IRecipe<I>, I extends IInventory> RecipeSerializerBuilder<T, P, RECIPE, I> recipeSerializer(P parent, String name, RecipeSerializerBuilder.RecipeSerializerFactory<T, RECIPE, I> factory)
 	{
 		return entry(name, callback -> RecipeSerializerBuilder.create(self(), parent, name, callback, factory));
+	}
+
+	// Painting Types
+	public PaintingTypeBuilder<PaintingType, R> painting(int width, int height)
+	{
+		return painting(self(), currentName(), PaintingType::new, () -> width, () -> height);
+	}
+
+	public PaintingTypeBuilder<PaintingType, R> painting(String name, int width, int height)
+	{
+		return painting(self(), name, PaintingType::new, () -> width, () -> height);
+	}
+
+	public <P> PaintingTypeBuilder<PaintingType, P> painting(P parent, int width, int height)
+	{
+		return painting(parent, currentName(), PaintingType::new, () -> width, () -> height);
+	}
+
+	public <P> PaintingTypeBuilder<PaintingType, P> painting(P parent, String name, int width, int height)
+	{
+		return painting(parent, name, PaintingType::new, () -> width, () -> height);
+	}
+
+	public PaintingTypeBuilder<PaintingType, R> painting(IntSupplier widthSupplier, IntSupplier heightSupplier)
+	{
+		return painting(self(), currentName(), PaintingType::new, widthSupplier, heightSupplier);
+	}
+
+	public PaintingTypeBuilder<PaintingType, R> painting(String name, IntSupplier widthSupplier, IntSupplier heightSupplier)
+	{
+		return painting(self(), name, PaintingType::new, widthSupplier, heightSupplier);
+	}
+
+	public <P> PaintingTypeBuilder<PaintingType, P> painting(P parent, IntSupplier widthSupplier, IntSupplier heightSupplier)
+	{
+		return painting(parent, currentName(), PaintingType::new, widthSupplier, heightSupplier);
+	}
+
+	public <P> PaintingTypeBuilder<PaintingType, P> painting(P parent, String name, IntSupplier widthSupplier, IntSupplier heightSupplier)
+	{
+		return painting(parent, name, PaintingType::new, widthSupplier, heightSupplier);
+	}
+
+	public <T extends PaintingType> PaintingTypeBuilder<T, R> painting(PaintingTypeBuilder.PaintingTypeFactory<T> factory, IntSupplier widthSupplier, IntSupplier heightSupplier)
+	{
+		return painting(self(), currentName(), factory, widthSupplier, heightSupplier);
+	}
+
+	public <T extends PaintingType> PaintingTypeBuilder<T, R> painting(String name, PaintingTypeBuilder.PaintingTypeFactory<T> factory, IntSupplier widthSupplier, IntSupplier heightSupplier)
+	{
+		return painting(self(), name, factory, widthSupplier, heightSupplier);
+	}
+
+	public <T extends PaintingType, P> PaintingTypeBuilder<T, P> painting(P parent, PaintingTypeBuilder.PaintingTypeFactory<T> factory, IntSupplier widthSupplier, IntSupplier heightSupplier)
+	{
+		return painting(parent, currentName(), factory, widthSupplier, heightSupplier);
+	}
+
+	public <T extends PaintingType, P> PaintingTypeBuilder<T, P> painting(P parent, String name, PaintingTypeBuilder.PaintingTypeFactory<T> factory, IntSupplier widthSupplier, IntSupplier heightSupplier)
+	{
+		return entry(name, callback -> PaintingTypeBuilder.create(self(), parent, name, callback, factory, widthSupplier, heightSupplier));
 	}
 
 	public static <R extends CustomRegistrate<R>> NonNullLazyValue<R> create(String modId, NonNullFunction<String, R> builder)
