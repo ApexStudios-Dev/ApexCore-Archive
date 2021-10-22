@@ -2,6 +2,8 @@ package xyz.apex.forge.apexcore.lib.registrate;
 
 import com.mojang.serialization.Codec;
 import com.tterrag.registrate.AbstractRegistrate;
+import com.tterrag.registrate.providers.ProviderType;
+import com.tterrag.registrate.providers.RegistrateTagsProvider;
 import com.tterrag.registrate.util.NonNullLazyValue;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
@@ -10,6 +12,8 @@ import net.minecraft.entity.merchant.villager.VillagerProfession;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.village.PointOfInterestType;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
@@ -22,6 +26,13 @@ import java.util.function.IntSupplier;
 
 public class CustomRegistrate<R extends CustomRegistrate<R>> extends AbstractRegistrate<R>
 {
+	// @formatter:off
+	public static final ProviderType<RegistrateTagsProvider<TileEntityType<?>>> BLOCK_ENTITY_TYPE_TAGS = ProviderType.register(
+			IMod.APEX_CORE.prefix("tags/block_entity_type"),
+			type -> (p, e) -> new RegistrateTagsProvider<TileEntityType<?>>(p, type, "tile_entity_types", e.getGenerator(), Registry.BLOCK_ENTITY_TYPE, e.getExistingFileHelper())
+	);
+	// @formatter:on
+
 	private final RegistrateHelper<R> helper;
 	private final IMod mod;
 
