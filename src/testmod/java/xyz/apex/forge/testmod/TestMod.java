@@ -1,5 +1,6 @@
 package xyz.apex.forge.testmod;
 
+import com.tterrag.registrate.providers.ProviderType;
 import com.tterrag.registrate.util.NonNullLazyValue;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -12,6 +13,7 @@ import xyz.apex.forge.apexcore.lib.util.IMod;
 import xyz.apex.forge.testmod.init.TBlocks;
 import xyz.apex.forge.testmod.init.TItems;
 import xyz.apex.forge.testmod.init.TPaintings;
+import xyz.apex.forge.testmod.init.TTags;
 
 import javax.annotation.Nullable;
 
@@ -39,7 +41,11 @@ public final class TestMod implements IMod
 	{
 		// @formatter:off
 		registrate()
-				.itemGroup(ModItemGroup::new);
+				.itemGroup(ModItemGroup::new)
+				.addDataGenerator(ProviderType.ITEM_TAGS, TTags.Items::generate)
+				.addDataGenerator(ProviderType.BLOCK_TAGS, TTags.Blocks::generate)
+				.addDataGenerator(ProviderType.FLUID_TAGS, TTags.Fluids::generate)
+				.addDataGenerator(ProviderType.ENTITY_TAGS, TTags.EntityTypes::generate)
 		;
 		// @formatter:on
 	}

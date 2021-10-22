@@ -1,4 +1,17 @@
 {
+  "block.testmod.copper_block": "Copper Block",
+  "block.testmod.copper_ore": "Copper Ore",
   "block.testmod.test_block": "Test Block",
+  "item.testmod.copper_axe": "Copper Axe",
+  "item.testmod.copper_boots": "Copper Boots",
+  "item.testmod.copper_chestplate": "Copper Chestplate",
+  "item.testmod.copper_helmet": "Copper Helmet",
+  "item.testmod.copper_hoe": "Copper Hoe",
+  "item.testmod.copper_horse_armor": "Copper Horse Armor",
+  "item.testmod.copper_ingot": "Copper Ingot",
+  "item.testmod.copper_leggings": "Copper Leggings",
+  "item.testmod.copper_pickaxe": "Copper Pickaxe",
+  "item.testmod.copper_shovel": "Copper Shovel",
+  "item.testmod.copper_sword": "Copper Sword",
   "item.testmod.test_item": "Test Item"
 }

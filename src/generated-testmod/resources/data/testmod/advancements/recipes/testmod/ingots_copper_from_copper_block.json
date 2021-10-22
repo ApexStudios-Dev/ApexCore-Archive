@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "testmod:ingots_copper_from_copper_block"
+    ]
+  },
+  "criteria": {
+    "has_storage_blocks_copper": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "tag": "forge:storage_blocks/copper"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "testmod:ingots_copper_from_copper_block"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_storage_blocks_copper",
+      "has_the_recipe"
+    ]
+  ]
+}
