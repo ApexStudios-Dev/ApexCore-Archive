@@ -7,6 +7,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.item.BlockItem;
+import xyz.apex.forge.apexcore.lib.registrate.RegistrateHelper;
 import xyz.apex.forge.apexcore.lib.registrate.SimpleRegistrate;
 import xyz.apex.forge.testmod.TestMod;
 
@@ -20,12 +21,9 @@ public final class TBlocks
 			.block(Block::new)
 			.initialProperties(Material.STONE, MaterialColor.STONE)
 			.properties(properties -> properties.strength(1.5F).sound(SoundType.STONE))
-			.defaultLang()
-			.defaultBlockstate()
-			.defaultLoot()
 			.tag(TTags.Blocks.TEST_BLOCK)
 			.item(BlockItem::new)
-			.model((ctx, provider) -> provider.blockItem(ctx))
+			.model(RegistrateHelper::blockItemModel)
 			.tag(TTags.Items.TEST_BLOCK)
 			.build()
 			.register();
@@ -35,13 +33,10 @@ public final class TBlocks
 			.block(Block::new)
 			.initialProperties(Material.STONE)
 			.properties(properties -> properties.requiresCorrectToolForDrops().strength(3F, 3F))
-			.defaultLang()
-			.defaultBlockstate()
-			.defaultLoot()
 			.tag(TTags.Blocks.COPPER_ORE)
 			.recipe((ctx, provider) -> provider.smeltingAndBlasting(DataIngredient.tag(TTags.Items.ORES_COPPER), TItems.COPPER_INGOT, .7F))
 			.item(BlockItem::new)
-			.model((ctx, provider) -> provider.blockItem(ctx))
+			.model(RegistrateHelper::blockItemModel)
 			.tag(TTags.Items.COPPER_ORE)
 			.build()
 			.register();
@@ -51,13 +46,10 @@ public final class TBlocks
 			.block(Block::new)
 			.initialProperties(Material.METAL, MaterialColor.METAL)
 			.properties(properties -> properties.requiresCorrectToolForDrops().strength(5F, 6F).sound(SoundType.METAL))
-			.defaultLang()
-			.defaultBlockstate()
-			.defaultLoot()
 			.tag(TTags.Blocks.COPPER_BLOCK)
 			.recipe((ctx, provider) -> provider.storage(DataIngredient.tag(TTags.Items.INGOTS_COPPER), TItems.COPPER_INGOT, DataIngredient.tag(TTags.Items.STORAGE_BLOCKS_COPPER), ctx))
 			.item(BlockItem::new)
-			.model((ctx, provider) -> provider.blockItem(ctx))
+			.model(RegistrateHelper::blockItemModel)
 			.tag(TTags.Items.COPPER_BLOCK)
 			.build()
 			.register();

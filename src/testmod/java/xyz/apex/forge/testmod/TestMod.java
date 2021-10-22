@@ -18,18 +18,21 @@ import xyz.apex.forge.testmod.init.TTags;
 import javax.annotation.Nullable;
 
 @Mod(TestMod.ID)
-public final class TestMod implements IMod
+public final class TestMod extends IMod.CachingMod
 {
 	public static final String ID = "testmod";
 	public static final Logger LOGGER = LogManager.getLogger();
 
-	@Nullable private static IMod mod;
-	private static final NonNullLazyValue<SimpleRegistrate> REGISTRATE = SimpleRegistrate.create(ID);
+	@Nullable private static TestMod mod = null;
+	private final NonNullLazyValue<SimpleRegistrate> registrate;
 
 	public TestMod()
 	{
+		super(ID);
+
 		mod = this;
 
+		registrate = SimpleRegistrate.create(this);
 		setupRegistrate();
 
 		TItems.register();
@@ -56,14 +59,14 @@ public final class TestMod implements IMod
 		return ID;
 	}
 
-	public static IMod getMod()
+	public static TestMod getMod()
 	{
 		return Validate.notNull(mod);
 	}
 
 	public static SimpleRegistrate registrate()
 	{
-		return REGISTRATE.get();
+		return getMod().registrate.get();
 	}
 
 	private static class ModItemGroup extends ItemGroup

@@ -16,14 +16,36 @@ import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import xyz.apex.forge.apexcore.lib.registrate.builders.*;
+import xyz.apex.forge.apexcore.lib.util.IMod;
 
 import java.util.function.IntSupplier;
 
 public class CustomRegistrate<R extends CustomRegistrate<R>> extends AbstractRegistrate<R>
 {
+	private final RegistrateHelper<R> helper;
+	private final IMod mod;
+
 	protected CustomRegistrate(String modId)
 	{
-		super(modId);
+		this(IMod.createCaching(modId));
+	}
+
+	protected CustomRegistrate(IMod mod)
+	{
+		super(mod.getModId());
+
+		helper = new RegistrateHelper<>(self());
+		this.mod = mod;
+	}
+
+	public IMod getMod()
+	{
+		return mod;
+	}
+
+	public RegistrateHelper<R> helper()
+	{
+		return helper;
 	}
 
 	/*
@@ -237,5 +259,10 @@ public class CustomRegistrate<R extends CustomRegistrate<R>> extends AbstractReg
 	public static <R extends CustomRegistrate<R>> NonNullLazyValue<R> create(String modId, NonNullFunction<String, R> builder)
 	{
 		return new NonNullLazyValue<>(() -> builder.apply(modId).registerEventListeners(FMLJavaModLoadingContext.get().getModEventBus()));
+	}
+
+	public static <R extends CustomRegistrate<R>> NonNullLazyValue<R> create(IMod mod, NonNullFunction<IMod, R> builder)
+	{
+		return new NonNullLazyValue<>(() -> builder.apply(mod).registerEventListeners(FMLJavaModLoadingContext.get().getModEventBus()));
 	}
 }

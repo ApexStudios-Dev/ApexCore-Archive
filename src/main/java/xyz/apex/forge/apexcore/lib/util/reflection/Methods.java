@@ -1,5 +1,7 @@
 package xyz.apex.forge.apexcore.lib.util.reflection;
 
+import com.tterrag.registrate.AbstractRegistrate;
+
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 
@@ -7,6 +9,9 @@ public enum Methods
 {
 	// 1.16.5: private static final void validateSafeReferent(Supplier<? extends SafeReferent> safeReferentSupplier)
 	// DIST_EXEC_VALIDATE("validateSafeReferent", false, DistExecutor.class, Supplier.class),
+
+	// 1.16.5: protected String currentName()
+	REGISTRATE_CURRENT_NAME("currentName", false, AbstractRegistrate.class),
 	;
 
 	private final String methodName;
