@@ -6,11 +6,8 @@ import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import xyz.apex.forge.apexcore.lib.container.ItemInventoryContainer;
 
-@OnlyIn(Dist.CLIENT)
 public class ItemInventoryContainerScreen<C extends ItemInventoryContainer> extends ContainerScreen<C>
 {
 	protected final ResourceLocation backgroundTexture;
