@@ -444,37 +444,37 @@ public class RegistrateHelper<R extends CustomRegistrate<R>>
 	// region: Boots
 	public ItemBuilder<ArmorItem, R> boots(NonNullSupplier<IArmorMaterial> armorMaterialSupplier)
 	{
-		return helmet(registrate, currentName(), ArmorItem::new, armorMaterialSupplier);
+		return boots(registrate, currentName(), ArmorItem::new, armorMaterialSupplier);
 	}
 
 	public <P> ItemBuilder<ArmorItem, P> boots(P parent, NonNullSupplier<IArmorMaterial> armorMaterialSupplier)
 	{
-		return helmet(parent, currentName(), ArmorItem::new, armorMaterialSupplier);
+		return boots(parent, currentName(), ArmorItem::new, armorMaterialSupplier);
 	}
 
 	public ItemBuilder<ArmorItem, R> boots(String name, NonNullSupplier<IArmorMaterial> armorMaterialSupplier)
 	{
-		return helmet(registrate, name, ArmorItem::new, armorMaterialSupplier);
+		return boots(registrate, name, ArmorItem::new, armorMaterialSupplier);
 	}
 
 	public <P> ItemBuilder<ArmorItem, P> boots(P parent, String name, NonNullSupplier<IArmorMaterial> armorMaterialSupplier)
 	{
-		return helmet(parent, name, ArmorItem::new, armorMaterialSupplier);
+		return boots(parent, name, ArmorItem::new, armorMaterialSupplier);
 	}
 
 	public <T extends ArmorItem> ItemBuilder<T, R> boots(ArmorItemFactory<T> factory, NonNullSupplier<IArmorMaterial> armorMaterialSupplier)
 	{
-		return helmet(registrate, currentName(), factory, armorMaterialSupplier);
+		return boots(registrate, currentName(), factory, armorMaterialSupplier);
 	}
 
 	public <T extends ArmorItem, P> ItemBuilder<T, P> boots(P parent, ArmorItemFactory<T> factory, NonNullSupplier<IArmorMaterial> armorMaterialSupplier)
 	{
-		return helmet(parent, currentName(), factory, armorMaterialSupplier);
+		return boots(parent, currentName(), factory, armorMaterialSupplier);
 	}
 
 	public <T extends ArmorItem> ItemBuilder<T, R> boots(String name, ArmorItemFactory<T> factory, NonNullSupplier<IArmorMaterial> armorMaterialSupplier)
 	{
-		return helmet(registrate, name, factory, armorMaterialSupplier);
+		return boots(registrate, name, factory, armorMaterialSupplier);
 	}
 
 	public <T extends ArmorItem, P> ItemBuilder<T, P> boots(P parent, String name, ArmorItemFactory<T> factory, NonNullSupplier<IArmorMaterial> armorMaterialSupplier)

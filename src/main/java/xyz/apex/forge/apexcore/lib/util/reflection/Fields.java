@@ -1,5 +1,6 @@
 package xyz.apex.forge.apexcore.lib.util.reflection;
 
+import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.ItemGroup;
 
 import javax.annotation.Nullable;
@@ -11,6 +12,8 @@ public enum Fields
 	ITEM_GROUP_ICON("field_151245_t", true, ItemGroup.class),
 	// 1.16.5: private final String langId;
 	ITEM_GROUP_LABEL("field_78034_o", true, ItemGroup.class),
+	// 1.16.5: private static final int[] HEALTH_PER_SLOT = new int[]{13, 15, 16, 11};
+	ARMOR_MATERIAL_HEALTH_PER_SLOT("field_77882_bY", true, ArmorMaterial.class)
 	;
 
 	private final Class<?> classToAccess;
