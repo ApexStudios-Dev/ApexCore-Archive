@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"priority": 1100,
+	"package": "xyz.apex.forge.apexcore.core.mixins",
+	"compatibilityLevel": "JAVA_8",
+	"refmap": "apexcore.refmap.json",
+	"mixins": [ ],
+	"client": [ ],
+	"server": [ ],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"minVersion": "0.8"
+}

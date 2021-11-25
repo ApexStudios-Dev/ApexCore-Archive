@@ -10,10 +10,6 @@ buildscript {
 	}
 }
 
-plugins {
-	id 'com.github.johnrengelman.shadow' version '5.2.0'
-}
-
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
@@ -45,8 +41,6 @@ configurations {
 	testmodCompile.extendsFrom(compile)
 	testmodCompileOnly.extendsFrom(compileOnly)
 	testmodRuntimeOnly.extendsFrom(runtimeOnly)
-
-	shade
 }
 
 minecraft {
@@ -57,7 +51,6 @@ minecraft {
 		client {
 			taskName 'Client'
 			workingDirectory project.file('run/client')
-			property 'fml.earlyprogresswindow', 'false'
 			property 'fml.earlyprogresswindow', 'false'
 			property 'mixin.env.disableRefMap', 'true'
 			property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
@@ -160,12 +153,6 @@ sourceSets.testmod.resources {
 	srcDir 'src/generated-testmod/resources'
 }
 
-processResources {
-	from(sourceSets.testmod.resources.srcDirs) {
-		include 'META-INF/mods.toml'
-	}
-}
-
 repositories {
 	mavenLocal() // Local Deps
 	maven { url 'https://dvs1.progwml6.com/files/maven' } // JEI
@@ -173,6 +160,17 @@ repositories {
 	maven { // CurseForge
 		url 'https://cursemaven.com'
 		content { includeGroup 'curse.maven' }
+	}
+
+	// GitHub Packages require read access
+	if(project.hasProperty('apex_git_package_token')) {
+		maven {
+			url = uri("https://maven.pkg.github.com/ApexModder/Registrator")
+			credentials {
+				username = 'Apex-GitHub-PackagesToken'
+				password = project.getProperty('apex_git_package_token')
+			}
+		}
 	}
 }
 
@@ -187,12 +185,6 @@ dependencies {
 	compileOnly fg.deobf('mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.1.4-22:api')
 	runtimeOnly fg.deobf('mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.1.4-22')
 
-	// Registrate
-	compileOnly fg.deobf('com.tterrag.registrate:Registrate:MC1.16.5-1.0.10')
-	runtimeOnly fg.deobf('com.tterrag.registrate:Registrate:MC1.16.5-1.0.10')
-	testCompileOnly fg.deobf('com.tterrag.registrate:Registrate:MC1.16.5-1.0.10')
-	shade 'com.tterrag.registrate:Registrate:MC1.16.5-1.0.10'
-
 	// CurseForge
 	// https://www.cursemaven.com/ - Examples
 	// runtimeOnly fg.deobf('curse.maven:<mod_name>-<cf_project_id>:<cf_project_file_id>')
@@ -200,6 +192,16 @@ dependencies {
 	if(project.hasProperty('apex_local_deps') && project.getProperty('apex_local_deps')) {
 		// runtimeOnly fg.deobf('xyz.apex.forge:devworld:1.16.5-2.0.0')
 		runtimeOnly fg.deobf('xyz.apex.forge:smoothboot:1.16.5-1.0.0')
+	}
+
+	if(project.hasProperty('apex_git_package_token')) {
+		// we have access to Apex's GH Packages pull from there
+		compileOnly fg.deobf('xyz.apex.forge.utility.registrator:registrator-1.16.5:1.0.2')
+		runtimeOnly fg.deobf('xyz.apex.forge.utility.registrator:registrator-1.16.5:1.0.2')
+	} else {
+		// we dont have access to Apex's GH Packages, pull from CurseForge
+		// compileOnly fg.deobf('curse.maven:registrator-550146:1.0.1')
+		// runtimeOnly fg.deobf('curse.maven:registrator-550146:1.0.1')
 	}
 }
 
@@ -218,15 +220,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 	from javadoc.destinationDir
 }
 
-shadowJar {
-	configurations = [ project.configurations.shade ]
-	relocate 'com.tterrag.registrate', 'xyz.apex.repack.com.tterrag.registrate'
-	classifier ''
-}
-
 jar {
-	classifier 'slim'
-
 	from sourceSets.main.output.classesDirs
 	from sourceSets.main.output.resourcesDir
 
@@ -249,11 +243,6 @@ artifacts {
 	archives sourcesJar
 	archives deobfJar
 	archives javadocJar
-	archives shadowJar
-}
-
-reobf {
-	shadowJar { }
 }
 
 jar.finalizedBy('reobfJar')
@@ -270,7 +259,6 @@ if(System.getenv('GITHUB_TOKEN') != null) {
 				artifact sourcesJar
 				artifact deobfJar
 				artifact javadocJar
-				artifact shadowJar
 			}
 		}
 		repositories {

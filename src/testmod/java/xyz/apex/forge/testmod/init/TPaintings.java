@@ -1,25 +1,13 @@
 package xyz.apex.forge.testmod.init;
 
-import com.tterrag.registrate.util.entry.RegistryEntry;
-import net.minecraft.entity.item.PaintingType;
-import xyz.apex.forge.apexcore.lib.registrate.SimpleRegistrate;
-import xyz.apex.forge.testmod.TestMod;
+import xyz.apex.forge.utility.registrator.entry.PaintingEntry;
 
 public final class TPaintings
 {
-	private static final SimpleRegistrate REGISTRATE = TestMod.registrate();
+	private static final TRegistry REGISTRY = TRegistry.getRegistry();
 
-	// @formatter:off
-	public static final RegistryEntry<PaintingType> TEST_PAINTING = REGISTRATE
-			.object("test_painting")
-			.painting(64, 64)
-			.register();
+	public static final PaintingEntry TEST_PAINTING = REGISTRY.painting("test_painting", 64, 64);
+	public static final PaintingEntry TEST_PAINTING_TRANSLUCENT = REGISTRY.painting("test_painting_translucent", 64, 64);
 
-	public static final RegistryEntry<PaintingType> TEST_PAINTING_TRANSLUCENT = REGISTRATE
-			.object("test_painting_translucent")
-			.painting(64, 64)
-			.register();
-	// @formatter:on
-
-	public static void register() { }
+	static void bootstrap() { }
 }

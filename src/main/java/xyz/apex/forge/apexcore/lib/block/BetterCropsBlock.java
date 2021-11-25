@@ -1,6 +1,5 @@
 package xyz.apex.forge.apexcore.lib.block;
 
-import com.tterrag.registrate.util.NonNullLazyValue;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -9,6 +8,8 @@ import net.minecraft.item.Item;
 import net.minecraft.state.Property;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.IItemProvider;
+
+import xyz.apex.java.utility.Lazy;
 
 import javax.annotation.Nullable;
 
@@ -23,7 +24,7 @@ import javax.annotation.Nullable;
 public class BetterCropsBlock extends CropsBlock
 {
 	@Nullable protected final IItemProvider baseSeedItem;
-	private final NonNullLazyValue<Item> lazySeedItem; // we use a lazy value so that #getBaseSeedIdRaw is only ever called once
+	private final Lazy<Item> lazySeedItem; // we use a lazy value so that #getBaseSeedIdRaw is only ever called once
 
 	/**
 	 * @param baseSeedItem Null to use block item as seed item
@@ -33,7 +34,7 @@ public class BetterCropsBlock extends CropsBlock
 		super(properties);
 
 		this.baseSeedItem = baseSeedItem;
-		lazySeedItem = new NonNullLazyValue<>(() -> getBaseSeedIdRaw().asItem());
+		lazySeedItem = Lazy.of(() -> getBaseSeedIdRaw().asItem());
 	}
 
 	public BetterCropsBlock(AbstractBlock.Properties properties)

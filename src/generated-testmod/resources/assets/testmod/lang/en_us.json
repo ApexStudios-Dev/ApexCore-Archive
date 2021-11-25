@@ -13,5 +13,6 @@
   "item.testmod.copper_pickaxe": "Copper Pickaxe",
   "item.testmod.copper_shovel": "Copper Shovel",
   "item.testmod.copper_sword": "Copper Sword",
-  "item.testmod.test_item": "Test Item"
+  "item.testmod.test_item": "Test Item",
+  "itemGroup.testmod": "Test Mod"
 }

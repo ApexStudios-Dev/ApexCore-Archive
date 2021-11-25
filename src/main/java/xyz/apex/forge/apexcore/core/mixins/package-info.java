@@ -1,5 +1,5 @@
 @MethodsReturnNonnullByDefault @ParametersAreNonnullByDefault @FieldsAreNonnullByDefault
-package xyz.apex.forge.apexcore.lib.container;
+package xyz.apex.forge.apexcore.core.mixins;
 
 import xyz.apex.java.utility.nullness.FieldsAreNonnullByDefault;
 import xyz.apex.java.utility.nullness.MethodsReturnNonnullByDefault;

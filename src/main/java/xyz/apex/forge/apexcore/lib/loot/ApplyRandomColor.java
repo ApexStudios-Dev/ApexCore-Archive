@@ -2,12 +2,14 @@ package xyz.apex.forge.apexcore.lib.loot;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootContext;
 import net.minecraft.loot.LootFunction;
 import net.minecraft.loot.LootFunctionType;
 import net.minecraft.loot.conditions.ILootCondition;
-import xyz.apex.forge.apexcore.core.init.ALootFunctionTypes;
+
+import xyz.apex.forge.apexcore.core.init.ACLootFunctionTypes;
 import xyz.apex.forge.apexcore.lib.constants.NbtNames;
 
 public class ApplyRandomColor extends LootFunction
@@ -28,7 +30,7 @@ public class ApplyRandomColor extends LootFunction
 	@Override
 	public LootFunctionType getType()
 	{
-		return ALootFunctionTypes.APPLY_RANDOM_COLOR;
+		return ACLootFunctionTypes.APPLY_RANDOM_COLOR;
 	}
 
 	private int generateColor(LootContext ctx)

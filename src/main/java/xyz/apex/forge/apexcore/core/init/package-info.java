@@ -1,7 +1,6 @@
 @MethodsReturnNonnullByDefault @ParametersAreNonnullByDefault @FieldsAreNonnullByDefault
 package xyz.apex.forge.apexcore.core.init;
 
-import com.tterrag.registrate.util.nullness.FieldsAreNonnullByDefault;
-import mcp.MethodsReturnNonnullByDefault;
-
-import javax.annotation.ParametersAreNonnullByDefault;
+import xyz.apex.java.utility.nullness.FieldsAreNonnullByDefault;
+import xyz.apex.java.utility.nullness.MethodsReturnNonnullByDefault;
+import xyz.apex.java.utility.nullness.ParametersAreNonnullByDefault;
