@@ -171,6 +171,15 @@ repositories {
 				password = project.getProperty('apex_git_package_token')
 			}
 		}
+	} else if(System.getenv('GITHUB_TOKEN') != null) {
+		// github workflows have a different set of credentials
+		maven {
+			url = uri("https://maven.pkg.github.com/ApexModder/Registrator")
+			credentials {
+				username = System.getenv('GITHUB_ACTOR')
+				password = System.getenv('GITHUB_TOKEN')
+			}
+		}
 	}
 }
 
@@ -194,7 +203,7 @@ dependencies {
 		runtimeOnly fg.deobf('xyz.apex.forge:smoothboot:1.16.5-1.0.0')
 	}
 
-	if(project.hasProperty('apex_git_package_token')) {
+	if(project.hasProperty('apex_git_package_token') || System.getenv('GITHUB_TOKEN') != null) {
 		// we have access to Apex's GH Packages pull from there
 		compileOnly fg.deobf('xyz.apex.forge.utility.registrator:registrator-1.16.5:1.0.2')
 		runtimeOnly fg.deobf('xyz.apex.forge.utility.registrator:registrator-1.16.5:1.0.2')
