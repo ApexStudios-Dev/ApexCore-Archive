@@ -16,7 +16,7 @@ apply plugin: 'idea'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.1.1'
+version = '1.1.2'
 group = 'xyz.apex.forge.apexcore'
 archivesBaseName = 'ApexCore-1.16.5'
 
@@ -263,7 +263,7 @@ if(System.getenv('GITHUB_TOKEN') != null) {
 		publications {
 			gpr(MavenPublication) {
 				groupId = 'xyz.apex.forge'
-				artifactId = 'apexcore'
+				artifactId = 'apexcore-1.16.5'
 				version = "${project.version}"
 
 				artifact jar
