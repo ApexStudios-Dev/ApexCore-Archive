@@ -194,6 +194,9 @@ dependencies {
 	compileOnly fg.deobf('mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.1.4-22:api')
 	runtimeOnly fg.deobf('mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.1.4-22')
 
+	// Mixin AP
+	annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
+
 	// CurseForge
 	// https://www.cursemaven.com/ - Examples
 	// runtimeOnly fg.deobf('curse.maven:<mod_name>-<cf_project_id>:<cf_project_file_id>')
