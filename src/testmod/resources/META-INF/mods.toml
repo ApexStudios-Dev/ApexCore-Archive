@@ -34,6 +34,6 @@ description="TestMod"
 [[dependencies.testmod]]
     modId="registrator"
     mandatory=true
-    versionRange="[1.0.2,2.0.0]"
+    versionRange="[1.0.5,2.0.0]"
     ordering="NONE"
     side="BOTH"
