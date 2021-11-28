@@ -27,13 +27,13 @@ description="TestMod"
 [[dependencies.testmod]]
     modId="apexcore"
     mandatory=true
-    versionRange="[1.0.0,2.0.0]"
+    versionRange="[1.1.9,2.0.0]"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.testmod]]
     modId="registrator"
     mandatory=true
-    versionRange="[1.0.5,2.0.0]"
+    versionRange="[1.0.9,2.0.0]"
     ordering="NONE"
     side="BOTH"
