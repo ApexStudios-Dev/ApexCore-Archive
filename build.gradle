@@ -16,7 +16,7 @@ apply plugin: 'idea'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.1.5'
+version = '1.1.6'
 group = 'xyz.apex.forge.apexcore'
 archivesBaseName = 'ApexCore-1.16.5'
 
@@ -208,8 +208,8 @@ dependencies {
 
 	if(project.hasProperty('apex_git_package_token') || System.getenv('GITHUB_TOKEN') != null) {
 		// we have access to Apex's GH Packages pull from there
-		compileOnly fg.deobf('xyz.apex.forge.utility:registrator-1.16.5:1.0.5')
-		runtimeOnly fg.deobf('xyz.apex.forge.utility:registrator-1.16.5:1.0.5')
+		compileOnly fg.deobf('xyz.apex.forge.utility:registrator-1.16.5:1.0.6')
+		runtimeOnly fg.deobf('xyz.apex.forge.utility:registrator-1.16.5:1.0.6')
 	} else {
 		// we dont have access to Apex's GH Packages, pull from CurseForge
 		// TODO: Add registrator once its approved on curse forge
