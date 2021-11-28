@@ -16,7 +16,7 @@ apply plugin: 'idea'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.1.4'
+version = '1.1.5'
 group = 'xyz.apex.forge.apexcore'
 archivesBaseName = 'ApexCore-1.16.5'
 

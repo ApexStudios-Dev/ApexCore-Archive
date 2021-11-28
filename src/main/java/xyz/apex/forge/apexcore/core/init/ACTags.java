@@ -31,6 +31,7 @@ public final class ACTags
 	public static final class Blocks
 	{
 		public static final Tags.IOptionalNamedTag<Block> CROPS = REGISTRY.blockTagOptionalForge("crops");
+		public static final Tags.IOptionalNamedTag<Block> MUSHROOMS = REGISTRY.blockTagOptionalForge("mushrooms");
 
 		private static void bootstrap()
 		{
@@ -38,6 +39,10 @@ public final class ACTags
 				// region: Crops
 				provider.tag(CROPS);
 				provider.tag(BlockTags.CROPS).addTags(CROPS);
+				// endregion
+
+				// region: Mushrooms
+				provider.tag(MUSHROOMS).add(net.minecraft.block.Blocks.BROWN_MUSHROOM, net.minecraft.block.Blocks.RED_MUSHROOM);
 				// endregion
 			});
 		}
