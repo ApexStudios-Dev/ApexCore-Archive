@@ -22,6 +22,16 @@ jobs:
       - uses: olegtarasov/get-tag@v2.1
         id: tagName
 
+      # Setup caching
+      - uses: actions/cache@v2
+        id: cache-setup
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
       # Checkout repository, Validate Gradle Wrapper & Setup JDK
       - uses: actions/checkout@v2
       - uses: gradle/wrapper-validation-action@v1
@@ -30,6 +40,11 @@ jobs:
           distribution: adopt
           java-version: 8
       - run: chmod +x ./gradlew
+
+      # Disable MinecraftForge warning notice
+      - name: Disable MinecraftForge copyright notice
+        if: steps.cache-setup.outputs.cache-hit != 'true'
+        run: ./gradlew hideOfficialWarningUntilChanged
 
       # Build package
       - run: ./gradlew build
@@ -50,3 +65,13 @@ jobs:
           body: Auto-Generated GitHub Release - ${{ steps.tagName.outputs.tag }}
           name: ${{ steps.tagName.outputs.tag }}
           files: ./build/libs/*.jar
+
+      # TODO: Uncomment once approved on CurseForge
+      # Publish to CurseForge
+      # - run: ./gradlew curseforge
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+
+      # Kill gradlew deamon (caching requires gradle to not be running)
+      - run: ./gradlew --stop

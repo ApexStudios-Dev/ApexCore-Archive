@@ -10,13 +10,18 @@ buildscript {
 	}
 }
 
+// TODO: Uncomment once approved on CurseForge
+/*plugins {
+	id 'com.matthewprenger.cursegradle' version '1.4.0'
+}*/
+
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.1.9'
+version = '1.1.10'
 group = 'xyz.apex.forge.apexcore'
 archivesBaseName = 'ApexCore-1.16.5'
 
@@ -212,7 +217,8 @@ dependencies {
 		runtimeOnly fg.deobf('xyz.apex.forge.utility:registrator-1.16.5:1.0.9')
 	} else {
 		// we dont have access to Apex's GH Packages, pull from CurseForge
-		// TODO: Add registrator once its approved on curse forge
+		compileOnly fg.deobf('curse.maven:registrator-550146:3541261')
+		runtimeOnly fg.deobf('curse.maven:registrator-550146:3541261')
 	}
 }
 
@@ -285,3 +291,37 @@ if(System.getenv('GITHUB_TOKEN') != null) {
 		}
 	}
 }
+
+// TODO: Uncomment once approved on CurseForge
+/*
+if(project.hasProperty('apex_curse_gradle_token')) {
+	curseforge {
+		apiKey = project.getProperty('apex_curse_gradle_token')
+
+		project {
+			id = '550778'
+			releaseType = 'release'
+			addGameVersion '1.16.5'
+
+			mainArtifact jar
+			addArtifact deobfJar
+			addArtifact sourcesJar
+			addArtifact javadocJar
+		}
+	}
+} else if(System.getenv('CURSEFORGE_TOKEN') != null) {
+	curseforge {
+		apiKey = System.getenv('CURSEFORGE_TOKEN')
+
+		project {
+			id = '550778'
+			releaseType = 'release'
+			addGameVersion '1.16.5'
+
+			mainArtifact jar
+			addArtifact deobfJar
+			addArtifact sourcesJar
+			addArtifact javadocJar
+		}
+	}
+}*/
