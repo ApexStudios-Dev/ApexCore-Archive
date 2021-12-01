@@ -31,6 +31,6 @@ description="Utility mod for all of Apex's mods."
 [[dependencies.apexcore]]
     modId="registrator"
     mandatory=true
-    versionRange="[1.0.9,2.0.0]"
+    versionRange="[1.0.16,2.0.0]"
     ordering="NONE"
     side="BOTH"
