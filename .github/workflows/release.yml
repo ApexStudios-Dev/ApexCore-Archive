@@ -42,9 +42,9 @@ jobs:
       - run: chmod +x ./gradlew
 
       # Disable MinecraftForge warning notice
-      - name: Disable MinecraftForge copyright notice
-        if: steps.cache-setup.outputs.cache-hit != 'true'
-        run: ./gradlew hideOfficialWarningUntilChanged
+      # - name: Disable MinecraftForge copyright notice
+      #   if: steps.cache-setup.outputs.cache-hit != 'true'
+      #   run: ./gradlew hideOfficialWarningUntilChanged
 
       # Build package
       - run: ./gradlew build
