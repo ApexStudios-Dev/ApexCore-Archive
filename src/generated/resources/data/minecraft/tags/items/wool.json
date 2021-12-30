@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "#forge:wools",
+    "#forge:wools/white",
+    "#forge:wools/orange",
+    "#forge:wools/magenta",
+    "#forge:wools/light_blue",
+    "#forge:wools/yellow",
+    "#forge:wools/lime",
+    "#forge:wools/pink",
+    "#forge:wools/gray",
+    "#forge:wools/light_gray",
+    "#forge:wools/cyan",
+    "#forge:wools/purple",
+    "#forge:wools/blue",
+    "#forge:wools/brown",
+    "#forge:wools/green",
+    "#forge:wools/red",
+    "#forge:wools/black"
+  ]
+}
