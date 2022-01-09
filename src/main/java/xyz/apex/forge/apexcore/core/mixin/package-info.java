@@ -1,5 +1,5 @@
 @MethodsReturnNonnullByDefault @ParametersAreNonnullByDefault @FieldsAreNonnullByDefault
-package xyz.apex.forge.testmod.init;
+package xyz.apex.forge.apexcore.core.mixin;
 
 import xyz.apex.java.utility.nullness.FieldsAreNonnullByDefault;
 import xyz.apex.java.utility.nullness.MethodsReturnNonnullByDefault;

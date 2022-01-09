@@ -1,75 +1,48 @@
 buildscript {
 	repositories {
-		maven { url = 'https://sizableshrimp.me/maven' }
-		maven { url = 'https://maven.minecraftforge.net/' }
+		maven { url = 'https://maven.minecraftforge.net' }
+		maven { url = 'https://maven.parchmentmc.org' }
 		maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
 		mavenCentral()
 	}
 	dependencies {
-		// classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
-		classpath group: 'me.sizableshrimp.parchmenttest', name: 'ForgeGradle', version: '4.1.+', changing: true
-		classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: "${forge_gradle_version}", changing: true
+		classpath 'org.parchmentmc:librarian:1.+'
+		classpath "org.spongepowered:mixingradle:${mixin_gradle_version}"
 	}
 }
 
-// TODO: Uncomment once approved on CurseForge
-/*plugins {
-	id 'com.matthewprenger.cursegradle' version '1.4.0'
-}*/
-
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
+apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'maven-publish'
-apply plugin: 'org.spongepowered.mixin'
 
-version = '1.1.12'
-group = 'xyz.apex.forge.apexcore'
-archivesBaseName = 'ApexCore-1.16.5'
+version = "${minecraft_version}-${mod_version}"
+group = "${mod_base_package}.${mod_id}"
+archivesBaseName = "${mod_id}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
-sourceSets {
-	testmod {
-		compileClasspath += sourceSets.main.output
-		runtimeClasspath += sourceSets.main.output
-
-		java {
-			srcDir 'src/testmod/java'
-		}
-
-		resources {
-			srcDir 'src/testmod/resources'
-		}
-	}
-}
-
-configurations {
-	testmodCompile.extendsFrom(compile)
-	testmodCompileOnly.extendsFrom(compileOnly)
-	testmodRuntimeOnly.extendsFrom(runtimeOnly)
-}
-
 minecraft {
-	// mappings channel: 'official', version: '1.16.5'
-	mappings channel: 'parchment', version: '2021.10.17-1.16.5'
-	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+	mappings channel: "${mappings_channel}", version: "${mappings_version}"
+	accessTransformer = file('src/main/resources/META-INF/accessTransformer.cfg')
 
 	runs {
 		client {
 			taskName 'Client'
 			workingDirectory project.file('run/client')
+			// property 'forge.logging.markers', 'REGISTRIES'
+			// property 'forge.logging.console.level', 'debug'
 			property 'fml.earlyprogresswindow', 'false'
-			property 'mixin.env.disableRefMap', 'true'
-			property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-			args '-mixin.config=apexcore.mixins.json'
 
 			if(project.hasProperty('mc_uuid') & project.hasProperty('mc_username')) {
 				args '--uuid', project.getProperty('mc_uuid'), '--username', project.getProperty('mc_username')
 			}
 
 			mods {
-				ApexCore {
+				"${mod_id}" {
 					source sourceSets.main
 				}
 			}
@@ -78,13 +51,13 @@ minecraft {
 		server {
 			taskName 'Server'
 			workingDirectory project.file('run/server')
+			// property 'forge.logging.markers', 'REGISTRIES'
+			// property 'forge.logging.console.level', 'debug'
 			property 'fml.earlyprogresswindow', 'false'
-			property 'mixin.env.disableRefMap', 'true'
-			property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-			args 'nogui', '-mixin.config=apexcore.mixins.json'
+			args 'nogui'
 
 			mods {
-				ApexCore {
+				"${mod_id}" {
 					source sourceSets.main
 				}
 			}
@@ -92,57 +65,15 @@ minecraft {
 
 		data {
 			taskName 'Data'
-			workingDirectory project.file('run/data')
+			workingDirectory project.file('run/client')
+			// property 'forge.logging.markers', 'REGISTRIES'
+			// property 'forge.logging.console.level', 'debug'
 			property 'fml.earlyprogresswindow', 'false'
-			property 'mixin.env.disableRefMap', 'true'
-			property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-			args '-mixin.config=apexcore.mixins.json', '--mod', 'apexcore', '--client', '--server', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+			args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
 			mods {
-				ApexCore {
+				"${mod_id}" {
 					source sourceSets.main
-				}
-			}
-		}
-
-		testClient {
-			parent runs.client
-			taskName 'Client-TestMod'
-			ideaModule "${project.name}.testmod"
-
-			if(project.hasProperty('mc_uuid') & project.hasProperty('mc_username')) {
-				args '--uuid', project.getProperty('mc_uuid'), '--username', project.getProperty('mc_username')
-			}
-
-			mods {
-				TestMod {
-					source sourceSets.testmod
-				}
-			}
-		}
-
-		testServer {
-			parent runs.server
-			taskName 'Server-TestMod'
-			ideaModule "${project.name}.testmod"
-			args 'nogui', '-mixin.config=apexcore.mixins.json'
-
-			mods {
-				TestMod {
-					source sourceSets.testmod
-				}
-			}
-		}
-
-		testData {
-			parent runs.data
-			taskName 'Data-TestMod'
-			ideaModule "${project.name}.testmod"
-			args '-mixin.config=apexcore.mixins.json', '--mod', 'testmod', '--client', '--server', '--output', file('src/generated-testmod/resources/'), '--existing', file('src/testmod/resources/'), '--existing-mod', 'apexcore'
-
-			mods {
-				TestMod {
-					source sourceSets.testmod
 				}
 			}
 		}
@@ -150,21 +81,23 @@ minecraft {
 }
 
 mixin {
-	add sourceSets.main, 'apexcore.refmap.json'
+	add sourceSets.main, "${mod_id}.refmap.json"
+	config "${mod_id}.mixins.json"
+
+	debug = true
+	debug.export = true
+	hotSwap = true
 }
 
 sourceSets.main.resources {
 	srcDir 'src/generated/resources'
 }
 
-sourceSets.testmod.resources {
-	srcDir 'src/generated-testmod/resources'
-}
-
 repositories {
 	mavenLocal() // Local Deps
 	maven { url 'https://dvs1.progwml6.com/files/maven' } // JEI
 	maven { url 'https://maven.tterrag.com/' } // TOP
+	
 	maven { // CurseForge
 		url 'https://cursemaven.com'
 		content { includeGroup 'curse.maven' }
@@ -192,36 +125,91 @@ repositories {
 }
 
 dependencies {
-	minecraft 'net.minecraftforge:forge:1.16.5-36.2.5'
+	minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
 	// JEI
-	compileOnly fg.deobf('mezz.jei:jei-1.16.5:7.6.4.90:api')
-	runtimeOnly fg.deobf('mezz.jei:jei-1.16.5:7.6.4.90')
+	compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}:api")
+	runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")
 
 	// TOP
-	compileOnly fg.deobf('mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.1.4-22:api')
-	runtimeOnly fg.deobf('mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.1.4-22')
-
-	// Mixin AP
-	annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
+	compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-${minecraft_version_short}:${minecraft_version_short}-${top_version}:api")
+	runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-${minecraft_version_short}:${minecraft_version_short}-${top_version}")
 
 	// CurseForge
 	// https://www.cursemaven.com/ - Examples
 	// runtimeOnly fg.deobf('curse.maven:<mod_name>-<cf_project_id>:<cf_project_file_id>')
 
+	// Mixin AP
+	annotationProcessor "org.spongepowered:mixin:${mixin_ap_version}:processor"
+
 	if(project.hasProperty('apex_local_deps') && project.getProperty('apex_local_deps')) {
 		// runtimeOnly fg.deobf('xyz.apex.forge:devworld:1.16.5-2.0.0')
-		runtimeOnly fg.deobf('xyz.apex.forge:smoothboot:1.16.5-1.0.0')
+		runtimeOnly fg.deobf("xyz.apex.forge:smoothboot:${minecraft_version}-${smooth_boot_version}")
 	}
 
 	if(project.hasProperty('apex_git_package_token') || System.getenv('GITHUB_TOKEN') != null) {
 		// we have access to Apex's GH Packages pull from there
-		compileOnly fg.deobf('xyz.apex.forge.utility:registrator-1.16.5:1.0.16')
-		runtimeOnly fg.deobf('xyz.apex.forge.utility:registrator-1.16.5:1.0.16')
+		compileOnly fg.deobf("xyz.apex.forge.utility:registrator-${minecraft_version}:${registrator_version}")
+		runtimeOnly fg.deobf("xyz.apex.forge.utility:registrator-${minecraft_version}:${registrator_version}")
 	} else {
 		// we dont have access to Apex's GH Packages, pull from CurseForge
-		compileOnly fg.deobf('curse.maven:registrator-550146:3543232')
-		runtimeOnly fg.deobf('curse.maven:registrator-550146:3543232')
+		compileOnly fg.deobf("curse.maven:registrator-${registrator_cf_project}:${registrator_cf_file}")
+		runtimeOnly fg.deobf("curse.maven:registrator-${registrator_cf_project}:${registrator_cf_file}")
+	}
+}
+
+def resourceTargets = [ 'META-INF/mods.toml', 'pack.mcmeta', "${mod_id}.mixins.json".toString() ]
+def intoTargets = [ "${rootDir}/out/production/resources/", "${rootDir}/out/production/${project.name}.main/", "${rootDir}/bin/main/" ]
+def replaceProperties = [
+	minecraft_version: minecraft_version,
+	minecraft_version_range: minecraft_version_range,
+	minecraft_version_short: minecraft_version_short,
+		
+	forge_version: forge_version,
+	forge_version_range: forge_version_range,
+	forge_gradle_version: forge_gradle_version,
+
+	mixin_gradle_version: mixin_gradle_version,
+	mixin_ap_version: mixin_ap_version,
+	
+	mappings_channel: mappings_channel,
+	mappings_version: mappings_version,
+	
+	mod_id: mod_id,
+	mod_name: mod_name,
+	mod_version: mod_version,
+	mod_base_package: mod_base_package,
+	mod_authors: mod_authors,
+
+	registrator_version: registrator_version,
+	registrator_version_range: registrator_version_range,
+	registrator_cf_project: registrator_cf_project,
+	registrator_cf_file: registrator_cf_file,
+	
+	jei_version: jei_version,
+	top_version: top_version,
+	smooth_boot_version: smooth_boot_version
+]
+
+processResources {
+	inputs.properties replaceProperties
+	replaceProperties.put 'project', project
+
+	filesMatching(resourceTargets) {
+		expand replaceProperties
+	}
+
+	intoTargets.each { target ->
+		if(file(target).exists()) {
+			copy{
+				from(sourceSets.main.resources) {
+					include resourceTargets
+					expand replaceProperties
+				}
+
+				into target
+			}
+		}
 	}
 }
 
@@ -255,27 +243,27 @@ artifacts {
 tasks.withType(Jar) {
 	manifest {
 		attributes([
-				'Specification-Title': 'ApexCore',
-				'Specification-Vendor': 'Apex',
-				'Specification-Version': '1',
-				'Implementation-Title': 'ApexCore',
+				'Specification-Title': "${mod_name}",
+				'Specification-Vendor': "${mod_authors}",
+				'Specification-Version': "${mod_version}",
+				'Implementation-Title': "${mod_name}",
 				'Implementation-Version': "${project.version}",
-				'Implementation-Vendor' : 'Apex',
+				'Implementation-Vendor' : "${mod_authors}",
 				'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-				'MixinConfigs': 'apexcore.mixins.json'
+				'MixinConfigs': "${mod_id}.mixins.json"
 		])
 	}
 }
 
-jar.finalizedBy('reobfJar')
+jar.finalizedBy('reobfJar') 
 
 if(System.getenv('GITHUB_TOKEN') != null) {
 	publishing {
 		publications {
 			gpr(MavenPublication) {
-				groupId = 'xyz.apex.forge'
-				artifactId = 'apexcore-1.16.5'
-				version = "${project.version}"
+				groupId = "${mod_base_package}"
+				artifactId = "${mod_id}"
+				version = "${minecraft_version}-${mod_version}"
 
 				artifact jar
 				artifact sourcesJar
@@ -297,16 +285,15 @@ if(System.getenv('GITHUB_TOKEN') != null) {
 	}
 }
 
-// TODO: Uncomment once approved on CurseForge
 /*
 if(project.hasProperty('apex_curse_gradle_token')) {
 	curseforge {
 		apiKey = project.getProperty('apex_curse_gradle_token')
 
 		project {
-			id = '550778'
+			id = "${mod_curseforge_id}"
 			releaseType = 'release'
-			addGameVersion '1.16.5'
+			addGameVersion "${minecraft_version}"
 
 			mainArtifact jar
 			addArtifact deobfJar
@@ -319,9 +306,9 @@ if(project.hasProperty('apex_curse_gradle_token')) {
 		apiKey = System.getenv('CURSEFORGE_TOKEN')
 
 		project {
-			id = '550778'
+			id = "${mod_curseforge_id}"
 			releaseType = 'release'
-			addGameVersion '1.16.5'
+			addGameVersion "${minecraft_version}"
 
 			mainArtifact jar
 			addArtifact deobfJar

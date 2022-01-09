@@ -1,36 +1,34 @@
 modLoader="javafml"
-loaderVersion="[36,)"
-license="GNU"
-issueTrackerURL="https://github.com/ApexModder/ApexCore/issues"
+loaderVersion="${forge_version_range}"
+license="All rights reserved"
 
 [[mods]]
-modId="apexcore"
-version="${file.jarVersion}"
-displayName="ApexCore"
-updateJSONURL="https://raw.githubusercontent.com/ApexModder/Version/master/apexcore.json"
-# displayURL="https://www.curseforge.com/minecraft/mc-mods/apexcore"
-# logoFile="logo.png"
-credits="Apex - Programming"
-authors="Apex"
-description="Utility mod for all of Apex's mods."
+	modId="${mod_id}"
+	version="${mod_version}"
+	displayName="${mod_name}"
+	# updateJSONURL=""
+	# displayURL=""
+	# logoFile=""
+	# credits=""
+	authors="${mod_authors}"
+	description=""
 
-[[dependencies.apexcore]]
-    modId="forge"
-    mandatory=true
-    versionRange="[36,)"
-    ordering="NONE"
-    side="BOTH"
+[[dependencies.${mod_id}]]
+	modId="forge"
+	mandatory=true
+	versionRange="${forge_version_range}"
+	ordering="NONE"
+	side="BOTH"
+[[dependencies.${mod_id}]]
+	modId="minecraft"
+	mandatory=true
+	versionRange="${minecraft_version_range}"
+	ordering="NONE"
+	side="BOTH"
 
-[[dependencies.apexcore]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="[1.16.5,1.17]"
-    ordering="NONE"
-    side="BOTH"
-
-[[dependencies.apexcore]]
+[[dependencies.${mod_id}]]
     modId="registrator"
     mandatory=true
-    versionRange="[1.0.16,2.0.0]"
+    versionRange="${registrator_version_range}"
     ordering="NONE"
     side="BOTH"
