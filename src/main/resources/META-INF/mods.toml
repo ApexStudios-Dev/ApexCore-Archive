@@ -1,17 +1,18 @@
 modLoader="javafml"
 loaderVersion="${forge_version_range}"
 license="All rights reserved"
+issueTrackerURL="https://github.com/ApexModder/ApexCore/issues"
 
 [[mods]]
 	modId="${mod_id}"
 	version="${mod_version}"
 	displayName="${mod_name}"
-	# updateJSONURL=""
+	updateJSONURL="https://raw.githubusercontent.com/ApexModder/Version/master/apexcore.json"
 	# displayURL=""
 	# logoFile=""
-	# credits=""
+	credits="Apex - Programming"
 	authors="${mod_authors}"
-	description=""
+	description="Utility mod for all of Apex's mods."
 
 [[dependencies.${mod_id}]]
 	modId="forge"
