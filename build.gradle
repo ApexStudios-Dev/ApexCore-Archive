@@ -193,7 +193,8 @@ def replaceProperties = [
 	registrator_version_range: registrator_version_range,
 	registrator_cf_project: registrator_cf_project,
 	registrator_cf_file: registrator_cf_file,
-	
+
+	cursegradle_version: cursegradle_version,
 	jei_version: jei_version,
 	top_version: top_version,
 	smooth_boot_version: smooth_boot_version
