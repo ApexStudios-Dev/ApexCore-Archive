@@ -187,6 +187,7 @@ def replaceProperties = [
 	mod_version: mod_version,
 	mod_base_package: mod_base_package,
 	mod_authors: mod_authors,
+	mod_curseforge_id: mod_curseforge_id,
 
 	registrator_version: registrator_version,
 	registrator_version_range: registrator_version_range,
@@ -305,6 +306,10 @@ if(project.hasProperty('apex_curse_gradle_token')) {
 			addArtifact deobfJar
 			addArtifact sourcesJar
 			addArtifact javadocJar
+
+			relations {
+				requiredDependency 'registrator'
+			}
 		}
 	}
 } else if(System.getenv('CURSEFORGE_TOKEN') != null) {
@@ -320,6 +325,10 @@ if(project.hasProperty('apex_curse_gradle_token')) {
 			addArtifact deobfJar
 			addArtifact sourcesJar
 			addArtifact javadocJar
+
+			relations {
+				requiredDependency 'registrator'
+			}
 		}
 	}
 }
