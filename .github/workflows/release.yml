@@ -72,8 +72,8 @@ jobs:
           files: ./build/libs/*.jar
 
       # Publish to CurseForge
-       - run: ./gradlew curseforge
-         env:
+      - run: ./gradlew curseforge
+        env:
            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
            CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
 
