@@ -12,6 +12,10 @@ buildscript {
 	}
 }
 
+plugins {
+	id 'com.matthewprenger.cursegradle' version "${cursegradle_version}"
+}
+
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
@@ -288,7 +292,6 @@ if(System.getenv('GITHUB_TOKEN') != null) {
 	}
 }
 
-/*
 if(project.hasProperty('apex_curse_gradle_token')) {
 	curseforge {
 		apiKey = project.getProperty('apex_curse_gradle_token')
@@ -319,4 +322,4 @@ if(project.hasProperty('apex_curse_gradle_token')) {
 			addArtifact javadocJar
 		}
 	}
-}*/
+}
