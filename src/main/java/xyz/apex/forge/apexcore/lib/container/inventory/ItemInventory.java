@@ -2,10 +2,10 @@ package xyz.apex.forge.apexcore.lib.container.inventory;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.util.Constants;
 
 import xyz.apex.forge.apexcore.lib.constants.NbtNames;
 
@@ -30,7 +30,7 @@ public class ItemInventory extends SimpleContainer
 
 			if(invTag != null)
 			{
-				var slotTag = invTag.getList(NbtNames.ITEMS, Constants.NBT.TAG_COMPOUND);
+				var slotTag = invTag.getList(NbtNames.ITEMS, Tag.TAG_COMPOUND);
 
 				for(var i = 0; i < slotTag.size(); i++)
 				{
