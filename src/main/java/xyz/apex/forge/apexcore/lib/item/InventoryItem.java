@@ -11,21 +11,21 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fmllegacy.network.NetworkHooks;
+import net.minecraftforge.network.NetworkHooks;
 
-import xyz.apex.forge.apexcore.lib.container.ItemInventoryContainer;
-import xyz.apex.forge.apexcore.lib.container.inventory.ItemInventory;
+import xyz.apex.forge.apexcore.lib.container.ItemInventoryMenu;
+import xyz.apex.forge.apexcore.lib.container.inventory.ItemContainer;
 
-public abstract class InventoryItem<C extends ItemInventoryContainer> extends Item
+public abstract class InventoryItem<C extends ItemInventoryMenu> extends Item
 {
 	public InventoryItem(Properties properties)
 	{
 		super(properties);
 	}
 
-	protected abstract MenuType<C> getContainerType();
-	protected abstract ItemInventory createInventory(ItemStack stack);
-	protected abstract C createContainer(MenuType<C> containerType, int windowId, Inventory playerInventory, ItemInventory inventory);
+	protected abstract MenuType<C> getMenuType();
+	protected abstract ItemContainer createMenu(ItemStack stack);
+	protected abstract C createMenu(MenuType<C> menuType, int windowId, Inventory playerInventory, ItemContainer container);
 
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand)
@@ -43,7 +43,7 @@ public abstract class InventoryItem<C extends ItemInventoryContainer> extends It
 
 	protected boolean openContainerScreen(Level level, ServerPlayer player, InteractionHand hand, ItemStack stack, Component titleComponent)
 	{
-		NetworkHooks.openGui(player, new SimpleMenuProvider((windowId, playerInventory, plr) -> createContainer(getContainerType(), windowId, playerInventory, createInventory(stack)), titleComponent));
+		NetworkHooks.openGui(player, new SimpleMenuProvider((windowId, playerInventory, plr) -> createMenu(getMenuType(), windowId, playerInventory, createMenu(stack)), titleComponent));
 		return true;
 	}
 }

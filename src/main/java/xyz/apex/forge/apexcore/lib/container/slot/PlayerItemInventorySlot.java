@@ -4,32 +4,32 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-import xyz.apex.forge.apexcore.lib.container.inventory.ItemInventory;
+import xyz.apex.forge.apexcore.lib.container.inventory.ItemContainer;
 
 public class PlayerItemInventorySlot extends PlayerInventorySlot
 {
-	protected final ItemInventory itemInventory;
+	protected final ItemContainer itemContainer;
 
-	public PlayerItemInventorySlot(Inventory playerInventory, ItemInventory itemInventory, int slotIndex, int slotX, int slotY, boolean allowOtherPlayerInteraction)
+	public PlayerItemInventorySlot(Inventory playerInventory, ItemContainer itemContainer, int slotIndex, int slotX, int slotY, boolean allowOtherPlayerInteraction)
 	{
 		super(playerInventory, slotIndex, slotX, slotY, allowOtherPlayerInteraction);
 
-		this.itemInventory = itemInventory;
+		this.itemContainer = itemContainer;
 	}
 
-	public PlayerItemInventorySlot(Inventory playerInventory, ItemInventory itemInventory, int slotIndex, int slotX, int slotY)
+	public PlayerItemInventorySlot(Inventory playerInventory, ItemContainer itemContainer, int slotIndex, int slotX, int slotY)
 	{
-		this(playerInventory, itemInventory, slotIndex, slotX, slotY, false);
+		this(playerInventory, itemContainer, slotIndex, slotX, slotY, false);
 	}
 
-	public ItemInventory getItemInventory()
+	public ItemContainer getItemContainer()
 	{
-		return itemInventory;
+		return itemContainer;
 	}
 
 	public ItemStack getContainerItem()
 	{
-		return itemInventory.getContainerItem();
+		return itemContainer.getContainerItem();
 	}
 
 	public boolean isContainerItem(ItemStack stack)

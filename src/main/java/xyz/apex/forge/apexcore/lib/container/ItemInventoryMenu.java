@@ -5,58 +5,58 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 
-import xyz.apex.forge.apexcore.lib.container.inventory.ItemInventory;
+import xyz.apex.forge.apexcore.lib.container.inventory.ItemContainer;
 
 import javax.annotation.Nullable;
 
-public class ItemInventoryContainer extends BaseContainer
+public class ItemInventoryMenu extends BaseMenu
 {
-	protected final ItemInventory itemInventory;
+	protected final ItemContainer itemContainer;
 
-	public ItemInventoryContainer(@Nullable MenuType<?> containerType, int windowId, Inventory playerInventory, ItemInventory itemInventory)
+	public ItemInventoryMenu(@Nullable MenuType<?> menuType, int windowId, Inventory playerInventory, ItemContainer itemContainer)
 	{
-		super(containerType, windowId, playerInventory);
+		super(menuType, windowId, playerInventory);
 
-		this.itemInventory = itemInventory;
+		this.itemContainer = itemContainer;
 
 		addSlots();
 		addPlayerSlots();
-		itemInventory.startOpen(playerInventory.player);
+		itemContainer.startOpen(playerInventory.player);
 	}
 
 	protected void addSlots()
 	{
-		super.addContainerSlots();
+		super.addMenuSlots();
 	}
 
 	protected void addPlayerSlots()
 	{
-		super.addPlayerInventorySlots();
+		super.addPlayerMenuSlots();
 	}
 
 	/**
 	 * @deprecated use {@link #addSlots()}
 	 */
 	@Override @Deprecated
-	protected final void addContainerSlots() { }
+	protected final void addMenuSlots() { }
 
 	/**
 	 * @deprecated use {@link #addSlots()}
 	 */
 	@Override @Deprecated
-	protected final void addPlayerInventorySlots() { }
+	protected final void addPlayerMenuSlots() { }
 
 	@Override
 	public boolean stillValid(Player player)
 	{
-		return itemInventory.stillValid(player);
+		return itemContainer.stillValid(player);
 	}
 
 	@Override
 	public void removed(Player player)
 	{
 		super.removed(player);
-		itemInventory.stopOpen(player);
+		itemContainer.stopOpen(player);
 	}
 
 	@Override
@@ -70,12 +70,12 @@ public class ItemInventoryContainer extends BaseContainer
 			var slotStack = slot.getItem();
 			result = slotStack.copy();
 
-			if(slotIndex < itemInventory.getContainerSize())
+			if(slotIndex < itemContainer.getContainerSize())
 			{
-				if(!moveItemStackTo(slotStack, itemInventory.getContainerSize(), slots.size(), true))
+				if(!moveItemStackTo(slotStack, itemContainer.getContainerSize(), slots.size(), true))
 					return ItemStack.EMPTY;
 			}
-			else if(!moveItemStackTo(slotStack, 0, itemInventory.getContainerSize(), false))
+			else if(!moveItemStackTo(slotStack, 0, itemContainer.getContainerSize(), false))
 				return ItemStack.EMPTY;
 
 			if(slotStack.isEmpty())

@@ -10,22 +10,22 @@ import xyz.apex.forge.apexcore.lib.container.slot.PlayerInventorySlot;
 
 import javax.annotation.Nullable;
 
-public class BaseContainer extends AbstractContainerMenu
+public class BaseMenu extends AbstractContainerMenu
 {
 	protected final Player opener;
 
-	protected BaseContainer(@Nullable MenuType<?> containerType, int windowId, Inventory playerInventory)
+	protected BaseMenu(@Nullable MenuType<?> containerType, int windowId, Inventory playerInventory)
 	{
 		super(containerType, windowId);
 
 		opener = playerInventory.player;
-		addContainerSlots();
-		addPlayerInventorySlots();
+		addMenuSlots();
+		addPlayerMenuSlots();
 	}
 
-	protected void addContainerSlots() { }
+	protected void addMenuSlots() { }
 
-	protected void addPlayerInventorySlots()
+	protected void addPlayerMenuSlots()
 	{
 		// main inventory
 		for(var i = 0; i < 3; i++)
