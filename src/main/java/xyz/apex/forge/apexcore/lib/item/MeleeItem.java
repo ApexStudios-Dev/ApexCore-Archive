@@ -1,15 +1,15 @@
 package xyz.apex.forge.apexcore.lib.item;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.item.IItemTier;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.SwordItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.level.block.state.BlockState;
 
 // Simple generic sword item that does not
 // break any blocks faster than a fist
 public class MeleeItem extends SwordItem
 {
-	public MeleeItem(Properties properties, int baseAttackDamage, float attackSpeed, IItemTier itemTier)
+	public MeleeItem(Properties properties, int baseAttackDamage, float attackSpeed, Tier itemTier)
 	{
 		super(itemTier, baseAttackDamage, attackSpeed, properties);
 	}

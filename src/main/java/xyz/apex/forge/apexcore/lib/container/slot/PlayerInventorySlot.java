@@ -1,24 +1,24 @@
 package xyz.apex.forge.apexcore.lib.container.slot;
 
-import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.world.entity.player.Inventory;
 
 public class PlayerInventorySlot extends BaseSlot
 {
-	protected final PlayerInventory playerInventory;
+	protected final Inventory playerInventory;
 
-	public PlayerInventorySlot(PlayerInventory playerInventory, int slotIndex, int slotX, int slotY, boolean allowOtherPlayerInteraction)
+	public PlayerInventorySlot(Inventory playerInventory, int slotIndex, int slotX, int slotY, boolean allowOtherPlayerInteraction)
 	{
 		super(playerInventory, playerInventory.player, slotIndex, slotX, slotY, allowOtherPlayerInteraction);
 
 		this.playerInventory = playerInventory;
 	}
 
-	public PlayerInventorySlot(PlayerInventory playerInventory, int slotIndex, int slotX, int slotY)
+	public PlayerInventorySlot(Inventory playerInventory, int slotIndex, int slotX, int slotY)
 	{
 		this(playerInventory, slotIndex, slotX, slotY, false);
 	}
 
-	public PlayerInventory getPlayerInventory()
+	public Inventory getPlayerInventory()
 	{
 		return playerInventory;
 	}

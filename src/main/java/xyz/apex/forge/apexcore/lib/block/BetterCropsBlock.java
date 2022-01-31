@@ -1,35 +1,34 @@
 package xyz.apex.forge.apexcore.lib.block;
 
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.CropsBlock;
-import net.minecraft.item.Item;
-import net.minecraft.state.Property;
-import net.minecraft.state.StateContainer;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.Property;
 
 import xyz.apex.java.utility.Lazy;
 
 import javax.annotation.Nullable;
 
 /**
- * Fixes the following issues with the base {@link CropsBlock} class
+ * Fixes the following issues with the base {@link CropBlock} class
  * <ul>
- * <li>Using incorrect {@link Property} during {@link #createBlockStateDefinition(StateContainer.Builder)}</li>
+ * <li>Using incorrect {@link Property} during {@link #createBlockStateDefinition(StateDefinition.Builder)}</li>
  * <li>Obtaining correct max age during {@link #getMaxAge()}</li>
  * <li>Allowing base seed item to be overridden</li>
  * </ul>
  */
-public class BetterCropsBlock extends CropsBlock
+public class BetterCropsBlock extends CropBlock
 {
-	@Nullable protected final IItemProvider baseSeedItem;
+	@Nullable protected final ItemLike baseSeedItem;
 	private final Lazy<Item> lazySeedItem; // we use a lazy value so that #getBaseSeedIdRaw is only ever called once
 
 	/**
 	 * @param baseSeedItem Null to use block item as seed item
 	 */
-	public BetterCropsBlock(AbstractBlock.Properties properties, @Nullable IItemProvider baseSeedItem)
+	public BetterCropsBlock(Properties properties, @Nullable ItemLike baseSeedItem)
 	{
 		super(properties);
 
@@ -37,7 +36,7 @@ public class BetterCropsBlock extends CropsBlock
 		lazySeedItem = Lazy.of(() -> getBaseSeedIdRaw().asItem());
 	}
 
-	public BetterCropsBlock(AbstractBlock.Properties properties)
+	public BetterCropsBlock(Properties properties)
 	{
 		this(properties, null);
 	}
@@ -49,7 +48,7 @@ public class BetterCropsBlock extends CropsBlock
 		if(baseSeedItem == null)
 			return asItem();
 
-		Item result = baseSeedItem.asItem();
+		var result = baseSeedItem.asItem();
 
 		// overridden type gave us null
 		// use Items#SEEDS (from CropsBlock)
@@ -61,7 +60,7 @@ public class BetterCropsBlock extends CropsBlock
 	}
 
 	@Override
-	protected IItemProvider getBaseSeedId()
+	protected ItemLike getBaseSeedId()
 	{
 		// allow the base seed item to be overridden
 		// CropsBlock just uses Items#SEEDS
@@ -79,7 +78,7 @@ public class BetterCropsBlock extends CropsBlock
 	}
 
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder)
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
 	{
 		builder.add(getAgeProperty()); // CropsBlock uses AGE_7 this fixes that to use the correct age property
 	}

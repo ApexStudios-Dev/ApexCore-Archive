@@ -3,10 +3,12 @@ package xyz.apex.forge.apexcore.lib.util.reflection;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import cpw.mods.modlauncher.api.INameMappingService;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+
 import xyz.apex.forge.apexcore.core.ApexCore;
 
 import javax.annotation.Nullable;
@@ -51,7 +53,7 @@ public class FieldHelper
 
 		try
 		{
-			Field field = findField(classToAccess, fieldName);
+			var field = findField(classToAccess, fieldName);
 			return (E) field.get(instance);
 		}
 		catch(UnableToFindFieldException e)
@@ -102,7 +104,7 @@ public class FieldHelper
 
 		try
 		{
-			Field field = classToAccess.getDeclaredField(fieldName);
+			var field = classToAccess.getDeclaredField(fieldName);
 			field.setAccessible(true);
 			return field;
 		}
@@ -129,9 +131,9 @@ public class FieldHelper
 
 		try
 		{
-			Field field = findField(classToAccess, fieldName);
+			var field = findField(classToAccess, fieldName);
 			// removeFinalModifier(field);
-			E oldValue = (E) field.get(instance);
+			var oldValue = (E) field.get(instance);
 			field.set(instance, newValue);
 			return oldValue;
 		}
@@ -152,7 +154,7 @@ public class FieldHelper
 	public static String getObfuscatedFieldName(Fields field)
 	{
 		Validate.notNull(field, "Field cannot be null");
-		String fieldName = field.getFieldNameRaw();
+		var fieldName = field.getFieldNameRaw();
 
 		if(field.isObfuscated())
 			return getObfuscatedFieldName(fieldName);
@@ -179,7 +181,7 @@ public class FieldHelper
 
 		try
 		{
-			Field field = findField(classToAccess, fieldName);
+			var field = findField(classToAccess, fieldName);
 			removeFinalModifier(field);
 		}
 		catch(UnableToFindFieldException e)
@@ -195,7 +197,7 @@ public class FieldHelper
 
 		try
 		{
-			int modifiers = field.getModifiers();
+			var modifiers = field.getModifiers();
 
 			if(Modifier.isFinal(modifiers))
 				MODIFIERS.setInt(field, modifiers & ~Modifier.FINAL);

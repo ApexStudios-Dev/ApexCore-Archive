@@ -1,17 +1,18 @@
 package xyz.apex.forge.apexcore.lib.item;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.SimpleNamedContainerProvider;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
+
 import xyz.apex.forge.apexcore.lib.container.ItemInventoryContainer;
 import xyz.apex.forge.apexcore.lib.container.inventory.ItemInventory;
 
@@ -22,27 +23,27 @@ public abstract class InventoryItem<C extends ItemInventoryContainer> extends It
 		super(properties);
 	}
 
-	protected abstract ContainerType<C> getContainerType();
+	protected abstract MenuType<C> getContainerType();
 	protected abstract ItemInventory createInventory(ItemStack stack);
-	protected abstract C createContainer(ContainerType<C> containerType, int windowId, PlayerInventory playerInventory, ItemInventory inventory);
+	protected abstract C createContainer(MenuType<C> containerType, int windowId, Inventory playerInventory, ItemInventory inventory);
 
 	@Override
-	public ActionResult<ItemStack> use(World level, PlayerEntity player, Hand hand)
+	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand)
 	{
-		ItemStack stack = player.getItemInHand(hand);
+		var stack = player.getItemInHand(hand);
 
-		if(player instanceof ServerPlayerEntity)
+		if(player instanceof ServerPlayer serverPlayer)
 		{
-			if(!openContainerScreen(level, (ServerPlayerEntity) player, hand, stack, stack.getHoverName()))
-				return ActionResult.pass(stack);
+			if(!openContainerScreen(level, serverPlayer, hand, stack, stack.getHoverName()))
+				return InteractionResultHolder.pass(stack);
 		}
 
-		return ActionResult.sidedSuccess(stack, level.isClientSide);
+		return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
 	}
 
-	protected boolean openContainerScreen(World level, ServerPlayerEntity player, Hand hand, ItemStack stack, ITextComponent titleComponent)
+	protected boolean openContainerScreen(Level level, ServerPlayer player, InteractionHand hand, ItemStack stack, Component titleComponent)
 	{
-		NetworkHooks.openGui(player, new SimpleNamedContainerProvider((windowId, playerInventory, plr) -> createContainer(getContainerType(), windowId, playerInventory, createInventory(stack)), titleComponent));
+		NetworkHooks.openGui(player, new SimpleMenuProvider((windowId, playerInventory, plr) -> createContainer(getContainerType(), windowId, playerInventory, createInventory(stack)), titleComponent));
 		return true;
 	}
 }

@@ -3,10 +3,12 @@ package xyz.apex.forge.apexcore.lib.util.reflection;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import cpw.mods.modlauncher.api.INameMappingService;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+
 import xyz.apex.forge.apexcore.core.ApexCore;
 
 import javax.annotation.Nullable;
@@ -89,7 +91,7 @@ public class MethodHelper
 
 		try
 		{
-			Method method = findMethod(classToAccess, methodName, parameterTypes);
+			var method = findMethod(classToAccess, methodName, parameterTypes);
 
 			if(parameters != null && parameters.length > 0)
 			{

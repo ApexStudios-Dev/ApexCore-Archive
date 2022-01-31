@@ -1,8 +1,8 @@
 package xyz.apex.forge.apexcore.lib.util;
 
-import net.minecraft.data.ShapedRecipeBuilder;
-import net.minecraft.item.Item;
-import net.minecraft.tags.ITag;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.common.Tags;
 
 import xyz.apex.repack.com.tterrag.registrate.providers.DataGenContext;
@@ -27,12 +27,12 @@ public final class RegistratorHelper
 	// region: Recipes
 	// region: Weapons
 	// region: Sword
-	public static <ITEM extends Item> void swordRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, ITag.INamedTag<Item> ingot)
+	public static <ITEM extends Item> void swordRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, Tag.Named<Item> ingot)
 	{
 		swordRecipe(ctx, provider, ingot, Tags.Items.RODS_WOODEN);
 	}
 
-	public static <ITEM extends Item> void swordRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, ITag.INamedTag<Item> ingot, ITag.INamedTag<Item> stick)
+	public static <ITEM extends Item> void swordRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, Tag.Named<Item> ingot, Tag.Named<Item> stick)
 	{
 		// @formatter:off
 		ShapedRecipeBuilder
@@ -42,7 +42,7 @@ public final class RegistratorHelper
 				.pattern("I")
 				.pattern("I")
 				.pattern("S")
-				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.hasItem(ingot))
+				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.has(ingot))
 				.save(provider);
 		// @formatter:on
 	}
@@ -51,12 +51,12 @@ public final class RegistratorHelper
 
 	// region: Tools
 	// region: Pickaxe
-	public static <ITEM extends Item> void pickaxeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, ITag.INamedTag<Item> ingot)
+	public static <ITEM extends Item> void pickaxeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, Tag.Named<Item> ingot)
 	{
 		pickaxeRecipe(ctx, provider, ingot, Tags.Items.RODS_WOODEN);
 	}
 
-	public static <ITEM extends Item> void pickaxeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, ITag.INamedTag<Item> ingot, ITag.INamedTag<Item> stick)
+	public static <ITEM extends Item> void pickaxeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, Tag.Named<Item> ingot, Tag.Named<Item> stick)
 	{
 		// @formatter:off
 		ShapedRecipeBuilder
@@ -66,19 +66,19 @@ public final class RegistratorHelper
 				.pattern("III")
 				.pattern(" S ")
 				.pattern(" S ")
-				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.hasItem(ingot))
+				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.has(ingot))
 				.save(provider);
 		// @formatter:on
 	}
 	// endregion
 
 	// region: Axe
-	public static <ITEM extends Item> void axeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, ITag.INamedTag<Item> ingot)
+	public static <ITEM extends Item> void axeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, Tag.Named<Item> ingot)
 	{
 		axeRecipe(ctx, provider, ingot, Tags.Items.RODS_WOODEN);
 	}
 
-	public static <ITEM extends Item> void axeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, ITag.INamedTag<Item> ingot, ITag.INamedTag<Item> stick)
+	public static <ITEM extends Item> void axeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, Tag.Named<Item> ingot, Tag.Named<Item> stick)
 	{
 		// @formatter:off
 		ShapedRecipeBuilder
@@ -88,19 +88,19 @@ public final class RegistratorHelper
 				.pattern("II")
 				.pattern("IS")
 				.pattern(" S")
-				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.hasItem(ingot))
+				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.has(ingot))
 				.save(provider);
 		// @formatter:on
 	}
 	// endregion
 
 	// region: Shovel
-	public static <ITEM extends Item> void shovelRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, ITag.INamedTag<Item> ingot)
+	public static <ITEM extends Item> void shovelRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, Tag.Named<Item> ingot)
 	{
 		shovelRecipe(ctx, provider, ingot, Tags.Items.RODS_WOODEN);
 	}
 
-	public static <ITEM extends Item> void shovelRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, ITag.INamedTag<Item> ingot, ITag.INamedTag<Item> stick)
+	public static <ITEM extends Item> void shovelRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, Tag.Named<Item> ingot, Tag.Named<Item> stick)
 	{
 		// @formatter:off
 		ShapedRecipeBuilder
@@ -110,19 +110,19 @@ public final class RegistratorHelper
 				.pattern("I")
 				.pattern("S")
 				.pattern("S")
-				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.hasItem(ingot))
+				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.has(ingot))
 				.save(provider);
 		// @formatter:on
 	}
 	// endregion
 
 	// region: Hoe
-	public static <ITEM extends Item> void hoeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, ITag.INamedTag<Item> ingot)
+	public static <ITEM extends Item> void hoeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, Tag.Named<Item> ingot)
 	{
 		hoeRecipe(ctx, provider, ingot, Tags.Items.RODS_WOODEN);
 	}
 
-	public static <ITEM extends Item> void hoeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, ITag.INamedTag<Item> ingot, ITag.INamedTag<Item> stick)
+	public static <ITEM extends Item> void hoeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, Tag.Named<Item> ingot, Tag.Named<Item> stick)
 	{
 		// @formatter:off
 		ShapedRecipeBuilder
@@ -132,7 +132,7 @@ public final class RegistratorHelper
 				.pattern("II")
 				.pattern(" S")
 				.pattern(" S")
-				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.hasItem(ingot))
+				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.has(ingot))
 				.save(provider);
 		// @formatter:on
 	}
@@ -140,7 +140,7 @@ public final class RegistratorHelper
 	// endregion
 
 	// region: Armor
-	public static <ITEM extends Item> void helmetRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, ITag.INamedTag<Item> ingot)
+	public static <ITEM extends Item> void helmetRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, Tag.Named<Item> ingot)
 	{
 		// @formatter:off
 		ShapedRecipeBuilder
@@ -148,12 +148,12 @@ public final class RegistratorHelper
 				.define('I', ingot)
 				.pattern("III")
 				.pattern("I I")
-				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.hasItem(ingot))
+				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.has(ingot))
 				.save(provider);
 		// @formatter:on
 	}
 
-	public static <ITEM extends Item> void chestplateRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, ITag.INamedTag<Item> ingot)
+	public static <ITEM extends Item> void chestplateRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, Tag.Named<Item> ingot)
 	{
 		// @formatter:off
 		ShapedRecipeBuilder
@@ -162,12 +162,12 @@ public final class RegistratorHelper
 				.pattern("I I")
 				.pattern("III")
 				.pattern("III")
-				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.hasItem(ingot))
+				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.has(ingot))
 				.save(provider);
 		// @formatter:on
 	}
 
-	public static <ITEM extends Item> void leggingsRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, ITag.INamedTag<Item> ingot)
+	public static <ITEM extends Item> void leggingsRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, Tag.Named<Item> ingot)
 	{
 		// @formatter:off
 		ShapedRecipeBuilder
@@ -176,12 +176,12 @@ public final class RegistratorHelper
 				.pattern("III")
 				.pattern("I I")
 				.pattern("I I")
-				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.hasItem(ingot))
+				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.has(ingot))
 				.save(provider);
 		// @formatter:on
 	}
 
-	public static <ITEM extends Item> void bootsRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, ITag.INamedTag<Item> ingot)
+	public static <ITEM extends Item> void bootsRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, Tag.Named<Item> ingot)
 	{
 		// @formatter:off
 		ShapedRecipeBuilder
@@ -189,7 +189,7 @@ public final class RegistratorHelper
 				.define('I', ingot)
 				.pattern("I I")
 				.pattern("I I")
-				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.hasItem(ingot))
+				.unlockedBy("has_" + provider.safeName(ingot.getName()), RegistrateRecipeProvider.has(ingot))
 				.save(provider);
 		// @formatter:on
 	}

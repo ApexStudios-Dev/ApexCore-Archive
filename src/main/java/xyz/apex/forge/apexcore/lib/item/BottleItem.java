@@ -1,17 +1,13 @@
 package xyz.apex.forge.apexcore.lib.item;
 
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.UseAction;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.DrinkHelper;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.Level;
 
 public class BottleItem extends Item
 {
@@ -21,17 +17,12 @@ public class BottleItem extends Item
 	}
 
 	@Override
-	public ItemStack finishUsingItem(ItemStack stack, World level, LivingEntity entity)
+	public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity)
 	{
-		if(entity instanceof ServerPlayerEntity)
-		{
-			ServerPlayerEntity player = (ServerPlayerEntity) entity;
+		if(entity instanceof ServerPlayer player)
 			CriteriaTriggers.CONSUME_ITEM.trigger(player, stack);
-		}
-
-		if(entity instanceof PlayerEntity && !((PlayerEntity) entity).abilities.instabuild)
+		if(entity instanceof Player player && !player.getAbilities().instabuild)
 			stack.shrink(1);
-
 		return stack.isEmpty() ? new ItemStack(Items.GLASS_BOTTLE) : stack;
 	}
 
@@ -42,14 +33,14 @@ public class BottleItem extends Item
 	}
 
 	@Override
-	public UseAction getUseAnimation(ItemStack stack)
+	public UseAnim getUseAnimation(ItemStack stack)
 	{
-		return UseAction.DRINK;
+		return UseAnim.DRINK;
 	}
 
 	@Override
-	public ActionResult<ItemStack> use(World level, PlayerEntity player, Hand hand)
+	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand)
 	{
-		return DrinkHelper.useDrink(level, player, hand);
+		return ItemUtils.startUsingInstantly(level, player, hand);
 	}
 }

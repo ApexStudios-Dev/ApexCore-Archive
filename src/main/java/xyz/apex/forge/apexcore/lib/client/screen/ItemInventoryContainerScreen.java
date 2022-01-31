@@ -1,18 +1,21 @@
 package xyz.apex.forge.apexcore.lib.client.screen;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+
 import xyz.apex.forge.apexcore.lib.container.ItemInventoryContainer;
 
-public class ItemInventoryContainerScreen<C extends ItemInventoryContainer> extends ContainerScreen<C>
+public class ItemInventoryContainerScreen<C extends ItemInventoryContainer> extends AbstractContainerScreen<C>
 {
 	protected final ResourceLocation backgroundTexture;
 
-	public ItemInventoryContainerScreen(C container, PlayerInventory playerInventory, ITextComponent title, ResourceLocation backgroundTexture)
+	public ItemInventoryContainerScreen(C container, Inventory playerInventory, Component title, ResourceLocation backgroundTexture)
 	{
 		super(container, playerInventory, title);
 
@@ -27,7 +30,7 @@ public class ItemInventoryContainerScreen<C extends ItemInventoryContainer> exte
 	}
 
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		renderBackground(matrixStack);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -35,10 +38,11 @@ public class ItemInventoryContainerScreen<C extends ItemInventoryContainer> exte
 	}
 
 	@Override
-	protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY)
+	protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY)
 	{
-		RenderSystem.color4f(1F, 1F, 1F, 1F);
-		minecraft.getTextureManager().bind(backgroundTexture);
+		RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		RenderSystem.setShaderTexture(0, backgroundTexture);
 		int i = (width - imageWidth) / 2;
 		int j = (height - imageHeight) / 2;
 		blit(matrixStack, i, j, 0, 0, imageWidth, imageHeight);

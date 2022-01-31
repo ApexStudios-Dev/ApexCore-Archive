@@ -1,15 +1,18 @@
 package xyz.apex.forge.apexcore.lib.item;
 
-import com.mojang.datafixers.util.Pair;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.world.World;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+
+import java.util.Random;
 
 public class SelfContainerItem extends Item
 {
+	public static final Random RNG = new Random();
+
 	public SelfContainerItem(Properties properties)
 	{
 		super(properties);
@@ -34,30 +37,30 @@ public class SelfContainerItem extends Item
 	@Override
 	public ItemStack getContainerItem(ItemStack stack)
 	{
-		ItemStack result = stack.copy();
+		var result = stack.copy();
 
-		if(result.hurt(getDamageAmount(stack), random, null))
+		if(result.hurt(getDamageAmount(stack), RNG, null))
 			return ItemStack.EMPTY;
 
 		return result;
 	}
 
 	@Override
-	public ItemStack finishUsingItem(ItemStack stack, World level, LivingEntity entity)
+	public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity)
 	{
 		if(isEdible())
 		{
-			level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), entity.getEatingSound(stack), SoundCategory.NEUTRAL, 1F, 1F + (level.random.nextFloat() - level.random.nextFloat()) * .4F);
+			level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), entity.getEatingSound(stack), SoundSource.NEUTRAL, 1F, 1F + (level.random.nextFloat() - level.random.nextFloat()) * .4F);
 
-			for(Pair<EffectInstance, Float> pair : getFoodProperties().getEffects())
+			for(var pair : getFoodProperties().getEffects())
 			{
 				if(!level.isClientSide && pair.getFirst() != null && level.random.nextFloat() < pair.getSecond())
-					entity.addEffect(new EffectInstance(pair.getFirst()));
+					entity.addEffect(new MobEffectInstance(pair.getFirst()));
 			}
 
-			ItemStack result = stack.copy();
+			var result = stack.copy();
 
-			if(result.hurt(getDamageAmount(stack), random, null))
+			if(result.hurt(getDamageAmount(stack), level.random, null))
 				return ItemStack.EMPTY;
 
 			return result;

@@ -2,24 +2,24 @@ package xyz.apex.forge.apexcore.lib.item.crafting;
 
 import com.google.gson.JsonObject;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.Registry;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 // Copy of vanilla SingleItemRecipe
 // Modified to make the factory interface public
 // Was using AccessTransformers for this but GitHub work flows did not like that
-public class SingleItemRecipe implements IRecipe<IInventory>
+public class SingleItemRecipe implements Recipe<Container>
 {
 	public static final String JSON_GROUP = "group";
 	public static final String JSON_INGREDIENT = "ingredient";
@@ -30,10 +30,10 @@ public class SingleItemRecipe implements IRecipe<IInventory>
 	protected final ItemStack recipeResult;
 	protected final ResourceLocation recipeId;
 	protected final String recipeGroup;
-	private final IRecipeType<?> recipeType;
-	private final IRecipeSerializer<?> recipeSerializer;
+	private final RecipeType<?> recipeType;
+	private final RecipeSerializer<?> recipeSerializer;
 
-	public SingleItemRecipe(IRecipeType<?> recipeType, IRecipeSerializer<?> recipeSerializer, ResourceLocation recipeId, String recipeGroup, Ingredient recipeIngredient, ItemStack recipeResult)
+	public SingleItemRecipe(RecipeType<?> recipeType, RecipeSerializer<?> recipeSerializer, ResourceLocation recipeId, String recipeGroup, Ingredient recipeIngredient, ItemStack recipeResult)
 	{
 		this.recipeType = recipeType;
 		this.recipeSerializer = recipeSerializer;
@@ -44,13 +44,13 @@ public class SingleItemRecipe implements IRecipe<IInventory>
 	}
 
 	@Override
-	public final IRecipeType<?> getType()
+	public final RecipeType<?> getType()
 	{
 		return recipeType;
 	}
 
 	@Override
-	public final IRecipeSerializer<?> getSerializer()
+	public final RecipeSerializer<?> getSerializer()
 	{
 		return recipeSerializer;
 	}
@@ -87,18 +87,18 @@ public class SingleItemRecipe implements IRecipe<IInventory>
 	}
 
 	@Override
-	public ItemStack assemble(IInventory inventory)
+	public ItemStack assemble(Container inventory)
 	{
 		return recipeResult.copy();
 	}
 
 	@Override
-	public boolean matches(IInventory inventory, World level)
+	public boolean matches(Container inventory, Level level)
 	{
 		return recipeIngredient.test(inventory.getItem(0));
 	}
 
-	public static final class Serializer<T extends SingleItemRecipe> extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<T>
+	public static final class Serializer<T extends SingleItemRecipe> extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<T>
 	{
 		private final IRecipeFactory<T> recipeFactory;
 
@@ -110,31 +110,31 @@ public class SingleItemRecipe implements IRecipe<IInventory>
 		@Override
 		public T fromJson(ResourceLocation recipeId, JsonObject json)
 		{
-			String recipeGroup = JSONUtils.getAsString(json, JSON_GROUP, "");
+			var recipeGroup = GsonHelper.getAsString(json, JSON_GROUP, "");
 			Ingredient recipeIngredient;
 
-			if(JSONUtils.isArrayNode(json, JSON_INGREDIENT))
-				recipeIngredient = Ingredient.fromJson(JSONUtils.getAsJsonArray(json, JSON_INGREDIENT));
+			if(GsonHelper.isArrayNode(json, JSON_INGREDIENT))
+				recipeIngredient = Ingredient.fromJson(GsonHelper.getAsJsonArray(json, JSON_INGREDIENT));
 			else
-				recipeIngredient = Ingredient.fromJson(JSONUtils.getAsJsonObject(json, JSON_INGREDIENT));
+				recipeIngredient = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, JSON_INGREDIENT));
 
-			String recipeResultName = JSONUtils.getAsString(json, JSON_RESULT);
-			int recipeResultCount = JSONUtils.getAsInt(json, JSON_COUNT);
-			ItemStack recipeResult = new ItemStack(Registry.ITEM.get(new ResourceLocation(recipeResultName)), recipeResultCount);
+			var recipeResultName = GsonHelper.getAsString(json, JSON_RESULT);
+			var recipeResultCount = GsonHelper.getAsInt(json, JSON_COUNT);
+			var recipeResult = new ItemStack(Registry.ITEM.get(new ResourceLocation(recipeResultName)), recipeResultCount);
 			return recipeFactory.create(recipeId, recipeGroup, recipeIngredient, recipeResult);
 		}
 
 		@Override
-		public T fromNetwork(ResourceLocation recipeId, PacketBuffer buffer)
+		public T fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer)
 		{
-			String recipeGroup = buffer.readUtf(32767);
-			Ingredient recipeIngredient = Ingredient.fromNetwork(buffer);
-			ItemStack recipeResult = buffer.readItem();
+			var recipeGroup = buffer.readUtf(32767);
+			var recipeIngredient = Ingredient.fromNetwork(buffer);
+			var recipeResult = buffer.readItem();
 			return recipeFactory.create(recipeId, recipeGroup, recipeIngredient, recipeResult);
 		}
 
 		@Override
-		public void toNetwork(PacketBuffer buffer, T recipe)
+		public void toNetwork(FriendlyByteBuf buffer, T recipe)
 		{
 			buffer.writeUtf(recipe.recipeGroup);
 			recipe.recipeIngredient.toNetwork(buffer);

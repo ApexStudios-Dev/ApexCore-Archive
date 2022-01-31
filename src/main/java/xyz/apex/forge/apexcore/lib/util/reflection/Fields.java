@@ -1,7 +1,7 @@
 package xyz.apex.forge.apexcore.lib.util.reflection;
 
-import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.ItemGroup;
+import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.world.item.CreativeModeTab;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
@@ -9,11 +9,16 @@ import java.lang.reflect.Field;
 public enum Fields
 {
 	// 1.16.5: private ItemStack iconItemStack;
-	ITEM_GROUP_ICON("field_151245_t", true, ItemGroup.class),
+	// 1.17.1: private ItemStack iconItemStack;
+	ITEM_GROUP_ICON("f_40770_", true, CreativeModeTab.class),
+
 	// 1.16.5: private final String langId;
-	ITEM_GROUP_LABEL("field_78034_o", true, ItemGroup.class),
+	// 1.17.1: private final String langId;
+	ITEM_GROUP_LABEL("f_40763_", true, CreativeModeTab.class),
+
 	// 1.16.5: private static final int[] HEALTH_PER_SLOT = new int[]{13, 15, 16, 11};
-	ARMOR_MATERIAL_HEALTH_PER_SLOT("field_77882_bY", true, ArmorMaterial.class)
+	// 1.17.1: private static final int[] HEALTH_PER_SLOT = new int[]{13, 15, 16, 11};
+	ARMOR_MATERIAL_HEALTH_PER_SLOT("f_40460_", true, ArmorMaterials.class)
 	;
 
 	private final Class<?> classToAccess;

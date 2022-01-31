@@ -1,10 +1,10 @@
 package xyz.apex.forge.apexcore.lib.container;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+
 import xyz.apex.forge.apexcore.lib.container.inventory.ItemInventory;
 
 import javax.annotation.Nullable;
@@ -13,7 +13,7 @@ public class ItemInventoryContainer extends BaseContainer
 {
 	protected final ItemInventory itemInventory;
 
-	public ItemInventoryContainer(@Nullable ContainerType<?> containerType, int windowId, PlayerInventory playerInventory, ItemInventory itemInventory)
+	public ItemInventoryContainer(@Nullable MenuType<?> containerType, int windowId, Inventory playerInventory, ItemInventory itemInventory)
 	{
 		super(containerType, windowId, playerInventory);
 
@@ -47,27 +47,27 @@ public class ItemInventoryContainer extends BaseContainer
 	protected final void addPlayerInventorySlots() { }
 
 	@Override
-	public boolean stillValid(PlayerEntity player)
+	public boolean stillValid(Player player)
 	{
 		return itemInventory.stillValid(player);
 	}
 
 	@Override
-	public void removed(PlayerEntity player)
+	public void removed(Player player)
 	{
 		super.removed(player);
 		itemInventory.stopOpen(player);
 	}
 
 	@Override
-	public ItemStack quickMoveStack(PlayerEntity player, int slotIndex)
+	public ItemStack quickMoveStack(Player player, int slotIndex)
 	{
-		ItemStack result = ItemStack.EMPTY;
-		Slot slot = slots.get(slotIndex);
+		var result = ItemStack.EMPTY;
+		var slot = slots.get(slotIndex);
 
 		if(slot != null && slot.hasItem())
 		{
-			ItemStack slotStack = slot.getItem();
+			var slotStack = slot.getItem();
 			result = slotStack.copy();
 
 			if(slotIndex < itemInventory.getContainerSize())

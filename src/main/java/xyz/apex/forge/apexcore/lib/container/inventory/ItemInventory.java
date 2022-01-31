@@ -1,14 +1,15 @@
 package xyz.apex.forge.apexcore.lib.container.inventory;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.Constants;
+
 import xyz.apex.forge.apexcore.lib.constants.NbtNames;
 
-public class ItemInventory extends Inventory
+public class ItemInventory extends SimpleContainer
 {
 	private final ItemStack item;
 	private int openCount = 0;
@@ -21,20 +22,20 @@ public class ItemInventory extends Inventory
 	}
 
 	@Override
-	public void startOpen(PlayerEntity player)
+	public void startOpen(Player player)
 	{
 		if(openCount == 0)
 		{
-			CompoundNBT invTag = item.getTagElement(NbtNames.INVENTORY);
+			var invTag = item.getTagElement(NbtNames.INVENTORY);
 
 			if(invTag != null)
 			{
-				ListNBT slotTag = invTag.getList(NbtNames.ITEMS, Constants.NBT.TAG_COMPOUND);
+				var slotTag = invTag.getList(NbtNames.ITEMS, Constants.NBT.TAG_COMPOUND);
 
-				for(int i = 0; i < slotTag.size(); i++)
+				for(var i = 0; i < slotTag.size(); i++)
 				{
-					CompoundNBT itemTag = slotTag.getCompound(i);
-					int slotIndex = itemTag.getByte(NbtNames.SLOT) & 255;
+					var itemTag = slotTag.getCompound(i);
+					var slotIndex = itemTag.getByte(NbtNames.SLOT) & 255;
 
 					if(slotIndex < getContainerSize())
 						setItem(slotIndex, ItemStack.of(itemTag));
@@ -46,22 +47,22 @@ public class ItemInventory extends Inventory
 	}
 
 	@Override
-	public void stopOpen(PlayerEntity player)
+	public void stopOpen(Player player)
 	{
 		openCount--;
 
 		if(openCount == 0)
 		{
-			CompoundNBT invTag = new CompoundNBT();
-			ListNBT slotTag = new ListNBT();
+			var invTag = new CompoundTag();
+			var slotTag = new ListTag();
 
-			for(int i = 0; i < getContainerSize(); i++)
+			for(var i = 0; i < getContainerSize(); i++)
 			{
-				ItemStack stack = getItem(i);
+				var stack = getItem(i);
 
 				if(!stack.isEmpty())
 				{
-					CompoundNBT itemTag = new CompoundNBT();
+					var itemTag = new CompoundTag();
 					itemTag.putByte(NbtNames.SLOT, (byte) i);
 					stack.save(itemTag);
 					slotTag.add(itemTag);

@@ -1,8 +1,8 @@
 package xyz.apex.forge.apexcore.lib.block;
 
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
 import javax.annotation.Nullable;
 
@@ -10,7 +10,7 @@ public class Age5CropsBlock extends BetterCropsBlock
 {
 	public static final IntegerProperty AGE = BlockStateProperties.AGE_5;
 
-	public Age5CropsBlock(Properties properties, @Nullable IItemProvider baseSeedItem)
+	public Age5CropsBlock(Properties properties, @Nullable ItemLike baseSeedItem)
 	{
 		super(properties, baseSeedItem);
 	}

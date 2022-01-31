@@ -1,41 +1,27 @@
 package xyz.apex.forge.apexcore.lib.util;
 
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.loot.ILootSerializer;
-import net.minecraft.loot.LootFunctionType;
-import net.minecraft.loot.functions.ILootFunction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.WorldGenRegistries;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.IFeatureConfig;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.storage.loot.Serializer;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 
 public final class RegistryHelper
 {
-	public static <FC extends IFeatureConfig, F extends Feature<FC>> ConfiguredFeature<FC, F> registerFeature(ResourceLocation featureName, ConfiguredFeature<FC, F> configuredFeature)
+	public static LootItemFunctionType registerLootFunction(ResourceLocation lootFunctionName, Serializer<? extends LootItemFunction> lootSerializer)
 	{
-		return Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, featureName, configuredFeature);
+		return Registry.register(Registry.LOOT_FUNCTION_TYPE, lootFunctionName, new LootItemFunctionType(lootSerializer));
 	}
 
-	public static <FC extends IFeatureConfig, F extends Feature<FC>> ConfiguredFeature<FC, F> registerFeature(String featureNamespace, String featureName, ConfiguredFeature<FC, F> configuredFeature)
-	{
-		return registerFeature(new ResourceLocation(featureNamespace, featureName), configuredFeature);
-	}
-
-	public static LootFunctionType registerLootFunction(ResourceLocation lootFunctionName, ILootSerializer<? extends ILootFunction> lootSerializer)
-	{
-		return Registry.register(Registry.LOOT_FUNCTION_TYPE, lootFunctionName, new LootFunctionType(lootSerializer));
-	}
-
-	public static LootFunctionType registerLootFunction(String lootFunctionNamespace, String lootFunctionName, ILootSerializer<? extends ILootFunction> lootSerializer)
+	public static LootItemFunctionType registerLootFunction(String lootFunctionNamespace, String lootFunctionName, Serializer<? extends LootItemFunction> lootSerializer)
 	{
 		return registerLootFunction(new ResourceLocation(lootFunctionNamespace, lootFunctionName), lootSerializer);
 	}
 
-	public static <T extends IRecipe<?>> IRecipeType<T> registerRecipeType(String recipeTypeNamespace, String recipeTypeName)
+	public static <T extends Recipe<?>> RecipeType<T> registerRecipeType(String recipeTypeNamespace, String recipeTypeName)
 	{
-		return IRecipeType.register(recipeTypeNamespace + ":" + recipeTypeName);
+		return RecipeType.register(recipeTypeNamespace + ":" + recipeTypeName);
 	}
 }

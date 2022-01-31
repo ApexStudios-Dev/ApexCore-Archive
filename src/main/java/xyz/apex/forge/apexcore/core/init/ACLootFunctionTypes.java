@@ -1,6 +1,6 @@
 package xyz.apex.forge.apexcore.core.init;
 
-import net.minecraft.loot.LootFunctionType;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 
 import xyz.apex.forge.apexcore.core.ApexCore;
 import xyz.apex.forge.apexcore.lib.loot.ApplyRandomColor;
@@ -8,7 +8,7 @@ import xyz.apex.forge.apexcore.lib.util.RegistryHelper;
 
 public final class ACLootFunctionTypes
 {
-	public static final LootFunctionType APPLY_RANDOM_COLOR = RegistryHelper.registerLootFunction(ApexCore.ID, "apply_random_color", new ApplyRandomColor.Serializer());
+	public static final LootItemFunctionType APPLY_RANDOM_COLOR = RegistryHelper.registerLootFunction(ApexCore.ID, "apply_random_color", new ApplyRandomColor.Serializer());
 
 	static void bootstrap()
 	{

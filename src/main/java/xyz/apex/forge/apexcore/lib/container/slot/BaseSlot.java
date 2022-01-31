@@ -1,16 +1,16 @@
 package xyz.apex.forge.apexcore.lib.container.slot;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Slot;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
 
 public class BaseSlot extends Slot
 {
-	protected final PlayerEntity opener;
+	protected final Player opener;
 
 	public boolean allowOtherPlayerInteraction;
 
-	public BaseSlot(IInventory inventory, PlayerEntity opener, int slotIndex, int slotX, int slotY, boolean allowOtherPlayerInteraction)
+	public BaseSlot(Container inventory, Player opener, int slotIndex, int slotX, int slotY, boolean allowOtherPlayerInteraction)
 	{
 		super(inventory, slotIndex, slotX, slotY);
 
@@ -18,7 +18,7 @@ public class BaseSlot extends Slot
 		this.allowOtherPlayerInteraction = allowOtherPlayerInteraction;
 	}
 
-	public BaseSlot(IInventory inventory, PlayerEntity opener, int slotIndex, int slotX, int slotY)
+	public BaseSlot(Container inventory, Player opener, int slotIndex, int slotX, int slotY)
 	{
 		this(inventory, opener, slotIndex, slotX, slotY, false);
 	}
@@ -28,18 +28,18 @@ public class BaseSlot extends Slot
 		return allowOtherPlayerInteraction;
 	}
 
-	public PlayerEntity getOpener()
+	public Player getOpener()
 	{
 		return opener;
 	}
 
-	public boolean isOpener(PlayerEntity player)
+	public boolean isOpener(Player player)
 	{
 		return opener.getGameProfile().getId().equals(opener.getGameProfile().getId());
 	}
 
 	@Override
-	public boolean mayPickup(PlayerEntity player)
+	public boolean mayPickup(Player player)
 	{
 		if(!areOtherPlayersAllowed() && !isOpener(player))
 			return false;

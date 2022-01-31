@@ -1,18 +1,19 @@
 package xyz.apex.forge.apexcore.lib.item;
 
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.entity.Entity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Set;
 
 public class WearableItem extends Item
 {
-	private final Set<EquipmentSlotType> slotTypes;
+	private final Set<EquipmentSlot> slotTypes;
 
-	public WearableItem(Properties properties, EquipmentSlotType... slotTypes)
+	public WearableItem(Properties properties, EquipmentSlot... slotTypes)
 	{
 		super(properties);
 
@@ -20,8 +21,8 @@ public class WearableItem extends Item
 	}
 
 	@Override
-	public boolean canEquip(ItemStack stack, EquipmentSlotType armorType, Entity entity)
+	public boolean canEquip(ItemStack stack, EquipmentSlot armorType, Entity entity)
 	{
-		return armorType.getType() == EquipmentSlotType.Group.HAND || slotTypes.contains(armorType);
+		return armorType.getType() == EquipmentSlot.Type.HAND || slotTypes.contains(armorType);
 	}
 }
