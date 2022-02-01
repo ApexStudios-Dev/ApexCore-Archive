@@ -1,4 +1,4 @@
-# ApexCore
+# ![ApexCore](./src/main/resources/banner.png)
 [![release](https://github.com/ApexModder/ApexCore/actions/workflows/release.yml/badge.svg)](https://github.com/ApexModder/ApexCore/actions/workflows/release.yml)
 [![license](https://img.shields.io/github/license/ApexModder/ApexCore)](https://github.com/ApexModder/ApexCore/blob/master/LICENSE)
 [![last commit](https://img.shields.io/github/last-commit/ApexModder/ApexCore)](https://github.com/ApexModder/ApexCore/)
