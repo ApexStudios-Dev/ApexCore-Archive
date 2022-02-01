@@ -232,11 +232,6 @@ task deobfJar(type: Jar) {
 	from sourceSets.main.output
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-	classifier 'javadoc'
-	from javadoc.destinationDir
-}
-
 jar {
 	from sourceSets.main.output.classesDirs
 	from sourceSets.main.output.resourcesDir
@@ -246,7 +241,6 @@ artifacts {
 	archives jar
 	archives sourcesJar
 	archives deobfJar
-	archives javadocJar
 }
 
 tasks.withType(Jar) {
@@ -277,7 +271,6 @@ if(System.getenv('GITHUB_TOKEN') != null) {
 				artifact jar
 				artifact sourcesJar
 				artifact deobfJar
-				artifact javadocJar
 			}
 		}
 		repositories {
@@ -306,7 +299,6 @@ if(project.hasProperty('apex_curse_gradle_token')) {
 			mainArtifact jar
 			addArtifact deobfJar
 			addArtifact sourcesJar
-			addArtifact javadocJar
 
 			relations {
 				requiredDependency 'registrator'
@@ -325,7 +317,6 @@ if(project.hasProperty('apex_curse_gradle_token')) {
 			mainArtifact jar
 			addArtifact deobfJar
 			addArtifact sourcesJar
-			addArtifact javadocJar
 
 			relations {
 				requiredDependency 'registrator'
