@@ -5,6 +5,10 @@
 [![release](https://img.shields.io/github/v/release/ApexModder/ApexCore)](https://github.com/ApexModder/ApexCore/releases)
 [![curseforge](https://cf.way2muchnoise.eu/versions/550778.svg)](https://www.curseforge.com/minecraft/mc-mods/apexcore)
 
+[<img src="https://i.imgur.com/qUJzbM4.png" width=33%></img>](http://discord.apexmods.xyz/)
+
+---
+
 Utility mod required by all of my (_Apex_) mods.<br>
 This mod by itself will do nothing and should only be installed when playing with other mods that require it.
 
