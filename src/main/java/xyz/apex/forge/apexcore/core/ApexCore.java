@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import net.minecraftforge.fml.common.Mod;
 
+import xyz.apex.forge.apexcore.core.init.ACCreativeModeTabCategories;
 import xyz.apex.forge.apexcore.core.init.ACRegistry;
 
 @Mod(ApexCore.ID)
@@ -16,5 +17,6 @@ public final class ApexCore
 	public ApexCore()
 	{
 		ACRegistry.bootstrap();
+		ACCreativeModeTabCategories.enable();
 	}
 }
