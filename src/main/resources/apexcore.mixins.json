@@ -1,10 +1,12 @@
 {
 	"required": true,
-	"package": "${project.group}.mixin",
+	"package": "${project.group}.core.mixin",
 	"compatibilityLevel": "JAVA_8",
 	"refmap": "${mod_id}.refmap.json",
 	"mixins": [ ],
-	"client": [ ],
+	"client": [
+		"client.CreativeScreenMixin"
+	],
 	"server": [ ],
 	"minVersion": "0.8.4"
 }
