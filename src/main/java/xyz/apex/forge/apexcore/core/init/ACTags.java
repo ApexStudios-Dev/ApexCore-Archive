@@ -45,6 +45,8 @@ public final class ACTags
 		public static final ITag.INamedTag<Item> WOOLS = REGISTRY.itemTagOptionalForge("wools");
 		// endregion
 
+		public static final ITag.INamedTag<Item> HATS = REGISTRY.itemTagModded("hats");
+
 		private static void bootstrap()
 		{
 			REGISTRY.addDataGenerator(ProviderType.ITEM_TAGS, provider -> {
@@ -69,6 +71,8 @@ public final class ACTags
 				provider.tag(WOOLS).addTags(WOOLS_WHITE, WOOLS_ORANGE, WOOLS_MAGENTA, WOOLS_LIGHT_BLUE, WOOLS_YELLOW, WOOLS_LIME, WOOLS_PINK, WOOLS_GRAY, WOOLS_LIGHT_GRAY, WOOLS_CYAN, WOOLS_PURPLE, WOOLS_BLUE, WOOLS_BROWN, WOOLS_GREEN, WOOLS_RED, WOOLS_BLACK);
 				provider.tag(ItemTags.WOOL).addTags(WOOLS, WOOLS_WHITE, WOOLS_ORANGE, WOOLS_MAGENTA, WOOLS_LIGHT_BLUE, WOOLS_YELLOW, WOOLS_LIME, WOOLS_PINK, WOOLS_GRAY, WOOLS_LIGHT_GRAY, WOOLS_CYAN, WOOLS_PURPLE, WOOLS_BLUE, WOOLS_BROWN, WOOLS_GREEN, WOOLS_RED, WOOLS_BLACK);
 				// endregion
+
+				provider.tag(HATS);
 			});
 		}
 	}
