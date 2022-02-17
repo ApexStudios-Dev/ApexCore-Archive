@@ -73,11 +73,6 @@ public final class CreativeScreenHandler
 		buttonNextCategoryPage.setHeight(buttonSize);
 
 		maxCategoryTabPages = 0;
-		buttonPreviousCategoryPage.active = false;
-		buttonPreviousCategoryPage.visible = false;
-
-		buttonNextCategoryPage.active = false;
-		buttonNextCategoryPage.visible = false;
 
 		if(isSupportedTab(itemGroup))
 		{
@@ -86,22 +81,19 @@ public final class CreativeScreenHandler
 			int tabCount = categories.size();
 
 			if(tabCount > MAX_CATEGORY_TAB)
-			{
 				maxCategoryTabPages = (int) Math.ceil((tabCount - MAX_CATEGORY_TAB) / (MAX_CATEGORY_TAB - 2D));
-
-				buttonPreviousCategoryPage.active = true;
-				buttonPreviousCategoryPage.visible = true;
-
-				buttonNextCategoryPage.active = true;
-				buttonNextCategoryPage.visible = true;
-			}
 		}
 	}
 
 	public static void init(CreativeScreen screen)
 	{
 		buttonNextCategoryPage = addButton(screen, new Button(0, 0, 1, 1, new StringTextComponent("V"), b -> categoryTabPage = Math.min(categoryTabPage + 1, maxCategoryTabPages)));
+		buttonNextCategoryPage.active = false;
+		buttonNextCategoryPage.visible = false;
+
 		buttonPreviousCategoryPage = addButton(screen, new Button(0, 0, 1, 1, new StringTextComponent("^"), b -> categoryTabPage = Math.max(categoryTabPage - 1, 0)));
+		buttonPreviousCategoryPage.active = false;
+		buttonPreviousCategoryPage.visible = false;
 
 		ItemGroup selectedTab = getSelectedTab(screen);
 		updatePages(screen, selectedTab);
@@ -126,7 +118,7 @@ public final class CreativeScreenHandler
 		updatePages(screen, itemGroup);
 	}
 
-	public static void renderBg(CreativeScreen screen, MatrixStack pose, int mouseX, int mouseY)
+	public static void renderBg(CreativeScreen screen, MatrixStack pose)
 	{
 		ItemGroup selectedTab = getSelectedTab(screen);
 
@@ -145,6 +137,11 @@ public final class CreativeScreenHandler
 		ItemGroup selectedTab = getSelectedTab(screen);
 
 		if(!isSupportedTab(selectedTab))
+			return;
+
+		if(buttonPreviousCategoryPage == null || buttonNextCategoryPage == null)
+			return;
+		if(!buttonPreviousCategoryPage.visible)
 			return;
 
 		Minecraft minecraft = screen.getMinecraft();
@@ -375,12 +372,15 @@ public final class CreativeScreenHandler
 		}
 	}
 
-	public static void tick(CreativeScreen screen)
+	public static void tick(CreativeScreen screen, int tabPage)
 	{
 		if(screen.getMinecraft().gameMode != null && !screen.getMinecraft().gameMode.hasInfiniteItems())
 			return;
 
 		ItemGroup selectedTab = getSelectedTab(screen);
+
+		updateButtonState(screen, selectedTab, tabPage, true);
+		updateButtonState(screen, selectedTab, tabPage, false);
 
 		if(!isSupportedTab(selectedTab))
 			return;
@@ -389,6 +389,56 @@ public final class CreativeScreenHandler
 
 		boolean cycleIcons = !Screen.hasShiftDown();
 		ItemGroupCategoryManager.getInstance(selectedTab).getCategories().forEach(c -> c.tick(cycleIcons));
+	}
+
+	private static void updateButtonState(CreativeScreen screen, @Nullable ItemGroup selectedTab, int tabPage, boolean isNext)
+	{
+		boolean isVisible = false;
+		boolean isActive = false;
+
+		if(maxCategoryTabPages > 0)
+		{
+			if(isSupportedTab(selectedTab) && isSelectedTab(screen, selectedTab))
+			{
+				if(tabPage == selectedTab.getTabPage())
+				{
+					isVisible = true;
+
+					if(isNext)
+					{
+						if(categoryTabPage <= maxCategoryTabPages - 1)
+							isActive = true;
+					}
+					else
+					{
+						if(categoryTabPage - 1 >= 0)
+							isActive = true;
+					}
+				}
+			}
+		}
+
+		if(!isVisible)
+			isActive = false;
+		if(isActive)
+			isVisible = true;
+
+		if(isNext)
+		{
+			if(buttonNextCategoryPage != null)
+			{
+				buttonNextCategoryPage.visible = isVisible;
+				buttonNextCategoryPage.active = isActive;
+			}
+		}
+		else
+		{
+			if(buttonPreviousCategoryPage != null)
+			{
+				buttonPreviousCategoryPage.visible = isVisible;
+				buttonPreviousCategoryPage.active = isActive;
+			}
+		}
 	}
 
 	private static int getTabPage(int tabIndex)

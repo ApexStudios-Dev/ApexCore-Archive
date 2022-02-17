@@ -20,6 +20,7 @@ import xyz.apex.forge.apexcore.core.client.CreativeScreenHandler;
 public abstract class CreativeScreenMixin
 {
 	@Shadow private float scrollOffs;
+	@Shadow(remap = false) private static int tabPage;
 
 	private final CreativeScreen self = (CreativeScreen) (Object) this;
 
@@ -50,7 +51,7 @@ public abstract class CreativeScreenMixin
 	@Inject(method = "renderBg", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/inventory/CreativeScreen;renderTabButton(Lcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/item/ItemGroup;)V", shift = At.Shift.AFTER, ordinal = 3))
 	private void renderBg(MatrixStack pose, float partialTick, int mouseX, int mouseY, CallbackInfo ci)
 	{
-		CreativeScreenHandler.renderBg(self, pose, mouseX, mouseY);
+		CreativeScreenHandler.renderBg(self, pose);
 	}
 
 	@Inject(method = "mouseClicked", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/inventory/CreativeScreen;topPos:I", shift = At.Shift.AFTER), cancellable = true)
@@ -72,8 +73,8 @@ public abstract class CreativeScreenMixin
 	}
 
 	@Inject(method = "tick", at = @At("TAIL"))
-	private void checkTabHovering(CallbackInfo ci)
+	private void tick(CallbackInfo ci)
 	{
-		CreativeScreenHandler.tick(self);
+		CreativeScreenHandler.tick(self, tabPage);
 	}
 }
