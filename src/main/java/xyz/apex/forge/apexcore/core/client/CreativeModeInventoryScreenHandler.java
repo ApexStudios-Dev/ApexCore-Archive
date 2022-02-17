@@ -67,11 +67,6 @@ public final class CreativeModeInventoryScreenHandler
 		buttonNextCategoryPage.setHeight(buttonSize);
 
 		maxCategoryTabPages = 0;
-		buttonPreviousCategoryPage.active = false;
-		buttonPreviousCategoryPage.visible = false;
-
-		buttonNextCategoryPage.active = false;
-		buttonNextCategoryPage.visible = false;
 
 		if(isSupportedTab(tab))
 		{
@@ -80,22 +75,19 @@ public final class CreativeModeInventoryScreenHandler
 			var tabCount = categories.size();
 
 			if(tabCount > MAX_CATEGORY_TAB)
-			{
 				maxCategoryTabPages = (int) Math.ceil((tabCount - MAX_CATEGORY_TAB) / (MAX_CATEGORY_TAB - 2D));
-
-				buttonPreviousCategoryPage.active = true;
-				buttonPreviousCategoryPage.visible = true;
-
-				buttonNextCategoryPage.active = true;
-				buttonNextCategoryPage.visible = true;
-			}
 		}
 	}
 
 	public static void init(CreativeModeInventoryScreen screen)
 	{
 		buttonNextCategoryPage = addButton(screen, new Button(0, 0, 1, 1, new TextComponent("V"), b -> categoryTabPage = Math.min(categoryTabPage + 1, maxCategoryTabPages)));
+		buttonNextCategoryPage.active = false;
+		buttonNextCategoryPage.visible = false;
+
 		buttonPreviousCategoryPage = addButton(screen, new Button(0, 0, 1, 1, new TextComponent("^"), b -> categoryTabPage = Math.max(categoryTabPage - 1, 0)));
+		buttonPreviousCategoryPage.active = false;
+		buttonPreviousCategoryPage.visible = false;
 
 		var selectedTab = getSelectedTab(screen);
 		updatePages(screen, selectedTab);
@@ -139,6 +131,11 @@ public final class CreativeModeInventoryScreenHandler
 		var selectedTab = getSelectedTab(screen);
 
 		if(!isSupportedTab(selectedTab))
+			return;
+
+		if(buttonPreviousCategoryPage == null || buttonNextCategoryPage == null)
+			return;
+		if(!buttonPreviousCategoryPage.visible)
 			return;
 
 		var minecraft = screen.getMinecraft();
@@ -365,12 +362,15 @@ public final class CreativeModeInventoryScreenHandler
 		}
 	}
 
-	public static void tick(CreativeModeInventoryScreen screen)
+	public static void tick(CreativeModeInventoryScreen screen, int tabPage)
 	{
 		if(screen.getMinecraft().gameMode != null && !screen.getMinecraft().gameMode.hasInfiniteItems())
 			return;
 
 		var selectedTab = getSelectedTab(screen);
+
+		updateButtonState(screen, selectedTab, tabPage, true);
+		updateButtonState(screen, selectedTab, tabPage, false);
 
 		if(!isSupportedTab(selectedTab))
 			return;
@@ -379,6 +379,56 @@ public final class CreativeModeInventoryScreenHandler
 
 		var cycleIcons = !Screen.hasShiftDown();
 		CreativeModeTabCategoryManager.getInstance(selectedTab).getCategories().forEach(c -> c.tick(cycleIcons));
+	}
+
+	private static void updateButtonState(CreativeModeInventoryScreen screen, @Nullable CreativeModeTab selectedTab, int tabPage, boolean isNext)
+	{
+		boolean isVisible = false;
+		boolean isActive = false;
+
+		if(maxCategoryTabPages > 0)
+		{
+			if(isSupportedTab(selectedTab) && isSelectedTab(screen, selectedTab))
+			{
+				if(tabPage == selectedTab.getTabPage())
+				{
+					isVisible = true;
+
+					if(isNext)
+					{
+						if(categoryTabPage <= maxCategoryTabPages - 1)
+							isActive = true;
+					}
+					else
+					{
+						if(categoryTabPage - 1 >= 0)
+							isActive = true;
+					}
+				}
+			}
+		}
+
+		if(!isVisible)
+			isActive = false;
+		if(isActive)
+			isVisible = true;
+
+		if(isNext)
+		{
+			if(buttonNextCategoryPage != null)
+			{
+				buttonNextCategoryPage.visible = isVisible;
+				buttonNextCategoryPage.active = isActive;
+			}
+		}
+		else
+		{
+			if(buttonPreviousCategoryPage != null)
+			{
+				buttonPreviousCategoryPage.visible = isVisible;
+				buttonPreviousCategoryPage.active = isActive;
+			}
+		}
 	}
 
 	private static int getTabPage(int tabIndex)

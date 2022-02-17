@@ -20,6 +20,7 @@ import xyz.apex.forge.apexcore.core.client.CreativeModeInventoryScreenHandler;
 public abstract class CreativeModeInventoryScreenMixin
 {
 	@Shadow private float scrollOffs;
+	@Shadow(remap = false) private static int tabPage;
 
 	private final CreativeModeInventoryScreen self = (CreativeModeInventoryScreen) (Object) this;
 
@@ -72,8 +73,8 @@ public abstract class CreativeModeInventoryScreenMixin
 	}
 
 	@Inject(method = "containerTick", at = @At("TAIL"))
-	private void checkTabHovering(CallbackInfo ci)
+	private void containerTick(CallbackInfo ci)
 	{
-		CreativeModeInventoryScreenHandler.tick(self);
+		CreativeModeInventoryScreenHandler.tick(self, tabPage);
 	}
 }
