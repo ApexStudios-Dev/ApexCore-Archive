@@ -7,8 +7,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Widget;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.network.chat.TextComponent;
@@ -16,21 +14,22 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import xyz.apex.forge.apexcore.core.ApexCore;
 import xyz.apex.forge.apexcore.lib.item.CreativeModeTabCategory;
 import xyz.apex.forge.apexcore.lib.item.CreativeModeTabCategoryManager;
-import xyz.apex.forge.apexcore.lib.util.reflection.MethodHelper;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.function.Consumer;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 // Simple offloading class to allow hot swapping while using mixins
 @OnlyIn(Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = ApexCore.ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class CreativeModeInventoryScreenHandler
 {
 	private static final ResourceLocation CATEGORY_TABS_TEXTURE = new ResourceLocation(ApexCore.ID, "textures/gui/container/creative_inventory/category_tabs.png");
@@ -39,12 +38,31 @@ public final class CreativeModeInventoryScreenHandler
 	private static final int CATEGORY_TAB_V_SIZE = 28;
 	private static final int CATEGORY_TABS_TEXTURE_WIDTH = CATEGORY_TAB_U_SIZE * 2;
 	private static final int CATEGORY_TABS_TEXTURE_HEIGHT = CATEGORY_TAB_V_SIZE;
-	private static final Method addButtonMethod = MethodHelper.findMethod(Screen.class, "addRenderableWidget", new Class[] { GuiEventListener.class });
 
 	private static int categoryTabPage = 0;
 	private static int maxCategoryTabPages = 0;
 	@Nullable private static Button buttonPreviousCategoryPage;
 	@Nullable private static Button buttonNextCategoryPage;
+
+	@SubscribeEvent
+	public static void onScreenInit(ScreenEvent.InitScreenEvent event)
+	{
+		if(event.getScreen() instanceof CreativeModeInventoryScreen screen)
+		{
+			buttonNextCategoryPage = new Button(0, 0, 1, 1, new TextComponent("V"), b -> categoryTabPage = Math.min(categoryTabPage + 1, maxCategoryTabPages));
+			buttonNextCategoryPage.active = false;
+			buttonNextCategoryPage.visible = false;
+			event.addListener(buttonNextCategoryPage);
+
+			buttonPreviousCategoryPage = new Button(0, 0, 1, 1, new TextComponent("^"), b -> categoryTabPage = Math.max(categoryTabPage - 1, 0));
+			buttonPreviousCategoryPage.active = false;
+			buttonPreviousCategoryPage.visible = false;
+			event.addListener(buttonPreviousCategoryPage);
+
+			var selectedTab = getSelectedTab(screen);
+			updatePages(screen, selectedTab);
+		}
+	}
 
 	private static void updatePages(CreativeModeInventoryScreen screen, @Nullable CreativeModeTab tab)
 	{
@@ -77,20 +95,6 @@ public final class CreativeModeInventoryScreenHandler
 			if(tabCount > MAX_CATEGORY_TAB)
 				maxCategoryTabPages = (int) Math.ceil((tabCount - MAX_CATEGORY_TAB) / (MAX_CATEGORY_TAB - 2D));
 		}
-	}
-
-	public static void init(CreativeModeInventoryScreen screen)
-	{
-		buttonNextCategoryPage = addButton(screen, new Button(0, 0, 1, 1, new TextComponent("V"), b -> categoryTabPage = Math.min(categoryTabPage + 1, maxCategoryTabPages)));
-		buttonNextCategoryPage.active = false;
-		buttonNextCategoryPage.visible = false;
-
-		buttonPreviousCategoryPage = addButton(screen, new Button(0, 0, 1, 1, new TextComponent("^"), b -> categoryTabPage = Math.max(categoryTabPage - 1, 0)));
-		buttonPreviousCategoryPage.active = false;
-		buttonPreviousCategoryPage.visible = false;
-
-		var selectedTab = getSelectedTab(screen);
-		updatePages(screen, selectedTab);
 	}
 
 	public static void selectTab_FilterItems(CreativeModeInventoryScreen screen, CreativeModeTab tab)
@@ -489,17 +493,5 @@ public final class CreativeModeInventoryScreenHandler
 	private static boolean matches(CreativeModeTab a, CreativeModeTab b)
 	{
 		return a.getId() == b.getId();
-	}
-
-	private static <T extends Widget> T addButton(Screen screen, T widget)
-	{
-		try
-		{
-			return (T) addButtonMethod.invoke(screen, widget);
-		}
-		catch(IllegalAccessException | InvocationTargetException e)
-		{
-			throw new IllegalStateException(e);
-		}
 	}
 }

@@ -24,12 +24,6 @@ public abstract class CreativeModeInventoryScreenMixin
 
 	private final CreativeModeInventoryScreen self = (CreativeModeInventoryScreen) (Object) this;
 
-	@Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/EffectRenderingInventoryScreen;init()V", shift = At.Shift.AFTER))
-	private void init(CallbackInfo ci)
-	{
-		CreativeModeInventoryScreenHandler.init(self);
-	}
-
 	@Inject(method = "selectTab", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/CreativeModeTab;fillItemList(Lnet/minecraft/core/NonNullList;)V", shift = At.Shift.AFTER))
 	private void selectTab_FilterItems(CreativeModeTab itemGroup, CallbackInfo ci)
 	{
