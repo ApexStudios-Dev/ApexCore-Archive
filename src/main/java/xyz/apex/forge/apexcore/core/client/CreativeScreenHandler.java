@@ -10,7 +10,6 @@ import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.CreativeScreen;
-import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -21,15 +20,15 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import xyz.apex.forge.apexcore.core.ApexCore;
 import xyz.apex.forge.apexcore.lib.item.ItemGroupCategory;
 import xyz.apex.forge.apexcore.lib.item.ItemGroupCategoryManager;
-import xyz.apex.forge.apexcore.lib.util.reflection.MethodHelper;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -37,6 +36,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 // Simple offloading class to allow hot swapping while using mixins
 @OnlyIn(Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = ApexCore.ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class CreativeScreenHandler
 {
 	private static final ResourceLocation CATEGORY_TABS_TEXTURE = new ResourceLocation(ApexCore.ID, "textures/gui/container/creative_inventory/category_tabs.png");
@@ -45,12 +45,33 @@ public final class CreativeScreenHandler
 	private static final int CATEGORY_TAB_V_SIZE = 28;
 	private static final int CATEGORY_TABS_TEXTURE_WIDTH = CATEGORY_TAB_U_SIZE * 2;
 	private static final int CATEGORY_TABS_TEXTURE_HEIGHT = CATEGORY_TAB_V_SIZE;
-	private static final Method addButtonMethod = MethodHelper.findMethod(Screen.class, "addButton", new Class[] { Widget.class });
 
 	private static int categoryTabPage = 0;
 	private static int maxCategoryTabPages = 0;
 	@Nullable private static Button buttonPreviousCategoryPage;
 	@Nullable private static Button buttonNextCategoryPage;
+
+	@SubscribeEvent
+	public static void onScreenInit(GuiScreenEvent.InitGuiEvent event)
+	{
+		if(event.getGui() instanceof CreativeScreen)
+		{
+			CreativeScreen screen = (CreativeScreen) event.getGui();
+
+			buttonNextCategoryPage = new Button(0, 0, 1, 1, new StringTextComponent("V"), b -> categoryTabPage = Math.min(categoryTabPage + 1, maxCategoryTabPages));
+			buttonNextCategoryPage.active = false;
+			buttonNextCategoryPage.visible = false;
+			event.addWidget(buttonNextCategoryPage);
+
+			buttonPreviousCategoryPage = new Button(0, 0, 1, 1, new StringTextComponent("^"), b -> categoryTabPage = Math.max(categoryTabPage - 1, 0));
+			buttonPreviousCategoryPage.active = false;
+			buttonPreviousCategoryPage.visible = false;
+			event.addWidget(buttonPreviousCategoryPage);
+
+			ItemGroup selectedTab = getSelectedTab(screen);
+			updatePages(screen, selectedTab);
+		}
+	}
 
 	private static void updatePages(CreativeScreen screen, @Nullable ItemGroup itemGroup)
 	{
@@ -83,20 +104,6 @@ public final class CreativeScreenHandler
 			if(tabCount > MAX_CATEGORY_TAB)
 				maxCategoryTabPages = (int) Math.ceil((tabCount - MAX_CATEGORY_TAB) / (MAX_CATEGORY_TAB - 2D));
 		}
-	}
-
-	public static void init(CreativeScreen screen)
-	{
-		buttonNextCategoryPage = addButton(screen, new Button(0, 0, 1, 1, new StringTextComponent("V"), b -> categoryTabPage = Math.min(categoryTabPage + 1, maxCategoryTabPages)));
-		buttonNextCategoryPage.active = false;
-		buttonNextCategoryPage.visible = false;
-
-		buttonPreviousCategoryPage = addButton(screen, new Button(0, 0, 1, 1, new StringTextComponent("^"), b -> categoryTabPage = Math.max(categoryTabPage - 1, 0)));
-		buttonPreviousCategoryPage.active = false;
-		buttonPreviousCategoryPage.visible = false;
-
-		ItemGroup selectedTab = getSelectedTab(screen);
-		updatePages(screen, selectedTab);
 	}
 
 	public static void selectTab_FilterItems(CreativeScreen screen, ItemGroup itemGroup)
@@ -499,17 +506,5 @@ public final class CreativeScreenHandler
 	private static boolean matches(ItemGroup a, ItemGroup b)
 	{
 		return a.getId() == b.getId();
-	}
-
-	private static <T extends Widget> T addButton(Screen screen, T widget)
-	{
-		try
-		{
-			return (T) addButtonMethod.invoke(screen, widget);
-		}
-		catch(IllegalAccessException | InvocationTargetException e)
-		{
-			throw new IllegalStateException(e);
-		}
 	}
 }

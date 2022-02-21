@@ -24,12 +24,6 @@ public abstract class CreativeScreenMixin
 
 	private final CreativeScreen self = (CreativeScreen) (Object) this;
 
-	@Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DisplayEffectsScreen;init()V", shift = At.Shift.AFTER))
-	private void init(CallbackInfo ci)
-	{
-		CreativeScreenHandler.init(self);
-	}
-
 	@Inject(method = "selectTab", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemGroup;fillItemList(Lnet/minecraft/util/NonNullList;)V", shift = At.Shift.AFTER))
 	private void selectTab_FilterItems(ItemGroup itemGroup, CallbackInfo ci)
 	{
