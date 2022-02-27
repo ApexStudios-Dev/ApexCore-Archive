@@ -5,6 +5,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+
 import xyz.apex.forge.apexcore.lib.container.inventory.ItemInventory;
 
 import javax.annotation.Nullable;
@@ -47,7 +48,7 @@ public class ItemInventoryContainer extends BaseContainer
 	protected final void addPlayerInventorySlots() { }
 
 	@Override
-	public boolean stillValid(PlayerEntity player)
+	public boolean isPlayerValid(PlayerEntity player)
 	{
 		return itemInventory.stillValid(player);
 	}

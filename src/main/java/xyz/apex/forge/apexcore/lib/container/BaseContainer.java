@@ -5,6 +5,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
+
 import xyz.apex.forge.apexcore.lib.container.slot.PlayerInventorySlot;
 
 import javax.annotation.Nullable;
@@ -47,9 +48,18 @@ public class BaseContainer extends Container
 		return new PlayerInventorySlot(opener.inventory, slotIndex, slotX, slotY);
 	}
 
-	@Override
-	public boolean stillValid(PlayerEntity player)
+	protected boolean isPlayerValid(PlayerEntity player)
 	{
 		return player.getGameProfile().getId().equals(opener.getGameProfile().getId());
+	}
+
+	// weird java compile error
+	// is causing me to have to move this
+	// apparently it always thinks this method is abstract
+	// and thus cannot be accessed via super
+	@Override
+	public final boolean stillValid(PlayerEntity player)
+	{
+		return isPlayerValid(player);
 	}
 }

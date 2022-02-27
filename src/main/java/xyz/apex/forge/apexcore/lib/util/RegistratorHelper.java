@@ -1,13 +1,13 @@
 package xyz.apex.forge.apexcore.lib.util;
 
+import com.tterrag.registrate.providers.DataGenContext;
+import com.tterrag.registrate.providers.RegistrateItemModelProvider;
+import com.tterrag.registrate.providers.RegistrateRecipeProvider;
+
 import net.minecraft.data.ShapedRecipeBuilder;
 import net.minecraft.item.Item;
 import net.minecraft.tags.ITag;
 import net.minecraftforge.common.Tags;
-
-import xyz.apex.repack.com.tterrag.registrate.providers.DataGenContext;
-import xyz.apex.repack.com.tterrag.registrate.providers.RegistrateItemModelProvider;
-import xyz.apex.repack.com.tterrag.registrate.providers.RegistrateRecipeProvider;
 
 // TODO: Merge directly into registrator
 public final class RegistratorHelper

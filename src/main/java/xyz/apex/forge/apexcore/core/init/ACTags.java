@@ -1,5 +1,7 @@
 package xyz.apex.forge.apexcore.core.init;
 
+import com.tterrag.registrate.providers.ProviderType;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
@@ -7,8 +9,6 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
 import net.minecraftforge.common.Tags;
-
-import xyz.apex.repack.com.tterrag.registrate.providers.ProviderType;
 
 public final class ACTags
 {
