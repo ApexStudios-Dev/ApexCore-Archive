@@ -353,7 +353,7 @@ if(project.hasProperty('apex_curse_gradle_token')) {
 		apiKey = project.getProperty('apex_curse_gradle_token')
 
 		project {
-			id = "${mod_curseforge_id}"
+			id = "${apexcore_cf_project}"
 			releaseType = 'release'
 			addGameVersion "${minecraft_version}"
 
@@ -372,7 +372,7 @@ if(project.hasProperty('apex_curse_gradle_token')) {
 		apiKey = System.getenv('CURSEFORGE_TOKEN')
 
 		project {
-			id = "${mod_curseforge_id}"
+			id = "${apexcore_cf_project}"
 			releaseType = 'release'
 			addGameVersion "${minecraft_version}"
 
