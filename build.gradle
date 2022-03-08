@@ -150,9 +150,9 @@ mixin {
 
 	setupModMixins('Registrator', consumer)
 
-	debug = true
+	/*debug = true
 	debug.export = true
-	hotSwap = true
+	hotSwap = true*/
 }
 
 sourceSets.main.resources {
