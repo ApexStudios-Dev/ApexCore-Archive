@@ -3,7 +3,7 @@ package xyz.apex.forge.apexcore.core.init;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 import xyz.apex.forge.apexcore.core.ApexCore;
-import xyz.apex.forge.apexcore.lib.util.ModEventBusHelper;
+import xyz.apex.forge.apexcore.lib.util.EventBusHelper;
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.java.utility.Lazy;
 
@@ -54,7 +54,7 @@ public final class ACRegistry extends AbstractRegistrator<ACRegistry>
 		{
 			ACTags.bootstrap();
 
-			ModEventBusHelper.addEnqueuedListener(FMLCommonSetupEvent.class, event -> ACLootFunctionTypes.bootstrap());
+			EventBusHelper.addEnqueuedListener(FMLCommonSetupEvent.class, event -> ACLootFunctionTypes.bootstrap());
 			bootstrap = true;
 		}
 	}

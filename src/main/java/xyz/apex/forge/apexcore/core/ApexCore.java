@@ -12,7 +12,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 
 import xyz.apex.forge.apexcore.core.client.hats.LayerHat;
 import xyz.apex.forge.apexcore.core.init.ACRegistry;
-import xyz.apex.forge.apexcore.lib.util.ModEventBusHelper;
+import xyz.apex.forge.apexcore.lib.util.EventBusHelper;
 
 @Mod(ApexCore.ID)
 public final class ApexCore
@@ -30,7 +30,7 @@ public final class ApexCore
 	{
 		private Client()
 		{
-			ModEventBusHelper.addEnqueuedListener(FMLLoadCompleteEvent.class, event -> {
+			EventBusHelper.addEnqueuedListener(FMLLoadCompleteEvent.class, event -> {
 				EntityRendererManager entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
 				LayerHat layerHat = new LayerHat();
 				entityRenderDispatcher.getSkinMap().values().forEach(r -> r.addLayer(layerHat));
