@@ -96,8 +96,8 @@ minecraft {
 }
 
 mixin {
-	add sourceSets.main, 'apexcore.refmap.json'
-	config 'apexcore.mixins.json'
+	add sourceSets.main, "${mod_id}.refmap.json"
+	config "${mod_id}.mixins.json"
 
 	/*debug = true
 	debug.export = true
