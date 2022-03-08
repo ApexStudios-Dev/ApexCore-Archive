@@ -24,7 +24,6 @@ public final class ACTags
 	public static final class Items
 	{
 		// region: Wools
-		// TODO: Move to ApexCore or PR into Forge
 		public static final ITag.INamedTag<Item> WOOLS_WHITE = REGISTRY.forgeItemTag("wools/white");
 		public static final ITag.INamedTag<Item> WOOLS_ORANGE = REGISTRY.forgeItemTag("wools/orange");
 		public static final ITag.INamedTag<Item> WOOLS_MAGENTA = REGISTRY.forgeItemTag("wools/magenta");
@@ -79,7 +78,6 @@ public final class ACTags
 	public static final class Blocks
 	{
 		// region: Wools
-		// TODO: Move to ApexCore or PR into Forge
 		public static final ITag.INamedTag<Block> WOOLS_WHITE = REGISTRY.forgeBlockTag("wools/white");
 		public static final ITag.INamedTag<Block> WOOLS_ORANGE = REGISTRY.forgeBlockTag("wools/orange");
 		public static final ITag.INamedTag<Block> WOOLS_MAGENTA = REGISTRY.forgeBlockTag("wools/magenta");
