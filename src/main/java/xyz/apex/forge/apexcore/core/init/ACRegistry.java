@@ -8,7 +8,7 @@ import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.java.utility.Lazy;
 
 import static xyz.apex.forge.utility.registrator.provider.RegistrateLangExtProvider.EN_GB;
-import static xyz.apex.repack.com.tterrag.registrate.providers.ProviderType.LANG;
+import static com.tterrag.registrate.providers.ProviderType.LANG;
 
 public final class ACRegistry extends AbstractRegistrator<ACRegistry>
 {
