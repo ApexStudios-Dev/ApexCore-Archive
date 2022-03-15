@@ -25,7 +25,6 @@ public final class ACTags
 	public static final class Items
 	{
 		// region: Wools
-		// TODO: Move to ApexCore or PR into Forge
 		public static final Tag.Named<Item> WOOLS_WHITE = REGISTRY.itemTagOptionalForge("wools/white");
 		public static final Tag.Named<Item> WOOLS_ORANGE = REGISTRY.itemTagOptionalForge("wools/orange");
 		public static final Tag.Named<Item> WOOLS_MAGENTA = REGISTRY.itemTagOptionalForge("wools/magenta");
@@ -76,7 +75,6 @@ public final class ACTags
 	public static final class Blocks
 	{
 		// region: Wools
-		// TODO: Move to ApexCore or PR into Forge
 		public static final Tag.Named<Block> WOOLS_WHITE = REGISTRY.blockTagOptionalForge("wools/white");
 		public static final Tag.Named<Block> WOOLS_ORANGE = REGISTRY.blockTagOptionalForge("wools/orange");
 		public static final Tag.Named<Block> WOOLS_MAGENTA = REGISTRY.blockTagOptionalForge("wools/magenta");
