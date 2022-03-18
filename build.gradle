@@ -295,5 +295,7 @@ if(System.getenv('MODRINTH_TOKEN') != null) {
 		dependencies = [
 		        new ModDependency("${registrator_mod_id}", 'required')
 		]
+		debugMode = true
+		failSilently = true
 	}
 }

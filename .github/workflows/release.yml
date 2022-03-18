@@ -39,7 +39,7 @@ jobs:
       - run: chmod +x ./gradlew
 
       # Generate Minecraft Assets & Data files
-      - run: ./gradlew Data # `Data` should match the `runData` gradle task name
+#      - run: ./gradlew Data # `Data` should match the `runData` gradle task name
 
       # Build package
       - run: ./gradlew build
@@ -51,14 +51,14 @@ jobs:
           path: ./build/libs
 
       # Publish mod
-      - run: ./gradlew publish
-        env:
-          APEX_MODS_MAVEN_USERNAME: ${{ secrets.APEX_MODS_MAVEN_USERNAME }}
-          APEX_MODS_MAVEN_PASSWORD: ${{ secrets.APEX_MODS_MAVEN_PASSWORD }}
+#      - run: ./gradlew publish
+#        env:
+#          APEX_MODS_MAVEN_USERNAME: ${{ secrets.APEX_MODS_MAVEN_USERNAME }}
+#          APEX_MODS_MAVEN_PASSWORD: ${{ secrets.APEX_MODS_MAVEN_PASSWORD }}
 
-      - run: ./gradlew curseforge
-        env:
-          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+#      - run: ./gradlew curseforge
+#        env:
+#          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
 
       - run: ./gradlew modrinth
         env:
