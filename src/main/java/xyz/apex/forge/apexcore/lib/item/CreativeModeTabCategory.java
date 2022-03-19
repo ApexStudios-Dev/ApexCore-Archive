@@ -5,7 +5,7 @@ import com.google.common.collect.Maps;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -114,7 +114,7 @@ public final class CreativeModeTabCategory implements NonnullPredicate<ItemStack
 			return this;
 		}
 
-		public Builder tagged(Tag<Item> itemTag)
+		public Builder tagged(TagKey<Item> itemTag)
 		{
 			return predicate(s -> s.is(itemTag));
 		}
