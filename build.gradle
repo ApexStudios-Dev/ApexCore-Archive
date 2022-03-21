@@ -153,10 +153,10 @@ dependencies {
 
 	annotationProcessor "org.spongepowered:mixin:${mixin_ap_version}:processor"
 
-	compileOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version_short}-${registrate_version}:sources")
-	compileOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version_short}-${registrate_version}")
-	shade fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version_short}-${registrate_version}")
-	runtimeOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version_short}-${registrate_version}")
+	compileOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}:sources")
+	compileOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}")
+	runtimeOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}")
+	shade fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}")
 
 	compileOnly "xyz.apex.java.utility:javautilities:${javautilities_version}:deobf"
 	compileOnly "xyz.apex.java.utility:javautilities:${javautilities_version}:sources"
