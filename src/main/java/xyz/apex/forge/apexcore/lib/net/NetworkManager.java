@@ -81,7 +81,7 @@ public final class NetworkManager
 
 	private void encodePacket(PacketHolder packet, FriendlyByteBuf buffer)
 	{
-		var packetType = packet.getClass();
+		var packetType = packet.packet.getClass();
 		Validate.isTrue(packetIdMap.containsKey(packetType), "Attempt to encode unregistered PacketType: '%s'", packetType);
 		var packetId = packetIdMap.get(packetType);
 		buffer.writeInt(packetId);
