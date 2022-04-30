@@ -81,7 +81,7 @@ public final class NetworkManager
 
 	private void encodePacket(PacketHolder packet, PacketBuffer buffer)
 	{
-		Class<? extends PacketHolder> packetType = packet.getClass();
+		Class<? extends AbstractPacket> packetType = packet.packet.getClass();
 		Validate.isTrue(packetIdMap.containsKey(packetType), "Attempt to encode unregistered PacketType: '%s'", packetType);
 		int packetId = packetIdMap.get(packetType);
 		buffer.writeInt(packetId);
