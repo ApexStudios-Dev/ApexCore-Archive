@@ -28,7 +28,8 @@ import java.util.stream.IntStream;
 public final class SupporterManager
 {
 	public static final Gson GSON = new GsonBuilder().setLenient().create();
-	public static final String SUPPORTER_URL = "file:///D:/Development/Java/Minecraft/Forge-1.16.5/supporter.json";
+	// public static final String SUPPORTER_URL = "file:///D:/Development/Java/Minecraft/Forge-1.16.5/supporter.json";
+	public static final String SUPPORTER_URL = "https://raw.githubusercontent.com/ApexStudios-Dev/Version/master/supporters.json";
 
 	private static final Set<SupporterInfo> supporterInfos = Sets.newHashSet();
 	private static final Map<UUID, SupporterInfo> supporterInfoMap = Maps.newHashMap();
