@@ -281,14 +281,18 @@ public final class SupporterManager
 			return aliases;
 		}
 
-		public boolean isFor(PlayerEntity player)
+		public boolean isFor(UUID playerId)
 		{
-			UUID playerId = player.getGameProfile().getId();
-
 			if(this.playerId.equals(playerId))
 				return true;
 
 			return aliases.contains(playerId);
+		}
+
+		public boolean isFor(PlayerEntity player)
+		{
+			UUID playerId = player.getGameProfile().getId();
+			return isFor(playerId);
 		}
 
 		@Nullable

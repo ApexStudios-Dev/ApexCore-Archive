@@ -19,8 +19,6 @@ public final class ACRegistry extends AbstractRegistrator<ACRegistry>
 	{
 		super(ApexCore.ID);
 
-		skipErrors();
-
 		addDataGenerator(LANG, provider -> {
 			provider.add(ACItemGroupCategories.ENCHANTED_BOOKS.getCategoryNameKey(), "Enchanted Books");
 			provider.add(ACItemGroupCategories.TOOLS.getCategoryNameKey(), "Tools");
@@ -55,6 +53,7 @@ public final class ACRegistry extends AbstractRegistrator<ACRegistry>
 			ACTags.bootstrap();
 
 			EventBusHelper.addEnqueuedListener(FMLCommonSetupEvent.class, event -> ACLootFunctionTypes.bootstrap());
+			PlayerPlushie.bootstrap();
 			bootstrap = true;
 		}
 	}
