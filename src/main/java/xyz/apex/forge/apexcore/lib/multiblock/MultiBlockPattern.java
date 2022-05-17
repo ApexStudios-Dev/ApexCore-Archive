@@ -184,6 +184,11 @@ public final class MultiBlockPattern
 
 		return worldSpace.subtract(localSpace);
 	}
+
+	public List<BlockPos> getLocalPositions()
+	{
+		return localPositions;
+	}
 	// endregion
 
 	public static Builder builder()

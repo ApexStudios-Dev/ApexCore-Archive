@@ -56,6 +56,11 @@ public class MultiBlock extends Block
 		super.onRemove(blockState, level, pos, oldBlockState, isMoving);
 	}
 
+	public final MultiBlockPattern getMultiBlockPattern()
+	{
+		return pattern;
+	}
+
 	// required as the default is built before our pattern has been set
 	public static void replaceStateContainer(MultiBlock block)
 	{
