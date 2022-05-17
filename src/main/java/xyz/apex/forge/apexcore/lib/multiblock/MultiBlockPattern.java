@@ -226,15 +226,23 @@ public final class MultiBlockPattern
 			return worldSpaceFromLocalSpace((blockState, pos) -> {
 				Direction facing = blockState.getValue(MultiBlockFourWay.FACING);
 
-				if(facing == Direction.NORTH || facing == Direction.SOUTH)
+				if(facing == Direction.NORTH)
 					return pos.rotate(Rotation.CLOCKWISE_90);
+				else if(facing == Direction.SOUTH)
+					return pos.rotate(Rotation.COUNTERCLOCKWISE_90);
+				else if(facing == Direction.EAST)
+					return pos.rotate(Rotation.CLOCKWISE_180);
 
 				return pos;
 			}).originFromWorldSpace((blockState, pos) -> {
 				Direction facing = blockState.getValue(MultiBlockFourWay.FACING);
 
-				if(facing == Direction.NORTH || facing == Direction.SOUTH)
+				if(facing == Direction.NORTH)
 					return pos.rotate(Rotation.CLOCKWISE_90);
+				else if(facing == Direction.SOUTH)
+					return pos.rotate(Rotation.COUNTERCLOCKWISE_90);
+				else if(facing == Direction.EAST)
+					return pos.rotate(Rotation.CLOCKWISE_180);
 
 				return pos;
 			});
