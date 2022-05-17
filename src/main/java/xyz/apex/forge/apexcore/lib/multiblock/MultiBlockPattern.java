@@ -18,6 +18,7 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 import xyz.apex.java.utility.nullness.NonnullBiFunction;
+import xyz.apex.java.utility.nullness.NonnullQuadFunction;
 import xyz.apex.java.utility.nullness.NonnullTriPredicate;
 
 import javax.annotation.Nullable;
@@ -32,6 +33,7 @@ public final class MultiBlockPattern
 	private final IntegerProperty blockProperty;
 	@Nullable private final NonnullBiFunction<BlockState, BlockPos, BlockPos> worldSpaceFromLocalSpace;
 	@Nullable private final NonnullBiFunction<BlockState, BlockPos, BlockPos> originFromWorldSpace;
+	@Nullable private final NonnullQuadFunction<MultiBlockPattern, BlockPos, BlockState, Integer, BlockState> placementStateModifier;
 	private final NonnullTriPredicate<World, BlockPos, BlockState> placementPredicate;
 	private final boolean placeSoundPerBlock;
 
@@ -41,6 +43,7 @@ public final class MultiBlockPattern
 		originFromWorldSpace = builder.originFromWorldSpace;
 		placementPredicate = builder.placementPredicate;
 		placeSoundPerBlock = builder.placeSoundPerBlock;
+		placementStateModifier = builder.placementStateModifier;
 
 		ImmutableList.Builder<BlockPos> list = ImmutableList.builder();
 		BlockPos.Mutable pos = new BlockPos.Mutable();
@@ -101,6 +104,7 @@ public final class MultiBlockPattern
 				BlockPos localSpace = localPositions.get(i);
 				BlockPos worldSpace = getWorldSpaceFromLocalSpace(blockState, origin, localSpace);
 				BlockState placementBlockState = blockState.setValue(blockProperty, i);
+				placementBlockState = getPlacementState(worldSpace, placementBlockState, i);
 
 				level.setBlock(worldSpace, placementBlockState, 11);
 
@@ -191,6 +195,14 @@ public final class MultiBlockPattern
 	}
 	// endregion
 
+	private BlockState getPlacementState(BlockPos pos, BlockState blockState, int index)
+	{
+		if(placementStateModifier != null)
+			return placementStateModifier.apply(this, pos, blockState, index);
+
+		return blockState;
+	}
+
 	public static Builder builder()
 	{
 		return new Builder();
@@ -201,6 +213,7 @@ public final class MultiBlockPattern
 		private final List<String[]> layers = Lists.newArrayList();
 		@Nullable private NonnullBiFunction<BlockState, BlockPos, BlockPos> worldSpaceFromLocalSpace;
 		@Nullable private NonnullBiFunction<BlockState, BlockPos, BlockPos> originFromWorldSpace;
+		@Nullable private NonnullQuadFunction<MultiBlockPattern, BlockPos, BlockState, Integer, BlockState> placementStateModifier;
 		private NonnullTriPredicate<World, BlockPos, BlockState> placementPredicate = (level, pos, blockState) -> blockState.getMaterial().isReplaceable();
 		private boolean placeSoundPerBlock = false;
 
@@ -251,6 +264,12 @@ public final class MultiBlockPattern
 
 				return pos;
 			});
+		}
+
+		public Builder placementStateModifier(NonnullQuadFunction<MultiBlockPattern, BlockPos, BlockState, Integer, BlockState> placementStateModifier)
+		{
+			this.placementStateModifier = placementStateModifier;
+			return this;
 		}
 
 		public Builder placementPredicate(NonnullTriPredicate<World, BlockPos, BlockState> placementPredicate)
