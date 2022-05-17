@@ -41,6 +41,7 @@ import xyz.apex.forge.apexcore.lib.support.SupporterManager;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public final class PlayerPlushieBlock extends HorizontalBlock implements IWaterLoggable
@@ -183,7 +184,12 @@ public final class PlayerPlushieBlock extends HorizontalBlock implements IWaterL
 					IFormattableTextComponent component = new StringTextComponent(username).withStyle(TextFormatting.GRAY, TextFormatting.ITALIC);
 
 					SupporterManager.getSupporters().stream().filter(info -> info.isFor(player.getPlayerId())).findFirst().ifPresent(info -> {
-						component.append(" (").append(new StringTextComponent(info.getLevel().getSerializedName()).withStyle(TextFormatting.AQUA)).append(")");
+						String name = info.getLevel().getSerializedName();
+						String englishName = name.toLowerCase(Locale.ROOT);
+						String letter = englishName.substring(0, 1).toUpperCase(Locale.ROOT);
+						englishName = letter + englishName.substring(1);
+
+						component.append(" (").append(new StringTextComponent(englishName).withStyle(TextFormatting.AQUA)).append(")");
 					});
 
 					tooltip.add(component);
