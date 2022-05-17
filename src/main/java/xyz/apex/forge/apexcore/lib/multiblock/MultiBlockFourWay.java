@@ -12,6 +12,8 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
+import javax.annotation.Nullable;
+
 public class MultiBlockFourWay extends MultiBlock
 {
 	public static final DirectionProperty FACING = HorizontalBlock.FACING;
@@ -23,6 +25,7 @@ public class MultiBlockFourWay extends MultiBlock
 		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH));
 	}
 
+	@Nullable
 	@Override
 	protected BlockState getPlacementState(BlockItemUseContext ctx, BlockState defaultBlockState)
 	{

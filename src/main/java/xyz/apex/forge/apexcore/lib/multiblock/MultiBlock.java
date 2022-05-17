@@ -35,6 +35,7 @@ public class MultiBlock extends Block
 		return placementState;
 	}
 
+	@Nullable
 	protected BlockState getPlacementState(BlockItemUseContext ctx, BlockState defaultBlockState)
 	{
 		return defaultBlockState;
