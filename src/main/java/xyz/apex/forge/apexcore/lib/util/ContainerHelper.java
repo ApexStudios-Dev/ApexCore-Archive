@@ -34,6 +34,9 @@ public final class ContainerHelper
 
 	public static int getRedstoneSignalFromContainer(@Nullable IItemHandler itemHandler)
 	{
+		if(itemHandler == null)
+			return 0;
+
 		float f = 0F;
 		int counter = 0;
 
