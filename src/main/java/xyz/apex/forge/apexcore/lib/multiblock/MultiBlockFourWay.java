@@ -29,7 +29,12 @@ public class MultiBlockFourWay extends MultiBlock
 	@Override
 	protected BlockState getPlacementState(BlockItemUseContext ctx, BlockState defaultBlockState)
 	{
-		return defaultBlockState.setValue(FACING, ctx.getHorizontalDirection().getOpposite());
+		BlockState placementState = super.getPlacementState(ctx, defaultBlockState);
+
+		if(placementState != null)
+			return placementState.setValue(FACING, ctx.getHorizontalDirection().getOpposite());
+
+		return null;
 	}
 
 	@Override

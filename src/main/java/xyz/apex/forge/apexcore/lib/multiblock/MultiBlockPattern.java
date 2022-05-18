@@ -35,7 +35,7 @@ public final class MultiBlockPattern
 	@Nullable private final NonnullBiFunction<BlockState, BlockPos, BlockPos> worldSpaceFromLocalSpace;
 	@Nullable private final NonnullBiFunction<BlockState, BlockPos, BlockPos> originFromWorldSpace;
 	@Nullable private final NonnullQuadFunction<MultiBlockPattern, BlockPos, BlockState, Integer, BlockState> placementStateModifier;
-	private final NonnullTriPredicate<IWorldReader, BlockPos, BlockState> placementPredicate;
+	@Nullable private final NonnullTriPredicate<IWorldReader, BlockPos, BlockState> placementPredicate;
 	private final boolean placeSoundPerBlock;
 
 	private MultiBlockPattern(Builder builder)
@@ -86,7 +86,7 @@ public final class MultiBlockPattern
 			BlockPos worldSpace = getWorldSpaceFromLocalSpace(defaultBlockState, origin, localSpace);
 			BlockState blockState = level.getBlockState(worldSpace);
 
-			if(placementPredicate.test(level, worldSpace, blockState))
+			if(passesPlacementTests(level, worldSpace, blockState))
 				return defaultBlockState;
 		}
 
@@ -103,7 +103,7 @@ public final class MultiBlockPattern
 			BlockPos worldSpace = getWorldSpaceFromLocalSpace(blockState, origin, localSpace);
 			BlockState testBlockState = level.getBlockState(worldSpace);
 
-			if(!placementPredicate.test(level, worldSpace, testBlockState))
+			if(!passesPlacementTests(level, worldSpace, testBlockState))
 				return false;
 		}
 
@@ -166,6 +166,15 @@ public final class MultiBlockPattern
 	public void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder)
 	{
 		builder.add(blockProperty);
+	}
+
+	private boolean passesPlacementTests(IWorldReader level, BlockPos pos, BlockState blockState)
+	{
+		if(!blockState.getMaterial().isReplaceable())
+			return false;
+		if(placementPredicate != null)
+			return placementPredicate.test(level, pos, blockState);
+		return true;
 	}
 
 	BlockState registerDefaultState(BlockState state)
@@ -232,7 +241,7 @@ public final class MultiBlockPattern
 		@Nullable private NonnullBiFunction<BlockState, BlockPos, BlockPos> worldSpaceFromLocalSpace;
 		@Nullable private NonnullBiFunction<BlockState, BlockPos, BlockPos> originFromWorldSpace;
 		@Nullable private NonnullQuadFunction<MultiBlockPattern, BlockPos, BlockState, Integer, BlockState> placementStateModifier;
-		private NonnullTriPredicate<IWorldReader, BlockPos, BlockState> placementPredicate = (level, pos, blockState) -> blockState.getMaterial().isReplaceable();
+		@Nullable private NonnullTriPredicate<IWorldReader, BlockPos, BlockState> placementPredicate;
 		private boolean placeSoundPerBlock = false;
 
 		private Builder()
