@@ -7,6 +7,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -14,15 +16,19 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
 
+import xyz.apex.forge.apexcore.core.block.PlayerPlushieBlock;
 import xyz.apex.forge.apexcore.core.client.hats.LayerHat;
 import xyz.apex.forge.apexcore.core.command.CommandApex;
 import xyz.apex.forge.apexcore.core.init.ACRegistry;
+import xyz.apex.forge.apexcore.core.init.PlayerPlushie;
 import xyz.apex.forge.apexcore.core.net.ClientSyncSupportersPacket;
 import xyz.apex.forge.apexcore.lib.net.NetworkManager;
 import xyz.apex.forge.apexcore.lib.support.SupporterManager;
 import xyz.apex.forge.apexcore.lib.util.EventBusHelper;
+import xyz.apex.forge.apexcore.lib.util.InterModUtil;
 
 @Mod(ApexCore.ID)
 public final class ApexCore
@@ -48,6 +54,17 @@ public final class ApexCore
 		});
 
 		EventBusHelper.addListener(RegisterCommandsEvent.class, event -> CommandApex.register(event.getDispatcher()));
+
+		EventBusHelper.addEnqueuedListener(InterModEnqueueEvent.class, event -> {
+			for(PlayerPlushieBlock.Player player : PlayerPlushieBlock.PLAYER.getPossibleValues())
+			{
+				ItemStack stack = PlayerPlushie.PLAYER_PLUSHIE_BLOCK.asItemStack();
+				CompoundNBT stackTag = stack.getOrCreateTag();
+				stackTag.putString(PlayerPlushieBlock.NBT_PLAYER, player.getSerializedName());
+				stackTag.putInt(PlayerPlushieBlock.NBT_PLAYER_INDEX, player.ordinal());
+				InterModUtil.sendFurnitureStationResult(ID, stack);
+			}
+		});
 	}
 
 	public static final class Client
