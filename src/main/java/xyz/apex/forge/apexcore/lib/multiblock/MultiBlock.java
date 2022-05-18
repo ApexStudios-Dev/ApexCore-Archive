@@ -52,7 +52,9 @@ public class MultiBlock extends Block
 	@Override
 	public void onRemove(BlockState blockState, World level, BlockPos pos, BlockState oldBlockState, boolean isMoving)
 	{
-		pattern.onRemove(blockState, level, pos, oldBlockState, isMoving);
+		if(!blockState.is(oldBlockState.getBlock()))
+			pattern.onRemove(blockState, level, pos, oldBlockState, isMoving);
+
 		super.onRemove(blockState, level, pos, oldBlockState, isMoving);
 	}
 
