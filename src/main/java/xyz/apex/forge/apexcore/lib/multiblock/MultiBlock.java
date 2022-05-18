@@ -5,6 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
@@ -33,6 +34,17 @@ public class MultiBlock extends Block
 			placementState = getPlacementState(ctx, placementState);
 
 		return placementState;
+	}
+
+	@Override
+	public final boolean canSurvive(BlockState blockState, IWorldReader level, BlockPos pos)
+	{
+		return pattern.canSurvive(level, pos, blockState) && canSurviveAdditional(level, pos, blockState);
+	}
+
+	protected boolean canSurviveAdditional(IWorldReader level, BlockPos pos, BlockState blockState)
+	{
+		return true;
 	}
 
 	@Nullable
