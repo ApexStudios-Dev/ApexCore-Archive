@@ -164,12 +164,13 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 
 task deobfJar(type: Jar) {
 	classifier 'deobf'
+	exclude '**/*bbmodel'
 	from sourceSets.main.output
 }
 
 jar {
 	classifier 'slim'
-
+	exclude '**/*bbmodel'
 	from sourceSets.main.output.classesDirs
 	from sourceSets.main.output.resourcesDir
 }
@@ -178,6 +179,7 @@ shadowJar {
 	classifier ''
 	configurations = [ project.configurations.shade ]
 	relocate "${registrate_package}", "xyz.apex.repack.${registrate_package}"
+	exclude '**/*bbmodel'
 
 	// we only want to remap class refrences imports etc
 	// and not shade in these into the mod jar
