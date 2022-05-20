@@ -7,9 +7,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -19,7 +18,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
 
-import xyz.apex.forge.apexcore.core.block.PlayerPlushieBlock;
 import xyz.apex.forge.apexcore.core.client.hats.LayerHat;
 import xyz.apex.forge.apexcore.core.command.CommandApex;
 import xyz.apex.forge.apexcore.core.init.ACRegistry;
@@ -29,6 +27,8 @@ import xyz.apex.forge.apexcore.lib.net.NetworkManager;
 import xyz.apex.forge.apexcore.lib.support.SupporterManager;
 import xyz.apex.forge.apexcore.lib.util.EventBusHelper;
 import xyz.apex.forge.apexcore.lib.util.InterModUtil;
+import xyz.apex.forge.apexcore.lib.util.ProfileHelper;
+import xyz.apex.forge.apexcore.lib.util.SkinHelper;
 
 @Mod(ApexCore.ID)
 public final class ApexCore
@@ -39,6 +39,7 @@ public final class ApexCore
 
 	public ApexCore()
 	{
+		ProfileHelper.setup();
 		ACRegistry.bootstrap();
 		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> Client::new);
 
@@ -56,14 +57,7 @@ public final class ApexCore
 		EventBusHelper.addListener(RegisterCommandsEvent.class, event -> CommandApex.register(event.getDispatcher()));
 
 		EventBusHelper.addEnqueuedListener(InterModEnqueueEvent.class, event -> {
-			for(PlayerPlushieBlock.Player player : PlayerPlushieBlock.PLAYER.getPossibleValues())
-			{
-				ItemStack stack = PlayerPlushie.PLAYER_PLUSHIE_BLOCK.asItemStack();
-				CompoundNBT stackTag = stack.getOrCreateTag();
-				stackTag.putString(PlayerPlushieBlock.NBT_PLAYER, player.getSerializedName());
-				stackTag.putInt(PlayerPlushieBlock.NBT_PLAYER_INDEX, player.ordinal());
-				InterModUtil.sendFurnitureStationResult(ID, stack);
-			}
+			PlayerPlushie.getPlushieItems().forEach(plushieItem -> InterModUtil.sendFurnitureStationResult(ID, plushieItem));
 		});
 	}
 
@@ -76,6 +70,8 @@ public final class ApexCore
 				LayerHat layerHat = new LayerHat();
 				entityRenderDispatcher.getSkinMap().values().forEach(r -> r.addLayer(layerHat));
 			});
+
+			EventBusHelper.addListener(ClientPlayerNetworkEvent.LoggedInEvent.class, event -> SkinHelper.invalidateCaches());
 		}
 	}
 }

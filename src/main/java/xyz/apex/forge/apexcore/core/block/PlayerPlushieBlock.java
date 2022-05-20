@@ -1,9 +1,8 @@
 package xyz.apex.forge.apexcore.core.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.IWaterLoggable;
+import com.mojang.authlib.GameProfile;
+
+import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,54 +11,52 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.Mirror;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
 
+import xyz.apex.forge.apexcore.core.block.entity.PlayerPlushieBlockEntity;
+import xyz.apex.forge.apexcore.core.init.PlayerPlushie;
+import xyz.apex.forge.apexcore.lib.block.BlockEntityBlock;
 import xyz.apex.forge.apexcore.lib.block.VoxelShaper;
 import xyz.apex.forge.apexcore.lib.support.SupporterManager;
+import xyz.apex.forge.apexcore.lib.util.ProfileHelper;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-public final class PlayerPlushieBlock extends HorizontalBlock implements IWaterLoggable
+public final class PlayerPlushieBlock extends BlockEntityBlock<PlayerPlushieBlockEntity> implements IWaterLoggable
 {
-	public static final EnumProperty<Player> PLAYER = EnumProperty.create("player", Player.class);
 	public static final DirectionProperty FACING = HorizontalBlock.FACING;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-	public static final VoxelShape SHAPE = box(2D, 0D, 3D, 14D, 11D, 14D);
+	public static final VoxelShape SHAPE = box(2D, 0D, 3D, 14D, 13D, 14D);
 	public static final VoxelShaper SHAPER = VoxelShaper.forHorizontal(SHAPE, Direction.NORTH);
-
-	public static final String NBT_PLAYER = "PlushiePlayer";
-	public static final String NBT_PLAYER_INDEX = "PlushiePlayer.Index";
 
 	public PlayerPlushieBlock(Properties properties)
 	{
 		super(properties);
 
-		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(PLAYER, Player.APEX));
+		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(WATERLOGGED, false));
 	}
 
 	@Override
@@ -67,6 +64,15 @@ public final class PlayerPlushieBlock extends HorizontalBlock implements IWaterL
 	{
 		Direction facing = blockState.getValue(FACING);
 		return SHAPER.get(facing);
+	}
+
+	@Override
+	public BlockState getStateForPlacement(BlockItemUseContext ctx)
+	{
+		BlockState blockState = defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite());
+		FluidState fluidState = ctx.getLevel().getFluidState(ctx.getClickedPos());
+		boolean waterLogged = fluidState.is(FluidTags.WATER);
+		return blockState.setValue(WATERLOGGED, waterLogged);
 	}
 
 	@Override
@@ -97,142 +103,103 @@ public final class PlayerPlushieBlock extends HorizontalBlock implements IWaterL
 	}
 
 	@Override
-	public ItemStack getPickBlock(BlockState blockState, RayTraceResult target, IBlockReader level, BlockPos pos, PlayerEntity player)
-	{
-		ItemStack stack = super.getPickBlock(blockState, target, level, pos, player);
-		Player modelPlayer = blockState.getValue(PLAYER);
-
-		CompoundNBT stackTag = stack.getOrCreateTag();
-		stackTag.putString(NBT_PLAYER, modelPlayer.serializedName);
-		stackTag.putInt(NBT_PLAYER_INDEX, modelPlayer.ordinal());
-
-		return stack;
-	}
-
-	@Override
 	public void setPlacedBy(World level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack)
 	{
-		CompoundNBT stackTag = stack.getTag();
+		SupporterManager.SupporterInfo supporterInfo = PlayerPlushie.getSupporterInfo(stack);
+		PlayerPlushieBlockEntity blockEntity = getBlockEntity(level, pos);
 
-		if(stackTag != null && stackTag.contains(NBT_PLAYER_INDEX, Constants.NBT.TAG_ANY_NUMERIC))
+		if(blockEntity != null && supporterInfo != null)
 		{
-			int playerIndex = stackTag.getInt(NBT_PLAYER_INDEX);
+			GameProfile profile = ProfileHelper.getGameProfile(supporterInfo.getPlayerId(), null);
+			blockEntity.setGameProfile(profile);
+		}
+	}
 
-			for(Player player : PLAYER.getPossibleValues())
+	@Override
+	public void fillItemCategory(ItemGroup itemGroup, NonNullList<ItemStack> stacks)
+	{
+		stacks.addAll(PlayerPlushie.getPlushieItems());
+	}
+
+	@Override
+	public BlockRenderType getRenderShape(BlockState blockState)
+	{
+		return BlockRenderType.ENTITYBLOCK_ANIMATED;
+	}
+
+	@Override
+	protected TileEntityType<PlayerPlushieBlockEntity> getBlockEntityType()
+	{
+		return PlayerPlushie.PLAYER_PLUSHIE_BLOCK_ENTITY.asBlockEntityType();
+	}
+
+	@Override
+	public ItemStack getPickBlock(BlockState blockState, RayTraceResult result, IBlockReader level, BlockPos pos, PlayerEntity player)
+	{
+		PlayerPlushieBlockEntity blockEntity = getBlockEntity(level, pos);
+
+		if(blockEntity != null)
+		{
+			GameProfile gameProfile = blockEntity.getGameProfile();
+			UUID playerId = gameProfile.getId();
+
+			for(SupporterManager.SupporterInfo info : SupporterManager.getSupporters())
 			{
-				if(player.ordinal() == playerIndex)
-				{
-					level.setBlock(pos, blockState.setValue(PLAYER, player), 3);
-					break;
-				}
+				if(info.isFor(playerId))
+					return PlayerPlushie.getPlushieItem(info);
 			}
 		}
-	}
 
-	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext ctx)
-	{
-		BlockState blockState = defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite());
-		FluidState fluidState = ctx.getLevel().getFluidState(ctx.getClickedPos());
-		boolean waterLogged = fluidState.is(FluidTags.WATER);
-		return blockState.setValue(WATERLOGGED, waterLogged);
-	}
-
-	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder)
-	{
-		builder.add(FACING, PLAYER, WATERLOGGED);
-		super.createBlockStateDefinition(builder);
-	}
-
-	@Override
-	public void fillItemCategory(ItemGroup itemGroup, NonNullList<ItemStack> items)
-	{
-		for(Player player : PLAYER.getPossibleValues())
-		{
-			ItemStack stack = asItem().getDefaultInstance();
-			CompoundNBT stackTag = stack.getOrCreateTag();
-			stackTag.putString(NBT_PLAYER, player.serializedName);
-			stackTag.putInt(NBT_PLAYER_INDEX, player.ordinal());
-			items.add(stack);
-		}
+		return super.getPickBlock(blockState, result, level, pos, player);
 	}
 
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable IBlockReader level, List<ITextComponent> tooltip, ITooltipFlag flag)
 	{
-		CompoundNBT stackTag = stack.getTag();
+		SupporterManager.SupporterInfo info = PlayerPlushie.getSupporterInfo(stack);
 
-		if(stackTag != null && stackTag.contains(NBT_PLAYER_INDEX, Constants.NBT.TAG_ANY_NUMERIC))
+		if(info != null)
 		{
-			int stackIndex = stackTag.getInt(NBT_PLAYER_INDEX);
+			String username = info.getUsername();
 
-			for(Player player : PLAYER.getPossibleValues())
+			if(level instanceof World)
 			{
-				if(player.ordinal() == stackIndex)
-				{
-					String username = player.getUsername();
+				World world = (World) level;
+				PlayerEntity player = info.getPlayer(world::getPlayerByUUID);
 
-					if(level instanceof World)
-					{
-						PlayerEntity entity = ((World) level).getPlayerByUUID(player.getPlayerId());
-
-						if(entity != null)
-							username = entity.getScoreboardName();
-					}
-
-					IFormattableTextComponent component = new StringTextComponent(username).withStyle(TextFormatting.GRAY, TextFormatting.ITALIC);
-
-					SupporterManager.getSupporters().stream().filter(info -> info.isFor(player.getPlayerId())).findFirst().ifPresent(info -> {
-						String name = info.getLevel().getSerializedName();
-						String englishName = name.toLowerCase(Locale.ROOT);
-						String letter = englishName.substring(0, 1).toUpperCase(Locale.ROOT);
-						englishName = letter + englishName.substring(1);
-
-						component.append(" (").append(new StringTextComponent(englishName).withStyle(TextFormatting.AQUA)).append(")");
-					});
-
-					tooltip.add(component);
-
-					break;
-				}
+				if(player != null)
+					username = player.getScoreboardName();
 			}
+
+			String supportLevelName = info.getLevel().getSerializedName().toLowerCase(Locale.ROOT);
+			String letter = supportLevelName.substring(0, 1).toUpperCase(Locale.ROOT);
+			supportLevelName = letter + supportLevelName.substring(1);
+
+			tooltip.add(new StringTextComponent(username)
+					.withStyle(TextFormatting.GRAY, TextFormatting.ITALIC)
+					.append(" (")
+					.append(new StringTextComponent(supportLevelName).withStyle(TextFormatting.AQUA))
+					.append(")")
+			);
 		}
 	}
 
-	public enum Player implements IStringSerializable
+	@Override
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder)
 	{
-		APEX("apex", "ApexSPG", UUID.fromString("43fd393b-879d-45ec-b2d5-ce8c4688ab66")),
-		FANTASY("fantasy", "FantasyGaming", UUID.fromString("598535bd-f330-4123-b4d0-c6e618390477")),
-		RUDY("rudy", "RudySPG", UUID.fromString("16d60e4e-53ba-4288-8062-ca1ea074b501")),
-		TOBI("tobi", "TroublesomeTobi", UUID.fromString("ae3f6ca6-b28c-479b-9c97-4be7df600041"))
-		;
+		builder.add(FACING, WATERLOGGED);
+		super.createBlockStateDefinition(builder);
+	}
 
-		private final String serializedName;
-		private final String username;
-		private final UUID playerId;
+	@Override
+	public BlockState rotate(BlockState blockState, Rotation rotation)
+	{
+		return blockState.setValue(FACING, rotation.rotate(blockState.getValue(FACING)));
+	}
 
-		Player(String serializedName, String username, UUID playerId)
-		{
-			this.serializedName = serializedName;
-			this.username = username;
-			this.playerId = playerId;
-		}
-
-		@Override
-		public String getSerializedName()
-		{
-			return serializedName;
-		}
-
-		public String getUsername()
-		{
-			return username;
-		}
-
-		public UUID getPlayerId()
-		{
-			return playerId;
-		}
+	@Override
+	public BlockState mirror(BlockState blockState, Mirror mirror)
+	{
+		return blockState.rotate(mirror.getRotation(blockState.getValue(FACING)));
 	}
 }

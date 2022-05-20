@@ -181,7 +181,7 @@ public final class SupporterManager
 			UUID playerId = parseUUID(element);
 
 			if(playerId != null)
-				return new SupporterInfo(playerId, SupporterLevel.DEFAULT, Collections.emptyList());
+				return new SupporterInfo(playerId, SupporterLevel.DEFAULT, Collections.emptyList(), "Unknown");
 		}
 		else if(element.isJsonObject())
 		{
@@ -196,13 +196,16 @@ public final class SupporterManager
 			{
 				Set<UUID> aliases = Sets.newHashSet();
 				SupporterLevel level = SupporterLevel.DEFAULT;
+				String username = "Unknown";
 
 				if(json.has("level"))
 					level = parseLevel(json.get("level"));
 				if(json.has("aliases"))
 					parseAliases(json.get("aliases"), aliases);
+				if(json.has("name"))
+					username = json.get("name").getAsString();
 
-				return new SupporterInfo(playerId, level, aliases);
+				return new SupporterInfo(playerId, level, aliases, username);
 			}
 		}
 
@@ -258,12 +261,14 @@ public final class SupporterManager
 		private final UUID playerId;
 		private final Set<UUID> aliases;
 		private final SupporterLevel level;
+		private final String username;
 
-		public SupporterInfo(UUID playerId, SupporterLevel level, Collection<UUID> aliases)
+		public SupporterInfo(UUID playerId, SupporterLevel level, Collection<UUID> aliases, String username)
 		{
 			this.playerId = playerId;
 			this.level = level;
 			this.aliases = ImmutableSet.copyOf(aliases);
+			this.username = username;
 		}
 
 		public UUID getPlayerId()
@@ -274,6 +279,11 @@ public final class SupporterManager
 		public SupporterLevel getLevel()
 		{
 			return level;
+		}
+
+		public String getUsername()
+		{
+			return username;
 		}
 
 		public Set<UUID> getAliases()
@@ -323,7 +333,7 @@ public final class SupporterManager
 			if(obj instanceof SupporterInfo)
 			{
 				SupporterInfo other = (SupporterInfo) obj;
-				return playerId.equals(other.playerId) && level.equals(other.level) && aliases.containsAll(other.aliases);
+				return playerId.equals(other.playerId) && level.equals(other.level) && aliases.containsAll(other.aliases) && username.equals(other.username);
 			}
 
 			return false;
@@ -332,13 +342,13 @@ public final class SupporterManager
 		@Override
 		public int hashCode()
 		{
-			return Objects.hash(playerId, level, aliases);
+			return Objects.hash(playerId, level, aliases, username);
 		}
 
 		@Override
 		public String toString()
 		{
-			StringBuilder str = new StringBuilder("SupporterInfo{ '" + playerId + "', '" + level.serializedName + '\'');
+			StringBuilder str = new StringBuilder("SupporterInfo{ '" + playerId + "', '" + level.serializedName + '\'' + "', '" + username + '\'');
 
 			if(!aliases.isEmpty())
 			{

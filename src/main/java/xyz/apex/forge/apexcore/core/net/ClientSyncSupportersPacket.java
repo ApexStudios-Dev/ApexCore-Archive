@@ -36,6 +36,7 @@ public final class ClientSyncSupportersPacket extends AbstractPacket
 				SupporterManager.SupporterLevel level = SupporterManager.SupporterLevel.DEFAULT;
 				Set<UUID> aliases = Sets.newHashSet();
 				UUID playerId = buffer.readUUID();
+				String username = buffer.readUtf();
 
 				if(buffer.readBoolean())
 					level = buffer.readEnum(SupporterManager.SupporterLevel.class);
@@ -46,7 +47,7 @@ public final class ClientSyncSupportersPacket extends AbstractPacket
 					IntStream.range(0, aliasCount).mapToObj(j -> buffer.readUUID()).forEach(aliases::add);
 				}
 
-				builder.add(new SupporterManager.SupporterInfo(playerId, level, aliases));
+				builder.add(new SupporterManager.SupporterInfo(playerId, level, aliases, username));
 			}
 
 			return builder;
@@ -64,6 +65,7 @@ public final class ClientSyncSupportersPacket extends AbstractPacket
 			Set<UUID> aliases = info.getAliases();
 
 			buffer.writeUUID(info.getPlayerId());
+			buffer.writeUtf(info.getUsername());
 
 			if(level.isDefault())
 				buffer.writeBoolean(false);

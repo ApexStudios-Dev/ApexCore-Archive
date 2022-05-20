@@ -24,6 +24,6 @@ public final class JeiIntegration implements IModPlugin
 	@Override
 	public void registerItemSubtypes(ISubtypeRegistration registration)
 	{
-		registration.useNbtForSubtypes(PlayerPlushie.PLAYER_PLUSHIE_BLOCK_ITEM.asItem());
+		registration.useNbtForSubtypes(PlayerPlushie.PLAYER_PLUSHIE_BLOCK.asItem());
 	}
 }
