@@ -13,6 +13,9 @@ import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraftforge.client.model.generators.ConfiguredModel;
+import net.minecraftforge.client.model.generators.ModelBuilder;
+import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.DatagenModLoader;
 
@@ -34,8 +37,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static xyz.apex.forge.utility.registrator.provider.RegistrateLangExtProvider.EN_GB;
-import static com.tterrag.registrate.providers.ProviderType.BLOCKSTATE;
-import static com.tterrag.registrate.providers.ProviderType.ITEM_MODEL;
 
 public final class PlayerPlushie
 {
@@ -68,7 +69,18 @@ public final class PlayerPlushie
 				.sound(SoundType.WOOL)
 				.noOcclusion()
 
-				.clearDataGenerator(BLOCKSTATE)
+				.blockState((ctx, provider) -> provider
+						.getVariantBuilder(ctx.get())
+						.forAllStates(blockState -> ConfiguredModel
+								.builder()
+								.modelFile(provider
+										.models()
+										.getBuilder(ctx.getName())
+										.texture("particle", "minecraft:block/white_wool")
+								)
+								.build()
+						)
+				)
 
 				.isValidSpawn(BlockHelper::never)
 				.isRedstoneConductor(BlockHelper::never)
@@ -78,7 +90,54 @@ public final class PlayerPlushie
 				.addRenderType(() -> RenderType::cutout)
 
 				.item((block, properties) -> new WearableBlockItem(block, properties, EquipmentSlotType.HEAD))
-					.clearDataGenerator(ITEM_MODEL)
+					.model((ctx, provider) -> {
+						ModelFile.UncheckedModelFile builtInEntity = new ModelFile.UncheckedModelFile("minecraft:builtin/entity");
+
+						provider.getBuilder(ctx.getName())
+						        .parent(builtInEntity)
+								.transforms()
+									.transform(ModelBuilder.Perspective.THIRDPERSON_RIGHT)
+										.rotation(75F, 45F, 0F)
+										.translation(0F, 2.5F, 0F)
+										.scale(.375F, .375F, .375F)
+									.end()
+									.transform(ModelBuilder.Perspective.THIRDPERSON_LEFT)
+										.rotation(75F, 45F, 0F)
+										.translation(0F, 2.5F, 0F)
+										.scale(.375F, .375F, .375F)
+									.end()
+									.transform(ModelBuilder.Perspective.FIRSTPERSON_RIGHT)
+										.rotation(0F, 135F, 0F)
+										.translation(0F, 4F, 0F)
+										.scale(.4F, .4F, .4F)
+									.end()
+									.transform(ModelBuilder.Perspective.FIRSTPERSON_LEFT)
+										.rotation(0F, 135F, 0F)
+										.translation(0F, 4F, 0F)
+										.scale(.4F, .4F, .4F)
+									.end()
+									.transform(ModelBuilder.Perspective.HEAD)
+										.rotation(0F, 0F, 0F)
+										.translation(0F, 14.5F, 0F)
+										.scale(1F, 1F, 1F)
+									.end()
+									.transform(ModelBuilder.Perspective.GROUND)
+										.rotation(0F, 0F, 0F)
+										.translation(0F, 3F, 0F)
+										.scale(.25F, .25F, .25F)
+									.end()
+									.transform(ModelBuilder.Perspective.FIXED)
+										.rotation(-90F, 0F, 0F)
+										.translation(0F, 0F, -8F)
+										.scale(1F, 1F, 1F)
+									.end()
+									.transform(ModelBuilder.Perspective.GUI)
+										.rotation(30F, -135F, 0F)
+										.translation(0F, 0F, 0F)
+										.scale(.625F, .625F, .625F)
+									.end()
+								.end();
+					})
 					.itemGroup(() -> ItemGroup.TAB_MISC)
 					.properties(properties -> properties.setISTER(() -> DatagenModLoader.isRunningDataGen() ? (() -> null) : ApexCoreItemStackBlockEntityRenderer::new))
 				.build()
