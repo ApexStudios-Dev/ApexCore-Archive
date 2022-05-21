@@ -12,15 +12,22 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.CreativeScreen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.texture.PotionSpriteUploader;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Effect;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.EffectUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.common.extensions.IForgeEffectInstance;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -29,9 +36,12 @@ import xyz.apex.forge.apexcore.lib.item.ItemGroupCategory;
 import xyz.apex.forge.apexcore.lib.item.ItemGroupCategoryManager;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
+import static net.minecraft.client.gui.screen.inventory.ContainerScreen.INVENTORY_LOCATION;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 // Simple offloading class to allow hot swapping while using mixins
@@ -398,6 +408,47 @@ public final class CreativeScreenHandler
 		ItemGroupCategoryManager.getInstance(selectedTab).getCategories().forEach(c -> c.tick(cycleIcons));
 	}
 
+	public static boolean checkEffectRendering(CreativeScreen screen, MatrixStack pose, int leftPos)
+	{
+		Minecraft mc = screen.getMinecraft();
+
+		if(mc.player != null)
+		{
+			ItemGroup itemGroup = getSelectedTab(screen);
+
+			if(isSupportedTab(itemGroup))
+			{
+				ItemGroupCategoryManager manager = ItemGroupCategoryManager.getInstance(itemGroup);
+
+				if(!manager.getCategories().isEmpty())
+				{
+					Collection<EffectInstance> effects = mc.player.getActiveEffects();
+
+					if(!effects.isEmpty())
+					{
+						RenderSystem.color4f(1F, 1F, 1F, 1F);
+
+						int effectCount = effects.size();
+						int renderX = leftPos - 150;
+						int renderY = 33;
+
+						if(effectCount > 5)
+							renderY = 132 / (effectCount - 1);
+
+						Iterable<EffectInstance> effectsToRender = effects.stream().filter(IForgeEffectInstance::shouldRender).sorted().collect(Collectors.toList());
+						renderEffectBackgrounds(screen, pose, renderX, renderY, effectsToRender);
+						renderEffectIcons(screen, pose, renderX, renderY, effectsToRender);
+						renderEffectLabels(screen, pose, renderX, renderY, effectsToRender);
+					}
+
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	private static void updateButtonState(CreativeScreen screen, @Nullable ItemGroup selectedTab, int tabPage, boolean isNext)
 	{
 		boolean isVisible = false;
@@ -506,5 +557,63 @@ public final class CreativeScreenHandler
 	private static boolean matches(ItemGroup a, ItemGroup b)
 	{
 		return a.getId() == b.getId();
+	}
+
+	private static void renderEffectBackgrounds(CreativeScreen screen, MatrixStack pose, int renderX, int renderY, Iterable<EffectInstance> effects)
+	{
+		screen.getMinecraft().textureManager.bind(INVENTORY_LOCATION);
+		int i = screen.getGuiTop();
+
+		for(EffectInstance effect : effects)
+		{
+			RenderSystem.color4f(1F, 1F, 1F, 1F);
+			screen.blit(pose, renderX, i, 0, 166, 140, 32);
+			i += renderY;
+		}
+	}
+
+	private static void renderEffectIcons(CreativeScreen screen, MatrixStack pose, int renderX, int renderY, Iterable<EffectInstance> effects)
+	{
+		Minecraft mc = screen.getMinecraft();
+		PotionSpriteUploader spriteUploader = mc.getMobEffectTextures();
+		int i = screen.getGuiTop();
+		int blitOffset = screen.getBlitOffset();
+
+		for(EffectInstance instance : effects)
+		{
+			Effect effect = instance.getEffect();
+			TextureAtlasSprite sprite = spriteUploader.get(effect);
+			mc.textureManager.bind(sprite.atlas().location());
+			AbstractGui.blit(pose, renderX + 6, i + 7, blitOffset, 18, 18, sprite);
+			i += renderY;
+		}
+	}
+
+	private static void renderEffectLabels(CreativeScreen screen, MatrixStack pose, int renderX, int renderY, Iterable<EffectInstance> effects)
+	{
+		Minecraft mc = screen.getMinecraft();
+		int i = screen.getGuiTop();
+		int blitOffset = screen.getBlitOffset();
+
+		for(EffectInstance effect : effects)
+		{
+			effect.renderInventoryEffect(screen, pose, renderX, i, blitOffset);
+
+			if(effect.shouldRenderInvText())
+			{
+				String s = I18n.get(effect.getEffect().getDescriptionId());
+				int amplifier = effect.getAmplifier();
+
+				if(amplifier >= 1 && amplifier <= 9)
+					s = s + ' ' + I18n.get("enchantment.level." + (amplifier + 1));
+
+				mc.font.drawShadow(pose, s, (float) (renderX + 10 + 18), (float) (i + 6), 16777215);
+
+				s = EffectUtils.formatDuration(effect, 1F);
+				mc.font.drawShadow(pose, s, (float) (renderX + 10 + 18), (float) (i + 6 + 10), 8355711);
+			}
+
+			i += renderY;
+		}
 	}
 }
