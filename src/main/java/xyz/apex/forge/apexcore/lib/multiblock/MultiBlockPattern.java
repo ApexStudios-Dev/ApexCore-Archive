@@ -112,7 +112,7 @@ public final class MultiBlockPattern
 
 	public void onPlace(BlockState blockState, World level, BlockPos origin, BlockState oldBlockState, boolean isMoving)
 	{
-		if(blockState.getValue(blockProperty) == INDEX_ORIGIN)
+		if(!oldBlockState.is(blockState.getBlock()) && blockState.getValue(blockProperty) == INDEX_ORIGIN)
 		{
 			SoundType soundType = blockState.getSoundType(level, origin, null);
 			SoundEvent placeSound = soundType.getPlaceSound();
@@ -151,7 +151,7 @@ public final class MultiBlockPattern
 	{
 		int index = blockState.getValue(blockProperty);
 
-		if(index != 0)
+		if(index != INDEX_ORIGIN)
 		{
 			for(int i = 1; i < localPositions.size(); i++)
 			{
