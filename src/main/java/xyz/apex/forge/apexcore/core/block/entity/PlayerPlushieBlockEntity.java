@@ -5,16 +5,15 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.common.util.Constants;
 
+import xyz.apex.forge.apexcore.lib.block.entity.BaseBlockEntity;
 import xyz.apex.forge.apexcore.lib.util.ProfileHelper;
 
 import javax.annotation.Nullable;
 
-public class PlayerPlushieBlockEntity extends TileEntity
+public class PlayerPlushieBlockEntity extends BaseBlockEntity
 {
 	public static final String NBT_GAME_PROFILE = "GameProfile";
 
@@ -60,20 +59,22 @@ public class PlayerPlushieBlockEntity extends TileEntity
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag()
+	protected CompoundNBT writeUpdateTag(CompoundNBT tagCompound)
 	{
-		CompoundNBT updateTag = super.getUpdateTag();
-
 		if(gameProfile != null)
-			updateTag.put(NBT_GAME_PROFILE, NBTUtil.writeGameProfile(new CompoundNBT(), gameProfile));
+			tagCompound.put(NBT_GAME_PROFILE, NBTUtil.writeGameProfile(new CompoundNBT(), gameProfile));
 
-		return updateTag;
+		return super.writeUpdateTag(tagCompound);
 	}
 
-	@Nullable
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket()
+	protected void readeUpdateTag(CompoundNBT tagCompound)
 	{
-		return new SUpdateTileEntityPacket(worldPosition, 3, getUpdateTag());
+		super.readeUpdateTag(tagCompound);
+
+		gameProfile = null;
+
+		if(tagCompound.contains(NBT_GAME_PROFILE, Constants.NBT.TAG_COMPOUND))
+			gameProfile = NBTUtil.readGameProfile(tagCompound.getCompound(NBT_GAME_PROFILE));
 	}
 }
