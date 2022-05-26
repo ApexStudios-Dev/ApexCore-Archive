@@ -69,6 +69,7 @@ public final class ApexCore
 				EntityRendererManager entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
 				LayerHat layerHat = new LayerHat();
 				entityRenderDispatcher.getSkinMap().values().forEach(r -> r.addLayer(layerHat));
+				SupporterManager.precacheSupporterSkins();
 			});
 
 			EventBusHelper.addListener(ClientPlayerNetworkEvent.LoggedInEvent.class, event -> SkinHelper.invalidateCaches());

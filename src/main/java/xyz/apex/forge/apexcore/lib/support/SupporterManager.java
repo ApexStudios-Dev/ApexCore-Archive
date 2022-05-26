@@ -9,11 +9,16 @@ import com.google.gson.*;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.IStringSerializable;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import xyz.apex.forge.apexcore.core.ApexCore;
 import xyz.apex.forge.apexcore.core.net.ClientSyncSupportersPacket;
+import xyz.apex.forge.apexcore.lib.util.ProfileHelper;
+import xyz.apex.forge.apexcore.lib.util.SkinHelper;
+import xyz.apex.java.utility.nullness.NonnullConsumer;
 import xyz.apex.java.utility.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -33,6 +38,24 @@ public final class SupporterManager
 
 	private static final Set<SupporterInfo> supporterInfos = Sets.newHashSet();
 	private static final Map<UUID, SupporterInfo> supporterInfoMap = Maps.newHashMap();
+
+	public static void precacheSupporterSkins()
+	{
+		ApexCore.LOGGER.info("Precaching Supporter Profile & Skins...");
+
+		for(SupporterInfo info : supporterInfos)
+		{
+			ApexCore.LOGGER.info("Precaching Supporter '{}' Profile & Skins...", info.username);
+			ProfileHelper.getGameProfile(info.playerId, info.username);
+
+			for(UUID alias : info.aliases)
+			{
+				ProfileHelper.getGameProfile(alias, null);
+			}
+
+			SkinHelper.getSkins(info.playerId, info.username, NonnullConsumer.noop());
+		}
+	}
 
 	public static Set<SupporterInfo> getSupporters()
 	{
@@ -72,6 +95,7 @@ public final class SupporterManager
 		supporterInfos.clear();
 		ReloadThread.finalizeParsing(packet.networkInfos);
 		ApexCore.LOGGER.info("Loaded {} Supporters (From Network)!", packet.networkInfos.size());
+		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> SupporterManager::precacheSupporterSkins);
 	}
 
 	public static final class ReloadThread extends Thread
