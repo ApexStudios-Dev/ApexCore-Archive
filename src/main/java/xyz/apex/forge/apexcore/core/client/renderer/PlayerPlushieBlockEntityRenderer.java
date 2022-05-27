@@ -2,7 +2,6 @@ package xyz.apex.forge.apexcore.core.client.renderer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 
@@ -22,6 +21,8 @@ import net.minecraft.util.math.vector.Vector3f;
 
 import xyz.apex.forge.apexcore.core.block.PlayerPlushieBlock;
 import xyz.apex.forge.apexcore.core.block.entity.PlayerPlushieBlockEntity;
+import xyz.apex.forge.apexcore.lib.support.SupporterManager;
+import xyz.apex.forge.apexcore.lib.util.ProfileHelper;
 import xyz.apex.forge.apexcore.lib.util.SkinHelper;
 import xyz.apex.forge.apexcore.lib.util.reflection.MethodHelper;
 
@@ -59,9 +60,20 @@ public class PlayerPlushieBlockEntityRenderer extends TileEntityRenderer<PlayerP
 	@Override
 	public void render(PlayerPlushieBlockEntity blockEntity, float partialTick, MatrixStack pose, IRenderTypeBuffer renderTypeBuffer, int combinedLight, int combinedOverlay)
 	{
-		GameProfile profile = blockEntity.getGameProfile();
-		UUID playerId = profile.getId();
-		String playerName = profile.getName();
+		SupporterManager.SupporterInfo supporterInfo = blockEntity.getSupporterInfo();
+		UUID playerId;
+		String playerName;
+
+		if(supporterInfo == null)
+		{
+			playerId = ProfileHelper.DUMMY_PROFILE.getId();
+			playerName = ProfileHelper.DUMMY_PROFILE.getName();
+		}
+		else
+		{
+			playerId = supporterInfo.getPlayerId();
+			playerName = supporterInfo.getUsername();
+		}
 
 		SkinHelper.getSkins(playerId, playerName, texture -> playerSkins.put(playerId, texture));
 

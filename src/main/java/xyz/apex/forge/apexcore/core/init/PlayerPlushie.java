@@ -3,11 +3,17 @@ package xyz.apex.forge.apexcore.core.init;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.data.loot.BlockLootTables;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.ConstantRange;
+import net.minecraft.loot.ItemLootEntry;
+import net.minecraft.loot.LootPool;
+import net.minecraft.loot.LootTable;
+import net.minecraft.loot.functions.CopyNbt;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
@@ -46,7 +52,7 @@ public final class PlayerPlushie
 	public static final ItemEntry<BlockItem> PLAYER_PLUSHIE_BLOCK_ITEM = ItemEntry.cast(PLAYER_PLUSHIE_BLOCK.getSibling(Item.class));
 	public static final BlockEntityEntry<PlayerPlushieBlockEntity> PLAYER_PLUSHIE_BLOCK_ENTITY = BlockEntityEntry.cast(PLAYER_PLUSHIE_BLOCK.getSibling(TileEntityType.class));
 
-	private static final String NBT_SUPPORTER_DATA = "SupporterData";
+	public static final String NBT_SUPPORTER_DATA = "SupporterData";
 	private static final String NBT_PLAYER_ID = "UUID";
 	private static final String NBT_PLAYER_ALIASES = "Aliases";
 	private static final String NBT_SUPPORTER_LEVEL = "Level";
@@ -79,6 +85,23 @@ public final class PlayerPlushie
 										.texture("particle", "minecraft:block/white_wool")
 								)
 								.build()
+						)
+				)
+
+				.loot((lootTables, block) -> lootTables
+						.add(block, LootTable
+								.lootTable()
+								.withPool(BlockLootTables
+										.applyExplosionCondition(block, LootPool
+												.lootPool()
+												.setRolls(ConstantRange.exactly(1))
+												.add(ItemLootEntry.lootTableItem(block))
+												.apply(CopyNbt
+														.copyData(CopyNbt.Source.BLOCK_ENTITY)
+														.copy(NBT_SUPPORTER_DATA, NBT_SUPPORTER_DATA)
+												)
+										)
+								)
 						)
 				)
 
@@ -159,22 +182,7 @@ public final class PlayerPlushie
 		ItemStack stack = PLAYER_PLUSHIE_BLOCK.asItemStack(stackSize);
 
 		CompoundNBT stackTag = stack.getOrCreateTag();
-
-		Set<UUID> aliases = info.getAliases();
-		SupporterManager.SupporterLevel level = info.getLevel();
-
-		CompoundNBT supporterTag = new CompoundNBT();
-		supporterTag.putUUID(NBT_PLAYER_ID, info.getPlayerId());
-		supporterTag.putString(NBT_SUPPORTER_LEVEL, level.getSerializedName());
-		supporterTag.putString(NBT_USERNAME, info.getUsername());
-
-		if(!aliases.isEmpty())
-		{
-			ListNBT aliasesTag = new ListNBT();
-			aliases.forEach(alias -> aliasesTag.add(NBTUtil.createUUID(alias)));
-			supporterTag.put(NBT_PLAYER_ALIASES, aliasesTag);
-		}
-
+		CompoundNBT supporterTag = writeSupporterInfoTag(info);
 		stackTag.put(NBT_SUPPORTER_DATA, supporterTag);
 
 		return stack;
@@ -193,11 +201,35 @@ public final class PlayerPlushie
 		if(stackTag != null && stackTag.contains(NBT_SUPPORTER_DATA, Constants.NBT.TAG_COMPOUND))
 		{
 			CompoundNBT supporterTag = stackTag.getCompound(NBT_SUPPORTER_DATA);
-			Set<SupporterManager.SupporterInfo> supporters = SupporterManager.getSupporters();
+			return getSupporterInfo(supporterTag);
+		}
 
-			if(supporterTag.contains(NBT_PLAYER_ID, Constants.NBT.TAG_INT_ARRAY))
+		return null;
+	}
+
+	@Nullable
+	public static SupporterManager.SupporterInfo getSupporterInfo(CompoundNBT supporterTag)
+	{
+		Set<SupporterManager.SupporterInfo> supporters = SupporterManager.getSupporters();
+
+		if(supporterTag.contains(NBT_PLAYER_ID, Constants.NBT.TAG_INT_ARRAY))
+		{
+			UUID playerId = supporterTag.getUUID(NBT_PLAYER_ID);
+
+			for(SupporterManager.SupporterInfo info : supporters)
 			{
-				UUID playerId = supporterTag.getUUID(NBT_PLAYER_ID);
+				if(info.isFor(playerId))
+					return info;
+			}
+		}
+
+		if(supporterTag.contains(NBT_PLAYER_ALIASES, Constants.NBT.TAG_LIST))
+		{
+			ListNBT aliasesTag = supporterTag.getList(NBT_PLAYER_ALIASES, Constants.NBT.TAG_INT_ARRAY);
+
+			for(INBT inbt : aliasesTag)
+			{
+				UUID playerId = NBTUtil.loadUUID(inbt);
 
 				for(SupporterManager.SupporterInfo info : supporters)
 				{
@@ -205,24 +237,28 @@ public final class PlayerPlushie
 						return info;
 				}
 			}
-
-			if(supporterTag.contains(NBT_PLAYER_ALIASES, Constants.NBT.TAG_LIST))
-			{
-				ListNBT aliasesTag = supporterTag.getList(NBT_PLAYER_ALIASES, Constants.NBT.TAG_INT_ARRAY);
-
-				for(INBT inbt : aliasesTag)
-				{
-					UUID playerId = NBTUtil.loadUUID(inbt);
-
-					for(SupporterManager.SupporterInfo info : supporters)
-					{
-						if(info.isFor(playerId))
-							return info;
-					}
-				}
-			}
 		}
 
 		return null;
+	}
+
+	public static CompoundNBT writeSupporterInfoTag(SupporterManager.SupporterInfo info)
+	{
+		Set<UUID> aliases = info.getAliases();
+		SupporterManager.SupporterLevel level = info.getLevel();
+
+		CompoundNBT supporterTag = new CompoundNBT();
+		supporterTag.putUUID(NBT_PLAYER_ID, info.getPlayerId());
+		supporterTag.putString(NBT_SUPPORTER_LEVEL, level.getSerializedName());
+		supporterTag.putString(NBT_USERNAME, info.getUsername());
+
+		if(!aliases.isEmpty())
+		{
+			ListNBT aliasesTag = new ListNBT();
+			aliases.forEach(alias -> aliasesTag.add(NBTUtil.createUUID(alias)));
+			supporterTag.put(NBT_PLAYER_ALIASES, aliasesTag);
+		}
+
+		return supporterTag;
 	}
 }

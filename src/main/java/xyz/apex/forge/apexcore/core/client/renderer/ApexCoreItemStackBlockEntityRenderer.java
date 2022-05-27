@@ -1,7 +1,6 @@
 package xyz.apex.forge.apexcore.core.client.renderer;
 
 import com.google.common.collect.Maps;
-import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
 import net.minecraft.client.Minecraft;
@@ -14,7 +13,6 @@ import net.minecraft.item.ItemStack;
 import xyz.apex.forge.apexcore.core.block.entity.PlayerPlushieBlockEntity;
 import xyz.apex.forge.apexcore.core.init.PlayerPlushie;
 import xyz.apex.forge.apexcore.lib.support.SupporterManager;
-import xyz.apex.forge.apexcore.lib.util.ProfileHelper;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -69,8 +67,7 @@ public final class ApexCoreItemStackBlockEntityRenderer extends ItemStackTileEnt
 
 		if(blockEntity != null)
 		{
-			GameProfile profile = ProfileHelper.getGameProfile(playerId, supporterInfo.getUsername());
-			blockEntity.setGameProfile(profile);
+			blockEntity.setSupporterInfo(supporterInfo);
 			playerPlushieBlockEntityMap.put(playerId, blockEntity);
 			return blockEntity;
 		}

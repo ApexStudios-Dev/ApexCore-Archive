@@ -1,48 +1,45 @@
 package xyz.apex.forge.apexcore.core.block.entity;
 
-import com.mojang.authlib.GameProfile;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.common.util.Constants;
 
+import xyz.apex.forge.apexcore.core.init.PlayerPlushie;
 import xyz.apex.forge.apexcore.lib.block.entity.BaseBlockEntity;
-import xyz.apex.forge.apexcore.lib.util.ProfileHelper;
+import xyz.apex.forge.apexcore.lib.support.SupporterManager;
 
 import javax.annotation.Nullable;
 
 public class PlayerPlushieBlockEntity extends BaseBlockEntity
 {
-	public static final String NBT_GAME_PROFILE = "GameProfile";
-
-	@Nullable private GameProfile gameProfile;
+	@Nullable private SupporterManager.SupporterInfo supporterInfo;
 
 	public PlayerPlushieBlockEntity(TileEntityType<?> blockEntityType)
 	{
 		super(blockEntityType);
 	}
 
-	public void setGameProfile(GameProfile gameProfile)
+	public void setSupporterInfo(SupporterManager.SupporterInfo supporterInfo)
 	{
-		this.gameProfile = gameProfile;
+		this.supporterInfo = supporterInfo;
 		setChanged();
 	}
 
-	public GameProfile getGameProfile()
+	@Nullable
+	public SupporterManager.SupporterInfo getSupporterInfo()
 	{
-		if(gameProfile == null)
-			return ProfileHelper.DUMMY_PROFILE;
-
-		return gameProfile;
+		return supporterInfo;
 	}
 
 	@Override
 	public CompoundNBT save(CompoundNBT tagCompound)
 	{
-		if(gameProfile != null)
-			tagCompound.put(NBT_GAME_PROFILE, NBTUtil.writeGameProfile(new CompoundNBT(), gameProfile));
+		if(supporterInfo != null)
+		{
+			CompoundNBT supporterTag = PlayerPlushie.writeSupporterInfoTag(supporterInfo);
+			tagCompound.put(PlayerPlushie.NBT_SUPPORTER_DATA, supporterTag);
+		}
 
 		return super.save(tagCompound);
 	}
@@ -52,17 +49,20 @@ public class PlayerPlushieBlockEntity extends BaseBlockEntity
 	{
 		super.load(blockState, tagCompound);
 
-		gameProfile = null;
+		supporterInfo = null;
 
-		if(tagCompound.contains(NBT_GAME_PROFILE, Constants.NBT.TAG_COMPOUND))
-			gameProfile = NBTUtil.readGameProfile(tagCompound.getCompound(NBT_GAME_PROFILE));
+		if(tagCompound.contains(PlayerPlushie.NBT_SUPPORTER_DATA, Constants.NBT.TAG_COMPOUND))
+			supporterInfo = PlayerPlushie.getSupporterInfo(tagCompound.getCompound(PlayerPlushie.NBT_SUPPORTER_DATA));
 	}
 
 	@Override
 	protected CompoundNBT writeUpdateTag(CompoundNBT tagCompound)
 	{
-		if(gameProfile != null)
-			tagCompound.put(NBT_GAME_PROFILE, NBTUtil.writeGameProfile(new CompoundNBT(), gameProfile));
+		if(supporterInfo != null)
+		{
+			CompoundNBT supporterTag = PlayerPlushie.writeSupporterInfoTag(supporterInfo);
+			tagCompound.put(PlayerPlushie.NBT_SUPPORTER_DATA, supporterTag);
+		}
 
 		return super.writeUpdateTag(tagCompound);
 	}
@@ -72,9 +72,9 @@ public class PlayerPlushieBlockEntity extends BaseBlockEntity
 	{
 		super.readeUpdateTag(tagCompound);
 
-		gameProfile = null;
+		supporterInfo = null;
 
-		if(tagCompound.contains(NBT_GAME_PROFILE, Constants.NBT.TAG_COMPOUND))
-			gameProfile = NBTUtil.readGameProfile(tagCompound.getCompound(NBT_GAME_PROFILE));
+		if(tagCompound.contains(PlayerPlushie.NBT_SUPPORTER_DATA, Constants.NBT.TAG_COMPOUND))
+			supporterInfo = PlayerPlushie.getSupporterInfo(tagCompound.getCompound(PlayerPlushie.NBT_SUPPORTER_DATA));
 	}
 }

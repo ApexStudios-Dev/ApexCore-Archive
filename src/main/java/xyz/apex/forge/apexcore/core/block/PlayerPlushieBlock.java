@@ -1,7 +1,5 @@
 package xyz.apex.forge.apexcore.core.block;
 
-import com.mojang.authlib.GameProfile;
-
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
@@ -38,12 +36,10 @@ import xyz.apex.forge.apexcore.core.init.PlayerPlushie;
 import xyz.apex.forge.apexcore.lib.block.BlockEntityBlock;
 import xyz.apex.forge.apexcore.lib.block.VoxelShaper;
 import xyz.apex.forge.apexcore.lib.support.SupporterManager;
-import xyz.apex.forge.apexcore.lib.util.ProfileHelper;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 
 public final class PlayerPlushieBlock extends BlockEntityBlock<PlayerPlushieBlockEntity> implements IWaterLoggable
 {
@@ -109,10 +105,7 @@ public final class PlayerPlushieBlock extends BlockEntityBlock<PlayerPlushieBloc
 		PlayerPlushieBlockEntity blockEntity = getBlockEntity(level, pos);
 
 		if(blockEntity != null && supporterInfo != null)
-		{
-			GameProfile profile = ProfileHelper.getGameProfile(supporterInfo.getPlayerId(), null);
-			blockEntity.setGameProfile(profile);
-		}
+			blockEntity.setSupporterInfo(supporterInfo);
 	}
 
 	@Override
@@ -140,14 +133,10 @@ public final class PlayerPlushieBlock extends BlockEntityBlock<PlayerPlushieBloc
 
 		if(blockEntity != null)
 		{
-			GameProfile gameProfile = blockEntity.getGameProfile();
-			UUID playerId = gameProfile.getId();
+			SupporterManager.SupporterInfo supporterInfo = blockEntity.getSupporterInfo();
 
-			for(SupporterManager.SupporterInfo info : SupporterManager.getSupporters())
-			{
-				if(info.isFor(playerId))
-					return PlayerPlushie.getPlushieItem(info);
-			}
+			if(supporterInfo != null)
+				return PlayerPlushie.getPlushieItem(supporterInfo);
 		}
 
 		return super.getPickBlock(blockState, result, level, pos, player);
