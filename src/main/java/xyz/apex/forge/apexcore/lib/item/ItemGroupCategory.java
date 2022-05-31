@@ -186,6 +186,12 @@ public final class ItemGroupCategory implements NonnullPredicate<ItemStack>
 			return this;
 		}
 
+		public Builder cycleIcons()
+		{
+			cycleIcons = true;
+			return this;
+		}
+
 		public ItemGroupCategory build()
 		{
 			return new ItemGroupCategory(this);
