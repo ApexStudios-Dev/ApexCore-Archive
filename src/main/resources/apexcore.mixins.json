@@ -5,7 +5,8 @@
 	"refmap": "${mod_id}.refmap.json",
 	"mixins": [ ],
 	"client": [
-		"client.CreativeModeInventoryScreenMixin"
+		"client.CreativeScreenMixin",
+		"client.DisplayEffectsScreenMixin"
 	],
 	"server": [ ],
 	"minVersion": "0.8.4"

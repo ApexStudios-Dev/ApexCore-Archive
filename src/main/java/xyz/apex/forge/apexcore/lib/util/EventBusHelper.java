@@ -21,13 +21,13 @@ public final class EventBusHelper
 
 	public static <T extends Event> void addListener(EventPriority priority, NonnullConsumer<T> consumer)
 	{
-		var eventType = getEventType(consumer);
+		Class<T> eventType = getEventType(consumer);
 		addListener(priority, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
 	}
 
 	public static <T extends Event> void addListener(EventPriority priority, boolean receiveCancelled, NonnullConsumer<T> consumer)
 	{
-		var eventType = getEventType(consumer);
+		Class<T> eventType = getEventType(consumer);
 		addListener(priority, receiveCancelled, eventType, consumer);
 	}
 
@@ -38,7 +38,7 @@ public final class EventBusHelper
 
 	public static <T extends Event> void addListener(EventPriority priority, boolean receiveCancelled, Class<T> eventType, NonnullConsumer<T> consumer)
 	{
-		var eventBus = getEventBus(eventType);
+		IEventBus eventBus = getEventBus(eventType);
 		eventBus.addListener(priority, receiveCancelled, eventType, consumer);
 	}
 
@@ -49,7 +49,7 @@ public final class EventBusHelper
 
 	public static <T extends Event> void addListener(boolean receiveCancelled, NonnullConsumer<T> consumer)
 	{
-		var eventType = getEventType(consumer);
+		Class<T> eventType = getEventType(consumer);
 		addListener(DEFAULT_EVENT_PRIORITY, receiveCancelled, eventType, consumer);
 	}
 
@@ -60,19 +60,19 @@ public final class EventBusHelper
 
 	public static <T extends Event> void addListener(NonnullConsumer<T> consumer)
 	{
-		var eventType = getEventType(consumer);
+		Class<T> eventType = getEventType(consumer);
 		addListener(DEFAULT_EVENT_PRIORITY, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
 	}
 
 	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(Class<F> genericClassFilter, EventPriority priority, NonnullConsumer<T> consumer)
 	{
-		var eventType = getEventType(consumer);
+		Class<T> eventType = getEventType(consumer);
 		addGenericListener(genericClassFilter, priority, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
 	}
 
 	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(Class<F> genericClassFilter, EventPriority priority, boolean receiveCancelled, NonnullConsumer<T> consumer)
 	{
-		var eventType = getEventType(consumer);
+		Class<T> eventType = getEventType(consumer);
 		addGenericListener(genericClassFilter, priority, receiveCancelled, eventType, consumer);
 	}
 
@@ -83,7 +83,7 @@ public final class EventBusHelper
 
 	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(Class<F> genericClassFilter, EventPriority priority, boolean receiveCancelled, Class<T> eventType, NonnullConsumer<T> consumer)
 	{
-		var eventBus = getEventBus(eventType);
+		IEventBus eventBus = getEventBus(eventType);
 		eventBus.addGenericListener(genericClassFilter, priority, receiveCancelled, eventType, consumer);
 	}
 
@@ -94,7 +94,7 @@ public final class EventBusHelper
 
 	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(Class<F> genericClassFilter, boolean receiveCancelled, NonnullConsumer<T> consumer)
 	{
-		var eventType = getEventType(consumer);
+		Class<T> eventType = getEventType(consumer);
 		addGenericListener(genericClassFilter, DEFAULT_EVENT_PRIORITY, receiveCancelled, eventType, consumer);
 	}
 
@@ -105,7 +105,7 @@ public final class EventBusHelper
 
 	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(Class<F> genericClassFilter, NonnullConsumer<T> consumer)
 	{
-		var eventType = getEventType(consumer);
+		Class<T> eventType = getEventType(consumer);
 		addGenericListener(genericClassFilter, DEFAULT_EVENT_PRIORITY, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
 	}
 
@@ -116,19 +116,19 @@ public final class EventBusHelper
 
 	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(EventPriority priority, boolean receiveCancelled, Class<T> eventType, NonnullConsumer<T> consumer)
 	{
-		var enqueuedListener = enqueueListener(consumer);
+		NonnullConsumer<T> enqueuedListener = enqueueListener(consumer);
 		addListener(priority, receiveCancelled, eventType, enqueuedListener);
 	}
 
 	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(EventPriority priority, boolean receiveCancelled, NonnullConsumer<T> consumer)
 	{
-		var eventType = getEventType(consumer);
+		Class<T> eventType = getEventType(consumer);
 		addEnqueuedListener(priority, receiveCancelled, eventType, consumer);
 	}
 
 	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(EventPriority priority, NonnullConsumer<T> consumer)
 	{
-		var eventType = getEventType(consumer);
+		Class<T> eventType = getEventType(consumer);
 		addEnqueuedListener(priority, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
 	}
 
@@ -144,7 +144,7 @@ public final class EventBusHelper
 
 	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(boolean receiveCancelled, NonnullConsumer<T> consumer)
 	{
-		var eventType = getEventType(consumer);
+		Class<T> eventType = getEventType(consumer);
 		addEnqueuedListener(DEFAULT_EVENT_PRIORITY, receiveCancelled, eventType, consumer);
 	}
 
@@ -155,13 +155,13 @@ public final class EventBusHelper
 
 	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(NonnullConsumer<T> consumer)
 	{
-		var eventType = getEventType(consumer);
+		Class<T> eventType = getEventType(consumer);
 		addEnqueuedListener(DEFAULT_EVENT_PRIORITY, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
 	}
 
 	public static <T extends Event> Class<T> getEventType(NonnullConsumer<T> consumer)
 	{
-		var eventType = (Class<T>) TypeResolver.resolveRawArgument(NonnullConsumer.class, consumer.getClass());
+		Class<T> eventType = (Class<T>) TypeResolver.resolveRawArgument(NonnullConsumer.class, consumer.getClass());
 
 		if((Class<?>) eventType == TypeResolver.Unknown.class)
 		{
