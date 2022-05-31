@@ -9,9 +9,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-import xyz.apex.forge.apexcore.lib.container.ItemInventoryMenu;
+import xyz.apex.forge.apexcore.lib.container.ItemInventoryContainer;
 
-public class ItemInventoryContainerScreen<C extends ItemInventoryMenu> extends AbstractContainerScreen<C>
+public class ItemInventoryContainerScreen<C extends ItemInventoryContainer> extends AbstractContainerScreen<C>
 {
 	protected final ResourceLocation backgroundTexture;
 

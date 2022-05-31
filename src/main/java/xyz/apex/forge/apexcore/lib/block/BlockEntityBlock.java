@@ -2,8 +2,8 @@ package xyz.apex.forge.apexcore.lib.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -23,7 +23,7 @@ public abstract class BlockEntityBlock<T extends BlockEntity> extends Block impl
 	protected abstract BlockEntityType<T> getBlockEntityType();
 
 	@Nullable
-	protected T getBlockEntity(LevelReader level, BlockPos pos)
+	protected T getBlockEntity(BlockGetter level, BlockPos pos)
 	{
 		return getBlockEntityType().getBlockEntity(level, pos);
 	}

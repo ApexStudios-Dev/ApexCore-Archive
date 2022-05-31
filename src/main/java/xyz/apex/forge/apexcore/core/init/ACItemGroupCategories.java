@@ -4,27 +4,30 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.*;
 import net.minecraftforge.common.Tags;
 
-import xyz.apex.forge.apexcore.lib.item.CreativeModeTabCategory;
-import xyz.apex.forge.apexcore.lib.item.CreativeModeTabCategoryManager;
+import xyz.apex.forge.apexcore.lib.item.ItemGroupCategory;
+import xyz.apex.forge.apexcore.lib.item.ItemGroupCategoryManager;
 
 // Example categories, disabled by default
-// Call ACCreativeModeTabCategories#enable() from your mod constructor to enable them
-public final class ACCreativeModeTabCategories
+// Call ACItemGroupCategories#enable() from your mod constructor to enable them
+public final class ACItemGroupCategories
 {
-	public static final CreativeModeTabCategory ENCHANTED_BOOKS = CreativeModeTabCategory
+	public static final ItemGroupCategory ENCHANTED_BOOKS = ItemGroupCategory
 			.builder("enchanted_books")
+				.cycleIcons()
 				.predicate(stack -> stack.getItem() == Items.ENCHANTED_BOOK)
 			.build();
 
-	public static final CreativeModeTabCategory TOOLS = CreativeModeTabCategory
+	public static final ItemGroupCategory TOOLS = ItemGroupCategory
 			.builder("tools")
+				.cycleIcons()
 				.predicate(stack -> stack.getItem() instanceof DiggerItem)
 			.build();
 
-	public static final CreativeModeTabCategory WEAPONS = CreativeModeTabCategory
+	public static final ItemGroupCategory WEAPONS = ItemGroupCategory
 			.builder("weapons")
+				.cycleIcons()
 				.predicate(stack -> {
-					var item = stack.getItem();
+					Item item = stack.getItem();
 
 					if(item instanceof SwordItem)
 						return true;
@@ -43,38 +46,45 @@ public final class ACCreativeModeTabCategories
                  })
 			.build();
 
-	public static final CreativeModeTabCategory ARMOR = CreativeModeTabCategory
+	public static final ItemGroupCategory ARMOR = ItemGroupCategory
 			.builder("armor")
+				.cycleIcons()
 				.predicate(stack -> stack.getItem() instanceof ArmorItem)
 			.build();
 
-	public static final CreativeModeTabCategory STAIRS = CreativeModeTabCategory
+	public static final ItemGroupCategory STAIRS = ItemGroupCategory
 			.builder("stairs")
+				.cycleIcons()
 				.tagged(ItemTags.STAIRS)
 			.build();
 
-	public static final CreativeModeTabCategory SLABS = CreativeModeTabCategory
+	public static final ItemGroupCategory SLABS = ItemGroupCategory
 			.builder("slabs")
+				.cycleIcons()
 				.tagged(ItemTags.SLABS)
 			.build();
 
-	public static final CreativeModeTabCategory ORES = CreativeModeTabCategory
+	public static final ItemGroupCategory ORES = ItemGroupCategory
 			.builder("ores")
+				.cycleIcons()
 				.tagged(Tags.Items.ORES)
 			.build();
 
-	public static final CreativeModeTabCategory STORAGE_BLOCKS = CreativeModeTabCategory
+	public static final ItemGroupCategory STORAGE_BLOCKS = ItemGroupCategory
 			.builder("storage_blocks")
+				.cycleIcons()
 				.tagged(Tags.Items.STORAGE_BLOCKS)
 			.build();
 
-	public static final CreativeModeTabCategory WOOLS = CreativeModeTabCategory
+	public static final ItemGroupCategory WOOLS = ItemGroupCategory
 			.builder("wool")
+				.cycleIcons()
 				.tagged(ACTags.Items.WOOLS)
 			.build();
 
-	public static final CreativeModeTabCategory LOGS = CreativeModeTabCategory
+	public static final ItemGroupCategory LOGS = ItemGroupCategory
 			.builder("logs")
+				.cycleIcons()
 				.tagged(ItemTags.LOGS)
 			.build();
 
@@ -85,13 +95,13 @@ public final class ACCreativeModeTabCategories
 		if(enabled)
 			return;
 
-		var manager = CreativeModeTabCategoryManager.getInstance(CreativeModeTab.TAB_COMBAT);
+		var manager = ItemGroupCategoryManager.getInstance(CreativeModeTab.TAB_COMBAT);
 		manager.addCategories(ENCHANTED_BOOKS, WEAPONS, ARMOR);
 
-		manager = CreativeModeTabCategoryManager.getInstance(CreativeModeTab.TAB_TOOLS);
+		manager = ItemGroupCategoryManager.getInstance(CreativeModeTab.TAB_TOOLS);
 		manager.addCategories(ENCHANTED_BOOKS, WEAPONS, TOOLS);
 
-		manager = CreativeModeTabCategoryManager.getInstance(CreativeModeTab.TAB_BUILDING_BLOCKS);
+		manager = ItemGroupCategoryManager.getInstance(CreativeModeTab.TAB_BUILDING_BLOCKS);
 		manager.addCategories(STAIRS, SLABS, ORES, STORAGE_BLOCKS, WOOLS, LOGS);
 
 		enabled = true;

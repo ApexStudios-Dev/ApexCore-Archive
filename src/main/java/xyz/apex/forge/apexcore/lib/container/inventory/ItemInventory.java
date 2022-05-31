@@ -9,12 +9,12 @@ import net.minecraft.world.item.ItemStack;
 
 import xyz.apex.forge.apexcore.lib.constants.NbtNames;
 
-public class ItemContainer extends SimpleContainer
+public class ItemInventory extends SimpleContainer
 {
 	private final ItemStack item;
 	private int openCount = 0;
 
-	public ItemContainer(ItemStack item, int slots)
+	public ItemInventory(ItemStack item, int slots)
 	{
 		super(slots);
 

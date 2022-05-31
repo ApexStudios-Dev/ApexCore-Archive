@@ -10,17 +10,17 @@ public class BaseSlot extends Slot
 
 	public boolean allowOtherPlayerInteraction;
 
-	public BaseSlot(Container container, Player opener, int slotIndex, int slotX, int slotY, boolean allowOtherPlayerInteraction)
+	public BaseSlot(Container inventory, Player opener, int slotIndex, int slotX, int slotY, boolean allowOtherPlayerInteraction)
 	{
-		super(container, slotIndex, slotX, slotY);
+		super(inventory, slotIndex, slotX, slotY);
 
 		this.opener = opener;
 		this.allowOtherPlayerInteraction = allowOtherPlayerInteraction;
 	}
 
-	public BaseSlot(Container container, Player opener, int slotIndex, int slotX, int slotY)
+	public BaseSlot(Container inventory, Player opener, int slotIndex, int slotX, int slotY)
 	{
-		this(container, opener, slotIndex, slotX, slotY, false);
+		this(inventory, opener, slotIndex, slotX, slotY, false);
 	}
 
 	public boolean areOtherPlayersAllowed()

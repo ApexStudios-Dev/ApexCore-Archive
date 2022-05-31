@@ -9,28 +9,35 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.RenderProperties;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import xyz.apex.forge.apexcore.core.ApexCore;
-import xyz.apex.forge.apexcore.lib.item.CreativeModeTabCategory;
-import xyz.apex.forge.apexcore.lib.item.CreativeModeTabCategoryManager;
+import xyz.apex.forge.apexcore.lib.item.ItemGroupCategory;
+import xyz.apex.forge.apexcore.lib.item.ItemGroupCategoryManager;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
+import static net.minecraft.client.gui.screens.inventory.AbstractContainerScreen.INVENTORY_LOCATION;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 // Simple offloading class to allow hot swapping while using mixins
 @OnlyIn(Dist.CLIENT)
 @Mod.EventBusSubscriber(modid = ApexCore.ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public final class CreativeModeInventoryScreenHandler
+public final class CreativeScreenHandler
 {
 	private static final ResourceLocation CATEGORY_TABS_TEXTURE = new ResourceLocation(ApexCore.ID, "textures/gui/container/creative_inventory/category_tabs.png");
 	private static final int MAX_CATEGORY_TAB = 4;
@@ -64,7 +71,7 @@ public final class CreativeModeInventoryScreenHandler
 		}
 	}
 
-	private static void updatePages(CreativeModeInventoryScreen screen, @Nullable CreativeModeTab tab)
+	private static void updatePages(CreativeModeInventoryScreen screen, @Nullable CreativeModeTab itemGroup)
 	{
 		Validate.notNull(buttonPreviousCategoryPage);
 		Validate.notNull(buttonNextCategoryPage);
@@ -86,9 +93,9 @@ public final class CreativeModeInventoryScreenHandler
 
 		maxCategoryTabPages = 0;
 
-		if(isSupportedTab(tab))
+		if(isSupportedTab(itemGroup))
 		{
-			var manager = CreativeModeTabCategoryManager.getInstance(tab);
+			var manager = ItemGroupCategoryManager.getInstance(itemGroup);
 			var categories = manager.getCategories();
 			var tabCount = categories.size();
 
@@ -97,23 +104,23 @@ public final class CreativeModeInventoryScreenHandler
 		}
 	}
 
-	public static void selectTab_FilterItems(CreativeModeInventoryScreen screen, CreativeModeTab tab)
+	public static void selectTab_FilterItems(CreativeModeInventoryScreen screen, CreativeModeTab itemGroup)
 	{
-		if(isSupportedTab(tab))
-			CreativeModeTabCategoryManager.getInstance(tab).applyFilter(screen.getMenu().items);
+		if(isSupportedTab(itemGroup))
+			ItemGroupCategoryManager.getInstance(itemGroup).applyFilter(screen.getMenu().items);
 	}
 
-	public static void selectTab_Head(CreativeModeInventoryScreen screen, CreativeModeTab tab)
+	public static void selectTab_Head(CreativeModeInventoryScreen screen, CreativeModeTab itemGroup)
 	{
 		var selectedTab = getSelectedTab(screen);
 
 		if(isSupportedTab(selectedTab))
 		{
-			CreativeModeTabCategoryManager.getInstance(selectedTab).disableCategories();
+			ItemGroupCategoryManager.getInstance(selectedTab).disableCategories();
 			categoryTabPage = 0;
 		}
 
-		updatePages(screen, tab);
+		updatePages(screen, itemGroup);
 	}
 
 	public static void renderBg(CreativeModeInventoryScreen screen, PoseStack pose)
@@ -159,7 +166,7 @@ public final class CreativeModeInventoryScreenHandler
 
 		for(var line : lines)
 		{
-			int lineWidth = font.width(line);
+			var lineWidth = font.width(line);
 			maxLineWidth = Math.max(lineWidth, maxLineWidth);
 		}*/
 
@@ -187,16 +194,17 @@ public final class CreativeModeInventoryScreenHandler
 		itemRenderer.blitOffset = 0F;
 	}
 
-	private static void renderTabButton(CreativeModeInventoryScreen screen, PoseStack pose, CreativeModeTab tab, boolean enabled)
+	private static void renderTabButton(CreativeModeInventoryScreen screen, PoseStack pose, CreativeModeTab itemGroup, boolean enabled)
 	{
-		if(!isSupportedTab(tab))
+		if(!isSupportedTab(itemGroup))
 			return;
-		if(!isSelectedTab(screen, tab))
+		if(!isSelectedTab(screen, itemGroup))
 			return;
 
-		var manager = CreativeModeTabCategoryManager.getInstance(tab);
+		var manager = ItemGroupCategoryManager.getInstance(itemGroup);
 		var minecraft = screen.getMinecraft();
 		var itemRenderer = minecraft.getItemRenderer();
+		var textureManager = minecraft.getTextureManager();
 
 		var tabIndex = 0;
 		var tabsInteracted = 0;
@@ -233,14 +241,14 @@ public final class CreativeModeInventoryScreenHandler
 				RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 				RenderSystem.enableBlend();
 
-				GuiComponent.blit(pose, x, y, screen.getBlitOffset(), u, 0, CATEGORY_TAB_U_SIZE, CATEGORY_TAB_V_SIZE, CATEGORY_TABS_TEXTURE_WIDTH, CATEGORY_TABS_TEXTURE_HEIGHT);
+				GuiComponent.blit(pose, x, y, screen.getBlitOffset(), u, 0, CATEGORY_TAB_U_SIZE, CATEGORY_TAB_V_SIZE, CATEGORY_TABS_TEXTURE_HEIGHT, CATEGORY_TABS_TEXTURE_WIDTH);
 
 				itemRenderer.blitOffset = 100F;
 
-				int iconX = x + 8;
-				int iconY = y + 6;
+				var iconX = x + 8;
+				var iconY = y + 6;
 
-				var icon = category.getCategoryIcon(tab);
+				var icon = category.getCategoryIcon(itemGroup);
 				itemRenderer.renderAndDecorateItem(icon, iconX, iconY);
 				itemRenderer.renderGuiItemDecorations(minecraft.font, icon, iconX, iconY);
 
@@ -264,7 +272,7 @@ public final class CreativeModeInventoryScreenHandler
 		if(mouseButton != GLFW_MOUSE_BUTTON_LEFT)
 			return;
 
-		var categories = CreativeModeTabCategoryManager.getInstance(selectedTab).getCategories();
+		var categories = ItemGroupCategoryManager.getInstance(selectedTab).getCategories();
 		var tabsInteracted = 0;
 
 		for(var tabIndex = 0; tabIndex < categories.size() && tabsInteracted < MAX_CATEGORY_TAB; tabIndex++)
@@ -294,7 +302,7 @@ public final class CreativeModeInventoryScreenHandler
 		if(mouseButton != GLFW_MOUSE_BUTTON_LEFT)
 			return;
 
-		var manager = CreativeModeTabCategoryManager.getInstance(selectedTab);
+		var manager = ItemGroupCategoryManager.getInstance(selectedTab);
 		var tabIndex = 0;
 		var tabsInteracted = 0;
 
@@ -336,7 +344,7 @@ public final class CreativeModeInventoryScreenHandler
 		if(!isSelectedTab(screen, itemGroup))
 			return;
 
-		var manager = CreativeModeTabCategoryManager.getInstance(itemGroup);
+		var manager = ItemGroupCategoryManager.getInstance(itemGroup);
 		var tabIndex = 0;
 		var tabsInteracted = 0;
 
@@ -382,13 +390,54 @@ public final class CreativeModeInventoryScreenHandler
 			return;
 
 		var cycleIcons = !Screen.hasShiftDown();
-		CreativeModeTabCategoryManager.getInstance(selectedTab).getCategories().forEach(c -> c.tick(cycleIcons));
+		ItemGroupCategoryManager.getInstance(selectedTab).getCategories().forEach(c -> c.tick(cycleIcons));
+	}
+
+	public static boolean checkEffectRendering(CreativeModeInventoryScreen screen, PoseStack pose, int leftPos)
+	{
+		var mc = screen.getMinecraft();
+
+		if(mc.player != null)
+		{
+			var itemGroup = getSelectedTab(screen);
+
+			if(isSupportedTab(itemGroup))
+			{
+				var manager = ItemGroupCategoryManager.getInstance(itemGroup);
+
+				if(!manager.getCategories().isEmpty())
+				{
+					var effects = mc.player.getActiveEffects();
+
+					if(!effects.isEmpty())
+					{
+						RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+
+						var effectCount = effects.size();
+						var renderX = leftPos - 150;
+						var renderY = 33;
+
+						if(effectCount > 5)
+							renderY = 132 / (effectCount - 1);
+
+						var effectsToRender = effects.stream().filter(ForgeHooksClient::shouldRenderEffect).sorted().collect(Collectors.toList());
+						renderEffectBackgrounds(screen, pose, renderX, renderY, effectsToRender);
+						renderEffectIcons(screen, pose, renderX, renderY, effectsToRender);
+						renderEffectLabels(screen, pose, renderX, renderY, effectsToRender);
+					}
+
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private static void updateButtonState(CreativeModeInventoryScreen screen, @Nullable CreativeModeTab selectedTab, int tabPage, boolean isNext)
 	{
-		boolean isVisible = false;
-		boolean isActive = false;
+		var isVisible = false;
+		var isActive = false;
 
 		if(maxCategoryTabPages > 0)
 		{
@@ -443,7 +492,7 @@ public final class CreativeModeInventoryScreenHandler
 		return ((tabIndex - MAX_CATEGORY_TAB) / (MAX_CATEGORY_TAB - 2)) + 1;
 	}
 
-	private static int getTabU(CreativeModeTabCategoryManager manager, CreativeModeTabCategory category)
+	private static int getTabU(ItemGroupCategoryManager manager, ItemGroupCategory category)
 	{
 		return manager.isCategoryEnabled(category) ? CATEGORY_TAB_U_SIZE : 0;
 	}
@@ -470,22 +519,22 @@ public final class CreativeModeInventoryScreenHandler
 		return CreativeModeTab.TABS[selectedTab];
 	}
 
-	private static boolean isSelectedTab(CreativeModeInventoryScreen screen, CreativeModeTab tab)
+	private static boolean isSelectedTab(CreativeModeInventoryScreen screen, CreativeModeTab itemGroup)
 	{
-		return screen.getSelectedTab() == tab.getId();
+		return screen.getSelectedTab() == itemGroup.getId();
 	}
 
-	private static boolean isSupportedTab(@Nullable CreativeModeTab tab)
+	private static boolean isSupportedTab(@Nullable CreativeModeTab itemGroup)
 	{
-		if(tab == null)
+		if(itemGroup == null)
 			return false;
-		if(matches(tab, CreativeModeTab.TAB_INVENTORY))
+		if(matches(itemGroup, CreativeModeTab.TAB_INVENTORY))
 			return false;
-		if(matches(tab, CreativeModeTab.TAB_HOTBAR))
+		if(matches(itemGroup, CreativeModeTab.TAB_HOTBAR))
 			return false;
-		if(matches(tab, CreativeModeTab.TAB_SEARCH))
+		if(matches(itemGroup, CreativeModeTab.TAB_SEARCH))
 			return false;
-		if(CreativeModeTabCategoryManager.getInstance(tab).getCategories().isEmpty())
+		if(ItemGroupCategoryManager.getInstance(itemGroup).getCategories().isEmpty())
 			return false;
 		return true;
 	}
@@ -493,5 +542,64 @@ public final class CreativeModeInventoryScreenHandler
 	private static boolean matches(CreativeModeTab a, CreativeModeTab b)
 	{
 		return a.getId() == b.getId();
+	}
+
+	private static void renderEffectBackgrounds(CreativeModeInventoryScreen screen, PoseStack pose, int renderX, int renderY, Iterable<MobEffectInstance> effects)
+	{
+		RenderSystem.setShaderTexture(0, INVENTORY_LOCATION);
+		var i = screen.getGuiTop();
+
+		for(var effect : effects)
+		{
+			RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+			screen.blit(pose, renderX, i, 0, 166, 140, 32);
+			i += renderY;
+		}
+	}
+
+	private static void renderEffectIcons(CreativeModeInventoryScreen screen, PoseStack pose, int renderX, int renderY, Iterable<MobEffectInstance> effects)
+	{
+		var mc = screen.getMinecraft();
+		var spriteUploader = mc.getMobEffectTextures();
+		var i = screen.getGuiTop();
+		var blitOffset = screen.getBlitOffset();
+
+		for(var instance : effects)
+		{
+			var effect = instance.getEffect();
+			var sprite = spriteUploader.get(effect);
+			RenderSystem.setShaderTexture(0, sprite.atlas().location());
+			GuiComponent.blit(pose, renderX + 6, i + 7, blitOffset, 18, 18, sprite);
+			i += renderY;
+		}
+	}
+
+	private static void renderEffectLabels(CreativeModeInventoryScreen screen, PoseStack pose, int renderX, int renderY, Iterable<MobEffectInstance> effects)
+	{
+		var mc = screen.getMinecraft();
+		var i = screen.getGuiTop();
+		var blitOffset = screen.getBlitOffset();
+
+		for(var effect : effects)
+		{
+			var effectRenderer = RenderProperties.getEffectRenderer(effect);
+			effectRenderer.renderInventoryEffect(effect, screen, pose, renderX, i, blitOffset);
+
+			if(effectRenderer.shouldRenderInvText(effect))
+			{
+				var s = I18n.get(effect.getEffect().getDescriptionId());
+				var amplifier = effect.getAmplifier();
+
+				if(amplifier >= 1 && amplifier <= 9)
+					s = s + ' ' + I18n.get("enchantment.level." + (amplifier + 1));
+
+				mc.font.drawShadow(pose, s, (float) (renderX + 10 + 18), (float) (i + 6), 16777215);
+
+				s = MobEffectUtil.formatDuration(effect, 1F);
+				mc.font.drawShadow(pose, s, (float) (renderX + 10 + 18), (float) (i + 6 + 10), 8355711);
+			}
+
+			i += renderY;
+		}
 	}
 }

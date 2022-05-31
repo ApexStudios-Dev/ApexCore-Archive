@@ -19,32 +19,30 @@ public final class ACRegistry extends AbstractRegistrator<ACRegistry>
 	{
 		super(ApexCore.ID);
 
-		skipErrors();
-
 		addDataGenerator(LANG, provider -> {
-			provider.add(ACCreativeModeTabCategories.ENCHANTED_BOOKS.getCategoryNameKey(), "Enchanted Books");
-			provider.add(ACCreativeModeTabCategories.TOOLS.getCategoryNameKey(), "Tools");
-			provider.add(ACCreativeModeTabCategories.WEAPONS.getCategoryNameKey(), "Weapons");
-			provider.add(ACCreativeModeTabCategories.ARMOR.getCategoryNameKey(), "Armor");
-			provider.add(ACCreativeModeTabCategories.STAIRS.getCategoryNameKey(), "Stairs");
-			provider.add(ACCreativeModeTabCategories.SLABS.getCategoryNameKey(), "Slabs");
-			provider.add(ACCreativeModeTabCategories.ORES.getCategoryNameKey(), "Ores");
-			provider.add(ACCreativeModeTabCategories.STORAGE_BLOCKS.getCategoryNameKey(), "Storage Blocks");
-			provider.add(ACCreativeModeTabCategories.WOOLS.getCategoryNameKey(), "Wools");
-			provider.add(ACCreativeModeTabCategories.LOGS.getCategoryNameKey(), "Logs");
+			provider.add(ACItemGroupCategories.ENCHANTED_BOOKS.getCategoryNameKey(), "Enchanted Books");
+			provider.add(ACItemGroupCategories.TOOLS.getCategoryNameKey(), "Tools");
+			provider.add(ACItemGroupCategories.WEAPONS.getCategoryNameKey(), "Weapons");
+			provider.add(ACItemGroupCategories.ARMOR.getCategoryNameKey(), "Armor");
+			provider.add(ACItemGroupCategories.STAIRS.getCategoryNameKey(), "Stairs");
+			provider.add(ACItemGroupCategories.SLABS.getCategoryNameKey(), "Slabs");
+			provider.add(ACItemGroupCategories.ORES.getCategoryNameKey(), "Ores");
+			provider.add(ACItemGroupCategories.STORAGE_BLOCKS.getCategoryNameKey(), "Storage Blocks");
+			provider.add(ACItemGroupCategories.WOOLS.getCategoryNameKey(), "Wools");
+			provider.add(ACItemGroupCategories.LOGS.getCategoryNameKey(), "Logs");
 		});
 
 		addDataGenerator(LANG_EXT_PROVIDER, provider -> {
-			provider.add(EN_GB, ACCreativeModeTabCategories.ENCHANTED_BOOKS.getCategoryNameKey(), "Enchanted Books");
-			provider.add(EN_GB, ACCreativeModeTabCategories.TOOLS.getCategoryNameKey(), "Tools");
-			provider.add(EN_GB, ACCreativeModeTabCategories.WEAPONS.getCategoryNameKey(), "Weapons");
-			provider.add(EN_GB, ACCreativeModeTabCategories.ARMOR.getCategoryNameKey(), "Armor");
-			provider.add(EN_GB, ACCreativeModeTabCategories.STAIRS.getCategoryNameKey(), "Stairs");
-			provider.add(EN_GB, ACCreativeModeTabCategories.SLABS.getCategoryNameKey(), "Slabs");
-			provider.add(EN_GB, ACCreativeModeTabCategories.ORES.getCategoryNameKey(), "Ores");
-			provider.add(EN_GB, ACCreativeModeTabCategories.STORAGE_BLOCKS.getCategoryNameKey(), "Storage Blocks");
-			provider.add(EN_GB, ACCreativeModeTabCategories.WOOLS.getCategoryNameKey(), "Wools");
-			provider.add(EN_GB, ACCreativeModeTabCategories.LOGS.getCategoryNameKey(), "Logs");
+			provider.add(EN_GB, ACItemGroupCategories.ENCHANTED_BOOKS.getCategoryNameKey(), "Enchanted Books");
+			provider.add(EN_GB, ACItemGroupCategories.TOOLS.getCategoryNameKey(), "Tools");
+			provider.add(EN_GB, ACItemGroupCategories.WEAPONS.getCategoryNameKey(), "Weapons");
+			provider.add(EN_GB, ACItemGroupCategories.ARMOR.getCategoryNameKey(), "Armor");
+			provider.add(EN_GB, ACItemGroupCategories.STAIRS.getCategoryNameKey(), "Stairs");
+			provider.add(EN_GB, ACItemGroupCategories.SLABS.getCategoryNameKey(), "Slabs");
+			provider.add(EN_GB, ACItemGroupCategories.ORES.getCategoryNameKey(), "Ores");
+			provider.add(EN_GB, ACItemGroupCategories.STORAGE_BLOCKS.getCategoryNameKey(), "Storage Blocks");
+			provider.add(EN_GB, ACItemGroupCategories.WOOLS.getCategoryNameKey(), "Wools");
+			provider.add(EN_GB, ACItemGroupCategories.LOGS.getCategoryNameKey(), "Logs");
 		});
 	}
 
@@ -55,6 +53,7 @@ public final class ACRegistry extends AbstractRegistrator<ACRegistry>
 			ACTags.bootstrap();
 
 			EventBusHelper.addEnqueuedListener(FMLCommonSetupEvent.class, event -> ACLootFunctionTypes.bootstrap());
+			PlayerPlushie.bootstrap();
 			bootstrap = true;
 		}
 	}
