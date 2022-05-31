@@ -13,16 +13,19 @@ public final class ACItemGroupCategories
 {
 	public static final ItemGroupCategory ENCHANTED_BOOKS = ItemGroupCategory
 			.builder("enchanted_books")
+				.cycleIcons()
 				.predicate(stack -> stack.getItem() == Items.ENCHANTED_BOOK)
 			.build();
 
 	public static final ItemGroupCategory TOOLS = ItemGroupCategory
 			.builder("tools")
+				.cycleIcons()
 				.predicate(stack -> stack.getItem() instanceof DiggerItem)
 			.build();
 
 	public static final ItemGroupCategory WEAPONS = ItemGroupCategory
 			.builder("weapons")
+				.cycleIcons()
 				.predicate(stack -> {
 					Item item = stack.getItem();
 
@@ -45,36 +48,43 @@ public final class ACItemGroupCategories
 
 	public static final ItemGroupCategory ARMOR = ItemGroupCategory
 			.builder("armor")
+				.cycleIcons()
 				.predicate(stack -> stack.getItem() instanceof ArmorItem)
 			.build();
 
 	public static final ItemGroupCategory STAIRS = ItemGroupCategory
 			.builder("stairs")
+				.cycleIcons()
 				.tagged(ItemTags.STAIRS)
 			.build();
 
 	public static final ItemGroupCategory SLABS = ItemGroupCategory
 			.builder("slabs")
+				.cycleIcons()
 				.tagged(ItemTags.SLABS)
 			.build();
 
 	public static final ItemGroupCategory ORES = ItemGroupCategory
 			.builder("ores")
+				.cycleIcons()
 				.tagged(Tags.Items.ORES)
 			.build();
 
 	public static final ItemGroupCategory STORAGE_BLOCKS = ItemGroupCategory
 			.builder("storage_blocks")
+				.cycleIcons()
 				.tagged(Tags.Items.STORAGE_BLOCKS)
 			.build();
 
 	public static final ItemGroupCategory WOOLS = ItemGroupCategory
 			.builder("wool")
+				.cycleIcons()
 				.tagged(ACTags.Items.WOOLS)
 			.build();
 
 	public static final ItemGroupCategory LOGS = ItemGroupCategory
 			.builder("logs")
+				.cycleIcons()
 				.tagged(ItemTags.LOGS)
 			.build();
 
