@@ -16,7 +16,6 @@ import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fmllegacy.network.PacketDistributor;
 
 import xyz.apex.forge.apexcore.core.command.CommandApex;
-import xyz.apex.forge.apexcore.core.init.ACItemGroupCategories;
 import xyz.apex.forge.apexcore.core.init.ACRegistry;
 import xyz.apex.forge.apexcore.core.init.PlayerPlushie;
 import xyz.apex.forge.apexcore.core.net.ClientSyncSupportersPacket;
@@ -38,7 +37,6 @@ public final class ApexCore
 	{
 		ProfileHelper.setup();
 		ACRegistry.bootstrap();
-		ACItemGroupCategories.enable();
 		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> Client::new);
 
 		EventBusHelper.addEnqueuedListener(FMLCommonSetupEvent.class, event -> {
