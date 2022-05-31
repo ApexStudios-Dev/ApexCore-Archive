@@ -1,14 +1,13 @@
 package xyz.apex.forge.apexcore.core.init;
 
+import com.tterrag.registrate.providers.ProviderType;
+
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.Tags;
-
-import xyz.apex.repack.com.tterrag.registrate.providers.ProviderType;
 
 public final class ACTags
 {
@@ -25,24 +24,23 @@ public final class ACTags
 	public static final class Items
 	{
 		// region: Wools
-		// TODO: Move to ApexCore or PR into Forge
-		public static final Tag.Named<Item> WOOLS_WHITE = REGISTRY.itemTagOptionalForge("wools/white");
-		public static final Tag.Named<Item> WOOLS_ORANGE = REGISTRY.itemTagOptionalForge("wools/orange");
-		public static final Tag.Named<Item> WOOLS_MAGENTA = REGISTRY.itemTagOptionalForge("wools/magenta");
-		public static final Tag.Named<Item> WOOLS_LIGHT_BLUE = REGISTRY.itemTagOptionalForge("wools/light_blue");
-		public static final Tag.Named<Item> WOOLS_YELLOW = REGISTRY.itemTagOptionalForge("wools/yellow");
-		public static final Tag.Named<Item> WOOLS_LIME = REGISTRY.itemTagOptionalForge("wools/lime");
-		public static final Tag.Named<Item> WOOLS_PINK = REGISTRY.itemTagOptionalForge("wools/pink");
-		public static final Tag.Named<Item> WOOLS_GRAY = REGISTRY.itemTagOptionalForge("wools/gray");
-		public static final Tag.Named<Item> WOOLS_LIGHT_GRAY = REGISTRY.itemTagOptionalForge("wools/light_gray");
-		public static final Tag.Named<Item> WOOLS_CYAN = REGISTRY.itemTagOptionalForge("wools/cyan");
-		public static final Tag.Named<Item> WOOLS_PURPLE = REGISTRY.itemTagOptionalForge("wools/purple");
-		public static final Tag.Named<Item> WOOLS_BLUE = REGISTRY.itemTagOptionalForge("wools/blue");
-		public static final Tag.Named<Item> WOOLS_BROWN = REGISTRY.itemTagOptionalForge("wools/brown");
-		public static final Tag.Named<Item> WOOLS_GREEN = REGISTRY.itemTagOptionalForge("wools/green");
-		public static final Tag.Named<Item> WOOLS_RED = REGISTRY.itemTagOptionalForge("wools/red");
-		public static final Tag.Named<Item> WOOLS_BLACK = REGISTRY.itemTagOptionalForge("wools/black");
-		public static final Tag.Named<Item> WOOLS = REGISTRY.itemTagOptionalForge("wools");
+		public static final Tag.Named<Item> WOOLS_WHITE = REGISTRY.forgeItemTag("wools/white");
+		public static final Tag.Named<Item> WOOLS_ORANGE = REGISTRY.forgeItemTag("wools/orange");
+		public static final Tag.Named<Item> WOOLS_MAGENTA = REGISTRY.forgeItemTag("wools/magenta");
+		public static final Tag.Named<Item> WOOLS_LIGHT_BLUE = REGISTRY.forgeItemTag("wools/light_blue");
+		public static final Tag.Named<Item> WOOLS_YELLOW = REGISTRY.forgeItemTag("wools/yellow");
+		public static final Tag.Named<Item> WOOLS_LIME = REGISTRY.forgeItemTag("wools/lime");
+		public static final Tag.Named<Item> WOOLS_PINK = REGISTRY.forgeItemTag("wools/pink");
+		public static final Tag.Named<Item> WOOLS_GRAY = REGISTRY.forgeItemTag("wools/gray");
+		public static final Tag.Named<Item> WOOLS_LIGHT_GRAY = REGISTRY.forgeItemTag("wools/light_gray");
+		public static final Tag.Named<Item> WOOLS_CYAN = REGISTRY.forgeItemTag("wools/cyan");
+		public static final Tag.Named<Item> WOOLS_PURPLE = REGISTRY.forgeItemTag("wools/purple");
+		public static final Tag.Named<Item> WOOLS_BLUE = REGISTRY.forgeItemTag("wools/blue");
+		public static final Tag.Named<Item> WOOLS_BROWN = REGISTRY.forgeItemTag("wools/brown");
+		public static final Tag.Named<Item> WOOLS_GREEN = REGISTRY.forgeItemTag("wools/green");
+		public static final Tag.Named<Item> WOOLS_RED = REGISTRY.forgeItemTag("wools/red");
+		public static final Tag.Named<Item> WOOLS_BLACK = REGISTRY.forgeItemTag("wools/black");
+		public static final Tag.Named<Item> WOOLS = REGISTRY.forgeItemTag("wools");
 		// endregion
 
 		private static void bootstrap()
@@ -76,28 +74,27 @@ public final class ACTags
 	public static final class Blocks
 	{
 		// region: Wools
-		// TODO: Move to ApexCore or PR into Forge
-		public static final Tag.Named<Block> WOOLS_WHITE = REGISTRY.blockTagOptionalForge("wools/white");
-		public static final Tag.Named<Block> WOOLS_ORANGE = REGISTRY.blockTagOptionalForge("wools/orange");
-		public static final Tag.Named<Block> WOOLS_MAGENTA = REGISTRY.blockTagOptionalForge("wools/magenta");
-		public static final Tag.Named<Block> WOOLS_LIGHT_BLUE = REGISTRY.blockTagOptionalForge("wools/light_blue");
-		public static final Tag.Named<Block> WOOLS_YELLOW = REGISTRY.blockTagOptionalForge("wools/yellow");
-		public static final Tag.Named<Block> WOOLS_LIME = REGISTRY.blockTagOptionalForge("wools/lime");
-		public static final Tag.Named<Block> WOOLS_PINK = REGISTRY.blockTagOptionalForge("wools/pink");
-		public static final Tag.Named<Block> WOOLS_GRAY = REGISTRY.blockTagOptionalForge("wools/gray");
-		public static final Tag.Named<Block> WOOLS_LIGHT_GRAY = REGISTRY.blockTagOptionalForge("wools/light_gray");
-		public static final Tag.Named<Block> WOOLS_CYAN = REGISTRY.blockTagOptionalForge("wools/cyan");
-		public static final Tag.Named<Block> WOOLS_PURPLE = REGISTRY.blockTagOptionalForge("wools/purple");
-		public static final Tag.Named<Block> WOOLS_BLUE = REGISTRY.blockTagOptionalForge("wools/blue");
-		public static final Tag.Named<Block> WOOLS_BROWN = REGISTRY.blockTagOptionalForge("wools/brown");
-		public static final Tag.Named<Block> WOOLS_GREEN = REGISTRY.blockTagOptionalForge("wools/green");
-		public static final Tag.Named<Block> WOOLS_RED = REGISTRY.blockTagOptionalForge("wools/red");
-		public static final Tag.Named<Block> WOOLS_BLACK = REGISTRY.blockTagOptionalForge("wools/black");
-		public static final Tag.Named<Block> WOOLS = REGISTRY.blockTagOptionalForge("wools");
+		public static final Tag.Named<Block> WOOLS_WHITE = REGISTRY.forgeBlockTag("wools/white");
+		public static final Tag.Named<Block> WOOLS_ORANGE = REGISTRY.forgeBlockTag("wools/orange");
+		public static final Tag.Named<Block> WOOLS_MAGENTA = REGISTRY.forgeBlockTag("wools/magenta");
+		public static final Tag.Named<Block> WOOLS_LIGHT_BLUE = REGISTRY.forgeBlockTag("wools/light_blue");
+		public static final Tag.Named<Block> WOOLS_YELLOW = REGISTRY.forgeBlockTag("wools/yellow");
+		public static final Tag.Named<Block> WOOLS_LIME = REGISTRY.forgeBlockTag("wools/lime");
+		public static final Tag.Named<Block> WOOLS_PINK = REGISTRY.forgeBlockTag("wools/pink");
+		public static final Tag.Named<Block> WOOLS_GRAY = REGISTRY.forgeBlockTag("wools/gray");
+		public static final Tag.Named<Block> WOOLS_LIGHT_GRAY = REGISTRY.forgeBlockTag("wools/light_gray");
+		public static final Tag.Named<Block> WOOLS_CYAN = REGISTRY.forgeBlockTag("wools/cyan");
+		public static final Tag.Named<Block> WOOLS_PURPLE = REGISTRY.forgeBlockTag("wools/purple");
+		public static final Tag.Named<Block> WOOLS_BLUE = REGISTRY.forgeBlockTag("wools/blue");
+		public static final Tag.Named<Block> WOOLS_BROWN = REGISTRY.forgeBlockTag("wools/brown");
+		public static final Tag.Named<Block> WOOLS_GREEN = REGISTRY.forgeBlockTag("wools/green");
+		public static final Tag.Named<Block> WOOLS_RED = REGISTRY.forgeBlockTag("wools/red");
+		public static final Tag.Named<Block> WOOLS_BLACK = REGISTRY.forgeBlockTag("wools/black");
+		public static final Tag.Named<Block> WOOLS = REGISTRY.forgeBlockTag("wools");
 		// endregion
 
-		public static final Tags.IOptionalNamedTag<Block> CROPS = REGISTRY.blockTagOptionalForge("crops");
-		public static final Tags.IOptionalNamedTag<Block> MUSHROOMS = REGISTRY.blockTagOptionalForge("mushrooms");
+		public static final Tag.Named<Block> CROPS = REGISTRY.forgeBlockTag("crops");
+		public static final Tag.Named<Block> MUSHROOMS = REGISTRY.forgeBlockTag("mushrooms");
 
 		private static void bootstrap()
 		{
@@ -144,8 +141,8 @@ public final class ACTags
 	public static final class EntityTypes
 	{
 		// region: Forge / Vanilla Missing
-		public static final Tags.IOptionalNamedTag<EntityType<?>> COWS = REGISTRY.entityTypeTagOptionalForge("cows");
-		public static final Tags.IOptionalNamedTag<EntityType<?>> CHICKENS = REGISTRY.entityTypeTagOptionalForge("chickens");
+		public static final Tag.Named<EntityType<?>> COWS = REGISTRY.forgeEntityTypeTag("cows");
+		public static final Tag.Named<EntityType<?>> CHICKENS = REGISTRY.forgeEntityTypeTag("chickens");
 		// endregion
 
 		private static void bootstrap()

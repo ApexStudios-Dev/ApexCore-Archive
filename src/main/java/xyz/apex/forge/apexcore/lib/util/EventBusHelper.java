@@ -1,10 +1,17 @@
 package xyz.apex.forge.apexcore.lib.util;
 
+import net.jodah.typetools.TypeResolver;
+
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.GenericEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.event.IModBusEvent;
+import net.minecraftforge.fml.event.lifecycle.ParallelDispatchEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
+import xyz.apex.forge.apexcore.core.ApexCore;
 import xyz.apex.java.utility.nullness.NonnullConsumer;
 
 public final class EventBusHelper
@@ -12,83 +19,168 @@ public final class EventBusHelper
 	private static final boolean DEFAULT_RECEIVE_CANCELLED = false;
 	private static final EventPriority DEFAULT_EVENT_PRIORITY = EventPriority.NORMAL;
 
-	public static <T extends Event> void addListener(IEventBus eventBus, EventPriority priority, NonnullConsumer<T> consumer)
+	public static <T extends Event> void addListener(EventPriority priority, NonnullConsumer<T> consumer)
 	{
-		addListener(eventBus, priority, DEFAULT_RECEIVE_CANCELLED, consumer);
+		Class<T> eventType = getEventType(consumer);
+		addListener(priority, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
 	}
 
-	public static <T extends Event> void addListener(IEventBus eventBus, EventPriority priority, boolean receiveCancelled, NonnullConsumer<T> consumer)
+	public static <T extends Event> void addListener(EventPriority priority, boolean receiveCancelled, NonnullConsumer<T> consumer)
 	{
-		eventBus.addListener(priority, receiveCancelled, consumer);
+		Class<T> eventType = getEventType(consumer);
+		addListener(priority, receiveCancelled, eventType, consumer);
 	}
 
-	public static <T extends Event> void addListener(IEventBus eventBus, EventPriority priority, Class<T> eventType, NonnullConsumer<T> consumer)
+	public static <T extends Event> void addListener(EventPriority priority, Class<T> eventType, NonnullConsumer<T> consumer)
 	{
-		addListener(eventBus, priority, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
+		addListener(priority, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
 	}
 
-	public static <T extends Event> void addListener(IEventBus eventBus, EventPriority priority, boolean receiveCancelled, Class<T> eventType, NonnullConsumer<T> consumer)
+	public static <T extends Event> void addListener(EventPriority priority, boolean receiveCancelled, Class<T> eventType, NonnullConsumer<T> consumer)
 	{
+		IEventBus eventBus = getEventBus(eventType);
 		eventBus.addListener(priority, receiveCancelled, eventType, consumer);
 	}
 
-	public static <T extends Event> void addListener(IEventBus eventBus, boolean receiveCancelled, Class<T> eventType, NonnullConsumer<T> consumer)
+	public static <T extends Event> void addListener(boolean receiveCancelled, Class<T> eventType, NonnullConsumer<T> consumer)
 	{
-		addListener(eventBus, DEFAULT_EVENT_PRIORITY, receiveCancelled, eventType, consumer);
+		addListener(DEFAULT_EVENT_PRIORITY, receiveCancelled, eventType, consumer);
 	}
 
-	public static <T extends Event> void addListener(IEventBus eventBus, boolean receiveCancelled, NonnullConsumer<T> consumer)
+	public static <T extends Event> void addListener(boolean receiveCancelled, NonnullConsumer<T> consumer)
 	{
-		addListener(eventBus, DEFAULT_EVENT_PRIORITY, receiveCancelled, consumer);
+		Class<T> eventType = getEventType(consumer);
+		addListener(DEFAULT_EVENT_PRIORITY, receiveCancelled, eventType, consumer);
 	}
 
-	public static <T extends Event> void addListener(IEventBus eventBus, Class<T> eventType, NonnullConsumer<T> consumer)
+	public static <T extends Event> void addListener(Class<T> eventType, NonnullConsumer<T> consumer)
 	{
-		addListener(eventBus, DEFAULT_EVENT_PRIORITY, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
+		addListener(DEFAULT_EVENT_PRIORITY, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
 	}
 
-	public static <T extends Event> void addListener(IEventBus eventBus, NonnullConsumer<T> consumer)
+	public static <T extends Event> void addListener(NonnullConsumer<T> consumer)
 	{
-		addListener(eventBus, DEFAULT_EVENT_PRIORITY, DEFAULT_RECEIVE_CANCELLED, consumer);
+		Class<T> eventType = getEventType(consumer);
+		addListener(DEFAULT_EVENT_PRIORITY, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
 	}
 
-	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(IEventBus eventBus, Class<F> genericClassFilter, EventPriority priority, NonnullConsumer<T> consumer)
+	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(Class<F> genericClassFilter, EventPriority priority, NonnullConsumer<T> consumer)
 	{
-		addGenericListener(eventBus, genericClassFilter, priority, DEFAULT_RECEIVE_CANCELLED, consumer);
+		Class<T> eventType = getEventType(consumer);
+		addGenericListener(genericClassFilter, priority, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
 	}
 
-	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(IEventBus eventBus, Class<F> genericClassFilter, EventPriority priority, boolean receiveCancelled, NonnullConsumer<T> consumer)
+	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(Class<F> genericClassFilter, EventPriority priority, boolean receiveCancelled, NonnullConsumer<T> consumer)
 	{
-		eventBus.addGenericListener(genericClassFilter, priority, receiveCancelled, consumer);
+		Class<T> eventType = getEventType(consumer);
+		addGenericListener(genericClassFilter, priority, receiveCancelled, eventType, consumer);
 	}
 
-	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(IEventBus eventBus, Class<F> genericClassFilter, EventPriority priority, Class<T> eventType, NonnullConsumer<T> consumer)
+	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(Class<F> genericClassFilter, EventPriority priority, Class<T> eventType, NonnullConsumer<T> consumer)
 	{
-		addGenericListener(eventBus, genericClassFilter, priority, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
+		addGenericListener(genericClassFilter, priority, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
 	}
 
-	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(IEventBus eventBus, Class<F> genericClassFilter, EventPriority priority, boolean receiveCancelled, Class<T> eventType, NonnullConsumer<T> consumer)
+	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(Class<F> genericClassFilter, EventPriority priority, boolean receiveCancelled, Class<T> eventType, NonnullConsumer<T> consumer)
 	{
+		IEventBus eventBus = getEventBus(eventType);
 		eventBus.addGenericListener(genericClassFilter, priority, receiveCancelled, eventType, consumer);
 	}
 
-	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(IEventBus eventBus, Class<F> genericClassFilter, boolean receiveCancelled, Class<T> eventType, NonnullConsumer<T> consumer)
+	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(Class<F> genericClassFilter, boolean receiveCancelled, Class<T> eventType, NonnullConsumer<T> consumer)
 	{
-		addGenericListener(eventBus, genericClassFilter, DEFAULT_EVENT_PRIORITY, receiveCancelled, eventType, consumer);
+		addGenericListener(genericClassFilter, DEFAULT_EVENT_PRIORITY, receiveCancelled, eventType, consumer);
 	}
 
-	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(IEventBus eventBus, Class<F> genericClassFilter, boolean receiveCancelled, NonnullConsumer<T> consumer)
+	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(Class<F> genericClassFilter, boolean receiveCancelled, NonnullConsumer<T> consumer)
 	{
-		addGenericListener(eventBus, genericClassFilter, DEFAULT_EVENT_PRIORITY, receiveCancelled, consumer);
+		Class<T> eventType = getEventType(consumer);
+		addGenericListener(genericClassFilter, DEFAULT_EVENT_PRIORITY, receiveCancelled, eventType, consumer);
 	}
 
-	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(IEventBus eventBus, Class<F> genericClassFilter, Class<T> eventType, NonnullConsumer<T> consumer)
+	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(Class<F> genericClassFilter, Class<T> eventType, NonnullConsumer<T> consumer)
 	{
-		addGenericListener(eventBus, genericClassFilter, DEFAULT_EVENT_PRIORITY, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
+		addGenericListener(genericClassFilter, DEFAULT_EVENT_PRIORITY, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
 	}
 
-	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(IEventBus eventBus, Class<F> genericClassFilter, NonnullConsumer<T> consumer)
+	public static <T extends GenericEvent<? extends F>, F> void addGenericListener(Class<F> genericClassFilter, NonnullConsumer<T> consumer)
 	{
-		addGenericListener(eventBus, genericClassFilter, DEFAULT_EVENT_PRIORITY, DEFAULT_RECEIVE_CANCELLED, consumer);
+		Class<T> eventType = getEventType(consumer);
+		addGenericListener(genericClassFilter, DEFAULT_EVENT_PRIORITY, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
+	}
+
+	private static <T extends ParallelDispatchEvent> NonnullConsumer<T> enqueueListener(NonnullConsumer<T> consumer)
+	{
+		return (T event) -> event.enqueueWork(() -> consumer.accept(event));
+	}
+
+	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(EventPriority priority, boolean receiveCancelled, Class<T> eventType, NonnullConsumer<T> consumer)
+	{
+		NonnullConsumer<T> enqueuedListener = enqueueListener(consumer);
+		addListener(priority, receiveCancelled, eventType, enqueuedListener);
+	}
+
+	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(EventPriority priority, boolean receiveCancelled, NonnullConsumer<T> consumer)
+	{
+		Class<T> eventType = getEventType(consumer);
+		addEnqueuedListener(priority, receiveCancelled, eventType, consumer);
+	}
+
+	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(EventPriority priority, NonnullConsumer<T> consumer)
+	{
+		Class<T> eventType = getEventType(consumer);
+		addEnqueuedListener(priority, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
+	}
+
+	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(EventPriority priority, Class<T> eventType, NonnullConsumer<T> consumer)
+	{
+		addEnqueuedListener(priority, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
+	}
+
+	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(boolean receiveCancelled, Class<T> eventType, NonnullConsumer<T> consumer)
+	{
+		addEnqueuedListener(DEFAULT_EVENT_PRIORITY, receiveCancelled, eventType, consumer);
+	}
+
+	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(boolean receiveCancelled, NonnullConsumer<T> consumer)
+	{
+		Class<T> eventType = getEventType(consumer);
+		addEnqueuedListener(DEFAULT_EVENT_PRIORITY, receiveCancelled, eventType, consumer);
+	}
+
+	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(Class<T> eventType, NonnullConsumer<T> consumer)
+	{
+		addEnqueuedListener(DEFAULT_EVENT_PRIORITY, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
+	}
+
+	public static <T extends ParallelDispatchEvent> void addEnqueuedListener(NonnullConsumer<T> consumer)
+	{
+		Class<T> eventType = getEventType(consumer);
+		addEnqueuedListener(DEFAULT_EVENT_PRIORITY, DEFAULT_RECEIVE_CANCELLED, eventType, consumer);
+	}
+
+	public static <T extends Event> Class<T> getEventType(NonnullConsumer<T> consumer)
+	{
+		Class<T> eventType = (Class<T>) TypeResolver.resolveRawArgument(NonnullConsumer.class, consumer.getClass());
+
+		if((Class<?>) eventType == TypeResolver.Unknown.class)
+		{
+			ApexCore.LOGGER.error("Failed to resolve handler for \"{}\"", consumer.toString());
+			throw new IllegalStateException("Failed to resolve consumer event type: " + consumer);
+		}
+
+		return eventType;
+	}
+
+	public static <T extends Event> boolean isModBusEvent(Class<T> eventType)
+	{
+		return IModBusEvent.class.isAssignableFrom(eventType);
+	}
+
+	public static <T extends Event> IEventBus getEventBus(Class<T> eventType)
+	{
+		if(isModBusEvent(eventType))
+			return FMLJavaModLoadingContext.get().getModEventBus();
+		return MinecraftForge.EVENT_BUS;
 	}
 }
