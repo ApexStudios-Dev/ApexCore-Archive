@@ -3,8 +3,6 @@ package xyz.apex.forge.apexcore.core;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.api.distmarker.Dist;
@@ -18,7 +16,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
 
-import xyz.apex.forge.apexcore.core.client.hats.LayerHat;
 import xyz.apex.forge.apexcore.core.command.CommandApex;
 import xyz.apex.forge.apexcore.core.init.ACRegistry;
 import xyz.apex.forge.apexcore.core.init.PlayerPlushie;
@@ -65,13 +62,7 @@ public final class ApexCore
 	{
 		private Client()
 		{
-			EventBusHelper.addEnqueuedListener(FMLLoadCompleteEvent.class, event -> {
-				EntityRendererManager entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
-				LayerHat layerHat = new LayerHat();
-				entityRenderDispatcher.getSkinMap().values().forEach(r -> r.addLayer(layerHat));
-				SupporterManager.precacheSupporterSkins();
-			});
-
+			EventBusHelper.addEnqueuedListener(FMLLoadCompleteEvent.class, event -> SupporterManager.precacheSupporterSkins());
 			EventBusHelper.addListener(ClientPlayerNetworkEvent.LoggedInEvent.class, event -> SkinHelper.invalidateCaches());
 		}
 	}
