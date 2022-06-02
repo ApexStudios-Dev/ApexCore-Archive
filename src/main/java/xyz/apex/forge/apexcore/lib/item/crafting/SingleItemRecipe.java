@@ -76,7 +76,9 @@ public class SingleItemRecipe implements Recipe<Container>
 	@Override
 	public final NonNullList<Ingredient> getIngredients()
 	{
-		return NonNullList.of(recipeIngredient);
+		NonNullList<Ingredient> ingredients = NonNullList.create();
+		ingredients.add(recipeIngredient);
+		return ingredients;
 	}
 
 	@Override
