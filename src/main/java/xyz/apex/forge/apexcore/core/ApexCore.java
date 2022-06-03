@@ -26,6 +26,7 @@ import xyz.apex.forge.apexcore.lib.util.EventBusHelper;
 import xyz.apex.forge.apexcore.lib.util.InterModUtil;
 import xyz.apex.forge.apexcore.lib.util.ProfileHelper;
 import xyz.apex.forge.apexcore.lib.util.SkinHelper;
+import xyz.apex.forge.apexcore.revamp.net.packet.SyncContainerPacket;
 
 @Mod(ApexCore.ID)
 public final class ApexCore
@@ -42,7 +43,7 @@ public final class ApexCore
 
 		EventBusHelper.addEnqueuedListener(FMLCommonSetupEvent.class, event -> {
 			SupporterManager.loadSupporters();
-			NETWORK.registerPacket(ClientSyncSupportersPacket.class);
+			NETWORK.registerPackets(ClientSyncSupportersPacket.class, SyncContainerPacket.class);
 		});
 
 		EventBusHelper.addListener(PlayerEvent.PlayerLoggedInEvent.class, event -> {
