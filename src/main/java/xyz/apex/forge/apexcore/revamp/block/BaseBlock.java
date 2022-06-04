@@ -13,10 +13,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.inventory.container.SimpleNamedContainerProvider;
+import net.minecraft.inventory.container.*;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -56,11 +53,17 @@ public class BaseBlock extends Block implements IWaterLoggable
 	{
 		super(properties);
 
-		postBlockConstructor();
+		blockConstructor();
 	}
 
 	// region: Core
+	@OverridingMethodsMustInvokeSuper
 	protected void registerProperties(NonnullConsumer<Property<?>> consumer)
+	{
+	}
+
+	@OverridingMethodsMustInvokeSuper
+	protected void preBlockConstructor()
 	{
 	}
 
@@ -72,6 +75,12 @@ public class BaseBlock extends Block implements IWaterLoggable
 		registerDefaultState(stateDefinition.any());
 		ObfuscationReflectionHelper.setPrivateValue(Block.class, this, stateDefinition, "field_176227_L");
 	}
+
+	private void blockConstructor()
+	{
+		preBlockConstructor();
+		postBlockConstructor();
+	}
 	// endregion
 
 	// region: Overrides
@@ -79,19 +88,18 @@ public class BaseBlock extends Block implements IWaterLoggable
 	public final BlockState getStateForPlacement(BlockItemUseContext ctx)
 	{
 		BlockState blockState = defaultBlockState();
-
 		World level = ctx.getLevel();
 		BlockPos pos = ctx.getClickedPos();
 
-		if(blockState.hasProperty(WATERLOGGED))
+		if(supportsWaterLogging(blockState))
 		{
 			FluidState fluidState = level.getFluidState(pos);
 			boolean waterLogged = fluidState.is(FluidTags.WATER);
-			blockState = blockState.setValue(WATERLOGGED, waterLogged);
+			blockState = setWaterLogged(blockState, waterLogged);
 		}
 
-		if(blockState.hasProperty(FACING_4_WAY))
-			blockState = blockState.setValue(FACING_4_WAY, getFourWayFacing(ctx));
+		if(supportsFacing(blockState))
+			blockState = setFacing(blockState, getFourWayFacing(ctx));
 
 		return blockState;
 	}
@@ -99,7 +107,7 @@ public class BaseBlock extends Block implements IWaterLoggable
 	@Override
 	public BlockState updateShape(BlockState blockState, Direction facing, BlockState facingBlockState, IWorld level, BlockPos pos, BlockPos facingPos)
 	{
-		if(blockState.hasProperty(WATERLOGGED) && blockState.getValue(WATERLOGGED))
+		if(isWaterLogged(blockState))
 			level.getLiquidTicks().scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
 
 		return super.updateShape(blockState, facing, facingBlockState, level, pos, facingPos);
@@ -113,8 +121,8 @@ public class BaseBlock extends Block implements IWaterLoggable
 	@Override
 	public final BlockState rotate(BlockState blockState, Rotation rotation)
 	{
-		if(blockState.hasProperty(FACING_4_WAY))
-			return blockState.setValue(FACING_4_WAY, rotation.rotate(blockState.getValue(FACING_4_WAY)));
+		if(supportsFacing(blockState))
+			return setFacing(blockState, rotation.rotate(getFacing(blockState)));
 
 		return blockState;
 	}
@@ -122,44 +130,60 @@ public class BaseBlock extends Block implements IWaterLoggable
 	@Override
 	public final BlockState mirror(BlockState blockState, Mirror mirror)
 	{
-		if(blockState.hasProperty(FACING_4_WAY))
-			return blockState.rotate(mirror.getRotation(blockState.getValue(FACING_4_WAY)));
+		if(supportsFacing(blockState))
+			return blockState.rotate(mirror.getRotation(getFacing(blockState)));
 
 		return blockState;
 	}
+
 	// endregion
 
 	// region: WaterLogging
 	@Override
 	public boolean propagatesSkylightDown(BlockState blockState, IBlockReader level, BlockPos pos)
 	{
-		if(blockState.hasProperty(WATERLOGGED))
-			return !blockState.getValue(WATERLOGGED);
+		if(supportsWaterLogging(blockState))
+			return !isWaterLogged(blockState);
 		return super.propagatesSkylightDown(blockState, level, pos);
 	}
 
 	@Override
 	public final FluidState getFluidState(BlockState blockState)
 	{
-		return blockState.hasProperty(WATERLOGGED) && blockState.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : Fluids.EMPTY.defaultFluidState();
+		return isWaterLogged(blockState) ? Fluids.WATER.getSource(false) : Fluids.EMPTY.defaultFluidState();
 	}
 
 	@Override
 	public final boolean canPlaceLiquid(IBlockReader level, BlockPos pos, BlockState blockState, Fluid fluid)
 	{
-		return blockState.hasProperty(WATERLOGGED) && IWaterLoggable.super.canPlaceLiquid(level, pos, blockState, fluid);
+		return supportsWaterLogging(blockState) && IWaterLoggable.super.canPlaceLiquid(level, pos, blockState, fluid);
 	}
 
 	@Override
 	public final boolean placeLiquid(IWorld level, BlockPos pos, BlockState blockState, FluidState fluidState)
 	{
-		return blockState.hasProperty(WATERLOGGED) && IWaterLoggable.super.placeLiquid(level, pos, blockState, fluidState);
+		return supportsWaterLogging(blockState) && IWaterLoggable.super.placeLiquid(level, pos, blockState, fluidState);
 	}
 
 	@Override
 	public final Fluid takeLiquid(IWorld level, BlockPos pos, BlockState blockState)
 	{
-		return !blockState.hasProperty(WATERLOGGED) ? Fluids.EMPTY : IWaterLoggable.super.takeLiquid(level, pos, blockState);
+		return supportsWaterLogging(blockState) ? IWaterLoggable.super.takeLiquid(level, pos, blockState) : Fluids.EMPTY;
+	}
+
+	public static boolean supportsWaterLogging(BlockState blockState)
+	{
+		return blockState.hasProperty(WATERLOGGED);
+	}
+
+	public static boolean isWaterLogged(BlockState blockState)
+	{
+		return blockState.getOptionalValue(WATERLOGGED).orElse(false);
+	}
+
+	public static BlockState setWaterLogged(BlockState blockState, boolean waterLogged)
+	{
+		return supportsWaterLogging(blockState) ? blockState.setValue(WATERLOGGED, waterLogged) : blockState;
 	}
 	// endregion
 
@@ -167,6 +191,21 @@ public class BaseBlock extends Block implements IWaterLoggable
 	protected Direction getFourWayFacing(BlockItemUseContext ctx)
 	{
 		return ctx.getHorizontalDirection().getOpposite();
+	}
+
+	public static boolean supportsFacing(BlockState blockState)
+	{
+		return blockState.hasProperty(FACING_4_WAY);
+	}
+
+	public static Direction getFacing(BlockState blockState)
+	{
+		return blockState.getOptionalValue(FACING_4_WAY).orElse(Direction.NORTH);
+	}
+
+	public static BlockState setFacing(BlockState blockState, Direction facing)
+	{
+		return supportsFacing(blockState) ? blockState.setValue(FACING_4_WAY, facing) : blockState;
 	}
 	// endregion
 
@@ -213,6 +252,27 @@ public class BaseBlock extends Block implements IWaterLoggable
 		public final boolean hasTileEntity(BlockState state)
 		{
 			return true;
+		}
+
+		@Nullable
+		@Override
+		public INamedContainerProvider getMenuProvider(BlockState blockState, World level, BlockPos pos)
+		{
+			BLOCK_ENTITY blockEntity = getBlockEntity(level, pos);
+
+			if(blockEntity instanceof INamedContainerProvider)
+				return (INamedContainerProvider) blockEntity;
+			else if(blockEntity instanceof IContainerProvider)
+			{
+				ITextComponent containerName = new TranslationTextComponent(getDescriptionId());
+
+				if(blockEntity instanceof INameable)
+					containerName = ((INameable) blockEntity).getDisplayName();
+
+				return new SimpleNamedContainerProvider((IContainerProvider) blockEntity, containerName);
+			}
+
+			return null;
 		}
 		// endregion
 	}
@@ -324,7 +384,7 @@ public class BaseBlock extends Block implements IWaterLoggable
 				}, containerName);
 			}
 
-			return null;
+			return super.getMenuProvider(blockState, level, pos);
 		}
 		// endregion
 	}
