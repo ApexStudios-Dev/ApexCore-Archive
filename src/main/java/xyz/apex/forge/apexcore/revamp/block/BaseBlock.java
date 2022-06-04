@@ -131,27 +131,35 @@ public class BaseBlock extends Block implements IWaterLoggable
 
 	// region: WaterLogging
 	@Override
+	public boolean propagatesSkylightDown(BlockState blockState, IBlockReader level, BlockPos pos)
+	{
+		if(blockState.hasProperty(WATERLOGGED))
+			return !blockState.getValue(WATERLOGGED);
+		return super.propagatesSkylightDown(blockState, level, pos);
+	}
+
+	@Override
 	public final FluidState getFluidState(BlockState blockState)
 	{
-		return blockState.getValue(WATERLOGGED) && blockState.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : Fluids.EMPTY.defaultFluidState();
+		return blockState.hasProperty(WATERLOGGED) && blockState.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : Fluids.EMPTY.defaultFluidState();
 	}
 
 	@Override
 	public final boolean canPlaceLiquid(IBlockReader level, BlockPos pos, BlockState blockState, Fluid fluid)
 	{
-		return blockState.getValue(WATERLOGGED) && IWaterLoggable.super.canPlaceLiquid(level, pos, blockState, fluid);
+		return blockState.hasProperty(WATERLOGGED) && IWaterLoggable.super.canPlaceLiquid(level, pos, blockState, fluid);
 	}
 
 	@Override
 	public final boolean placeLiquid(IWorld level, BlockPos pos, BlockState blockState, FluidState fluidState)
 	{
-		return blockState.getValue(WATERLOGGED) && IWaterLoggable.super.placeLiquid(level, pos, blockState, fluidState);
+		return blockState.hasProperty(WATERLOGGED) && IWaterLoggable.super.placeLiquid(level, pos, blockState, fluidState);
 	}
 
 	@Override
 	public final Fluid takeLiquid(IWorld level, BlockPos pos, BlockState blockState)
 	{
-		return !blockState.getValue(WATERLOGGED) ? Fluids.EMPTY : IWaterLoggable.super.takeLiquid(level, pos, blockState);
+		return !blockState.hasProperty(WATERLOGGED) ? Fluids.EMPTY : IWaterLoggable.super.takeLiquid(level, pos, blockState);
 	}
 	// endregion
 
@@ -277,17 +285,20 @@ public class BaseBlock extends Block implements IWaterLoggable
 		@Override
 		public void onRemove(BlockState blockState, World level, BlockPos pos, BlockState newBlockState, boolean isMoving)
 		{
-			BLOCK_ENTITY blockEntity = getBlockEntity(level, pos);
-
-			if(blockEntity != null)
+			if(!blockState.is(newBlockState.getBlock()))
 			{
-				blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(itemHandler -> {
-					for(int i = 0; i < itemHandler.getSlots(); i++)
-					{
-						ItemStack stack = itemHandler.getStackInSlot(i);
-						InventoryHelper.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
-					}
-				});
+				BLOCK_ENTITY blockEntity = getBlockEntity(level, pos);
+
+				if(blockEntity != null)
+				{
+					blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(itemHandler -> {
+						for(int i = 0; i < itemHandler.getSlots(); i++)
+						{
+							ItemStack stack = itemHandler.getStackInSlot(i);
+							InventoryHelper.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
+						}
+					});
+				}
 			}
 
 			super.onRemove(blockState, level, pos, newBlockState, isMoving);
