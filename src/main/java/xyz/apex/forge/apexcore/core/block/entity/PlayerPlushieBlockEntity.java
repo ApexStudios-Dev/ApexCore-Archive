@@ -7,8 +7,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.Constants;
 
 import xyz.apex.forge.apexcore.core.init.PlayerPlushie;
-import xyz.apex.forge.apexcore.lib.block.entity.BaseBlockEntity;
 import xyz.apex.forge.apexcore.lib.support.SupporterManager;
+import xyz.apex.forge.apexcore.revamp.block.entity.BaseBlockEntity;
 
 import javax.annotation.Nullable;
 
@@ -16,7 +16,7 @@ public class PlayerPlushieBlockEntity extends BaseBlockEntity
 {
 	@Nullable private SupporterManager.SupporterInfo supporterInfo;
 
-	public PlayerPlushieBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState blockState)
+	public PlayerPlushieBlockEntity(BlockEntityType<? extends PlayerPlushieBlockEntity> blockEntityType, BlockPos pos, BlockState blockState)
 	{
 		super(blockEntityType, pos, blockState);
 	}
@@ -34,45 +34,22 @@ public class PlayerPlushieBlockEntity extends BaseBlockEntity
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag tagCompound)
+	public CompoundTag serializeData()
 	{
+		var tagCompound = new CompoundTag();
+
 		if(supporterInfo != null)
 		{
 			var supporterTag = PlayerPlushie.writeSupporterInfoTag(supporterInfo);
 			tagCompound.put(PlayerPlushie.NBT_SUPPORTER_DATA, supporterTag);
 		}
 
-		return super.save(tagCompound);
+		return tagCompound;
 	}
 
 	@Override
-	public void load(CompoundTag tagCompound)
+	public void deserializeData(CompoundTag tagCompound)
 	{
-		super.load(tagCompound);
-
-		supporterInfo = null;
-
-		if(tagCompound.contains(PlayerPlushie.NBT_SUPPORTER_DATA, Constants.NBT.TAG_COMPOUND))
-			supporterInfo = PlayerPlushie.getSupporterInfo(tagCompound.getCompound(PlayerPlushie.NBT_SUPPORTER_DATA));
-	}
-
-	@Override
-	protected CompoundTag writeUpdateTag(CompoundTag tagCompound)
-	{
-		if(supporterInfo != null)
-		{
-			var supporterTag = PlayerPlushie.writeSupporterInfoTag(supporterInfo);
-			tagCompound.put(PlayerPlushie.NBT_SUPPORTER_DATA, supporterTag);
-		}
-
-		return super.writeUpdateTag(tagCompound);
-	}
-
-	@Override
-	protected void readeUpdateTag(CompoundTag tagCompound)
-	{
-		super.readeUpdateTag(tagCompound);
-
 		supporterInfo = null;
 
 		if(tagCompound.contains(PlayerPlushie.NBT_SUPPORTER_DATA, Constants.NBT.TAG_COMPOUND))
