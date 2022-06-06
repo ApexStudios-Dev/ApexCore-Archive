@@ -13,6 +13,7 @@ import net.minecraft.world.*;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -54,11 +55,17 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 	{
 		super(properties);
 
-		postBlockConstructor();
+		blockConstructor();
 	}
 
 	// region: Core
+	@OverridingMethodsMustInvokeSuper
 	protected void registerProperties(NonnullConsumer<Property<?>> consumer)
+	{
+	}
+
+	@OverridingMethodsMustInvokeSuper
+	protected void preBlockConstructor()
 	{
 	}
 
@@ -67,8 +74,17 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 		var builder = new StateDefinition.Builder<Block, BlockState>(this);
 		registerProperties(builder::add);
 		var stateDefinition = builder.create(Block::defaultBlockState, BlockState::new);
-		registerDefaultState(stateDefinition.any());
+		var defaultBlockState = stateDefinition.any();
+		defaultBlockState = setFacing(defaultBlockState, Direction.NORTH);
+		defaultBlockState = setWaterLogged(defaultBlockState, false);
+		registerDefaultState(defaultBlockState);
 		ObfuscationReflectionHelper.setPrivateValue(Block.class, this, stateDefinition, "f_49792_");
+	}
+
+	private void blockConstructor()
+	{
+		preBlockConstructor();
+		postBlockConstructor();
 	}
 	// endregion
 
@@ -81,15 +97,15 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 		var level = ctx.getLevel();
 		var pos = ctx.getClickedPos();
 
-		if(blockState.hasProperty(WATERLOGGED))
+		if(supportsWaterLogging(blockState))
 		{
 			var fluidState = level.getFluidState(pos);
 			var waterLogged = fluidState.is(FluidTags.WATER);
-			blockState = blockState.setValue(WATERLOGGED, waterLogged);
+			blockState = setWaterLogged(blockState, waterLogged);
 		}
 
-		if(blockState.hasProperty(FACING_4_WAY))
-			blockState = blockState.setValue(FACING_4_WAY, getFourWayFacing(ctx));
+		if(supportsFacing(blockState))
+			blockState = setFacing(blockState, getFourWayFacing(ctx));
 
 		return blockState;
 	}
@@ -97,7 +113,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 	@Override
 	public BlockState updateShape(BlockState blockState, Direction facing, BlockState facingBlockState, LevelAccessor level, BlockPos pos, BlockPos facingPos)
 	{
-		if(blockState.hasProperty(WATERLOGGED) && blockState.getValue(WATERLOGGED))
+		if(isWaterLogged(blockState))
 			level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
 
 		return super.updateShape(blockState, facing, facingBlockState, level, pos, facingPos);
@@ -111,8 +127,8 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 	@Override
 	public final BlockState rotate(BlockState blockState, Rotation rotation)
 	{
-		if(blockState.hasProperty(FACING_4_WAY))
-			return blockState.setValue(FACING_4_WAY, rotation.rotate(blockState.getValue(FACING_4_WAY)));
+		if(supportsFacing(blockState))
+			return setFacing(blockState, rotation.rotate(getFacing(blockState)));
 
 		return blockState;
 	}
@@ -120,8 +136,8 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 	@Override
 	public final BlockState mirror(BlockState blockState, Mirror mirror)
 	{
-		if(blockState.hasProperty(FACING_4_WAY))
-			return blockState.rotate(mirror.getRotation(blockState.getValue(FACING_4_WAY)));
+		if(supportsFacing(blockState))
+			return blockState.rotate(mirror.getRotation(getFacing(blockState)));
 
 		return blockState;
 	}
@@ -131,33 +147,48 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 	@Override
 	public boolean propagatesSkylightDown(BlockState blockState, BlockGetter level, BlockPos pos)
 	{
-		if(blockState.hasProperty(WATERLOGGED))
-			return !blockState.getValue(WATERLOGGED);
+		if(supportsWaterLogging(blockState))
+			return !isWaterLogged(blockState);
 		return super.propagatesSkylightDown(blockState, level, pos);
 	}
 
 	@Override
 	public final FluidState getFluidState(BlockState blockState)
 	{
-		return blockState.hasProperty(WATERLOGGED) && blockState.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : Fluids.EMPTY.defaultFluidState();
+		return isWaterLogged(blockState) ? Fluids.WATER.getSource(false) : Fluids.EMPTY.defaultFluidState();
 	}
 
 	@Override
 	public final boolean canPlaceLiquid(BlockGetter level, BlockPos pos, BlockState blockState, Fluid fluid)
 	{
-		return blockState.hasProperty(WATERLOGGED) && SimpleWaterloggedBlock.super.canPlaceLiquid(level, pos, blockState, fluid);
+		return supportsWaterLogging(blockState) && SimpleWaterloggedBlock.super.canPlaceLiquid(level, pos, blockState, fluid);
 	}
 
 	@Override
 	public final boolean placeLiquid(LevelAccessor level, BlockPos pos, BlockState blockState, FluidState fluidState)
 	{
-		return blockState.hasProperty(WATERLOGGED) && SimpleWaterloggedBlock.super.placeLiquid(level, pos, blockState, fluidState);
+		return supportsWaterLogging(blockState) && SimpleWaterloggedBlock.super.placeLiquid(level, pos, blockState, fluidState);
 	}
 
 	@Override
 	public final ItemStack pickupBlock(LevelAccessor level, BlockPos pos, BlockState blockState)
 	{
-		return !blockState.hasProperty(WATERLOGGED) ? ItemStack.EMPTY : SimpleWaterloggedBlock.super.pickupBlock(level, pos, blockState);
+		return supportsWaterLogging(blockState) ? SimpleWaterloggedBlock.super.pickupBlock(level, pos, blockState) : ItemStack.EMPTY;
+	}
+
+	public static boolean supportsWaterLogging(BlockState blockState)
+	{
+		return blockState.hasProperty(WATERLOGGED);
+	}
+
+	public static boolean isWaterLogged(BlockState blockState)
+	{
+		return blockState.getOptionalValue(WATERLOGGED).orElse(false);
+	}
+
+	public static BlockState setWaterLogged(BlockState blockState, boolean waterLogged)
+	{
+		return supportsWaterLogging(blockState) ? blockState.setValue(WATERLOGGED, waterLogged) : blockState;
 	}
 	// endregion
 
@@ -165,6 +196,21 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 	protected Direction getFourWayFacing(BlockPlaceContext ctx)
 	{
 		return ctx.getHorizontalDirection().getOpposite();
+	}
+
+	public static boolean supportsFacing(BlockState blockState)
+	{
+		return blockState.hasProperty(FACING_4_WAY);
+	}
+
+	public static Direction getFacing(BlockState blockState)
+	{
+		return blockState.getOptionalValue(FACING_4_WAY).orElse(Direction.NORTH);
+	}
+
+	public static BlockState setFacing(BlockState blockState, Direction facing)
+	{
+		return supportsFacing(blockState) ? blockState.setValue(FACING_4_WAY, facing) : blockState;
 	}
 	// endregion
 
@@ -219,6 +265,27 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 		public final <T extends BlockEntity> GameEventListener getListener(Level level, T blockEntity)
 		{
 			return blockEntity instanceof GameEventListener gameEventListener ? gameEventListener : null;
+		}
+
+		@Nullable
+		@Override
+		public MenuProvider getMenuProvider(BlockState blockState, Level level, BlockPos pos)
+		{
+			var blockEntity = getBlockEntity(level, pos);
+
+			if(blockEntity instanceof MenuProvider menuProvider)
+				return menuProvider;
+			else if(blockEntity instanceof MenuConstructor menuConstructor)
+			{
+				Component containerName = new TranslatableComponent(getDescriptionId());
+
+				if(blockEntity instanceof Nameable nameable)
+					containerName = nameable.getDisplayName();
+
+				return new SimpleMenuProvider(menuConstructor, containerName);
+			}
+
+			return null;
 		}
 		// endregion
 
@@ -336,7 +403,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 				}, containerName);
 			}
 
-			return null;
+			return super.getMenuProvider(blockState, level, pos);
 		}
 		// endregion
 	}
