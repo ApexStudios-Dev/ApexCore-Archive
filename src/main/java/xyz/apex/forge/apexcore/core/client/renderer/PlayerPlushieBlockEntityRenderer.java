@@ -18,11 +18,11 @@ import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
-import xyz.apex.forge.apexcore.core.block.PlayerPlushieBlock;
 import xyz.apex.forge.apexcore.core.block.entity.PlayerPlushieBlockEntity;
 import xyz.apex.forge.apexcore.lib.util.ProfileHelper;
 import xyz.apex.forge.apexcore.lib.util.SkinHelper;
 import xyz.apex.forge.apexcore.lib.util.reflection.MethodHelper;
+import xyz.apex.forge.apexcore.revamp.block.BaseBlock;
 
 import java.util.Map;
 import java.util.UUID;
@@ -208,7 +208,7 @@ public class PlayerPlushieBlockEntityRenderer implements BlockEntityRenderer<Pla
 		{
 			pose.translate(.5D, .5D, .5D);
 			var blockState = blockEntity.getBlockState();
-			var facing = blockState.getValue(PlayerPlushieBlock.FACING);
+			var facing = BaseBlock.getFacing(blockState);
 			pose.mulPose(Vector3f.YP.rotationDegrees(-facing.toYRot()));
 			pose.mulPose(Vector3f.XP.rotationDegrees(180F));
 			pose.translate(0D, 0D, .2D);
