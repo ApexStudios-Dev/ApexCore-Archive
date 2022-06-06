@@ -19,12 +19,12 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 
-import xyz.apex.forge.apexcore.core.block.PlayerPlushieBlock;
 import xyz.apex.forge.apexcore.core.block.entity.PlayerPlushieBlockEntity;
 import xyz.apex.forge.apexcore.lib.support.SupporterManager;
 import xyz.apex.forge.apexcore.lib.util.ProfileHelper;
 import xyz.apex.forge.apexcore.lib.util.SkinHelper;
 import xyz.apex.forge.apexcore.lib.util.reflection.MethodHelper;
+import xyz.apex.forge.apexcore.revamp.block.BaseBlock;
 
 import java.util.Map;
 import java.util.UUID;
@@ -207,7 +207,7 @@ public class PlayerPlushieBlockEntityRenderer extends TileEntityRenderer<PlayerP
 		{
 			pose.translate(.5D, .5D, .5D);
 			BlockState blockState = blockEntity.getBlockState();
-			Direction facing = blockState.getValue(PlayerPlushieBlock.FACING);
+			Direction facing = BaseBlock.getFacing(blockState);
 			pose.mulPose(Vector3f.YP.rotationDegrees(-facing.toYRot()));
 			pose.mulPose(Vector3f.XP.rotationDegrees(180F));
 			pose.translate(0D, 0D, .2D);

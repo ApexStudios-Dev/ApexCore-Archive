@@ -37,12 +37,12 @@ public final class ApexCore
 
 	public ApexCore()
 	{
+		SupporterManager.loadSupporters();
 		ProfileHelper.setup();
 		ACRegistry.bootstrap();
 		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> Client::new);
 
 		EventBusHelper.addEnqueuedListener(FMLCommonSetupEvent.class, event -> {
-			SupporterManager.loadSupporters();
 			NETWORK.registerPackets(ClientSyncSupportersPacket.class, SyncContainerPacket.class);
 		});
 

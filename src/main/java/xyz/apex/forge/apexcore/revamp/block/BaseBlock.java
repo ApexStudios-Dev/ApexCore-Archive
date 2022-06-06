@@ -72,7 +72,10 @@ public class BaseBlock extends Block implements IWaterLoggable
 		StateContainer.Builder<Block, BlockState> builder = new StateContainer.Builder<>(this);
 		registerProperties(builder::add);
 		StateContainer<Block, BlockState> stateDefinition = builder.create(Block::defaultBlockState, BlockState::new);
-		registerDefaultState(stateDefinition.any());
+		BlockState defaultBlockState = stateDefinition.any();
+		defaultBlockState = setFacing(defaultBlockState, Direction.NORTH);
+		defaultBlockState = setWaterLogged(defaultBlockState, false);
+		registerDefaultState(defaultBlockState);
 		ObfuscationReflectionHelper.setPrivateValue(Block.class, this, stateDefinition, "field_176227_L");
 	}
 

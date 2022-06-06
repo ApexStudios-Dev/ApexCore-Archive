@@ -1,25 +1,17 @@
 package xyz.apex.forge.apexcore.core.block;
 
-import net.minecraft.block.*;
+import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathType;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tags.FluidTags;
+import net.minecraft.state.Property;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Mirror;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -28,68 +20,42 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 import xyz.apex.forge.apexcore.core.block.entity.PlayerPlushieBlockEntity;
 import xyz.apex.forge.apexcore.core.init.PlayerPlushie;
-import xyz.apex.forge.apexcore.lib.block.BlockEntityBlock;
 import xyz.apex.forge.apexcore.lib.block.VoxelShaper;
 import xyz.apex.forge.apexcore.lib.support.SupporterManager;
+import xyz.apex.forge.apexcore.revamp.block.BaseBlock;
+import xyz.apex.java.utility.nullness.NonnullConsumer;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 
-public final class PlayerPlushieBlock extends BlockEntityBlock<PlayerPlushieBlockEntity> implements IWaterLoggable
+public final class PlayerPlushieBlock extends BaseBlock.WithBlockEntity<PlayerPlushieBlockEntity>
 {
-	public static final DirectionProperty FACING = HorizontalBlock.FACING;
-	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	public static final VoxelShape SHAPE = box(2D, 0D, 3D, 14D, 13D, 14D);
 	public static final VoxelShaper SHAPER = VoxelShaper.forHorizontal(SHAPE, Direction.NORTH);
 
 	public PlayerPlushieBlock(Properties properties)
 	{
 		super(properties);
+	}
 
-		registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH).setValue(WATERLOGGED, false));
+	@Override
+	protected void registerProperties(NonnullConsumer<Property<?>> consumer)
+	{
+		super.registerProperties(consumer);
+		consumer.accept(FACING_4_WAY);
+		consumer.accept(WATERLOGGED);
 	}
 
 	@Override
 	public VoxelShape getShape(BlockState blockState, IBlockReader level, BlockPos pos, ISelectionContext ctx)
 	{
-		Direction facing = blockState.getValue(FACING);
+		Direction facing = getFacing(blockState);
 		return SHAPER.get(facing);
-	}
-
-	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext ctx)
-	{
-		BlockState blockState = defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite());
-		FluidState fluidState = ctx.getLevel().getFluidState(ctx.getClickedPos());
-		boolean waterLogged = fluidState.is(FluidTags.WATER);
-		return blockState.setValue(WATERLOGGED, waterLogged);
-	}
-
-	@Override
-	public boolean propagatesSkylightDown(BlockState blockState, IBlockReader level, BlockPos pos)
-	{
-		return !blockState.getValue(WATERLOGGED);
-	}
-
-	@Override
-	public FluidState getFluidState(BlockState blockState)
-	{
-		return blockState.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(blockState);
-	}
-
-	@Override
-	public BlockState updateShape(BlockState blockState, Direction facing, BlockState facingBlockState, IWorld level, BlockPos pos, BlockPos facingPos)
-	{
-		if(blockState.getValue(WATERLOGGED))
-			level.getLiquidTicks().scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
-
-		return super.updateShape(blockState, facing, facingBlockState, level, pos, facingPos);
 	}
 
 	@Override
@@ -171,24 +137,5 @@ public final class PlayerPlushieBlock extends BlockEntityBlock<PlayerPlushieBloc
 					.append(")")
 			);
 		}
-	}
-
-	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder)
-	{
-		builder.add(FACING, WATERLOGGED);
-		super.createBlockStateDefinition(builder);
-	}
-
-	@Override
-	public BlockState rotate(BlockState blockState, Rotation rotation)
-	{
-		return blockState.setValue(FACING, rotation.rotate(blockState.getValue(FACING)));
-	}
-
-	@Override
-	public BlockState mirror(BlockState blockState, Mirror mirror)
-	{
-		return blockState.rotate(mirror.getRotation(blockState.getValue(FACING)));
 	}
 }
