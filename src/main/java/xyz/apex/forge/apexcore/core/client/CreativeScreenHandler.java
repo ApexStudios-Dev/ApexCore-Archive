@@ -241,7 +241,7 @@ public final class CreativeScreenHandler
 				RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 				RenderSystem.enableBlend();
 
-				GuiComponent.blit(pose, x, y, screen.getBlitOffset(), u, 0, CATEGORY_TAB_U_SIZE, CATEGORY_TAB_V_SIZE, CATEGORY_TABS_TEXTURE_HEIGHT, CATEGORY_TABS_TEXTURE_WIDTH);
+				GuiComponent.blit(pose, x, y, screen.getBlitOffset(), u, 0, CATEGORY_TAB_U_SIZE, CATEGORY_TAB_V_SIZE, CATEGORY_TABS_TEXTURE_WIDTH, CATEGORY_TABS_TEXTURE_HEIGHT);
 
 				itemRenderer.blitOffset = 100F;
 
