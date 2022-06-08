@@ -7,8 +7,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-
-import xyz.apex.forge.apexcore.lib.util.reflection.FieldHelper;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
@@ -85,6 +84,6 @@ public class MultiBlock extends Block
 		var stateDefinition = builder.create(Block::defaultBlockState, BlockState::new);
 		block.registerDefaultState(block.pattern.registerDefaultState(stateDefinition.any()));
 
-		FieldHelper.setPrivateValue(Block.class, block, stateDefinition, "f_49792_");
+		ObfuscationReflectionHelper.setPrivateValue(Block.class, block, stateDefinition, "f_49792_");
 	}
 }
