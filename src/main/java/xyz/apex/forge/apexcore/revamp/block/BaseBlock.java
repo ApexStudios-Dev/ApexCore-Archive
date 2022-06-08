@@ -73,11 +73,12 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 	{
 		var builder = new StateDefinition.Builder<Block, BlockState>(this);
 		registerProperties(builder::add);
-		var defaultBlockState = stateDefinition.any();
+		var definition = builder.create(Block::defaultBlockState, BlockState::new);
+		var defaultBlockState = definition.any();
 		defaultBlockState = setFacing(defaultBlockState, Direction.NORTH);
 		defaultBlockState = setWaterLogged(defaultBlockState, false);
 		registerDefaultState(defaultBlockState);
-		ObfuscationReflectionHelper.setPrivateValue(Block.class, this, stateDefinition, "f_49792_");
+		ObfuscationReflectionHelper.setPrivateValue(Block.class, this, definition, "f_49792_");
 	}
 
 	private void blockConstructor()
