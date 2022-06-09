@@ -97,7 +97,7 @@ public class BaseBlock extends Block implements IWaterLoggable
 		if(supportsWaterLogging(blockState))
 		{
 			FluidState fluidState = level.getFluidState(pos);
-			boolean waterLogged = fluidState.is(FluidTags.WATER);
+			boolean waterLogged = fluidState.is(FluidTags.WATER) && fluidState.isSource();
 			blockState = setWaterLogged(blockState, waterLogged);
 		}
 
