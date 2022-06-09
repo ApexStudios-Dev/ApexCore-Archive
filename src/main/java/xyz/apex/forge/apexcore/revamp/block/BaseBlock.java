@@ -100,7 +100,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 		if(supportsWaterLogging(blockState))
 		{
 			var fluidState = level.getFluidState(pos);
-			var waterLogged = fluidState.is(FluidTags.WATER);
+			var waterLogged = fluidState.is(FluidTags.WATER) && fluidState.isSource();
 			blockState = setWaterLogged(blockState, waterLogged);
 		}
 
