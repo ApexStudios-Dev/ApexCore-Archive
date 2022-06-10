@@ -74,7 +74,7 @@ public final class MultiBlockPattern
 
 	// region: Block Wrappers
 	@Nullable
-	public BlockState getStateForPlacement(BlockPlaceContext ctx, BlockState defaultBlockState)
+	public BlockState getStateForPlacement(MultiBlock multiBlock, BlockPlaceContext ctx, BlockState defaultBlockState)
 	{
 		var level = ctx.getLevel();
 		var origin = ctx.getClickedPos();
@@ -84,14 +84,14 @@ public final class MultiBlockPattern
 			var worldSpace = getWorldSpaceFromLocalSpace(defaultBlockState, origin, localSpace);
 			var blockState = level.getBlockState(worldSpace);
 
-			if(passesPlacementTests(level, worldSpace, blockState))
+			if(passesPlacementTests(multiBlock, level, worldSpace, blockState))
 				return defaultBlockState;
 		}
 
 		return null;
 	}
 
-	public boolean canSurvive(LevelReader level, BlockPos pos, BlockState blockState)
+	public boolean canSurvive(MultiBlock multiBlock, LevelReader level, BlockPos pos, BlockState blockState)
 	{
 		var index = getIndex(blockState);
 		var origin = getOriginFromWorldSpace(blockState, pos, localPositions.get(index));
@@ -101,7 +101,7 @@ public final class MultiBlockPattern
 			var worldSpace = getWorldSpaceFromLocalSpace(blockState, origin, localSpace);
 			var testBlockState = level.getBlockState(worldSpace);
 
-			if(!passesPlacementTests(level, worldSpace, testBlockState))
+			if(!passesPlacementTests(multiBlock, level, worldSpace, testBlockState))
 				return false;
 		}
 
@@ -166,10 +166,14 @@ public final class MultiBlockPattern
 		builder.add(blockProperty);
 	}
 
-	private boolean passesPlacementTests(LevelReader level, BlockPos pos, BlockState blockState)
+	private boolean passesPlacementTests(MultiBlock multiBlock, LevelReader level, BlockPos pos, BlockState blockState)
 	{
-		if(!blockState.getMaterial().isReplaceable())
-			return false;
+		if(!blockState.is(multiBlock))
+		{
+			if(!blockState.getMaterial().isReplaceable())
+				return false;
+		}
+
 		if(placementPredicate != null)
 			return placementPredicate.test(level, pos, blockState);
 		return true;

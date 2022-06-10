@@ -28,7 +28,7 @@ public class MultiBlock extends Block
 	public final BlockState getStateForPlacement(BlockPlaceContext ctx)
 	{
 		var defaultBlockState = defaultBlockState();
-		var placementState = pattern.getStateForPlacement(ctx, defaultBlockState);
+		var placementState = pattern.getStateForPlacement(this, ctx, defaultBlockState);
 
 		if(placementState != null)
 			placementState = getPlacementState(ctx, placementState);
@@ -39,7 +39,7 @@ public class MultiBlock extends Block
 	@Override
 	public final boolean canSurvive(BlockState blockState, LevelReader level, BlockPos pos)
 	{
-		return pattern.canSurvive(level, pos, blockState) && canSurviveAdditional(level, pos, blockState);
+		return pattern.canSurvive(this, level, pos, blockState) && canSurviveAdditional(level, pos, blockState);
 	}
 
 	protected boolean canSurviveAdditional(LevelReader level, BlockPos pos, BlockState blockState)
