@@ -14,9 +14,9 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -26,12 +26,13 @@ import xyz.apex.forge.apexcore.core.block.entity.PlayerPlushieBlockEntity;
 import xyz.apex.forge.apexcore.core.init.PlayerPlushie;
 import xyz.apex.forge.apexcore.lib.block.VoxelShaper;
 import xyz.apex.forge.apexcore.revamp.block.BaseBlock;
+import xyz.apex.java.utility.nullness.NonnullConsumer;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 
-public final class PlayerPlushieBlock extends BaseBlock.WithBlockEntity<PlayerPlushieBlockEntity> implements SimpleWaterloggedBlock
+public final class PlayerPlushieBlock extends BaseBlock.WithBlockEntity<PlayerPlushieBlockEntity>
 {
 	public static final VoxelShape SHAPE = box(2D, 0D, 3D, 14D, 13D, 14D);
 	public static final VoxelShaper SHAPER = VoxelShaper.forHorizontal(SHAPE, Direction.NORTH);
@@ -39,6 +40,14 @@ public final class PlayerPlushieBlock extends BaseBlock.WithBlockEntity<PlayerPl
 	public PlayerPlushieBlock(Properties properties)
 	{
 		super(properties);
+	}
+
+	@Override
+	protected void registerProperties(NonnullConsumer<Property<?>> consumer)
+	{
+		super.registerProperties(consumer);
+		consumer.accept(WATERLOGGED);
+		consumer.accept(FACING_4_WAY);
 	}
 
 	@Override
