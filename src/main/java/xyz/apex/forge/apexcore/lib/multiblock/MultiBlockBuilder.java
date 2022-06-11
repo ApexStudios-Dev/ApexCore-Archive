@@ -48,6 +48,8 @@ import java.util.List;
 import java.util.function.ToIntFunction;
 
 // Copy of BlockBuilder but modified for MultiBlock
+// Replaced with revamped code
+@Deprecated(since = "4.3.5", forRemoval = true)
 public class MultiBlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK extends MultiBlock, PARENT> extends RegistratorBuilder<OWNER, Block, BLOCK, PARENT, MultiBlockBuilder<OWNER, BLOCK, PARENT>, BlockEntry<BLOCK>>
 {
 	private final MultiBlockFactory<BLOCK> blockFactory;

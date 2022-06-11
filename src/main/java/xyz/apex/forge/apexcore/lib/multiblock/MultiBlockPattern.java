@@ -24,6 +24,8 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
+// Replaced with revamped code
+@Deprecated(since = "4.3.5", forRemoval = true)
 public final class MultiBlockPattern
 {
 	public static final int INDEX_ORIGIN = 0;

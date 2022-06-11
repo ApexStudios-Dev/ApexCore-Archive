@@ -14,6 +14,8 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 
 import javax.annotation.Nullable;
 
+// Replaced with revamped code
+@Deprecated(since = "4.3.5", forRemoval = true)
 public class MultiBlockFourWay extends MultiBlock
 {
 	public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;

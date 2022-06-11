@@ -12,6 +12,8 @@ import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 
+// Replaced with revamped code
+@Deprecated(since = "4.3.5", forRemoval = true)
 public class MultiBlock extends Block
 {
 	protected final MultiBlockPattern pattern;

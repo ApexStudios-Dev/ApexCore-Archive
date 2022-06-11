@@ -105,11 +105,20 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 		}
 
 		if(supportsFacing(blockState))
-			blockState = setFacing(blockState, getFourWayFacing(ctx));
+		{
+			var facing = getFourWayFacing(ctx);
+			// if null is provided we use the default value, which is normally NORTH
+			// but pulling from the default block state allows an implementation to change the
+			// default facing state if need be
+			facing = facing == null ? getFacing(defaultBlockState()) : facing;
 
-		return blockState;
+			blockState = setFacing(blockState, facing);
+		}
+
+		return modifyPlacementState(blockState, ctx);
 	}
 
+	@OverridingMethodsMustInvokeSuper
 	@Override
 	public BlockState updateShape(BlockState blockState, Direction facing, BlockState facingBlockState, LevelAccessor level, BlockPos pos, BlockPos facingPos)
 	{
@@ -127,18 +136,43 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 	@Override
 	public final BlockState rotate(BlockState blockState, Rotation rotation)
 	{
-		if(supportsFacing(blockState))
-			return setFacing(blockState, rotation.rotate(getFacing(blockState)));
+		var rotatedBlockState = blockState;
 
-		return blockState;
+		if(supportsFacing(blockState))
+			rotatedBlockState = setFacing(blockState, rotation.rotate(getFacing(blockState)));
+
+		return modifyRotation(rotatedBlockState, rotation);
 	}
 
 	@Override
 	public final BlockState mirror(BlockState blockState, Mirror mirror)
 	{
-		if(supportsFacing(blockState))
-			return blockState.rotate(mirror.getRotation(getFacing(blockState)));
+		var mirroredBlockState = blockState;
 
+		if(supportsFacing(blockState))
+			mirroredBlockState = blockState.rotate(mirror.getRotation(getFacing(blockState)));
+
+		return modifyMirror(mirroredBlockState, mirror);
+	}
+	// endregion
+
+	// region: Wrappers
+	@Nullable
+	@OverridingMethodsMustInvokeSuper
+	protected BlockState modifyPlacementState(BlockState placementBlockState, BlockPlaceContext ctx)
+	{
+		return placementBlockState;
+	}
+
+	@OverridingMethodsMustInvokeSuper
+	protected BlockState modifyRotation(BlockState blockState, Rotation rotation)
+	{
+		return blockState;
+	}
+
+	@OverridingMethodsMustInvokeSuper
+	protected BlockState modifyMirror(BlockState blockState, Mirror mirror)
+	{
 		return blockState;
 	}
 	// endregion
@@ -193,6 +227,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 	// endregion
 
 	// region: FourWay
+	@Nullable
 	protected Direction getFourWayFacing(BlockPlaceContext ctx)
 	{
 		return ctx.getHorizontalDirection().getOpposite();
