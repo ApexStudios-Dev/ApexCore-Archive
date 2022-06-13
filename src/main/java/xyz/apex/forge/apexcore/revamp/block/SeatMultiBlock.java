@@ -11,10 +11,9 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import xyz.apex.java.utility.nullness.NonnullConsumer;
 
-// Does not support having BlockEntities or Containers
-public class SeatBlock extends BaseBlock implements ISeatBlock
+public abstract class SeatMultiBlock extends BaseMultiBlock implements ISeatMultiBlock
 {
-	public SeatBlock(Properties properties)
+	public SeatMultiBlock(Properties properties)
 	{
 		super(properties);
 

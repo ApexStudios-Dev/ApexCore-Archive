@@ -8,6 +8,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -78,6 +79,13 @@ public abstract class BaseMultiBlock extends BaseBlock implements IMultiBlock
 		super.registerProperties(consumer);
 		getMultiBlockPattern().registerProperties(consumer);
 	}
+
+	@Override
+	public RenderShape getRenderShape(BlockState blockState)
+	{
+		var index = getMultiBlockIndex(blockState);
+		return index == getMultiBlockRenderModelIndex() ? RenderShape.MODEL : RenderShape.INVISIBLE;
+	}
 	// endregion
 
 	public static abstract class WithBlockEntity<BLOCK_ENTITY extends BlockEntity> extends BaseBlock.WithBlockEntity<BLOCK_ENTITY> implements IMultiBlock
@@ -139,6 +147,13 @@ public abstract class BaseMultiBlock extends BaseBlock implements IMultiBlock
 		{
 			super.registerProperties(consumer);
 			getMultiBlockPattern().registerProperties(consumer);
+		}
+
+		@Override
+		public RenderShape getRenderShape(BlockState blockState)
+		{
+			var index = getMultiBlockIndex(blockState);
+			return index == getMultiBlockRenderModelIndex() ? RenderShape.MODEL : RenderShape.INVISIBLE;
 		}
 		// endregion
 	}
@@ -202,6 +217,13 @@ public abstract class BaseMultiBlock extends BaseBlock implements IMultiBlock
 		{
 			super.registerProperties(consumer);
 			getMultiBlockPattern().registerProperties(consumer);
+		}
+
+		@Override
+		public RenderShape getRenderShape(BlockState blockState)
+		{
+			var index = getMultiBlockIndex(blockState);
+			return index == getMultiBlockRenderModelIndex() ? RenderShape.MODEL : RenderShape.INVISIBLE;
 		}
 		// endregion
 	}

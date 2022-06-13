@@ -4,6 +4,7 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.block.Blocks;
 
 import xyz.apex.forge.apexcore.core.entity.SeatEntity;
+import xyz.apex.forge.apexcore.lib.client.renderer.DummyEntityRenderer;
 import xyz.apex.forge.utility.registrator.entry.EntityEntry;
 
 import static xyz.apex.forge.utility.registrator.provider.RegistrateLangExtProvider.EN_GB;
@@ -25,7 +26,7 @@ public final class ACEntities
 				.fireImmune()
 				.immuneTo(() -> Blocks.TNT, () -> Blocks.LAVA)
 
-				.renderer(() -> SeatEntityRenderer::new)
+				.renderer(() -> DummyEntityRenderer::new)
 			.register();
 	// endregion
 

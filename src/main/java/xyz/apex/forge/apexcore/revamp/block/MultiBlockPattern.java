@@ -225,6 +225,13 @@ public final class MultiBlockPattern
 	{
 		return localPositions;
 	}
+
+	public BlockPos getOriginPos(IMultiBlock multiBlock, BlockState blockState, BlockPos worldSpace)
+	{
+		var index = getIndex(blockState);
+		var localSpace = localPositions.get(index);
+		return getOriginFromWorldSpace(multiBlock, blockState, worldSpace, localSpace);
+	}
 	// endregion
 
 	public static MultiBlockPattern.Builder builder()

@@ -54,6 +54,7 @@ public final class ACRegistry extends AbstractRegistrator<ACRegistry>
 
 			EventBusHelper.addEnqueuedListener(FMLCommonSetupEvent.class, event -> ACLootFunctionTypes.bootstrap());
 			PlayerPlushie.bootstrap();
+			ACEntities.bootstrap();
 			bootstrap = true;
 		}
 	}

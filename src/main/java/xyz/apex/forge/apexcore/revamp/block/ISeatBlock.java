@@ -3,7 +3,6 @@ package xyz.apex.forge.apexcore.revamp.block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -11,7 +10,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.phys.BlockHitResult;
 
 import xyz.apex.forge.apexcore.core.entity.SeatEntity;
 
@@ -29,7 +27,7 @@ public interface ISeatBlock
 		return new TranslatableComponent(getOccupiedTranslationKey());
 	}
 
-	default InteractionResult useSeatBlock(BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult rayTraceResult)
+	default InteractionResult useSeatBlock(BlockState blockState, Level level, BlockPos pos, Player player)
 	{
 		if(level.isClientSide)
 			return InteractionResult.CONSUME;

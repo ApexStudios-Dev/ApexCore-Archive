@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Random;
 
-// Doe not support having BlockEntities or Containers
+// Does not support having BlockEntities or Containers
 public class WallLightBlock extends BaseBlock
 {
 	public WallLightBlock(Properties properties)
