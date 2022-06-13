@@ -125,13 +125,13 @@ public class BaseMenu extends AbstractContainerMenu
 		{
 			for(int j = 0; j < 9; j++)
 			{
-				menu.addSlot(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
+				menu.addSlot(new Slot(playerInventory, j + i * 9 + 9, x + j * 18, y + i * 18));
 			}
 		}
 
 		for(int i = 0; i < 9; ++i)
 		{
-			menu.addSlot(new Slot(playerInventory, i, 8 + i * 18, 84 + 58));
+			menu.addSlot(new Slot(playerInventory, i, x + i * 18, y + 58));
 		}
 	}
 }
