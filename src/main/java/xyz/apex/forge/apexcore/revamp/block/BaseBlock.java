@@ -36,7 +36,6 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.network.NetworkHooks;
 
 import xyz.apex.forge.apexcore.lib.util.ContainerHelper;
@@ -268,16 +267,24 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 		// endregion
 
 		// region: Overrides
-		@Nullable
-		protected final BLOCK_ENTITY getBlockEntity(BlockGetter level, BlockPos pos)
+		protected final BlockPos getBlockEntityPos(BlockState blockState, BlockPos pos)
 		{
-			return getBlockEntityType().getBlockEntity(level, pos);
+			if(this instanceof IMultiBlock multiBlock)
+				return multiBlock.getMultiBlockOriginPos(blockState, pos);
+			return pos;
+		}
+
+		@Nullable
+		protected final BLOCK_ENTITY getBlockEntity(BlockState blockState, BlockGetter level, BlockPos pos)
+		{
+			var blockEntityPos = getBlockEntityPos(blockState, pos);
+			return getBlockEntityType().getBlockEntity(level, blockEntityPos);
 		}
 
 		@Override
 		public final boolean triggerEvent(BlockState blockState, Level level, BlockPos pos, int event, int param)
 		{
-			var blockEntity = getBlockEntity(level, pos);
+			var blockEntity = getBlockEntity(blockState, level, pos);
 			return blockEntity != null && blockEntity.triggerEvent(event, param);
 		}
 
@@ -285,6 +292,14 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 		@Override
 		public final BlockEntity newBlockEntity(BlockPos pos, BlockState blockState)
 		{
+			if(this instanceof IMultiBlock multiBlock)
+			{
+				var origin = multiBlock.getMultiBlockOriginPos(blockState, pos);
+
+				if(!origin.equals(pos))
+					return null;
+			}
+
 			return getBlockEntityType().create(pos, blockState);
 		}
 
@@ -307,7 +322,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 		@Override
 		public MenuProvider getMenuProvider(BlockState blockState, Level level, BlockPos pos)
 		{
-			var blockEntity = getBlockEntity(level, pos);
+			var blockEntity = getBlockEntity(blockState, level, pos);
 
 			if(blockEntity instanceof MenuProvider menuProvider)
 				return menuProvider;
@@ -327,7 +342,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 		@Override
 		public void setPlacedBy(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack)
 		{
-			var blockEntity = getBlockEntity(level, pos);
+			var blockEntity = getBlockEntity(blockState, level, pos);
 
 			if(blockEntity instanceof NameableMutable nameable && stack.hasCustomHoverName())
 			{
@@ -365,7 +380,10 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 
 				if(player instanceof ServerPlayer serverPlayer)
 				{
-					NetworkHooks.openGui(serverPlayer, provider, buffer -> buffer.writeBlockPos(pos));
+					NetworkHooks.openGui(serverPlayer, provider, buffer -> {
+						var blockEntityPos = getBlockEntityPos(blockState, pos);
+						buffer.writeBlockPos(blockEntityPos);
+					});
 					return InteractionResult.CONSUME;
 				}
 			}
@@ -384,7 +402,8 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 		@Override
 		public final int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos)
 		{
-			return ContainerHelper.getRedstoneSignalFromContainer(level, pos);
+			var blockEntityPos = getBlockEntityPos(blockState, pos);
+			return ContainerHelper.getRedstoneSignalFromContainer(level, blockEntityPos);
 		}
 
 		@Override
@@ -397,22 +416,6 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 		@Override
 		public void onRemove(BlockState blockState, Level level, BlockPos pos, BlockState newBlockState, boolean isMoving)
 		{
-			if(!blockState.is(newBlockState.getBlock()))
-			{
-				var blockEntity = getBlockEntity(level, pos);
-
-				if(blockEntity != null)
-				{
-					blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(itemHandler -> {
-						for(var i = 0; i < itemHandler.getSlots(); i++)
-						{
-							ItemStack stack = itemHandler.getStackInSlot(i);
-							Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
-						}
-					});
-				}
-			}
-
 			super.onRemove(blockState, level, pos, newBlockState, isMoving);
 		}
 
@@ -420,7 +423,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 		@Override
 		public final MenuProvider getMenuProvider(BlockState blockState, Level level, BlockPos pos)
 		{
-			var blockEntity = getBlockEntity(level, pos);
+			var blockEntity = getBlockEntity(blockState, level, pos);
 
 			if(blockEntity != null)
 			{
@@ -431,7 +434,8 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 
 				return new SimpleMenuProvider((windowId, playerInventory, player) -> {
 					var buffer = new FriendlyByteBuf(Unpooled.buffer());
-					buffer.writeBlockPos(pos);
+					var blockEntityPos = getBlockEntityPos(blockState, pos);
+					buffer.writeBlockPos(blockEntityPos);
 					return getContainerType().create(windowId, playerInventory, buffer);
 				}, containerName);
 			}

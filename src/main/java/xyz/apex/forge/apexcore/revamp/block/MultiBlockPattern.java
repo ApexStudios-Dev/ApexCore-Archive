@@ -228,9 +228,14 @@ public final class MultiBlockPattern
 
 	public BlockPos getOriginPos(IMultiBlock multiBlock, BlockState blockState, BlockPos worldSpace)
 	{
-		var index = getIndex(blockState);
-		var localSpace = localPositions.get(index);
-		return getOriginFromWorldSpace(multiBlock, blockState, worldSpace, localSpace);
+		if(blockState.hasProperty(blockProperty))
+		{
+			var index = getIndex(blockState);
+			var localSpace = localPositions.get(index);
+			return getOriginFromWorldSpace(multiBlock, blockState, worldSpace, localSpace);
+		}
+
+		return worldSpace;
 	}
 	// endregion
 

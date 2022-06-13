@@ -5,6 +5,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -68,6 +70,15 @@ public abstract class InventoryBlockEntity extends BaseBlockEntity.WithCustomNam
 	@Override
 	public void setRemoved()
 	{
+		if(level != null)
+		{
+			for(var i = 0; i < itemHandler.getSlots(); i++)
+			{
+				ItemStack stack = itemHandler.getStackInSlot(i);
+				Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), stack);
+			}
+		}
+
 		itemHandlerCapability.invalidate();
 		super.setRemoved();
 	}

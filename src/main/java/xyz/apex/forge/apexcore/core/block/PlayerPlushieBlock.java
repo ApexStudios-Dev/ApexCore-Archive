@@ -67,7 +67,7 @@ public final class PlayerPlushieBlock extends BaseBlock.WithBlockEntity<PlayerPl
 	public void setPlacedBy(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack)
 	{
 		var supporterInfo = PlayerPlushie.getSupporterInfo(stack);
-		var blockEntity = getBlockEntity(level, pos);
+		var blockEntity = getBlockEntity(blockState, level, pos);
 
 		if(blockEntity != null && supporterInfo != null)
 			blockEntity.setSupporterInfo(supporterInfo);
@@ -94,7 +94,7 @@ public final class PlayerPlushieBlock extends BaseBlock.WithBlockEntity<PlayerPl
 	@Override
 	public ItemStack getCloneItemStack(BlockState blockState, HitResult result, BlockGetter level, BlockPos pos, Player player)
 	{
-		var blockEntity = getBlockEntity(level, pos);
+		var blockEntity = getBlockEntity(blockState, level, pos);
 
 		if(blockEntity != null)
 		{
