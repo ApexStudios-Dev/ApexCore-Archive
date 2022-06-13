@@ -131,6 +131,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 	@Override
 	protected final void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
 	{
+		registerProperties(builder::add);
 	}
 
 	@Override
@@ -322,6 +323,18 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 
 			return null;
 		}
+
+		@Override
+		public void setPlacedBy(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack)
+		{
+			var blockEntity = getBlockEntity(level, pos);
+
+			if(blockEntity instanceof NameableMutable nameable && stack.hasCustomHoverName())
+			{
+				var customName = stack.getHoverName();
+				nameable.setCustomName(customName);
+			}
+		}
 		// endregion
 
 		@Nullable
@@ -378,21 +391,6 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 		public InteractionResult use(BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult rayTraceResult)
 		{
 			return tryOpenContainerScreen(blockState, level, pos, player, hand, rayTraceResult);
-		}
-
-		@OverridingMethodsMustInvokeSuper
-		@Override
-		public void setPlacedBy(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack)
-		{
-			super.setPlacedBy(level, pos, blockState, placer, stack);
-
-			var blockEntity = getBlockEntity(level, pos);
-
-			if(blockEntity instanceof NameableMutable nameable && stack.hasCustomHoverName())
-			{
-				var customName = stack.getHoverName();
-				nameable.setCustomName(customName);
-			}
 		}
 
 		@OverridingMethodsMustInvokeSuper

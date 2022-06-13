@@ -10,6 +10,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 
+// Replaced with revamped code
+@Deprecated(since = "4.3.5", forRemoval = true)
 public class BaseBlockEntity extends BlockEntity
 {
 	public BaseBlockEntity(BlockEntityType<?> blockEntityType, BlockPos worldPosition, BlockState blockState)
