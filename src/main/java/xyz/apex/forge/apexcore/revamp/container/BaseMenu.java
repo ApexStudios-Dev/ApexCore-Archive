@@ -92,6 +92,9 @@ public class BaseMenu extends AbstractContainerMenu
 	{
 		super.broadcastChanges();
 
+		if(blockEntity != null)
+			blockEntity.setChanged();
+
 		if(blockEntity instanceof InventoryBlockEntity inventoryBlockEntity)
 			SyncContainerPacket.sendToClient(inventoryBlockEntity);
 	}
