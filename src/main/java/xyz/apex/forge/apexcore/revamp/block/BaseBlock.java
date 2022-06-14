@@ -34,6 +34,7 @@ import net.minecraft.world.level.gameevent.GameEventListener;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -155,6 +156,15 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 
 		return modifyMirror(mirroredBlockState, mirror);
 	}
+
+	@Override
+	public PushReaction getPistonPushReaction(BlockState blockState)
+	{
+		if(blockState.hasBlockEntity())
+			return PushReaction.IGNORE;
+		return this instanceof IMultiBlock ? PushReaction.DESTROY : super.getPistonPushReaction(blockState);
+	}
+
 	// endregion
 
 	// region: Wrappers
