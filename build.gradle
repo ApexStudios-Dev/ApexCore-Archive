@@ -161,6 +161,9 @@ dependencies {
 	implementation fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}")
 	shade "com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}"
 
+	implementation fg.deobf("xyz.apex.forge:${commonality_mod_id}:${minecraft_version}-${commonality_version}")
+	shade "xyz.apex.forge:${commonality_mod_id}:${minecraft_version}-${commonality_version}"
+
 	implementation "xyz.apex.java.utility:javautilities:${javautilities_version}"
 	shade "xyz.apex.java.utility:javautilities:${javautilities_version}"
 	library "xyz.apex.java.utility:javautilities:${javautilities_version}"

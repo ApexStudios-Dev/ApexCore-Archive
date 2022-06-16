@@ -26,13 +26,13 @@ import xyz.apex.forge.apexcore.lib.util.InterModUtil;
 import xyz.apex.forge.apexcore.lib.util.ProfileHelper;
 import xyz.apex.forge.apexcore.lib.util.SkinHelper;
 import xyz.apex.forge.apexcore.revamp.net.packet.SyncContainerPacket;
+import xyz.apex.forge.commonality.init.Mods;
 
-@Mod(ApexCore.ID)
+@Mod(Mods.APEX_CORE)
 public final class ApexCore
 {
-	public static final String ID = "apexcore";
 	public static final Logger LOGGER = LogManager.getLogger();
-	public static final NetworkManager NETWORK = new NetworkManager(ID, "main", "1");
+	public static final NetworkManager NETWORK = new NetworkManager(Mods.APEX_CORE, "main", "1");
 
 	public ApexCore()
 	{
@@ -53,7 +53,7 @@ public final class ApexCore
 
 		EventBusHelper.addListener(RegisterCommandsEvent.class, event -> CommandApex.register(event.getDispatcher()));
 
-		EventBusHelper.addEnqueuedListener(InterModEnqueueEvent.class, event -> PlayerPlushie.getPlushieItems().forEach(plushieItem -> InterModUtil.sendFurnitureStationResult(ID, plushieItem)));
+		EventBusHelper.addEnqueuedListener(InterModEnqueueEvent.class, event -> PlayerPlushie.getPlushieItems().forEach(plushieItem -> InterModUtil.sendFurnitureStationResult(Mods.APEX_CORE, plushieItem)));
 	}
 
 	public static final class Client

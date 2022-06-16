@@ -12,8 +12,8 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
-import xyz.apex.forge.apexcore.core.ApexCore;
 import xyz.apex.forge.apexcore.lib.support.SupporterManager;
+import xyz.apex.forge.commonality.init.Mods;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
@@ -23,7 +23,7 @@ public final class CommandApex
 {
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher)
 	{
-		dispatcher.register(literal(ApexCore.ID)
+		dispatcher.register(literal(Mods.APEX_CORE)
 				.then(literal("supporters")
 						.then(literal("arethey")
 								.then(argument("player", EntityArgument.player())

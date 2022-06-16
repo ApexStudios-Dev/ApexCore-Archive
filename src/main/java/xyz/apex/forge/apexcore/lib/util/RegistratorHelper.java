@@ -7,7 +7,8 @@ import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.common.Tags;
+
+import xyz.apex.forge.commonality.init.ItemTags;
 
 // TODO: Merge directly into registrator
 public final class RegistratorHelper
@@ -29,7 +30,7 @@ public final class RegistratorHelper
 	// region: Sword
 	public static <ITEM extends Item> void swordRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, TagKey<Item> ingot)
 	{
-		swordRecipe(ctx, provider, ingot, Tags.Items.RODS_WOODEN);
+		swordRecipe(ctx, provider, ingot, ItemTags.Forge.RODS_WOODEN);
 	}
 
 	public static <ITEM extends Item> void swordRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, TagKey<Item> ingot, TagKey<Item> stick)
@@ -53,7 +54,7 @@ public final class RegistratorHelper
 	// region: Pickaxe
 	public static <ITEM extends Item> void pickaxeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, TagKey<Item> ingot)
 	{
-		pickaxeRecipe(ctx, provider, ingot, Tags.Items.RODS_WOODEN);
+		pickaxeRecipe(ctx, provider, ingot, ItemTags.Forge.RODS_WOODEN);
 	}
 
 	public static <ITEM extends Item> void pickaxeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, TagKey<Item> ingot, TagKey<Item> stick)
@@ -75,7 +76,7 @@ public final class RegistratorHelper
 	// region: Axe
 	public static <ITEM extends Item> void axeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, TagKey<Item> ingot)
 	{
-		axeRecipe(ctx, provider, ingot, Tags.Items.RODS_WOODEN);
+		axeRecipe(ctx, provider, ingot, ItemTags.Forge.RODS_WOODEN);
 	}
 
 	public static <ITEM extends Item> void axeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, TagKey<Item> ingot, TagKey<Item> stick)
@@ -97,7 +98,7 @@ public final class RegistratorHelper
 	// region: Shovel
 	public static <ITEM extends Item> void shovelRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, TagKey<Item> ingot)
 	{
-		shovelRecipe(ctx, provider, ingot, Tags.Items.RODS_WOODEN);
+		shovelRecipe(ctx, provider, ingot, ItemTags.Forge.RODS_WOODEN);
 	}
 
 	public static <ITEM extends Item> void shovelRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, TagKey<Item> ingot, TagKey<Item> stick)
@@ -119,7 +120,7 @@ public final class RegistratorHelper
 	// region: Hoe
 	public static <ITEM extends Item> void hoeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, TagKey<Item> ingot)
 	{
-		hoeRecipe(ctx, provider, ingot, Tags.Items.RODS_WOODEN);
+		hoeRecipe(ctx, provider, ingot, ItemTags.Forge.RODS_WOODEN);
 	}
 
 	public static <ITEM extends Item> void hoeRecipe(DataGenContext<Item, ITEM> ctx, RegistrateRecipeProvider provider, TagKey<Item> ingot, TagKey<Item> stick)

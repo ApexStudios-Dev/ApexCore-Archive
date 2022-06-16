@@ -2,8 +2,8 @@ package xyz.apex.forge.apexcore.core.init;
 
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
-import xyz.apex.forge.apexcore.core.ApexCore;
 import xyz.apex.forge.apexcore.lib.util.EventBusHelper;
+import xyz.apex.forge.commonality.init.Mods;
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.java.utility.Lazy;
 
@@ -17,7 +17,7 @@ public final class ACRegistry extends AbstractRegistrator<ACRegistry>
 
 	private ACRegistry()
 	{
-		super(ApexCore.ID);
+		super(Mods.APEX_CORE);
 
 		addDataGenerator(LANG, provider -> {
 			provider.add(ACItemGroupCategories.ENCHANTED_BOOKS.getCategoryNameKey(), "Enchanted Books");
@@ -50,8 +50,6 @@ public final class ACRegistry extends AbstractRegistrator<ACRegistry>
 	{
 		if(!bootstrap)
 		{
-			ACTags.bootstrap();
-
 			EventBusHelper.addEnqueuedListener(FMLCommonSetupEvent.class, event -> ACLootFunctionTypes.bootstrap());
 			PlayerPlushie.bootstrap();
 			ACEntities.bootstrap();

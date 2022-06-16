@@ -8,7 +8,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -42,6 +41,7 @@ import net.minecraftforge.network.NetworkHooks;
 
 import xyz.apex.forge.apexcore.lib.util.ContainerHelper;
 import xyz.apex.forge.apexcore.lib.util.NameableMutable;
+import xyz.apex.forge.commonality.init.FluidTags;
 import xyz.apex.java.utility.nullness.NonnullConsumer;
 
 import javax.annotation.Nullable;
@@ -101,7 +101,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 		if(supportsWaterLogging(blockState))
 		{
 			var fluidState = level.getFluidState(pos);
-			var waterLogged = fluidState.is(FluidTags.WATER) && fluidState.isSource();
+			var waterLogged = fluidState.is(FluidTags.Vanilla.WATER) && fluidState.isSource();
 			blockState = setWaterLogged(blockState, waterLogged);
 		}
 

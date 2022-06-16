@@ -1,11 +1,10 @@
 package xyz.apex.forge.apexcore.core.init;
 
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.*;
-import net.minecraftforge.common.Tags;
 
 import xyz.apex.forge.apexcore.lib.item.ItemGroupCategory;
 import xyz.apex.forge.apexcore.lib.item.ItemGroupCategoryManager;
+import xyz.apex.forge.commonality.init.ItemTags;
 
 // Example categories, disabled by default
 // Call ACItemGroupCategories#enable() from your mod constructor to enable them
@@ -55,37 +54,37 @@ public final class ACItemGroupCategories
 	public static final ItemGroupCategory STAIRS = ItemGroupCategory
 			.builder("stairs")
 				.cycleIcons()
-				.tagged(ItemTags.STAIRS)
+				.tagged(ItemTags.Vanilla.STAIRS)
 			.build();
 
 	public static final ItemGroupCategory SLABS = ItemGroupCategory
 			.builder("slabs")
 				.cycleIcons()
-				.tagged(ItemTags.SLABS)
+				.tagged(ItemTags.Vanilla.SLABS)
 			.build();
 
 	public static final ItemGroupCategory ORES = ItemGroupCategory
 			.builder("ores")
 				.cycleIcons()
-				.tagged(Tags.Items.ORES)
+				.tagged(ItemTags.Forge.ORES)
 			.build();
 
 	public static final ItemGroupCategory STORAGE_BLOCKS = ItemGroupCategory
 			.builder("storage_blocks")
 				.cycleIcons()
-				.tagged(Tags.Items.STORAGE_BLOCKS)
+				.tagged(ItemTags.Forge.STORAGE_BLOCKS)
 			.build();
 
 	public static final ItemGroupCategory WOOLS = ItemGroupCategory
 			.builder("wool")
 				.cycleIcons()
-				.tagged(ACTags.Items.WOOLS)
+				.tagged(ItemTags.Vanilla.WOOL)
 			.build();
 
 	public static final ItemGroupCategory LOGS = ItemGroupCategory
 			.builder("logs")
 				.cycleIcons()
-				.tagged(ItemTags.LOGS)
+				.tagged(ItemTags.Vanilla.LOGS)
 			.build();
 
 	private static boolean enabled = false;

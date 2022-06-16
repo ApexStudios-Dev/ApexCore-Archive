@@ -23,9 +23,9 @@ import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import xyz.apex.forge.apexcore.core.ApexCore;
 import xyz.apex.forge.apexcore.lib.item.ItemGroupCategory;
 import xyz.apex.forge.apexcore.lib.item.ItemGroupCategoryManager;
+import xyz.apex.forge.commonality.init.Mods;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
@@ -36,10 +36,10 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 // Simple offloading class to allow hot swapping while using mixins
 @OnlyIn(Dist.CLIENT)
-@Mod.EventBusSubscriber(modid = ApexCore.ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = Mods.APEX_CORE, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class CreativeScreenHandler
 {
-	private static final ResourceLocation CATEGORY_TABS_TEXTURE = new ResourceLocation(ApexCore.ID, "textures/gui/container/creative_inventory/category_tabs.png");
+	private static final ResourceLocation CATEGORY_TABS_TEXTURE = new ResourceLocation(Mods.APEX_CORE, "textures/gui/container/creative_inventory/category_tabs.png");
 	private static final int MAX_CATEGORY_TAB = 4;
 	private static final int CATEGORY_TAB_U_SIZE = 32;
 	private static final int CATEGORY_TAB_V_SIZE = 28;

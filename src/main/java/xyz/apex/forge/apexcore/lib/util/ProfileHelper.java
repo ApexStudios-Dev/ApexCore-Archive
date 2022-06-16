@@ -18,7 +18,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-import xyz.apex.forge.apexcore.core.ApexCore;
+import xyz.apex.forge.commonality.init.Mods;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -92,7 +92,7 @@ public final class ProfileHelper
 
 	public static void setup()
 	{
-		Validate.isTrue(ModLoadingContext.get().getActiveContainer().getModId().equals(ApexCore.ID));
+		Validate.isTrue(ModLoadingContext.get().getActiveContainer().getModId().equals(Mods.APEX_CORE));
 
 		EventBusHelper.addEnqueuedListener(FMLClientSetupEvent.class, event -> INSTANCE.setClientProfileLookupObjects());
 
