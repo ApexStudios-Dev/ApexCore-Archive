@@ -200,10 +200,22 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 	from sourceSets.main.resources
 }
 
-task deobfJar(type: Jar) {
+task deobfJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.class) {
 	classifier 'deobf'
 	exclude '**/*bbmodel'
 	from sourceSets.main.output
+
+	configurations = [ project.configurations.shade ]
+	// relocate "${registrate_package}", "xyz.apex.repack.${registrate_package}"
+
+	// we only want to remap class refrences imports etc
+	// and not shade in these into the mod jar
+	// registrator already comes with these pre shaded
+	// and we dependend on registrator
+	dependencies {
+		exclude dependency("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}")
+		exclude dependency("xyz.apex.java.utility:javautilities:${javautilities_version}")
+	}
 }
 
 jar {
