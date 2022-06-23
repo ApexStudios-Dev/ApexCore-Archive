@@ -4,7 +4,7 @@ import net.minecraft.world.item.*;
 
 import xyz.apex.forge.apexcore.lib.item.ItemGroupCategory;
 import xyz.apex.forge.apexcore.lib.item.ItemGroupCategoryManager;
-import xyz.apex.forge.commonality.init.ItemTags;
+import xyz.apex.forge.commonality.tags.ItemTags;
 
 // Example categories, disabled by default
 // Call ACItemGroupCategories#enable() from your mod constructor to enable them

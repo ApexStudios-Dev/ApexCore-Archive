@@ -9,7 +9,6 @@ import net.minecraftforge.network.NetworkEvent;
 import xyz.apex.forge.apexcore.lib.net.AbstractPacket;
 import xyz.apex.forge.apexcore.lib.net.NetworkManager;
 import xyz.apex.forge.apexcore.lib.support.SupporterManager;
-import xyz.apex.java.utility.Apex;
 
 import java.util.Set;
 import java.util.UUID;
@@ -30,28 +29,28 @@ public final class ClientSyncSupportersPacket extends AbstractPacket
 
 		var count = buffer.readVarInt();
 
-		networkInfos = Apex.makeImmutableSet(builder -> {
-			for(var i = 0; i < count; i++)
+		var builder = ImmutableSet.<SupporterManager.SupporterInfo>builder();
+
+		for(var i = 0; i < count; i++)
+		{
+			var level = SupporterManager.SupporterLevel.DEFAULT;
+			var aliases = Sets.<UUID>newHashSet();
+			var playerId = buffer.readUUID();
+			var username = buffer.readUtf();
+
+			if(buffer.readBoolean())
+				level = buffer.readEnum(SupporterManager.SupporterLevel.class);
+
+			if(buffer.readBoolean())
 			{
-				var level = SupporterManager.SupporterLevel.DEFAULT;
-				var aliases = Sets.<UUID>newHashSet();
-				var playerId = buffer.readUUID();
-				var username = buffer.readUtf();
-
-				if(buffer.readBoolean())
-					level = buffer.readEnum(SupporterManager.SupporterLevel.class);
-
-				if(buffer.readBoolean())
-				{
-					var aliasCount = buffer.readVarInt();
-					IntStream.range(0, aliasCount).mapToObj(j -> buffer.readUUID()).forEach(aliases::add);
-				}
-
-				builder.add(new SupporterManager.SupporterInfo(playerId, level, aliases, username));
+				var aliasCount = buffer.readVarInt();
+				IntStream.range(0, aliasCount).mapToObj(j -> buffer.readUUID()).forEach(aliases::add);
 			}
 
-			return builder;
-		});
+			builder.add(new SupporterManager.SupporterInfo(playerId, level, aliases, username));
+		}
+
+		networkInfos = builder.build();
 	}
 
 	@Override

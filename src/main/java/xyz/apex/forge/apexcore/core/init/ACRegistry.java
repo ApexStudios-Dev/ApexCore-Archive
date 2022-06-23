@@ -1,18 +1,18 @@
 package xyz.apex.forge.apexcore.core.init;
 
+import com.tterrag.registrate.AbstractRegistrate;
+
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import xyz.apex.forge.apexcore.lib.util.EventBusHelper;
-import xyz.apex.forge.commonality.init.Mods;
-import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.java.utility.Lazy;
+import xyz.apex.forge.commonality.Mods;
 
-import static xyz.apex.forge.utility.registrator.provider.RegistrateLangExtProvider.EN_GB;
 import static com.tterrag.registrate.providers.ProviderType.LANG;
 
-public final class ACRegistry extends AbstractRegistrator<ACRegistry>
+public final class ACRegistry extends AbstractRegistrate<ACRegistry>
 {
-	private static final Lazy<ACRegistry> REGISTRY = create(ACRegistry::new);
+	public static final ACRegistry INSTANCE = new ACRegistry();
 	private static boolean bootstrap = false;
 
 	private ACRegistry()
@@ -31,34 +31,17 @@ public final class ACRegistry extends AbstractRegistrator<ACRegistry>
 			provider.add(ACItemGroupCategories.WOOLS.getCategoryNameKey(), "Wools");
 			provider.add(ACItemGroupCategories.LOGS.getCategoryNameKey(), "Logs");
 		});
-
-		addDataGenerator(LANG_EXT_PROVIDER, provider -> {
-			provider.add(EN_GB, ACItemGroupCategories.ENCHANTED_BOOKS.getCategoryNameKey(), "Enchanted Books");
-			provider.add(EN_GB, ACItemGroupCategories.TOOLS.getCategoryNameKey(), "Tools");
-			provider.add(EN_GB, ACItemGroupCategories.WEAPONS.getCategoryNameKey(), "Weapons");
-			provider.add(EN_GB, ACItemGroupCategories.ARMOR.getCategoryNameKey(), "Armor");
-			provider.add(EN_GB, ACItemGroupCategories.STAIRS.getCategoryNameKey(), "Stairs");
-			provider.add(EN_GB, ACItemGroupCategories.SLABS.getCategoryNameKey(), "Slabs");
-			provider.add(EN_GB, ACItemGroupCategories.ORES.getCategoryNameKey(), "Ores");
-			provider.add(EN_GB, ACItemGroupCategories.STORAGE_BLOCKS.getCategoryNameKey(), "Storage Blocks");
-			provider.add(EN_GB, ACItemGroupCategories.WOOLS.getCategoryNameKey(), "Wools");
-			provider.add(EN_GB, ACItemGroupCategories.LOGS.getCategoryNameKey(), "Logs");
-		});
 	}
 
 	public static void bootstrap()
 	{
 		if(!bootstrap)
 		{
+			INSTANCE.registerEventListeners(FMLJavaModLoadingContext.get().getModEventBus());
 			EventBusHelper.addEnqueuedListener(FMLCommonSetupEvent.class, event -> ACLootFunctionTypes.bootstrap());
 			PlayerPlushie.bootstrap();
 			ACEntities.bootstrap();
 			bootstrap = true;
 		}
-	}
-
-	public static ACRegistry getRegistry()
-	{
-		return REGISTRY.get();
 	}
 }

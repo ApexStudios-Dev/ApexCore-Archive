@@ -13,9 +13,9 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
+import xyz.apex.forge.apexcore.revamp.block.MultiBlockPattern;
 import xyz.apex.forge.apexcore.revamp.block.entity.InventoryBlockEntity;
 import xyz.apex.forge.apexcore.revamp.net.packet.SyncContainerPacket;
-import xyz.apex.java.utility.nullness.NonnullQuadFunction;
 
 import javax.annotation.Nullable;
 
@@ -99,7 +99,7 @@ public class BaseMenu extends AbstractContainerMenu
 			SyncContainerPacket.sendToClient(inventoryBlockEntity);
 	}
 
-	public static void bindItemHandlerSlots(BaseMenu menu, IItemHandler itemHandler, int rows, int cols, int x, int y, NonnullQuadFunction<IItemHandler, Integer, Integer, Integer, SlotItemHandler> slotFactory)
+	public static void bindItemHandlerSlots(BaseMenu menu, IItemHandler itemHandler, int rows, int cols, int x, int y, MultiBlockPattern.QuadFunction<IItemHandler, Integer, Integer, Integer, SlotItemHandler> slotFactory)
 	{
 		for(var j = 0; j < rows; j++)
 		{

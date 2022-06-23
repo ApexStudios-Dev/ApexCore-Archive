@@ -40,7 +40,7 @@ public final class ApexCoreItemStackBlockEntityRenderer extends BlockEntityWitho
 	{
 		var partialTick = Minecraft.getInstance().getDeltaFrameTime();
 
-		if(PlayerPlushie.PLAYER_PLUSHIE_BLOCK.isInStack(stack))
+		if(PlayerPlushie.PLAYER_PLUSHIE_BLOCK.isIn(stack))
 		{
 			var supporterInfo = PlayerPlushie.getSupporterInfo(stack);
 
@@ -68,8 +68,8 @@ public final class ApexCoreItemStackBlockEntityRenderer extends BlockEntityWitho
 		if(playerPlushieBlockEntityMap.containsKey(playerId))
 			return playerPlushieBlockEntityMap.get(playerId);
 
-		var blockState = PlayerPlushie.PLAYER_PLUSHIE_BLOCK.defaultBlockState();
-		var blockEntity = PlayerPlushie.PLAYER_PLUSHIE_BLOCK_ENTITY.createBlockEntity(BlockPos.ZERO, blockState);
+		var blockState = PlayerPlushie.PLAYER_PLUSHIE_BLOCK.getDefaultState();
+		var blockEntity = PlayerPlushie.PLAYER_PLUSHIE_BLOCK_ENTITY.create(BlockPos.ZERO, blockState);
 
 		if(blockEntity != null)
 		{

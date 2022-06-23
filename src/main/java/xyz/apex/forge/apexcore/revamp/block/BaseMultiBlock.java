@@ -13,9 +13,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 
-import xyz.apex.java.utility.nullness.NonnullConsumer;
-
 import javax.annotation.OverridingMethodsMustInvokeSuper;
+import java.util.function.Consumer;
 
 public abstract class BaseMultiBlock extends BaseBlock implements IMultiBlock
 {
@@ -74,7 +73,7 @@ public abstract class BaseMultiBlock extends BaseBlock implements IMultiBlock
 
 	@OverridingMethodsMustInvokeSuper
 	@Override
-	protected void registerProperties(NonnullConsumer<Property<?>> consumer)
+	protected void registerProperties(Consumer<Property<?>> consumer)
 	{
 		super.registerProperties(consumer);
 		getMultiBlockPattern().registerProperties(consumer);
@@ -143,7 +142,7 @@ public abstract class BaseMultiBlock extends BaseBlock implements IMultiBlock
 
 		@OverridingMethodsMustInvokeSuper
 		@Override
-		protected void registerProperties(NonnullConsumer<Property<?>> consumer)
+		protected void registerProperties(Consumer<Property<?>> consumer)
 		{
 			super.registerProperties(consumer);
 			getMultiBlockPattern().registerProperties(consumer);
@@ -213,7 +212,7 @@ public abstract class BaseMultiBlock extends BaseBlock implements IMultiBlock
 
 		@OverridingMethodsMustInvokeSuper
 		@Override
-		protected void registerProperties(NonnullConsumer<Property<?>> consumer)
+		protected void registerProperties(Consumer<Property<?>> consumer)
 		{
 			super.registerProperties(consumer);
 			getMultiBlockPattern().registerProperties(consumer);

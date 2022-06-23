@@ -26,7 +26,7 @@ import xyz.apex.forge.apexcore.lib.util.InterModUtil;
 import xyz.apex.forge.apexcore.lib.util.ProfileHelper;
 import xyz.apex.forge.apexcore.lib.util.SkinHelper;
 import xyz.apex.forge.apexcore.revamp.net.packet.SyncContainerPacket;
-import xyz.apex.forge.commonality.init.Mods;
+import xyz.apex.forge.commonality.Mods;
 
 @Mod(Mods.APEX_CORE)
 public final class ApexCore

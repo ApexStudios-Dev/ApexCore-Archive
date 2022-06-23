@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 
-import xyz.apex.java.utility.nullness.NonnullConsumer;
+import java.util.function.Consumer;
 
 public abstract class SeatMultiBlock extends BaseMultiBlock implements ISeatMultiBlock
 {
@@ -27,7 +27,7 @@ public abstract class SeatMultiBlock extends BaseMultiBlock implements ISeatMult
 	}
 
 	@Override
-	protected void registerProperties(NonnullConsumer<Property<?>> consumer)
+	protected void registerProperties(Consumer<Property<?>> consumer)
 	{
 		super.registerProperties(consumer);
 		consumer.accept(OCCUPIED);

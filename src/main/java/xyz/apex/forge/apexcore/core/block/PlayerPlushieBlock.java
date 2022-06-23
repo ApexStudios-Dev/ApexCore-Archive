@@ -26,11 +26,11 @@ import xyz.apex.forge.apexcore.core.block.entity.PlayerPlushieBlockEntity;
 import xyz.apex.forge.apexcore.core.init.PlayerPlushie;
 import xyz.apex.forge.apexcore.lib.block.VoxelShaper;
 import xyz.apex.forge.apexcore.revamp.block.BaseBlock;
-import xyz.apex.java.utility.nullness.NonnullConsumer;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 public final class PlayerPlushieBlock extends BaseBlock.WithBlockEntity<PlayerPlushieBlockEntity>
 {
@@ -43,7 +43,7 @@ public final class PlayerPlushieBlock extends BaseBlock.WithBlockEntity<PlayerPl
 	}
 
 	@Override
-	protected void registerProperties(NonnullConsumer<Property<?>> consumer)
+	protected void registerProperties(Consumer<Property<?>> consumer)
 	{
 		super.registerProperties(consumer);
 		consumer.accept(WATERLOGGED);
@@ -88,7 +88,7 @@ public final class PlayerPlushieBlock extends BaseBlock.WithBlockEntity<PlayerPl
 	@Override
 	protected BlockEntityType<PlayerPlushieBlockEntity> getBlockEntityType()
 	{
-		return PlayerPlushie.PLAYER_PLUSHIE_BLOCK_ENTITY.asBlockEntityType();
+		return PlayerPlushie.PLAYER_PLUSHIE_BLOCK_ENTITY.get();
 	}
 
 	@Override

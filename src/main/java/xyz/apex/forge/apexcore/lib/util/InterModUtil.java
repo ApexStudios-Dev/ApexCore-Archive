@@ -3,7 +3,7 @@ package xyz.apex.forge.apexcore.lib.util;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fml.InterModComms;
 
-import xyz.apex.forge.commonality.init.Mods;
+import xyz.apex.forge.commonality.Mods;
 
 public final class InterModUtil
 {

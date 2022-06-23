@@ -1,6 +1,4 @@
-@MethodsReturnNonnullByDefault @ParametersAreNonnullByDefault @FieldsAreNonnullByDefault
+@javax.annotation.ParametersAreNonnullByDefault
+@net.minecraft.MethodsReturnNonnullByDefault
+@com.tterrag.registrate.util.nullness.FieldsAreNonnullByDefault
 package xyz.apex.forge.apexcore.core;
-
-import xyz.apex.java.utility.nullness.FieldsAreNonnullByDefault;
-import xyz.apex.java.utility.nullness.MethodsReturnNonnullByDefault;
-import xyz.apex.java.utility.nullness.ParametersAreNonnullByDefault;

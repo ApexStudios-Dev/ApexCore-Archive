@@ -35,14 +35,6 @@ public class FieldHelper
 		}
 	}
 
-	// region: Getters
-	@Nullable
-	public static <E> E getPrivateValue(@Nullable Object instance, Fields field)
-	{
-		Validate.notNull(field, "Field to find cannot be null");
-		return getPrivateValue(field.getClassToAccess(), instance, field.getFieldName());
-	}
-
 	@Nullable
 	public static <E> E getPrivateValue(Class<?> classToAccess, @Nullable Object instance, String fieldName)
 	{
@@ -67,9 +59,7 @@ public class FieldHelper
 			throw new UnableToFindFieldException(e);
 		}
 	}
-	// endregion
 
-	// region: Finders
 	public static Field findField(Class<?> classToAccess, String fieldName)
 	{
 		Validate.notNull(classToAccess, "Class to find field cannot be null");
@@ -87,14 +77,6 @@ public class FieldHelper
 		}
 	}
 
-	public static Field findField(Fields field)
-	{
-		Validate.notNull(field, "Field to find cannot be null");
-		return findField(field.getClassToAccess(), field.getFieldName());
-	}
-	// endregion
-
-	// region: Caching
 	private static Field cacheField(Class<?> classToAccess, String fieldName)
 	{
 		Validate.notNull(classToAccess, "Class to find field cannot be null");
@@ -112,14 +94,6 @@ public class FieldHelper
 		{
 			throw new UnableToFindFieldException(e);
 		}
-	}
-	// endregion
-
-	// region: Setters
-	public static <E> E setPrivateValue(@Nullable Object instance, @Nullable E newValue, Fields field)
-	{
-		Validate.notNull(field, "Field to find cannot be null");
-		return setPrivateValue(field.getClassToAccess(), instance, newValue, field.getFieldName());
 	}
 
 	public static <E> E setPrivateValue(Class<?> classToAccess, @Nullable Object instance, @Nullable E newValue, String fieldName)
@@ -148,18 +122,6 @@ public class FieldHelper
 			throw new UnableToFindFieldException(e);
 		}
 	}
-	// endregion
-
-	// region: Names
-	public static String getObfuscatedFieldName(Fields field)
-	{
-		Validate.notNull(field, "Field cannot be null");
-		var fieldName = field.getFieldNameRaw();
-
-		if(field.isObfuscated())
-			return getObfuscatedFieldName(fieldName);
-		return fieldName;
-	}
 
 	public static String getObfuscatedFieldName(String fieldName)
 	{
@@ -169,9 +131,7 @@ public class FieldHelper
 
 		return ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, fieldName);
 	}
-	// endregion
 
-	// region: Final
 	public static void removeFinalModifier(Class<?> classToAccess, String fieldName)
 	{
 		Validate.notNull(classToAccess, "Class to find field cannot be null");
@@ -208,9 +168,7 @@ public class FieldHelper
 			throw new UnableToFindFieldException(e);
 		}
 	}
-	// endregion
 
-	// region: Exceptions
 	public static class UnableToFindFieldException extends RuntimeException
 	{
 		public UnableToFindFieldException(Exception e)
@@ -218,5 +176,4 @@ public class FieldHelper
 			super(e);
 		}
 	}
-	// endregion
 }

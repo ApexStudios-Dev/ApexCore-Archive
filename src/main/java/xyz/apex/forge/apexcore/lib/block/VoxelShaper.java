@@ -12,21 +12,21 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import xyz.apex.forge.apexcore.lib.util.VectorHelper;
-import xyz.apex.java.utility.nullness.NonnullFunction;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Function;
 
 public final class VoxelShaper
 {
-	public static final NonnullFunction<Direction, Vec3> DEFAULT_ROTATION_VALUES = dir ->
+	public static final Function<Direction, Vec3> DEFAULT_ROTATION_VALUES = dir ->
 			new Vec3(
 					dir == Direction.UP ? 0D : (Direction.Plane.VERTICAL.test(dir) ? 180D : 90D),
 					-horizontalAngleFromDirection(dir),
 					0D
 			);
 
-	public static final NonnullFunction<Direction, Vec3> HORIZONTAL_ROTATION_VALUES = dir ->
+	public static final Function<Direction, Vec3> HORIZONTAL_ROTATION_VALUES = dir ->
 			new Vec3(
 					0D,
 					-horizontalAngleFromDirection(dir),
@@ -86,7 +86,7 @@ public final class VoxelShaper
 		return forDirectionsWithRotation(source, axisAsFace(axis), Arrays.asList(Direction.SOUTH, Direction.EAST, Direction.UP), DEFAULT_ROTATION_VALUES);
 	}
 
-	public static VoxelShaper forDirectionsWithRotation(VoxelShape source, Direction facing, Iterable<Direction> directions, NonnullFunction<Direction, Vec3> usingValues)
+	public static VoxelShaper forDirectionsWithRotation(VoxelShape source, Direction facing, Iterable<Direction> directions, Function<Direction, Vec3> usingValues)
 	{
 		var shaper = new VoxelShaper();
 
@@ -98,7 +98,7 @@ public final class VoxelShaper
 		return shaper;
 	}
 
-	public static VoxelShape rotate(VoxelShape source, Direction from, Direction to, NonnullFunction<Direction, Vec3> usingValues)
+	public static VoxelShape rotate(VoxelShape source, Direction from, Direction to, Function<Direction, Vec3> usingValues)
 	{
 		if(from == to)
 			return source;

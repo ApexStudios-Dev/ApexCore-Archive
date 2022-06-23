@@ -12,8 +12,7 @@ import xyz.apex.forge.apexcore.core.init.PlayerPlushie;
 @JeiPlugin
 public final class JeiIntegration implements IModPlugin
 {
-	private final ACRegistry registry = ACRegistry.getRegistry();
-	private final ResourceLocation pluginName = registry.id("jei_plugin");
+	private final ResourceLocation pluginName = ACRegistry.INSTANCE.id("jei_plugin");
 
 	@Override
 	public ResourceLocation getPluginUid()

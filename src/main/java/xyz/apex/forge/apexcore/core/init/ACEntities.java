@@ -1,30 +1,28 @@
 package xyz.apex.forge.apexcore.core.init;
 
+import com.tterrag.registrate.util.entry.EntityEntry;
+
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.block.Blocks;
 
 import xyz.apex.forge.apexcore.core.entity.SeatEntity;
 import xyz.apex.forge.apexcore.lib.client.renderer.DummyEntityRenderer;
-import xyz.apex.forge.utility.registrator.entry.EntityEntry;
-
-import static xyz.apex.forge.utility.registrator.provider.RegistrateLangExtProvider.EN_GB;
 
 public final class ACEntities
 {
-	private static final ACRegistry REGISTRY = ACRegistry.getRegistry();
-
 	// region: Seat Entity
-	public static final EntityEntry<SeatEntity> SEAT_ENTITY = REGISTRY
-			.<SeatEntity>entity("seat", MobCategory.MISC, SeatEntity::new)
+	public static final EntityEntry<SeatEntity> SEAT_ENTITY = ACRegistry.INSTANCE
+			.object("seat")
+			.<SeatEntity>entity(SeatEntity::new, MobCategory.MISC)
 				.lang("Seat")
-				.lang(EN_GB, "Seat")
 
-				.sized(0F, 0F)
-				.setCustomClientFactory(SeatEntity::new)
-
-				.noSummon()
-				.fireImmune()
-				.immuneTo(() -> Blocks.TNT, () -> Blocks.LAVA)
+				.properties(properties -> properties
+						.sized(0F, 0F)
+						.setCustomClientFactory(SeatEntity::new)
+						.noSummon()
+						.fireImmune()
+						.immuneTo(Blocks.TNT, Blocks.LAVA)
+				)
 
 				.renderer(() -> DummyEntityRenderer::new)
 			.register();

@@ -25,7 +25,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import xyz.apex.forge.apexcore.lib.item.ItemGroupCategory;
 import xyz.apex.forge.apexcore.lib.item.ItemGroupCategoryManager;
-import xyz.apex.forge.commonality.init.Mods;
+import xyz.apex.forge.commonality.Mods;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;

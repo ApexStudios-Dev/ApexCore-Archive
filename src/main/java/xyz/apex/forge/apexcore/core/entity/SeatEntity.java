@@ -34,7 +34,7 @@ public final class SeatEntity extends Entity
 	@ApiStatus.Internal
 	public SeatEntity(PlayMessages.SpawnEntity spawnEntity, Level level)
 	{
-		this(ACEntities.SEAT_ENTITY.asEntityType(), level);
+		this(ACEntities.SEAT_ENTITY.get(), level);
 	}
 
 	@Override

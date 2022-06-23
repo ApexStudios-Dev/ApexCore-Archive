@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.*;
+import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.player.Player;
@@ -18,8 +19,6 @@ import xyz.apex.forge.apexcore.core.ApexCore;
 import xyz.apex.forge.apexcore.core.net.ClientSyncSupportersPacket;
 import xyz.apex.forge.apexcore.lib.util.ProfileHelper;
 import xyz.apex.forge.apexcore.lib.util.SkinHelper;
-import xyz.apex.java.utility.nullness.NonnullConsumer;
-import xyz.apex.java.utility.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.io.BufferedReader;
@@ -53,7 +52,7 @@ public final class SupporterManager
 				ProfileHelper.getGameProfile(alias, null);
 			}
 
-			SkinHelper.getSkins(info.playerId, info.username, NonnullConsumer.noop());
+			SkinHelper.getSkins(info.playerId, info.username, a -> { });
 		}
 	}
 
@@ -133,7 +132,7 @@ public final class SupporterManager
 
 					if(info == null)
 					{
-						unknownElements.add(Pair.createImmutable(i, element));
+						unknownElements.add(Pair.of(i, element));
 						continue;
 					}
 

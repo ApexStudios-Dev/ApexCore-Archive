@@ -41,11 +41,11 @@ import net.minecraftforge.network.NetworkHooks;
 
 import xyz.apex.forge.apexcore.lib.util.ContainerHelper;
 import xyz.apex.forge.apexcore.lib.util.NameableMutable;
-import xyz.apex.forge.commonality.init.FluidTags;
-import xyz.apex.java.utility.nullness.NonnullConsumer;
+import xyz.apex.forge.commonality.tags.FluidTags;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
+import java.util.function.Consumer;
 
 public class BaseBlock extends Block implements SimpleWaterloggedBlock
 {
@@ -61,7 +61,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 
 	// region: Core
 	@OverridingMethodsMustInvokeSuper
-	protected void registerProperties(NonnullConsumer<Property<?>> consumer)
+	protected void registerProperties(Consumer<Property<?>> consumer)
 	{
 	}
 

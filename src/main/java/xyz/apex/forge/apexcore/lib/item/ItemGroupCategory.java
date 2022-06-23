@@ -1,6 +1,7 @@
 package xyz.apex.forge.apexcore.lib.item;
 
 import com.google.common.collect.Maps;
+import com.tterrag.registrate.AbstractRegistrate;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
@@ -10,19 +11,16 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-
-import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.java.utility.Lazy;
-import xyz.apex.java.utility.nullness.NonnullPredicate;
-import xyz.apex.java.utility.nullness.NonnullSupplier;
+import net.minecraftforge.common.util.Lazy;
 
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
-import static xyz.apex.forge.utility.registrator.AbstractRegistrator.LANG_EXT_PROVIDER;
 import static com.tterrag.registrate.providers.ProviderType.LANG;
 
-public final class ItemGroupCategory implements NonnullPredicate<ItemStack>
+public final class ItemGroupCategory implements Predicate<ItemStack>
 {
 	private static final int cycleTime = 1000;
 
@@ -131,15 +129,9 @@ public final class ItemGroupCategory implements NonnullPredicate<ItemStack>
 		return new TranslatableComponent(categoryNameKey);
 	}
 
-	public <T extends AbstractRegistrator<T>> ItemGroupCategory addTranslationGenerator(T registrator, String englishName)
+	public <T extends AbstractRegistrate<T>> ItemGroupCategory addTranslationGenerator(T registrator, String englishName)
 	{
 		registrator.addDataGenerator(LANG, provider -> provider.add(getCategoryNameKey(), englishName));
-		return this;
-	}
-
-	public <T extends AbstractRegistrator<T>> ItemGroupCategory addTranslationGenerator(T registrator, String languageKey, String translationValue)
-	{
-		registrator.addDataGenerator(LANG_EXT_PROVIDER, provider -> provider.add(languageKey, getCategoryNameKey(), translationValue));
 		return this;
 	}
 
@@ -153,21 +145,21 @@ public final class ItemGroupCategory implements NonnullPredicate<ItemStack>
 		private final String categoryName;
 		private int cycleOffset = (int) ((Math.random() * 10000) % Integer.MAX_VALUE);
 		private boolean cycleIcons = false;
-		private NonnullPredicate<ItemStack> categoryPredicate = stack -> true;
-		@Nullable private NonnullSupplier<ItemStack> defaultIcon;
+		private Predicate<ItemStack> categoryPredicate = stack -> true;
+		@Nullable private Supplier<ItemStack> defaultIcon;
 
 		private Builder(String categoryName)
 		{
 			this.categoryName = categoryName;
 		}
 
-		public Builder predicate(NonnullPredicate<ItemStack> categoryPredicate)
+		public Builder predicate(Predicate<ItemStack> categoryPredicate)
 		{
 			this.categoryPredicate = categoryPredicate;
 			return this;
 		}
 
-		public Builder defaultIcon(NonnullSupplier<ItemStack> defaultIcon)
+		public Builder defaultIcon(Supplier<ItemStack> defaultIcon)
 		{
 			this.defaultIcon = defaultIcon;
 			return this;

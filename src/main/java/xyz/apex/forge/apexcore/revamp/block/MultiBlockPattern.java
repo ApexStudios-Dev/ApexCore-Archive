@@ -13,13 +13,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 
-import xyz.apex.java.utility.nullness.NonnullConsumer;
-import xyz.apex.java.utility.nullness.NonnullQuadFunction;
-import xyz.apex.java.utility.nullness.NonnullQuadPredicate;
-
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public final class MultiBlockPattern
 {
@@ -27,10 +26,10 @@ public final class MultiBlockPattern
 
 	private final List<BlockPos> localPositions;
 	private final IntegerProperty blockProperty;
-	private final NonnullQuadFunction<IMultiBlock, MultiBlockPattern, BlockState, BlockPos, BlockPos> worldSpaceFromLocalSpace;
-	private final NonnullQuadFunction<IMultiBlock, MultiBlockPattern, BlockState, BlockPos, BlockPos> originFromWorldSpace;
-	private final NonnullQuadFunction<MultiBlockPattern, BlockPos, BlockState, Integer, BlockState> placementStateModifier;
-	private final NonnullQuadPredicate<IMultiBlock, LevelReader, BlockPos, BlockState> placementPredicate;
+	private final QuadFunction<IMultiBlock, MultiBlockPattern, BlockState, BlockPos, BlockPos> worldSpaceFromLocalSpace;
+	private final QuadFunction<IMultiBlock, MultiBlockPattern, BlockState, BlockPos, BlockPos> originFromWorldSpace;
+	private final QuadFunction<MultiBlockPattern, BlockPos, BlockState, Integer, BlockState> placementStateModifier;
+	private final QuadPredicate<IMultiBlock, LevelReader, BlockPos, BlockState> placementPredicate;
 	private final boolean placeSoundPerBlock;
 
 	private MultiBlockPattern(MultiBlockPattern.Builder builder)
@@ -161,7 +160,7 @@ public final class MultiBlockPattern
 		}
 	}
 
-	void registerProperties(NonnullConsumer<Property<?>> consumer)
+	void registerProperties(Consumer<Property<?>> consumer)
 	{
 		consumer.accept(blockProperty);
 	}
@@ -285,10 +284,10 @@ public final class MultiBlockPattern
 	public static final class Builder
 	{
 		private final List<String[]> layers = Lists.newArrayList();
-		private NonnullQuadFunction<IMultiBlock, MultiBlockPattern, BlockState, BlockPos, BlockPos> worldSpaceFromLocalSpace = MultiBlockPattern::getMultiBlockWorldSpaceFromLocalSpace;
-		private NonnullQuadFunction<IMultiBlock, MultiBlockPattern, BlockState, BlockPos, BlockPos> originFromWorldSpace = MultiBlockPattern::getMultiBlockOriginFromWorldSpace;
-		private NonnullQuadFunction<MultiBlockPattern, BlockPos, BlockState, Integer, BlockState> placementStateModifier = (pattern, pos, blockState, integer) -> blockState;
-		private NonnullQuadPredicate<IMultiBlock, LevelReader, BlockPos, BlockState> placementPredicate = (multiBlock, level, pos, blockState) -> true;
+		private QuadFunction<IMultiBlock, MultiBlockPattern, BlockState, BlockPos, BlockPos> worldSpaceFromLocalSpace = MultiBlockPattern::getMultiBlockWorldSpaceFromLocalSpace;
+		private QuadFunction<IMultiBlock, MultiBlockPattern, BlockState, BlockPos, BlockPos> originFromWorldSpace = MultiBlockPattern::getMultiBlockOriginFromWorldSpace;
+		private QuadFunction<MultiBlockPattern, BlockPos, BlockState, Integer, BlockState> placementStateModifier = (pattern, pos, blockState, integer) -> blockState;
+		private QuadPredicate<IMultiBlock, LevelReader, BlockPos, BlockState> placementPredicate = (multiBlock, level, pos, blockState) -> true;
 		private boolean placeSoundPerBlock = false;
 
 		private Builder()
@@ -301,25 +300,25 @@ public final class MultiBlockPattern
 			return this;
 		}
 
-		public MultiBlockPattern.Builder worldSpaceFromLocalSpace(NonnullQuadFunction<IMultiBlock, MultiBlockPattern, BlockState, BlockPos, BlockPos> worldSpaceFromLocalSpace)
+		public MultiBlockPattern.Builder worldSpaceFromLocalSpace(QuadFunction<IMultiBlock, MultiBlockPattern, BlockState, BlockPos, BlockPos> worldSpaceFromLocalSpace)
 		{
 			this.worldSpaceFromLocalSpace = worldSpaceFromLocalSpace;
 			return this;
 		}
 
-		public MultiBlockPattern.Builder originFromWorldSpace(NonnullQuadFunction<IMultiBlock, MultiBlockPattern, BlockState, BlockPos, BlockPos> originFromWorldSpace)
+		public MultiBlockPattern.Builder originFromWorldSpace(QuadFunction<IMultiBlock, MultiBlockPattern, BlockState, BlockPos, BlockPos> originFromWorldSpace)
 		{
 			this.originFromWorldSpace = originFromWorldSpace;
 			return this;
 		}
 
-		public MultiBlockPattern.Builder placementStateModifier(NonnullQuadFunction<MultiBlockPattern, BlockPos, BlockState, Integer, BlockState> placementStateModifier)
+		public MultiBlockPattern.Builder placementStateModifier(QuadFunction<MultiBlockPattern, BlockPos, BlockState, Integer, BlockState> placementStateModifier)
 		{
 			this.placementStateModifier = placementStateModifier;
 			return this;
 		}
 
-		public MultiBlockPattern.Builder placementPredicate(NonnullQuadPredicate<IMultiBlock, LevelReader, BlockPos, BlockState> placementPredicate)
+		public MultiBlockPattern.Builder placementPredicate(QuadPredicate<IMultiBlock, LevelReader, BlockPos, BlockState> placementPredicate)
 		{
 			this.placementPredicate = placementPredicate;
 			return this;
@@ -334,6 +333,47 @@ public final class MultiBlockPattern
 		public MultiBlockPattern build()
 		{
 			return new MultiBlockPattern(this);
+		}
+	}
+
+	@FunctionalInterface
+	public interface QuadFunction<A, B, C, D, RESULT>
+	{
+		RESULT apply(A a, B b, C c, D d);
+
+		default <RETURN> QuadFunction<A, B, C, D, RETURN> andThen(Function<? super RESULT, ? extends RETURN> after)
+		{
+			Objects.requireNonNull(after);
+			return (a, b, c, d) -> after.apply(apply(a, b, c, d));
+		}
+	}
+
+	@FunctionalInterface
+	public interface QuadPredicate<A, B, C, D> extends QuadFunction<A, B, C, D, Boolean>
+	{
+		boolean test(A a, B b, C c, D d);
+
+		@Override
+		default Boolean apply(A a, B b, C c, D d)
+		{
+			return test(a, b, c, d);
+		}
+
+		default QuadPredicate<A, B, C, D> and(QuadPredicate<? super A, ? super B, ? super C, ? super D> other)
+		{
+			Objects.requireNonNull(other);
+			return (a, b, c, d) -> test(a, b, c, d) && other.test(a, b, c, d);
+		}
+
+		default QuadPredicate<A, B, C, D> negate()
+		{
+			return (a, b, c, d) -> !test(a, b, c, d);
+		}
+
+		default QuadPredicate<A, B, C, D> or(QuadPredicate<? super A, ? super B, ? super C, ? super D> other)
+		{
+			Objects.requireNonNull(other);
+			return (a, b, c, d) -> test(a, b, c, d) || other.test(a, b, c, d);
 		}
 	}
 }

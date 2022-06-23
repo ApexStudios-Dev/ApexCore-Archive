@@ -4,7 +4,7 @@ import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 
 import xyz.apex.forge.apexcore.lib.loot.ApplyRandomColor;
 import xyz.apex.forge.apexcore.lib.util.RegistryHelper;
-import xyz.apex.forge.commonality.init.Mods;
+import xyz.apex.forge.commonality.Mods;
 
 public final class ACLootFunctionTypes
 {

@@ -15,12 +15,11 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 import xyz.apex.forge.apexcore.core.ApexCore;
-import xyz.apex.java.utility.nullness.NonnullPredicate;
-import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public final class NetworkManager
@@ -36,7 +35,7 @@ public final class NetworkManager
 		this(modId, channelName, () -> channelVersion, channelVersion::equals, channelVersion::equals);
 	}
 
-	public NetworkManager(String modId, String channelName, NonnullSupplier<String> channelVersionSupplier, NonnullPredicate<String> clientAcceptedVersions, NonnullPredicate<String> serverAcceptedVersions)
+	public NetworkManager(String modId, String channelName, Supplier<String> channelVersionSupplier, Predicate<String> clientAcceptedVersions, Predicate<String> serverAcceptedVersions)
 	{
 		instance = NetworkRegistry.ChannelBuilder
 				.named(new ResourceLocation(modId, channelName))

@@ -21,13 +21,6 @@ public class MethodHelper
 	private static final Marker MARKER = MarkerManager.getMarker("MethodReflection");
 	private static final Cache<String, Method> methodsCache = CacheBuilder.newBuilder().weakValues().build();
 
-	// region: Finding
-	public static Method findMethod(Methods method)
-	{
-		Validate.notNull(method, "Method to find cannot be null");
-		return findMethod(method.getClassToAccess(), method.getMethodName(), method.getParameterTypes());
-	}
-
 	public static Method findMethod(Class<?> classToAccess, String methodName, @Nullable Class<?>[] parameterTypes)
 	{
 		Validate.notNull(classToAccess, "Class to find method cannot be null");
@@ -44,9 +37,7 @@ public class MethodHelper
 			throw new UnableToFindMethodException(e);
 		}
 	}
-	// endregion
 
-	// region: Caching
 	private static Method cacheMethod(Class<?> classToAccess, String methodName, @Nullable Class<?>[] parameterTypes)
 	{
 		Validate.notNull(classToAccess, "Class to find method cannot be null");
@@ -70,15 +61,6 @@ public class MethodHelper
 		{
 			throw new UnableToFindMethodException(e);
 		}
-	}
-	// endregion
-
-	// region: Invokers
-	@Nullable
-	public static <E> E invokeMethod(Methods method, @Nullable Object instance, @Nullable Object... parameters)
-	{
-		Validate.notNull(method, "Method to find cannot be null");
-		return invokeMethod(method.getClassToAccess(), instance, method.getMethodName(), method.getParameterTypes(), parameters);
 	}
 
 	@Nullable
@@ -118,18 +100,6 @@ public class MethodHelper
 			throw new UnableToFindMethodException(e);
 		}
 	}
-	// endregion
-
-	// region: Names
-	public static String getObfuscatedMethodName(Methods method)
-	{
-		Validate.notNull(method, "Method cannot be null");
-		String methodName = method.getMethodNameRaw();
-
-		if(method.isObfuscated())
-			return getObfuscatedMethodName(methodName);
-		return methodName;
-	}
 
 	public static String getObfuscatedMethodName(String methodName)
 	{
@@ -139,9 +109,7 @@ public class MethodHelper
 
 		return ObfuscationReflectionHelper.remapName(INameMappingService.Domain.METHOD, methodName);
 	}
-	// endregion
 
-	// region: Exceptions
 	public static class UnableToFindMethodException extends RuntimeException
 	{
 		public UnableToFindMethodException(Throwable failed)
@@ -149,5 +117,4 @@ public class MethodHelper
 			super(failed);
 		}
 	}
-	// endregion
 }

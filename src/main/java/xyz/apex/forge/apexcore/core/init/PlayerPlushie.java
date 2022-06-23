@@ -1,7 +1,11 @@
 package xyz.apex.forge.apexcore.core.init;
 
+import com.tterrag.registrate.providers.loot.RegistrateBlockLootTables;
+import com.tterrag.registrate.util.entry.BlockEntityEntry;
+import com.tterrag.registrate.util.entry.BlockEntry;
+import com.tterrag.registrate.util.entry.ItemEntry;
+
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.data.loot.BlockLoot;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
@@ -29,20 +33,13 @@ import xyz.apex.forge.apexcore.core.client.renderer.PlayerPlushieBlockEntityRend
 import xyz.apex.forge.apexcore.core.item.PlayerPlushieBlockItem;
 import xyz.apex.forge.apexcore.lib.block.BlockHelper;
 import xyz.apex.forge.apexcore.lib.support.SupporterManager;
-import xyz.apex.forge.utility.registrator.entry.BlockEntityEntry;
-import xyz.apex.forge.utility.registrator.entry.BlockEntry;
-import xyz.apex.forge.utility.registrator.entry.ItemEntry;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static xyz.apex.forge.utility.registrator.provider.RegistrateLangExtProvider.EN_GB;
-
 public final class PlayerPlushie
 {
-	private static final ACRegistry REGISTRY = ACRegistry.getRegistry();
-
 	public static final BlockEntry<PlayerPlushieBlock> PLAYER_PLUSHIE_BLOCK = playerPlushie();
 	public static final ItemEntry<BlockItem> PLAYER_PLUSHIE_BLOCK_ITEM = ItemEntry.cast(PLAYER_PLUSHIE_BLOCK.getSibling(Item.class));
 	public static final BlockEntityEntry<PlayerPlushieBlockEntity> PLAYER_PLUSHIE_BLOCK_ENTITY = BlockEntityEntry.cast(PLAYER_PLUSHIE_BLOCK.getSibling(BlockEntityType.class));
@@ -59,18 +56,18 @@ public final class PlayerPlushie
 
 	private static BlockEntry<PlayerPlushieBlock> playerPlushie()
 	{
-		return REGISTRY
-				.block("player_plushie", PlayerPlushieBlock::new)
+		return ACRegistry.INSTANCE
+				.object("player_plushie")
+				.block(PlayerPlushieBlock::new)
 
 				.lang("Player Plushie")
-				.lang(EN_GB, "Player Plushie")
 
 				.initialProperties(Material.WOOL)
 				.strength(.8F)
 				.sound(SoundType.WOOL)
 				.noOcclusion()
 
-				.blockState((ctx, provider) -> provider
+				.blockstate((ctx, provider) -> provider
 						.getVariantBuilder(ctx.get())
 						.forAllStates(blockState -> ConfiguredModel
 								.builder()
@@ -86,7 +83,7 @@ public final class PlayerPlushie
 				.loot((lootTables, block) -> lootTables
 						.add(block, LootTable
 								.lootTable()
-								.withPool(BlockLoot
+								.withPool(RegistrateBlockLootTables
 										.applyExplosionCondition(block, LootPool
 												.lootPool()
 												.setRolls(ConstantValue.exactly(1))
@@ -105,7 +102,7 @@ public final class PlayerPlushie
 				.isSuffocating(BlockHelper::never)
 				.isViewBlocking(BlockHelper::never)
 
-				.addRenderType(() -> RenderType::cutout)
+				.addLayer(() -> RenderType::cutout)
 
 				.item(PlayerPlushieBlockItem::new)
 					.model((ctx, provider) -> {
@@ -173,7 +170,7 @@ public final class PlayerPlushie
 
 	public static ItemStack getPlushieItem(SupporterManager.SupporterInfo info, int stackSize)
 	{
-		var stack = PLAYER_PLUSHIE_BLOCK.asItemStack(stackSize);
+		var stack = PLAYER_PLUSHIE_BLOCK.asStack(stackSize);
 
 		var stackTag = stack.getOrCreateTag();
 		var supporterTag = writeSupporterInfoTag(info);
