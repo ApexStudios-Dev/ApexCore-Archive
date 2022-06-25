@@ -16,7 +16,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.RenderProperties;
 import net.minecraftforge.client.event.ScreenEvent;
@@ -35,7 +34,6 @@ import static net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 // Simple offloading class to allow hot swapping while using mixins
-@OnlyIn(Dist.CLIENT)
 @Mod.EventBusSubscriber(modid = Mods.APEX_CORE, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class CreativeScreenHandler
 {

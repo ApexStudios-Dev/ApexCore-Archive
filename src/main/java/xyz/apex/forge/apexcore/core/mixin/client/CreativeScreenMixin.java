@@ -10,13 +10,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import xyz.apex.forge.apexcore.core.client.CreativeScreenHandler;
 
 @Mixin(CreativeModeInventoryScreen.class)
-@OnlyIn(Dist.CLIENT)
 public abstract class CreativeScreenMixin
 {
 	@Shadow private float scrollOffs;

@@ -10,8 +10,6 @@ import org.apache.commons.lang3.Validate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.players.GameProfileCache;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -74,7 +72,6 @@ public final class ProfileHelper
 		return profile;
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	private void setClientProfileLookupObjects()
 	{
 		var mc = Minecraft.getInstance();

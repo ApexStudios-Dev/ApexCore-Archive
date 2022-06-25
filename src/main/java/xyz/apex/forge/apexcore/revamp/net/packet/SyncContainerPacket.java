@@ -6,7 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
@@ -50,7 +49,6 @@ public final class SyncContainerPacket extends AbstractPacket
 		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> this::processClient);
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	private void processClient()
 	{
 		var mc = Minecraft.getInstance();
