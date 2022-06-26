@@ -72,39 +72,43 @@ public final class MultiBlockPattern
 	@Nullable
 	BlockState getStateForPlacement(IMultiBlock multiBlock, BlockState placementBlockState, BlockPlaceContext ctx)
 	{
-		if(placementBlockState.hasProperty(blockProperty))
+		if(hasIndexProperty(placementBlockState))
 		{
 			var level = ctx.getLevel();
 			var origin = ctx.getClickedPos();
 
-			for(var localSpace : localPositions)
+			for(var i = 0; i < localPositions.size(); i++)
 			{
+				var localSpace = localPositions.get(i);
 				var worldSpace = getWorldSpaceFromLocalSpace(multiBlock, placementBlockState, origin, localSpace);
-				var blockState = level.getBlockState(worldSpace);
+				var testBlockState = setIndex(placementBlockState, i);
+				var worldBlockState = level.getBlockState(worldSpace);
 
-				if(passesPlacementTests(multiBlock, level, worldSpace, blockState))
-					return placementBlockState;
+				if(!passesPlacementTests(multiBlock, level, worldSpace, testBlockState, worldBlockState))
+					return null;
 			}
 
-			return null;
+			return placementBlockState;
 		}
 
-		return placementBlockState;
+		return null;
 	}
 
 	boolean canSurvive(IMultiBlock multiBlock, LevelReader level, BlockPos pos, BlockState blockState)
 	{
-		if(blockState.hasProperty(blockProperty))
+		if(hasIndexProperty(blockState))
 		{
 			var index = getIndex(blockState);
 			var origin = getOriginFromWorldSpace(multiBlock, blockState, pos, localPositions.get(index));
 
-			for(var localSpace : localPositions)
+			for(var i = 0; i < localPositions.size(); i++)
 			{
+				var localSpace = localPositions.get(i);
 				var worldSpace = getWorldSpaceFromLocalSpace(multiBlock, blockState, origin, localSpace);
-				var testBlockState = level.getBlockState(worldSpace);
+				var testBlockState = setIndex(blockState, i);
+				var worldBlockState = level.getBlockState(worldSpace);
 
-				if(!passesPlacementTests(multiBlock, level, worldSpace, testBlockState))
+				if(!passesPlacementTests(multiBlock, level, worldSpace, testBlockState, worldBlockState))
 					return false;
 			}
 		}
@@ -114,9 +118,9 @@ public final class MultiBlockPattern
 
 	void onPlace(IMultiBlock multiBlock, BlockState blockState, Level level, BlockPos origin, BlockState oldBlockState)
 	{
-		if(blockState.hasProperty(blockProperty))
+		if(hasIndexProperty(blockState))
 		{
-			if(!oldBlockState.is(multiBlock.asBlock()) && blockState.getValue(blockProperty) == INDEX_ORIGIN)
+			if(!oldBlockState.is(multiBlock.asBlock()) && getIndex(blockState) == INDEX_ORIGIN)
 			{
 				var soundType = blockState.getSoundType(level, origin, null);
 				var placeSound = soundType.getPlaceSound();
@@ -125,7 +129,7 @@ public final class MultiBlockPattern
 				{
 					var localSpace = localPositions.get(i);
 					var worldSpace = getWorldSpaceFromLocalSpace(multiBlock, blockState, origin, localSpace);
-					var placementBlockState = blockState.setValue(blockProperty, i);
+					var placementBlockState = setIndex(blockState, i);
 					placementBlockState = placementStateModifier.apply(this, worldSpace, placementBlockState, i);
 
 					level.setBlock(worldSpace, placementBlockState, 11);
@@ -139,14 +143,14 @@ public final class MultiBlockPattern
 
 	void onRemove(IMultiBlock multiBlock, BlockState blockState, Level level, BlockPos pos, BlockState newBlockState)
 	{
-		if(blockState.hasProperty(blockProperty))
+		if(hasIndexProperty(blockState))
 		{
 			var block = multiBlock.asBlock();
 
 			// current or new block is now required multi block type
 			if(!blockState.is(block) || !newBlockState.is(block))
 			{
-				var index = blockState.getValue(blockProperty);
+				var index = getIndex(blockState);
 				var origin = getOriginFromWorldSpace(multiBlock, blockState, pos, localPositions.get(index));
 
 				for(var localSpace : localPositions)
@@ -167,23 +171,20 @@ public final class MultiBlockPattern
 
 	BlockState registerDefaultState(BlockState state)
 	{
-		return state.hasProperty(blockProperty) ? state.setValue(blockProperty, INDEX_ORIGIN) : state;
+		return setIndex(state, INDEX_ORIGIN);
 	}
 
-	private boolean passesPlacementTests(IMultiBlock multiBlock, LevelReader level, BlockPos pos, BlockState blockState)
+	public boolean passesPlacementTests(IMultiBlock multiBlock, LevelReader level, BlockPos pos, BlockState multiBlockState, BlockState worldBlockState)
 	{
-		if(blockState.hasProperty(blockProperty))
+		if(hasIndexProperty(multiBlockState))
 		{
-			if(!blockState.is(multiBlock.asBlock()))
-			{
-				if(!blockState.getMaterial().isReplaceable())
-					return false;
-			}
-
-			return placementPredicate.test(multiBlock, level, pos, blockState);
+			if(!worldBlockState.getMaterial().isReplaceable())
+				return false;
+			if(placementPredicate.test(multiBlock, level, pos, worldBlockState))
+				return true;
 		}
 
-		return true;
+		return false;
 	}
 	// endregion
 
@@ -193,6 +194,16 @@ public final class MultiBlockPattern
 		return blockState.getOptionalValue(blockProperty).orElse(INDEX_ORIGIN);
 	}
 
+	public BlockState setIndex(BlockState blockState, int index)
+	{
+		return hasIndexProperty(blockState) ? blockState.setValue(blockProperty, index) : blockState;
+	}
+
+	public boolean hasIndexProperty(BlockState blockState)
+	{
+		return blockState.hasProperty(blockProperty);
+	}
+
 	public boolean isOrigin(BlockState blockState)
 	{
 		return getIndex(blockState) == INDEX_ORIGIN;
@@ -200,7 +211,7 @@ public final class MultiBlockPattern
 
 	public BlockPos getWorldSpaceFromLocalSpace(IMultiBlock multiBlock, BlockState blockState, BlockPos origin, BlockPos localSpace)
 	{
-		if(blockState.hasProperty(blockProperty))
+		if(hasIndexProperty(blockState))
 		{
 			var newLocalSpace = worldSpaceFromLocalSpace.apply(multiBlock, this, blockState, localSpace);
 			return origin.offset(newLocalSpace);
@@ -211,7 +222,7 @@ public final class MultiBlockPattern
 
 	public BlockPos getOriginFromWorldSpace(IMultiBlock multiBlock, BlockState blockState, BlockPos worldSpace, BlockPos localSpace)
 	{
-		if(blockState.hasProperty(blockProperty))
+		if(hasIndexProperty(blockState))
 		{
 			var newLocalSpace = originFromWorldSpace.apply(multiBlock, this, blockState, localSpace);
 			return worldSpace.subtract(newLocalSpace);
@@ -227,7 +238,7 @@ public final class MultiBlockPattern
 
 	public BlockPos getOriginPos(IMultiBlock multiBlock, BlockState blockState, BlockPos worldSpace)
 	{
-		if(blockState.hasProperty(blockProperty))
+		if(hasIndexProperty(blockState))
 		{
 			var index = getIndex(blockState);
 			var localSpace = localPositions.get(index);
@@ -245,7 +256,7 @@ public final class MultiBlockPattern
 
 	public static BlockPos getMultiBlockWorldSpaceFromLocalSpace(IMultiBlock multiBlock, MultiBlockPattern pattern, BlockState blockState, BlockPos pos)
 	{
-		if(blockState.hasProperty(pattern.blockProperty))
+		if(multiBlock.hasMultiBlockIndexProperty(blockState))
 		{
 			if(BaseBlock.supportsFacing(blockState))
 			{
@@ -264,7 +275,7 @@ public final class MultiBlockPattern
 
 	public static BlockPos getMultiBlockOriginFromWorldSpace(IMultiBlock multiBlock, MultiBlockPattern pattern, BlockState blockState, BlockPos pos)
 	{
-		if(blockState.hasProperty(pattern.blockProperty))
+		if(multiBlock.hasMultiBlockIndexProperty(blockState))
 		{
 			if(BaseBlock.supportsFacing(blockState))
 			{

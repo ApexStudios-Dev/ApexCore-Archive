@@ -10,26 +10,27 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import xyz.apex.forge.apexcore.revamp.block.BaseMultiBlock;
 import xyz.apex.forge.apexcore.revamp.block.IMultiBlock;
+import xyz.apex.forge.apexcore.revamp.block.MultiBlockPattern;
 import xyz.apex.forge.commonality.Mods;
 
 import java.util.IdentityHashMap;
@@ -43,26 +44,19 @@ public final class MultiBlockVisualizer
 	@SubscribeEvent
 	public static void onRenderWorld(RenderLevelLastEvent event)
 	{
-		try
-		{
-			var mc = Minecraft.getInstance();
-			var player = mc.player;
-			var level = mc.level;
+		var mc = Minecraft.getInstance();
+		var player = mc.player;
+		var level = mc.level;
 
-			if(player != null && level != null)
+		if(player != null && level != null)
+		{
+			var pose = event.getPoseStack();
+
+			for(var hand : InteractionHand.values())
 			{
-				var pose = event.getPoseStack();
-
-				for(var hand : InteractionHand.values())
-				{
-					if(renderBlockFromHand(mc, pose, level, hand, player))
-						break;
-				}
+				if(renderBlockFromHand(mc, pose, level, hand, player))
+					break;
 			}
-		}
-		catch(Exception e)
-		{
-			System.out.println(e.getLocalizedMessage());
 		}
 	}
 
@@ -75,15 +69,30 @@ public final class MultiBlockVisualizer
 		{
 			if(mc.hitResult instanceof BlockHitResult result)
 			{
-				var renderPos = result.getBlockPos().relative(result.getDirection());
+				var blockPos = result.getBlockPos();
+
+				if(level.isEmptyBlock(blockPos))
+					return false;
+
+				var renderPos = blockPos.relative(result.getDirection());
 
 				var placeContext = new BlockPlaceContext(level, player, hand, stack, result);
 				var placeState = block.getStateForPlacement(placeContext);
 
 				if(placeState == null)
-					placeState = block.defaultBlockState();
+				{
+					var horizontalFacing = placeContext.getHorizontalDirection().getOpposite();
+					var facing = block instanceof BaseMultiBlock base ? base.getFourWayFacing(placeContext) : horizontalFacing;
+					facing = facing == null ? horizontalFacing : facing;
 
-				if(placeState.canSurvive(level, renderPos))
+					placeState = block.defaultBlockState();
+					placeState = BaseMultiBlock.setFacing(placeState, facing);
+					placeState = multiBlock.setMultiBlockIndex(placeState, MultiBlockPattern.INDEX_ORIGIN);
+				}
+
+				placeState = BaseMultiBlock.setWaterLogged(placeState, false);
+
+				// if(placeState.canSurvive(level, renderPos))
 				{
 					var position = mc.getEntityRenderDispatcher().camera.getPosition();
 
@@ -97,11 +106,12 @@ public final class MultiBlockVisualizer
 					if(ghostBuffers == null)
 						ghostBuffers = initBuffers(buffers);
 
-					var consumer = ghostBuffers.getBuffer(type);
+					var consumer = buffers.getBuffer(type);
 
 					renderBlock(mc, pose, ghostBuffers, consumer, level, renderPos, placeState, multiBlock);
 
-					// ghostBuffers.endBatch();
+					buffers.endBatch(type);
+					ghostBuffers.endBatch();
 					pose.popPose();
 					return true;
 				}
@@ -114,31 +124,58 @@ public final class MultiBlockVisualizer
 	private static void renderBlock(Minecraft mc, PoseStack pose, MultiBufferSource.BufferSource bufferSource, VertexConsumer vertexConsumer, ClientLevel level, BlockPos pos, BlockState blockState, IMultiBlock multiBlock)
 	{
 		var origin = multiBlock.getMultiBlockOriginPos(blockState, pos);
+		var localPositions = multiBlock.getMultiBlockLocalPositions();
 
-		for(var localPos : multiBlock.getMultiBlockLocalPositions())
+		var isValid = true;
+
+		for(var i = 0; i < localPositions.size(); i++)
 		{
+			var localPos = localPositions.get(i);
 			var worldPos = multiBlock.getMultiBlockWorldSpaceFromLocalSpace(blockState, origin, localPos);
-			renderBlockState(mc, pose, bufferSource, vertexConsumer, level, worldPos, blockState, multiBlock);
+			var renderState = multiBlock.setMultiBlockIndex(blockState, i);
+			var worldState = level.getBlockState(worldPos);
+
+			if(!multiBlock.getMultiBlockPattern().passesPlacementTests(multiBlock, level, worldPos, renderState, worldState))
+			{
+				isValid = false;
+				break;
+			}
+		}
+
+		var overlay = isValid ? OverlayTexture.NO_OVERLAY : OverlayTexture.pack(OverlayTexture.NO_WHITE_U, OverlayTexture.RED_OVERLAY_V);
+
+		for(var i = 0; i < localPositions.size(); i++)
+		{
+			var localPos = localPositions.get(i);
+			var worldPos = multiBlock.getMultiBlockWorldSpaceFromLocalSpace(blockState, origin, localPos);
+			var renderState = multiBlock.setMultiBlockIndex(blockState, i);
+			renderBlockState(mc, pose, bufferSource, vertexConsumer, level, overlay, worldPos, renderState, multiBlock);
 		}
 	}
 
-	private static void renderBlockState(Minecraft mc, PoseStack pose, MultiBufferSource.BufferSource bufferSource, VertexConsumer vertexConsumer, ClientLevel level, BlockPos pos, BlockState blockState, IMultiBlock multiBlock)
+	private static void renderBlockState(Minecraft mc, PoseStack pose, MultiBufferSource.BufferSource bufferSource, VertexConsumer vertexConsumer, ClientLevel level, int overlay, BlockPos pos, BlockState blockState, IMultiBlock multiBlock)
 	{
 		var x = pos.getX();
 		var y = pos.getY();
 		var z = pos.getZ();
 
-		pose.translate(x, y, z);
-
-		if(multiBlock.isMultiBlockOrigin(blockState))
+		//if(multiBlock.isMultiBlockOrigin(blockState))
 		{
-			var shape = blockState.getVisualShape(level, pos, CollisionContext.empty());
-			var aabbs = shape.toAabbs();
-			aabbs.forEach(aabb -> LevelRenderer.renderLineBox(pose, vertexConsumer, aabb, .65F, .65F, .65F, .65F));
+			RenderSystem.runAsFancy(() -> {
+				pose.pushPose();
+				renderHitOutline(pose, vertexConsumer, level, pos, blockState, 0F, 0F, 0F, .4F);
+				pose.popPose();
+			});
 		}
 
+		pose.translate(x, y, z);
+
 		if(blockState.getRenderShape() == RenderShape.MODEL)
-			mc.getBlockRenderer().renderSingleBlock(blockState, pose, bufferSource, LightTexture.FULL_BLOCK, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE);
+		{
+			pose.pushPose();
+			mc.getBlockRenderer().renderSingleBlock(blockState, pose, bufferSource, LightTexture.FULL_BLOCK, overlay, EmptyModelData.INSTANCE);
+			pose.popPose();
+		}
 
 		pose.translate(-x, -y, -z);
 	}
@@ -153,6 +190,23 @@ public final class MultiBlockVisualizer
 		}
 
 		return new GhostBuffers(original.builder, remapped);
+	}
+
+	private static void renderHitOutline(PoseStack pose, VertexConsumer consumer, ClientLevel level, BlockPos pos, BlockState blockState, float r, float g, float b, float a)
+	{
+		var last = pose.last();
+
+		blockState.getShape(level, pos).forAllEdges((minX, minY, minZ, maxX, maxY, maxZ) -> {
+			var f = (float) (maxX - minX);
+			var f1 = (float) (maxY - minY);
+			var f2 = (float) (maxZ - minZ);
+			var f3 = Mth.sqrt(f * f + f1 * f1 + f2 * f2);
+			f /= f3;
+			f1 /= f3;
+			f2 /= f3;
+			consumer.vertex(last.pose(), (float) (minX + pos.getX()), (float) (minY + pos.getY()), (float) (minZ + pos.getZ())).color(r, g, b, a).normal(last.normal(), f, f1, f2).endVertex();
+			consumer.vertex(last.pose(), (float) (maxX + pos.getX()), (float) (maxY + pos.getY()), (float) (maxZ + pos.getZ())).color(r, g, b, a).normal(last.normal(), f, f1, f2).endVertex();
+		});
 	}
 
 	private static final class GhostBuffers extends MultiBufferSource.BufferSource

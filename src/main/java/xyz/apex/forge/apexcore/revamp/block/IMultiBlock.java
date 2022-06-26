@@ -30,6 +30,16 @@ public interface IMultiBlock
 		return getMultiBlockPattern().getIndex(blockState);
 	}
 
+	default BlockState setMultiBlockIndex(BlockState blockState, int index)
+	{
+		return getMultiBlockPattern().setIndex(blockState, index);
+	}
+
+	default boolean hasMultiBlockIndexProperty(BlockState blockState)
+	{
+		return getMultiBlockPattern().hasIndexProperty(blockState);
+	}
+
 	default boolean isMultiBlockOrigin(BlockState blockState)
 	{
 		return getMultiBlockPattern().isOrigin(blockState);
