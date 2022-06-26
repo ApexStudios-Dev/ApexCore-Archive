@@ -239,7 +239,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 
 	// region: FourWay
 	@Nullable
-	protected Direction getFourWayFacing(BlockPlaceContext ctx)
+	public Direction getFourWayFacing(BlockPlaceContext ctx)
 	{
 		return ctx.getHorizontalDirection().getOpposite();
 	}
