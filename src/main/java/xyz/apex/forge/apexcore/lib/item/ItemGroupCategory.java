@@ -2,6 +2,7 @@ package xyz.apex.forge.apexcore.lib.item;
 
 import com.google.common.collect.Maps;
 import com.tterrag.registrate.AbstractRegistrate;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
@@ -13,7 +14,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.util.Lazy;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;

@@ -1,10 +1,10 @@
 package xyz.apex.forge.apexcore.lib.block;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-
-import javax.annotation.Nullable;
 
 public class Age5CropsBlock extends BetterCropsBlock
 {

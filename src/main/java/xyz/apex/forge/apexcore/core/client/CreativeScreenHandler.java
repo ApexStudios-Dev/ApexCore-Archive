@@ -3,6 +3,7 @@ package xyz.apex.forge.apexcore.core.client;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.gui.GuiComponent;
@@ -26,7 +27,6 @@ import xyz.apex.forge.apexcore.lib.item.ItemGroupCategory;
 import xyz.apex.forge.apexcore.lib.item.ItemGroupCategoryManager;
 import xyz.apex.forge.commonality.Mods;
 
-import javax.annotation.Nullable;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 

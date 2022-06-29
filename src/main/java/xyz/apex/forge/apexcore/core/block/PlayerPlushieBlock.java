@@ -1,5 +1,7 @@
 package xyz.apex.forge.apexcore.core.block;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,7 +29,6 @@ import xyz.apex.forge.apexcore.core.init.PlayerPlushie;
 import xyz.apex.forge.apexcore.lib.block.VoxelShaper;
 import xyz.apex.forge.apexcore.revamp.block.BaseBlock;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;

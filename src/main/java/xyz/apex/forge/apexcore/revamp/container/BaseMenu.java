@@ -1,5 +1,7 @@
 package xyz.apex.forge.apexcore.revamp.container;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
@@ -16,8 +18,6 @@ import net.minecraftforge.items.SlotItemHandler;
 import xyz.apex.forge.apexcore.revamp.block.MultiBlockPattern;
 import xyz.apex.forge.apexcore.revamp.block.entity.InventoryBlockEntity;
 import xyz.apex.forge.apexcore.revamp.net.packet.SyncContainerPacket;
-
-import javax.annotation.Nullable;
 
 public class BaseMenu extends AbstractContainerMenu
 {

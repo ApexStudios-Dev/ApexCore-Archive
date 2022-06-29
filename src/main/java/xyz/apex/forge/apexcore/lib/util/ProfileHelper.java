@@ -6,6 +6,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
@@ -18,7 +19,6 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 
 import xyz.apex.forge.commonality.Mods;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Collections;
 import java.util.Map;

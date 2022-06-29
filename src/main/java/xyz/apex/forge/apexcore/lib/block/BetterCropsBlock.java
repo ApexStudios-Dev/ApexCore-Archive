@@ -1,5 +1,7 @@
 package xyz.apex.forge.apexcore.lib.block;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -8,8 +10,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraftforge.common.util.Lazy;
-
-import javax.annotation.Nullable;
 
 /**
  * Fixes the following issues with the base {@link CropBlock} class

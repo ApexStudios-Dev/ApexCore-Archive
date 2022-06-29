@@ -2,6 +2,7 @@ package xyz.apex.forge.apexcore.core.client.renderer;
 
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.vertex.PoseStack;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -16,7 +17,6 @@ import xyz.apex.forge.apexcore.core.block.entity.PlayerPlushieBlockEntity;
 import xyz.apex.forge.apexcore.core.init.PlayerPlushie;
 import xyz.apex.forge.apexcore.lib.support.SupporterManager;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.UUID;
 

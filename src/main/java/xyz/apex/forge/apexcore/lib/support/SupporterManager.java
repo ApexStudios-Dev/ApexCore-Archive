@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.*;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +21,6 @@ import xyz.apex.forge.apexcore.core.net.ClientSyncSupportersPacket;
 import xyz.apex.forge.apexcore.lib.util.ProfileHelper;
 import xyz.apex.forge.apexcore.lib.util.SkinHelper;
 
-import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

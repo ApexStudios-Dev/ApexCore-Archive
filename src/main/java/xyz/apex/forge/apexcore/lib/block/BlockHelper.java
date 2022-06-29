@@ -1,5 +1,7 @@
 package xyz.apex.forge.apexcore.lib.block;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -10,7 +12,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
 
-import javax.annotation.Nullable;
 import java.util.function.ToIntFunction;
 
 public final class BlockHelper

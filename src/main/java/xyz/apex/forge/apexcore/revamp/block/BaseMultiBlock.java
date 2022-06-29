@@ -1,5 +1,6 @@
 package xyz.apex.forge.apexcore.revamp.block;
 
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -13,7 +14,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 
-import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.function.Consumer;
 
 public abstract class BaseMultiBlock extends BaseBlock implements IMultiBlock
@@ -44,7 +44,7 @@ public abstract class BaseMultiBlock extends BaseBlock implements IMultiBlock
 		return getMultiBlockPattern().getStateForPlacement(this, blockState, ctx);
 	}
 
-	@OverridingMethodsMustInvokeSuper
+	@MustBeInvokedByOverriders
 	@Override
 	public boolean canSurvive(BlockState blockState, LevelReader level, BlockPos pos)
 	{
@@ -56,14 +56,14 @@ public abstract class BaseMultiBlock extends BaseBlock implements IMultiBlock
 		return super.canSurvive(blockState, level, pos);
 	}
 
-	@OverridingMethodsMustInvokeSuper
+	@MustBeInvokedByOverriders
 	@Override
 	public void onPlace(BlockState blockState, Level level, BlockPos pos, BlockState oldBlockState, boolean isMoving)
 	{
 		getMultiBlockPattern().onPlace(this, blockState, level, pos, oldBlockState);
 	}
 
-	@OverridingMethodsMustInvokeSuper
+	@MustBeInvokedByOverriders
 	@Override
 	public void onRemove(BlockState blockState, Level level, BlockPos pos, BlockState newBlockState, boolean isMoving)
 	{
@@ -71,7 +71,7 @@ public abstract class BaseMultiBlock extends BaseBlock implements IMultiBlock
 		super.onRemove(blockState, level, pos, newBlockState, isMoving);
 	}
 
-	@OverridingMethodsMustInvokeSuper
+	@MustBeInvokedByOverriders
 	@Override
 	protected void registerProperties(Consumer<Property<?>> consumer)
 	{
@@ -113,7 +113,7 @@ public abstract class BaseMultiBlock extends BaseBlock implements IMultiBlock
 			return getMultiBlockPattern().getStateForPlacement(this, blockState, ctx);
 		}
 
-		@OverridingMethodsMustInvokeSuper
+		@MustBeInvokedByOverriders
 		@Override
 		public boolean canSurvive(BlockState blockState, LevelReader level, BlockPos pos)
 		{
@@ -125,14 +125,14 @@ public abstract class BaseMultiBlock extends BaseBlock implements IMultiBlock
 			return super.canSurvive(blockState, level, pos);
 		}
 
-		@OverridingMethodsMustInvokeSuper
+		@MustBeInvokedByOverriders
 		@Override
 		public void onPlace(BlockState blockState, Level level, BlockPos pos, BlockState oldBlockState, boolean isMoving)
 		{
 			getMultiBlockPattern().onPlace(this, blockState, level, pos, oldBlockState);
 		}
 
-		@OverridingMethodsMustInvokeSuper
+		@MustBeInvokedByOverriders
 		@Override
 		public void onRemove(BlockState blockState, Level level, BlockPos pos, BlockState newBlockState, boolean isMoving)
 		{
@@ -140,7 +140,7 @@ public abstract class BaseMultiBlock extends BaseBlock implements IMultiBlock
 			super.onRemove(blockState, level, pos, newBlockState, isMoving);
 		}
 
-		@OverridingMethodsMustInvokeSuper
+		@MustBeInvokedByOverriders
 		@Override
 		protected void registerProperties(Consumer<Property<?>> consumer)
 		{
@@ -183,7 +183,7 @@ public abstract class BaseMultiBlock extends BaseBlock implements IMultiBlock
 			return getMultiBlockPattern().getStateForPlacement(this, blockState, ctx);
 		}
 
-		@OverridingMethodsMustInvokeSuper
+		@MustBeInvokedByOverriders
 		@Override
 		public boolean canSurvive(BlockState blockState, LevelReader level, BlockPos pos)
 		{
@@ -195,14 +195,14 @@ public abstract class BaseMultiBlock extends BaseBlock implements IMultiBlock
 			return super.canSurvive(blockState, level, pos);
 		}
 
-		@OverridingMethodsMustInvokeSuper
+		@MustBeInvokedByOverriders
 		@Override
 		public void onPlace(BlockState blockState, Level level, BlockPos pos, BlockState oldBlockState, boolean isMoving)
 		{
 			getMultiBlockPattern().onPlace(this, blockState, level, pos, oldBlockState);
 		}
 
-		@OverridingMethodsMustInvokeSuper
+		@MustBeInvokedByOverriders
 		@Override
 		public void onRemove(BlockState blockState, Level level, BlockPos pos, BlockState newBlockState, boolean isMoving)
 		{
@@ -210,7 +210,7 @@ public abstract class BaseMultiBlock extends BaseBlock implements IMultiBlock
 			super.onRemove(blockState, level, pos, newBlockState, isMoving);
 		}
 
-		@OverridingMethodsMustInvokeSuper
+		@MustBeInvokedByOverriders
 		@Override
 		protected void registerProperties(Consumer<Property<?>> consumer)
 		{

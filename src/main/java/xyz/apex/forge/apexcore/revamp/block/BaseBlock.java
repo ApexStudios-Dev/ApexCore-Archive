@@ -1,6 +1,8 @@
 package xyz.apex.forge.apexcore.revamp.block;
 
 import io.netty.buffer.Unpooled;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -43,8 +45,6 @@ import xyz.apex.forge.apexcore.lib.util.ContainerHelper;
 import xyz.apex.forge.apexcore.lib.util.NameableMutable;
 import xyz.apex.forge.commonality.tags.FluidTags;
 
-import javax.annotation.Nullable;
-import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.function.Consumer;
 
 public class BaseBlock extends Block implements SimpleWaterloggedBlock
@@ -60,12 +60,12 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 	}
 
 	// region: Core
-	@OverridingMethodsMustInvokeSuper
+	@MustBeInvokedByOverriders
 	protected void registerProperties(Consumer<Property<?>> consumer)
 	{
 	}
 
-	@OverridingMethodsMustInvokeSuper
+	@MustBeInvokedByOverriders
 	protected void preBlockConstructor()
 	{
 	}
@@ -119,7 +119,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 		return modifyPlacementState(blockState, ctx);
 	}
 
-	@OverridingMethodsMustInvokeSuper
+	@MustBeInvokedByOverriders
 	@Override
 	public BlockState updateShape(BlockState blockState, Direction facing, BlockState facingBlockState, LevelAccessor level, BlockPos pos, BlockPos facingPos)
 	{
@@ -169,19 +169,19 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 
 	// region: Wrappers
 	@Nullable
-	@OverridingMethodsMustInvokeSuper
+	@MustBeInvokedByOverriders
 	protected BlockState modifyPlacementState(BlockState placementBlockState, BlockPlaceContext ctx)
 	{
 		return placementBlockState;
 	}
 
-	@OverridingMethodsMustInvokeSuper
+	@MustBeInvokedByOverriders
 	protected BlockState modifyRotation(BlockState blockState, Rotation rotation)
 	{
 		return blockState;
 	}
 
-	@OverridingMethodsMustInvokeSuper
+	@MustBeInvokedByOverriders
 	protected BlockState modifyMirror(BlockState blockState, Mirror mirror)
 	{
 		return blockState;
@@ -423,7 +423,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 			return tryOpenContainerScreen(blockState, level, pos, player, hand, rayTraceResult);
 		}
 
-		@OverridingMethodsMustInvokeSuper
+		@MustBeInvokedByOverriders
 		@Override
 		public void onRemove(BlockState blockState, Level level, BlockPos pos, BlockState newBlockState, boolean isMoving)
 		{

@@ -1,13 +1,13 @@
 package xyz.apex.forge.apexcore.lib.container;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 
 import xyz.apex.forge.apexcore.lib.container.inventory.ItemInventory;
-
-import javax.annotation.Nullable;
 
 public class ItemInventoryContainer extends BaseContainer
 {

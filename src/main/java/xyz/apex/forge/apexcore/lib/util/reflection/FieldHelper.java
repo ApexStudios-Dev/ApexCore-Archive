@@ -6,12 +6,12 @@ import cpw.mods.modlauncher.api.INameMappingService;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 import xyz.apex.forge.apexcore.core.ApexCore;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.concurrent.ExecutionException;

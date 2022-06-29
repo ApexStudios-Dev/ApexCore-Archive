@@ -1,5 +1,7 @@
 package xyz.apex.forge.apexcore.lib.container;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -7,8 +9,6 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 
 import xyz.apex.forge.apexcore.lib.container.slot.PlayerInventorySlot;
-
-import javax.annotation.Nullable;
 
 public class BaseContainer extends AbstractContainerMenu
 {

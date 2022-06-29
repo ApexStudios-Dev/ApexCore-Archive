@@ -1,5 +1,9 @@
 package xyz.apex.forge.apexcore.revamp.block.entity;
 
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -12,10 +16,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.OverridingMethodsMustInvokeSuper;
 
 public abstract class InventoryBlockEntity extends BaseBlockEntity.WithCustomName
 {
@@ -32,7 +32,7 @@ public abstract class InventoryBlockEntity extends BaseBlockEntity.WithCustomNam
 	}
 
 	// region: Serialization
-	@OverridingMethodsMustInvokeSuper
+	@MustBeInvokedByOverriders
 	@Override
 	public CompoundTag serializeData()
 	{
@@ -41,7 +41,7 @@ public abstract class InventoryBlockEntity extends BaseBlockEntity.WithCustomNam
 		return tagCompound;
 	}
 
-	@OverridingMethodsMustInvokeSuper
+	@MustBeInvokedByOverriders
 	@Override
 	public void deserializeData(CompoundTag tagCompound)
 	{
@@ -53,10 +53,10 @@ public abstract class InventoryBlockEntity extends BaseBlockEntity.WithCustomNam
 	// endregion
 
 	// region: Core
-	@OverridingMethodsMustInvokeSuper
-	@Nonnull
+	@MustBeInvokedByOverriders
+	@NotNull
 	@Override
-	public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side)
+	public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side)
 	{
 		if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
 			return itemHandlerCapability.cast();
@@ -64,7 +64,7 @@ public abstract class InventoryBlockEntity extends BaseBlockEntity.WithCustomNam
 		return super.getCapability(cap, side);
 	}
 
-	@OverridingMethodsMustInvokeSuper
+	@MustBeInvokedByOverriders
 	@Override
 	public void setRemoved()
 	{

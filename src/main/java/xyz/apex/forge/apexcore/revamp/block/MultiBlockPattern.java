@@ -2,6 +2,7 @@ package xyz.apex.forge.apexcore.revamp.block;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
@@ -13,7 +14,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;

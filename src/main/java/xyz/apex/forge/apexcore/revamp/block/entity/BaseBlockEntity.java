@@ -1,5 +1,8 @@
 package xyz.apex.forge.apexcore.revamp.block.entity;
 
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -12,9 +15,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import xyz.apex.forge.apexcore.lib.util.NameableMutable;
-
-import javax.annotation.Nullable;
-import javax.annotation.OverridingMethodsMustInvokeSuper;
 
 public class BaseBlockEntity extends BlockEntity
 {
@@ -112,7 +112,7 @@ public class BaseBlockEntity extends BlockEntity
 			return new TranslatableComponent(getBlockState().getBlock().getDescriptionId());
 		}
 
-		@OverridingMethodsMustInvokeSuper
+		@MustBeInvokedByOverriders
 		@Override
 		protected CompoundTag serializeData()
 		{
@@ -127,7 +127,7 @@ public class BaseBlockEntity extends BlockEntity
 			return tagCompound;
 		}
 
-		@OverridingMethodsMustInvokeSuper
+		@MustBeInvokedByOverriders
 		@Override
 		protected void deserializeData(CompoundTag tagCompound)
 		{
