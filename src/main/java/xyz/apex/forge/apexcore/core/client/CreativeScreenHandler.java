@@ -38,6 +38,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 public final class CreativeScreenHandler
 {
 	private static final ResourceLocation CATEGORY_TABS_TEXTURE = new ResourceLocation(Mods.APEX_CORE, "textures/gui/container/creative_inventory/category_tabs.png");
+	private static final ResourceLocation CATEGORY_TABS_ARROW_TEXTURE = new ResourceLocation(Mods.APEX_CORE, "textures/gui/arrows.png");
 	private static final int MAX_CATEGORY_TAB = 4;
 	private static final int CATEGORY_TAB_U_SIZE = 32;
 	private static final int CATEGORY_TAB_V_SIZE = 28;
@@ -54,12 +55,12 @@ public final class CreativeScreenHandler
 	{
 		if(event.getScreen() instanceof CreativeModeInventoryScreen screen)
 		{
-			buttonNextCategoryPage = new Button(0, 0, 1, 1, new TextComponent("V"), b -> categoryTabPage = Math.min(categoryTabPage + 1, maxCategoryTabPages));
+			buttonNextCategoryPage = new Button(0, 0, 1, 1, TextComponent.EMPTY, b -> categoryTabPage = Math.min(categoryTabPage + 1, maxCategoryTabPages));
 			buttonNextCategoryPage.active = false;
 			buttonNextCategoryPage.visible = false;
 			event.addListener(buttonNextCategoryPage);
 
-			buttonPreviousCategoryPage = new Button(0, 0, 1, 1, new TextComponent("^"), b -> categoryTabPage = Math.max(categoryTabPage - 1, 0));
+			buttonPreviousCategoryPage = new Button(0, 0, 1, 1, TextComponent.EMPTY, b -> categoryTabPage = Math.max(categoryTabPage - 1, 0));
 			buttonPreviousCategoryPage.active = false;
 			buttonPreviousCategoryPage.visible = false;
 			event.addListener(buttonPreviousCategoryPage);
@@ -170,8 +171,10 @@ public final class CreativeScreenHandler
 
 		var maxLineWidth = 6;
 
+		var enabledColor = 0xffffff;
+		var disabledColor = 0xa0a0a0;
+
 		var x = buttonPreviousCategoryPage.x + ((buttonPreviousCategoryPage.getWidth() / 2) - (maxLineWidth / 2));
-		var fontColor = buttonPreviousCategoryPage.getFGColor();
 
 		var nextY = buttonNextCategoryPage.y;
 		var nextHeight = buttonNextCategoryPage.getHeight();
@@ -184,12 +187,37 @@ public final class CreativeScreenHandler
 		var yDist = yBottom - yTop;
 		var y = yTop - (font.lineHeight / 2F) + (yDist / 2F);
 
-		font.drawShadow(pose, "" + (categoryTabPage + 1), x, y - font.lineHeight, fontColor);
-		font.drawShadow(pose, "/", x, y, fontColor);
-		font.drawShadow(pose, "" + (maxCategoryTabPages + 1), x, y + font.lineHeight, fontColor);
+		font.drawShadow(pose, "" + (categoryTabPage + 1), x, y - font.lineHeight, enabledColor);
+		font.drawShadow(pose, "/", x, y, enabledColor);
+		font.drawShadow(pose, "" + (maxCategoryTabPages + 1), x, y + font.lineHeight, enabledColor);
 
 		screen.setBlitOffset(0);
 		itemRenderer.blitOffset = 0F;
+
+		// arrows
+		RenderSystem.setShaderTexture(0, CATEGORY_TABS_ARROW_TEXTURE);
+
+		// previous arrow
+		var color = buttonPreviousCategoryPage.active ? enabledColor : disabledColor;
+		var r = (float)(color >> 16 & 255) / 255F;
+		var g = (float)(color >> 8 & 255) / 255F;
+		var b = (float)(color & 255) / 255F;
+		var a = (float)(color >> 24 & 255) / 255F;
+
+		RenderSystem.setShaderColor(r, g, b, a);
+		GuiComponent.blit(pose, buttonPreviousCategoryPage.x + 1, buttonPreviousCategoryPage.y + 2, 0, 0F, 0F, 16, 16, 32, 16);
+
+		// next arrow
+		color = buttonNextCategoryPage.active ? enabledColor : disabledColor;
+		r = (float)(color >> 16 & 255) / 255F;
+		g = (float)(color >> 8 & 255) / 255F;
+		b = (float)(color & 255) / 255F;
+		a = (float)(color >> 24 & 255) / 255F;
+
+		RenderSystem.setShaderColor(r, g, b, a);
+		GuiComponent.blit(pose, buttonNextCategoryPage.x + 1, buttonNextCategoryPage.y + 2, 0, 16F, 0F, 16, 16, 32, 16);
+
+		RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 	}
 
 	private static void renderTabButton(CreativeModeInventoryScreen screen, PoseStack pose, CreativeModeTab itemGroup, boolean enabled)
