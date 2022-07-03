@@ -19,6 +19,7 @@ import net.minecraftforge.common.util.Lazy;
  * <li>Allowing base seed item to be overridden</li>
  * </ul>
  */
+@Deprecated(forRemoval = true)
 public class BetterCropsBlock extends CropBlock
 {
 	@Nullable protected final ItemLike baseSeedItem;

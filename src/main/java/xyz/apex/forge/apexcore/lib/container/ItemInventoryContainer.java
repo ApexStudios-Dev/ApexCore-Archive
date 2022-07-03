@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 
 import xyz.apex.forge.apexcore.lib.container.inventory.ItemInventory;
 
+@Deprecated(forRemoval = true)
 public class ItemInventoryContainer extends BaseContainer
 {
 	protected final ItemInventory itemInventory;

@@ -13,6 +13,7 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import xyz.apex.forge.apexcore.core.init.ACLootFunctionTypes;
 import xyz.apex.forge.apexcore.lib.constants.NbtNames;
 
+@Deprecated(forRemoval = true)
 public class ApplyRandomColor extends LootItemConditionalFunction
 {
 	private ApplyRandomColor(LootItemCondition[] conditions)

@@ -16,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.ExecutionException;
 
+@Deprecated(forRemoval = true)
 public class MethodHelper
 {
 	private static final Marker MARKER = MarkerManager.getMarker("MethodReflection");

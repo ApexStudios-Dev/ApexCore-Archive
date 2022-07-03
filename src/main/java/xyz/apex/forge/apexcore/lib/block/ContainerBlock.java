@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
 
+@Deprecated(forRemoval = true)
 public abstract class ContainerBlock<T extends BlockEntity> extends BlockEntityBlock<T>
 {
 	public ContainerBlock(Properties properties)

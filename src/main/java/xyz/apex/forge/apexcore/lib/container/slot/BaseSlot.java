@@ -4,6 +4,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 
+@Deprecated(forRemoval = true)
 public class BaseSlot extends Slot
 {
 	protected final Player opener;

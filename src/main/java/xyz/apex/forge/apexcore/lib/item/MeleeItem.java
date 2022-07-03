@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 // Simple generic sword item that does not
 // break any blocks faster than a fist
+@Deprecated(forRemoval = true)
 public class MeleeItem extends SwordItem
 {
 	public MeleeItem(Properties properties, int baseAttackDamage, float attackSpeed, Tier itemTier)

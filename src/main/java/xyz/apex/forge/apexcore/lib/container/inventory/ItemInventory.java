@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 
 import xyz.apex.forge.apexcore.lib.constants.NbtNames;
 
+@Deprecated(forRemoval = true)
 public class ItemInventory extends SimpleContainer
 {
 	private final ItemStack item;

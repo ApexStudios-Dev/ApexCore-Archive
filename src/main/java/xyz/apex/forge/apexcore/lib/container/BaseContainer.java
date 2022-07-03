@@ -10,6 +10,7 @@ import net.minecraft.world.inventory.Slot;
 
 import xyz.apex.forge.apexcore.lib.container.slot.PlayerInventorySlot;
 
+@Deprecated(forRemoval = true)
 public class BaseContainer extends AbstractContainerMenu
 {
 	protected final Player opener;

@@ -6,6 +6,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
+@Deprecated(forRemoval = true)
 public class Age5CropsBlock extends BetterCropsBlock
 {
 	public static final IntegerProperty AGE = BlockStateProperties.AGE_5;

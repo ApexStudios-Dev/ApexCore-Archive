@@ -8,6 +8,7 @@ import net.minecraft.world.level.storage.loot.Serializer;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 
+@Deprecated(forRemoval = true)
 public final class RegistryHelper
 {
 	public static LootItemFunctionType registerLootFunction(ResourceLocation lootFunctionName, Serializer<? extends LootItemFunction> lootSerializer)

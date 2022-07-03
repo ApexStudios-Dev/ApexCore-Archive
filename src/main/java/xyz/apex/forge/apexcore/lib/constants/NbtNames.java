@@ -1,5 +1,6 @@
 package xyz.apex.forge.apexcore.lib.constants;
 
+@Deprecated(forRemoval = true)
 public class NbtNames
 {
 	public static final String INVENTORY = "Inventory";

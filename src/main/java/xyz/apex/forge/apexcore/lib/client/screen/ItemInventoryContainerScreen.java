@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Inventory;
 
 import xyz.apex.forge.apexcore.lib.container.ItemInventoryContainer;
 
+@Deprecated(forRemoval = true)
 public class ItemInventoryContainerScreen<C extends ItemInventoryContainer> extends AbstractContainerScreen<C>
 {
 	protected final ResourceLocation backgroundTexture;

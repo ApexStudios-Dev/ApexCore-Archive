@@ -9,6 +9,7 @@ import net.minecraft.world.level.Level;
 
 import java.util.Random;
 
+@Deprecated(forRemoval = true)
 public class SelfContainerItem extends Item
 {
 	public static final Random RNG = new Random();

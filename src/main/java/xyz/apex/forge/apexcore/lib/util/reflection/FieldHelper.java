@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.concurrent.ExecutionException;
 
+@Deprecated(forRemoval = true)
 public class FieldHelper
 {
 	private static final Marker MARKER = MarkerManager.getMarker("FieldReflection");

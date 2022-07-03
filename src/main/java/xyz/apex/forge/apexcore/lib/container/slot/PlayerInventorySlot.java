@@ -2,6 +2,7 @@ package xyz.apex.forge.apexcore.lib.container.slot;
 
 import net.minecraft.world.entity.player.Inventory;
 
+@Deprecated(forRemoval = true)
 public class PlayerInventorySlot extends BaseSlot
 {
 	protected final Inventory playerInventory;

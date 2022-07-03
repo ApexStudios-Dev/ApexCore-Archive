@@ -6,6 +6,7 @@ import net.minecraft.world.item.ItemStack;
 
 import xyz.apex.forge.apexcore.lib.container.inventory.ItemInventory;
 
+@Deprecated(forRemoval = true)
 public class PlayerItemInventorySlot extends PlayerInventorySlot
 {
 	protected final ItemInventory itemInventory;

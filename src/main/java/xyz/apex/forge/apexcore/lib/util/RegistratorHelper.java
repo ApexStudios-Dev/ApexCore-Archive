@@ -10,7 +10,7 @@ import net.minecraft.world.item.Item;
 
 import xyz.apex.forge.commonality.tags.ItemTags;
 
-// TODO: Merge directly into registrator
+@Deprecated(forRemoval = true)
 public final class RegistratorHelper
 {
 	// region: Models

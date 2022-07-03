@@ -16,6 +16,7 @@ import net.minecraftforge.network.NetworkHooks;
 import xyz.apex.forge.apexcore.lib.container.ItemInventoryContainer;
 import xyz.apex.forge.apexcore.lib.container.inventory.ItemInventory;
 
+@Deprecated(forRemoval = true)
 public abstract class InventoryItem<C extends ItemInventoryContainer> extends Item
 {
 	public InventoryItem(Properties properties)

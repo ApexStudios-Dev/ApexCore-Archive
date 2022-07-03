@@ -9,6 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 
+@Deprecated(forRemoval = true)
 public class BottleItem extends Item
 {
 	public BottleItem(Properties properties)
