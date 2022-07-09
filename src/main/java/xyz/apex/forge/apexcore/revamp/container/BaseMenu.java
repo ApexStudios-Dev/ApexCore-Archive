@@ -11,6 +11,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
@@ -21,9 +22,9 @@ import xyz.apex.forge.apexcore.revamp.net.packet.SyncContainerPacket;
 
 public class BaseMenu extends AbstractContainerMenu
 {
-	protected final Player player;
-	protected final BlockPos pos;
-	@Nullable protected final BlockEntity blockEntity;
+	public final Player player;
+	public final BlockPos pos;
+	@Nullable public final BlockEntity blockEntity;
 
 	public BaseMenu(@Nullable MenuType<? extends BaseMenu> menuType, int windowId, Inventory playerInventory, FriendlyByteBuf buffer)
 	{
@@ -34,6 +35,12 @@ public class BaseMenu extends AbstractContainerMenu
 		pos = buffer.readBlockPos();
 		blockEntity = player.level.getBlockEntity(pos);
 
+	}
+
+	@Nullable
+	public final <BLOCK_ENTITY extends BlockEntity> BLOCK_ENTITY getBlockEntity(BlockEntityType<BLOCK_ENTITY> blockEntityType)
+	{
+		return blockEntity != null && blockEntity.getType() == blockEntityType ? (BLOCK_ENTITY) blockEntity : null;
 	}
 
 	@Override
