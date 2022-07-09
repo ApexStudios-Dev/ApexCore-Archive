@@ -7,8 +7,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -78,7 +76,7 @@ public class BaseBlockEntity extends BlockEntity
 
 	public static class WithCustomName extends BaseBlockEntity implements NameableMutable
 	{
-		public static final String NBT_CUSTOM_NAME = InventoryBlockEntity.NBT_CUSTOM_NAME;
+		public static final String NBT_CUSTOM_NAME = "CustomName";
 
 		@Nullable private Component customName = null;
 
@@ -109,7 +107,7 @@ public class BaseBlockEntity extends BlockEntity
 		@Override
 		public Component getName()
 		{
-			return new TranslatableComponent(getBlockState().getBlock().getDescriptionId());
+			return Component.translatable(getBlockState().getBlock().getDescriptionId());
 		}
 
 		@MustBeInvokedByOverriders
@@ -120,7 +118,7 @@ public class BaseBlockEntity extends BlockEntity
 
 			if(customName != null)
 			{
-				var customNameJson = TextComponent.Serializer.toJson(customName);
+				var customNameJson = Component.Serializer.toJson(customName);
 				tagCompound.putString(NBT_CUSTOM_NAME, customNameJson);
 			}
 
@@ -134,7 +132,7 @@ public class BaseBlockEntity extends BlockEntity
 			if(tagCompound.contains(NBT_CUSTOM_NAME, Tag.TAG_STRING))
 			{
 				var customNameJson = tagCompound.getString(NBT_CUSTOM_NAME);
-				customName = TextComponent.Serializer.fromJson(customNameJson);
+				customName = Component.Serializer.fromJson(customNameJson);
 			}
 
 			super.deserializeData(tagCompound);

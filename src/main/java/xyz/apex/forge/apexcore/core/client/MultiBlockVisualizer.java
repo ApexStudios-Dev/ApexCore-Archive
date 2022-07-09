@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderLevelLastEvent;
-import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -94,9 +94,7 @@ public final class MultiBlockVisualizer
 				placeState = BaseMultiBlock.setWaterLogged(placeState, false);
 
 				var position = mc.getEntityRenderDispatcher().camera.getPosition();
-
 				var buffers = mc.renderBuffers().bufferSource();
-
 				var type = RenderType.lines();
 
 				if(ghostBuffers == null)
@@ -206,7 +204,7 @@ public final class MultiBlockVisualizer
 		if(blockState.getRenderShape() == RenderShape.MODEL)
 		{
 			pose.pushPose();
-			mc.getBlockRenderer().renderSingleBlock(blockState, pose, bufferSource, LightTexture.FULL_BLOCK, overlay, EmptyModelData.INSTANCE);
+			mc.getBlockRenderer().renderSingleBlock(blockState, pose, bufferSource, LightTexture.FULL_BLOCK, overlay, ModelData.EMPTY, null);
 			pose.popPose();
 		}
 
@@ -224,7 +222,7 @@ public final class MultiBlockVisualizer
 		if(blockState.getRenderShape() == RenderShape.MODEL)
 		{
 			pose.pushPose();
-			mc.getBlockRenderer().renderSingleBlock(blockState, pose, bufferSource, LightTexture.FULL_BLOCK, overlay, EmptyModelData.INSTANCE);
+			mc.getBlockRenderer().renderSingleBlock(blockState, pose, bufferSource, LightTexture.FULL_BLOCK, overlay, ModelData.EMPTY, null);
 			pose.popPose();
 		}
 

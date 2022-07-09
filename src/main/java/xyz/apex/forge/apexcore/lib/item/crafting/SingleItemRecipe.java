@@ -14,7 +14,6 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
 // Copy of vanilla SingleItemRecipe
 // Modified to make the factory interface public
@@ -100,7 +99,7 @@ public class SingleItemRecipe implements Recipe<Container>
 		return recipeIngredient.test(inventory.getItem(0));
 	}
 
-	public static final class Serializer<T extends SingleItemRecipe> extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<T>
+	public static final class Serializer<T extends SingleItemRecipe> implements RecipeSerializer<T>
 	{
 		private final IRecipeFactory<T> recipeFactory;
 

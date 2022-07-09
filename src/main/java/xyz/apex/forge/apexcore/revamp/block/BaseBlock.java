@@ -8,7 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.LivingEntity;
@@ -324,7 +324,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 
 		@Nullable
 		@Override
-		public final <T extends BlockEntity> GameEventListener getListener(Level level, T blockEntity)
+		public final <T extends BlockEntity> GameEventListener getListener(ServerLevel level, T blockEntity)
 		{
 			return blockEntity instanceof GameEventListener gameEventListener ? gameEventListener : null;
 		}
@@ -339,7 +339,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 				return menuProvider;
 			else if(blockEntity instanceof MenuConstructor menuConstructor)
 			{
-				Component containerName = new TranslatableComponent(getDescriptionId());
+				Component containerName = Component.translatable(getDescriptionId());
 
 				if(blockEntity instanceof Nameable nameable)
 					containerName = nameable.getDisplayName();
@@ -453,7 +453,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 
 			if(blockEntity != null)
 			{
-				Component containerName = new TranslatableComponent(getDescriptionId());
+				Component containerName = Component.translatable(getDescriptionId());
 
 				if(blockEntity instanceof Nameable nameable)
 					containerName = nameable.getDisplayName();

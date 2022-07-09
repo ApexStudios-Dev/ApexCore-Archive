@@ -1,8 +1,8 @@
 package xyz.apex.forge.apexcore.revamp.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -24,7 +24,7 @@ public interface ISeatBlock
 
 	default MutableComponent getOccupiedTranslation()
 	{
-		return new TranslatableComponent(getOccupiedTranslationKey());
+		return Component.translatable(getOccupiedTranslationKey());
 	}
 
 	default InteractionResult useSeatBlock(BlockState blockState, Level level, BlockPos pos, Player player)

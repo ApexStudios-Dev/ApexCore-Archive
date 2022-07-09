@@ -4,12 +4,11 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.Random;
 
 // Does not support having BlockEntities or Containers
 public class WallLightBlock extends BaseBlock
@@ -63,7 +62,7 @@ public class WallLightBlock extends BaseBlock
 	}
 
 	@Override
-	public void animateTick(BlockState blockState, Level level, BlockPos pos, Random rng)
+	public void animateTick(BlockState blockState, Level level, BlockPos pos, RandomSource rng)
 	{
 		if(supportsWaterLogging(blockState) && isWaterLogged(blockState))
 			return;
@@ -75,7 +74,7 @@ public class WallLightBlock extends BaseBlock
 		spawnLightParticles(level, pos, blockState, x, y, z, rng);
 	}
 
-	protected void spawnLightParticles(Level level, BlockPos pos, BlockState blockState, double pX, double pY, double pZ, Random rng)
+	protected void spawnLightParticles(Level level, BlockPos pos, BlockState blockState, double pX, double pY, double pZ, RandomSource rng)
 	{
 		var x = pX;
 		var y = pY;
@@ -96,7 +95,7 @@ public class WallLightBlock extends BaseBlock
 		onLightParticle(level, pos, blockState, x, y, z, rng);
 	}
 
-	protected void onLightParticle(Level level, BlockPos pos, BlockState blockState, double pX, double pY, double pZ, Random rng)
+	protected void onLightParticle(Level level, BlockPos pos, BlockState blockState, double pX, double pY, double pZ, RandomSource rng)
 	{
 		level.addParticle(ParticleTypes.SMOKE, pX, pY, pZ, 0D, 0D, 0D);
 		level.addParticle(ParticleTypes.FLAME, pX, pY, pZ, 0D, 0D, 0D);

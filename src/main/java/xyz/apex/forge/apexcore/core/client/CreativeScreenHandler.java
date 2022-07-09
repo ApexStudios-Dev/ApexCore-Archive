@@ -10,16 +10,15 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
-import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.RenderProperties;
 import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.client.extensions.common.IClientMobEffectExtensions;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -51,16 +50,16 @@ public final class CreativeScreenHandler
 	@Nullable private static Button buttonNextCategoryPage;
 
 	@SubscribeEvent
-	public static void onScreenInit(ScreenEvent.InitScreenEvent event)
+	public static void onScreenInit(ScreenEvent.Init.Pre event)
 	{
 		if(event.getScreen() instanceof CreativeModeInventoryScreen screen)
 		{
-			buttonNextCategoryPage = new Button(0, 0, 1, 1, TextComponent.EMPTY, b -> categoryTabPage = Math.min(categoryTabPage + 1, maxCategoryTabPages));
+			buttonNextCategoryPage = new Button(0, 0, 1, 1, Component.empty(), b -> categoryTabPage = Math.min(categoryTabPage + 1, maxCategoryTabPages));
 			buttonNextCategoryPage.active = false;
 			buttonNextCategoryPage.visible = false;
 			event.addListener(buttonNextCategoryPage);
 
-			buttonPreviousCategoryPage = new Button(0, 0, 1, 1, TextComponent.EMPTY, b -> categoryTabPage = Math.max(categoryTabPage - 1, 0));
+			buttonPreviousCategoryPage = new Button(0, 0, 1, 1, Component.empty(), b -> categoryTabPage = Math.max(categoryTabPage - 1, 0));
 			buttonPreviousCategoryPage.active = false;
 			buttonPreviousCategoryPage.visible = false;
 			event.addListener(buttonPreviousCategoryPage);
@@ -608,22 +607,23 @@ public final class CreativeScreenHandler
 
 		for(var effect : effects)
 		{
-			var effectRenderer = RenderProperties.getEffectRenderer(effect);
-			effectRenderer.renderInventoryEffect(effect, screen, pose, renderX, i, blitOffset);
+			var effectRenderer = IClientMobEffectExtensions.of(effect);
 
-			if(effectRenderer.shouldRenderInvText(effect))
+			if(effectRenderer.renderInventoryText(effect, screen, pose, renderX, i, blitOffset))
 			{
-				var s = I18n.get(effect.getEffect().getDescriptionId());
-				var amplifier = effect.getAmplifier();
-
-				if(amplifier >= 1 && amplifier <= 9)
-					s = s + ' ' + I18n.get("enchantment.level." + (amplifier + 1));
-
-				mc.font.drawShadow(pose, s, (float) (renderX + 10 + 18), (float) (i + 6), 16777215);
-
-				s = MobEffectUtil.formatDuration(effect, 1F);
-				mc.font.drawShadow(pose, s, (float) (renderX + 10 + 18), (float) (i + 6 + 10), 8355711);
+				i += renderY;
+				continue;
 			}
+
+			var component = effect.getEffect().getDisplayName().copy();
+			var amplifier = effect.getAmplifier();
+
+			if(amplifier >= 1 && amplifier <= 9)
+				component.append(" ").append(Component.translatable("enchantment.level.%d".formatted(amplifier + 1)));
+
+			mc.font.drawShadow(pose, component, (float) (renderX + 10 + 18), (float) (i + 6), 16777215);
+			var str = MobEffectUtil.formatDuration(effect, 1F);
+			mc.font.drawShadow(pose, component, (float) (renderX + 10 + 18), (float) (i + 6 + 10), 8355711);
 
 			i += renderY;
 		}

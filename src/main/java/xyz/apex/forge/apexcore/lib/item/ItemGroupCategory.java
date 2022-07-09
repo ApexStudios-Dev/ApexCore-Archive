@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -126,7 +125,7 @@ public final class ItemGroupCategory implements Predicate<ItemStack>
 	public Component getCategoryName()
 	{
 		var categoryNameKey = getCategoryNameKey();
-		return new TranslatableComponent(categoryNameKey);
+		return Component.translatable(categoryNameKey);
 	}
 
 	public <T extends AbstractRegistrate<T>> ItemGroupCategory addTranslationGenerator(T registrator, String englishName)
