@@ -87,15 +87,15 @@ jobs:
           APEX_MODS_MAVEN_USERNAME: ${{ secrets.APEX_MODS_MAVEN_USERNAME }}
           APEX_MODS_MAVEN_PASSWORD: ${{ secrets.APEX_MODS_MAVEN_PASSWORD }}
 
-      - name: Publish Mod to CurseForge
-        run: ./gradlew curseforge
-        env:
-          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+#      - name: Publish Mod to CurseForge
+#        run: ./gradlew curseforge
+#        env:
+#          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
 
-      - name: Publish Mod to Modrinth
-        run: ./gradlew modrinth
-        env:
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+#      - name: Publish Mod to Modrinth
+#        run: ./gradlew modrinth
+#        env:
+#          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
 
       - name: Send Version Release Announcement Messages
         uses: appleboy/discord-action@0.0.3
