@@ -15,7 +15,7 @@ import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.PlayMessages;
 
 import xyz.apex.forge.apexcore.core.init.ACEntities;
-import xyz.apex.forge.apexcore.revamp.block.ISeatBlock;
+import xyz.apex.forge.apexcore.lib.block.ISeatBlock;
 
 public final class SeatEntity extends Entity
 {

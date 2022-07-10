@@ -1,4 +1,4 @@
-package xyz.apex.forge.apexcore.revamp.client.screen;
+package xyz.apex.forge.apexcore.lib.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;

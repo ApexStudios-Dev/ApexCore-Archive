@@ -1,4 +1,4 @@
-package xyz.apex.forge.apexcore.revamp.block;
+package xyz.apex.forge.apexcore.lib.block;
 
 import io.netty.buffer.Unpooled;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;

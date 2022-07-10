@@ -1,4 +1,4 @@
-package xyz.apex.forge.apexcore.revamp.net.packet;
+package xyz.apex.forge.apexcore.lib.net;
 
 import io.netty.buffer.Unpooled;
 
@@ -11,9 +11,7 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 
 import xyz.apex.forge.apexcore.core.ApexCore;
-import xyz.apex.forge.apexcore.lib.net.AbstractPacket;
-import xyz.apex.forge.apexcore.lib.net.NetworkManager;
-import xyz.apex.forge.apexcore.revamp.block.entity.InventoryBlockEntity;
+import xyz.apex.forge.apexcore.lib.block.entity.InventoryBlockEntity;
 
 public final class SyncContainerPacket extends AbstractPacket
 {

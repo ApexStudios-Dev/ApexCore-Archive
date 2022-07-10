@@ -1,4 +1,4 @@
-package xyz.apex.forge.apexcore.revamp.block;
+package xyz.apex.forge.apexcore.lib.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;

@@ -1,4 +1,4 @@
-package xyz.apex.forge.apexcore.revamp.block.entity;
+package xyz.apex.forge.apexcore.lib.block.entity;
 
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;

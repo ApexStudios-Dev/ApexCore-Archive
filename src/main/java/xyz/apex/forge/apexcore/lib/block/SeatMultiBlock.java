@@ -1,4 +1,4 @@
-package xyz.apex.forge.apexcore.revamp.block;
+package xyz.apex.forge.apexcore.lib.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -11,10 +11,9 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.function.Consumer;
 
-// Does not support having BlockEntities or Containers
-public class SeatBlock extends BaseBlock implements ISeatBlock
+public abstract class SeatMultiBlock extends BaseMultiBlock implements ISeatMultiBlock
 {
-	public SeatBlock(Properties properties)
+	public SeatMultiBlock(Properties properties)
 	{
 		super(properties);
 
