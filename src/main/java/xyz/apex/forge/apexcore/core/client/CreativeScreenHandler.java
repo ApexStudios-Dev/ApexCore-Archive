@@ -2,7 +2,6 @@ package xyz.apex.forge.apexcore.core.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -50,7 +49,7 @@ public final class CreativeScreenHandler
 	@Nullable private static Button buttonNextCategoryPage;
 
 	@SubscribeEvent
-	public static void onScreenInit(ScreenEvent.Init.Pre event)
+	public static void onScreenInit(ScreenEvent.Init.Post event)
 	{
 		if(event.getScreen() instanceof CreativeModeInventoryScreen screen)
 		{
@@ -71,8 +70,8 @@ public final class CreativeScreenHandler
 
 	private static void updatePages(CreativeModeInventoryScreen screen, @Nullable CreativeModeTab itemGroup)
 	{
-		Validate.notNull(buttonPreviousCategoryPage);
-		Validate.notNull(buttonNextCategoryPage);
+		if(buttonNextCategoryPage == null || buttonPreviousCategoryPage == null)
+			return;
 
 		var leftPos = screen.getGuiLeft();
 		var topPos = screen.getGuiTop();
