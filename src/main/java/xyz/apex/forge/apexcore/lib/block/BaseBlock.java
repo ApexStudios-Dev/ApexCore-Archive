@@ -391,7 +391,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 
 				if(player instanceof ServerPlayer serverPlayer)
 				{
-					NetworkHooks.openGui(serverPlayer, provider, buffer -> {
+					NetworkHooks.openScreen(serverPlayer, provider, buffer -> {
 						var blockEntityPos = getBlockEntityPos(blockState, pos);
 						buffer.writeBlockPos(blockEntityPos);
 					});
