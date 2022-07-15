@@ -39,7 +39,6 @@ public final class ACRegistry extends AbstractRegistrate<ACRegistry>
 		{
 			INSTANCE.registerEventListeners(FMLJavaModLoadingContext.get().getModEventBus());
 			EventBusHelper.addEnqueuedListener(FMLCommonSetupEvent.class, event -> ACLootFunctionTypes.bootstrap());
-			PlayerPlushie.bootstrap();
 			ACEntities.bootstrap();
 			bootstrap = true;
 		}
