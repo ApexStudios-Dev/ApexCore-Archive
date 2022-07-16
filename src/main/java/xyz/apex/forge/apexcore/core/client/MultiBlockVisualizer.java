@@ -28,9 +28,9 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import xyz.apex.forge.apexcore.revamp.block.BaseMultiBlock;
-import xyz.apex.forge.apexcore.revamp.block.IMultiBlock;
-import xyz.apex.forge.apexcore.revamp.block.MultiBlockPattern;
+import xyz.apex.forge.apexcore.lib.block.BaseMultiBlock;
+import xyz.apex.forge.apexcore.lib.block.IMultiBlock;
+import xyz.apex.forge.apexcore.lib.block.MultiBlockPattern;
 import xyz.apex.forge.commonality.Mods;
 
 import java.util.IdentityHashMap;

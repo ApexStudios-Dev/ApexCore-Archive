@@ -1,5 +1,4 @@
 @javax.annotation.ParametersAreNonnullByDefault
 @net.minecraft.MethodsReturnNonnullByDefault
 @com.tterrag.registrate.util.nullness.FieldsAreNonnullByDefault
-package xyz.apex.forge.apexcore.lib.loot;
-
+package xyz.apex.forge.apexcore.lib.net.packet;

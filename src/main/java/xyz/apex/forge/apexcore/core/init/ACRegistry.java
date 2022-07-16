@@ -2,10 +2,8 @@ package xyz.apex.forge.apexcore.core.init;
 
 import com.tterrag.registrate.AbstractRegistrate;
 
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-import xyz.apex.forge.apexcore.lib.util.EventBusHelper;
 import xyz.apex.forge.commonality.Mods;
 
 import static com.tterrag.registrate.providers.ProviderType.LANG;
@@ -38,7 +36,6 @@ public final class ACRegistry extends AbstractRegistrate<ACRegistry>
 		if(!bootstrap)
 		{
 			INSTANCE.registerEventListeners(FMLJavaModLoadingContext.get().getModEventBus());
-			EventBusHelper.addEnqueuedListener(FMLCommonSetupEvent.class, event -> ACLootFunctionTypes.bootstrap());
 			ACEntities.bootstrap();
 			bootstrap = true;
 		}

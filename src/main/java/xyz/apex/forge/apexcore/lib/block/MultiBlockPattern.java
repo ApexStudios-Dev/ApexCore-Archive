@@ -1,4 +1,4 @@
-package xyz.apex.forge.apexcore.revamp.block;
+package xyz.apex.forge.apexcore.lib.block;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
