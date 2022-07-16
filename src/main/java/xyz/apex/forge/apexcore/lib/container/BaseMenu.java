@@ -3,7 +3,9 @@ package xyz.apex.forge.apexcore.lib.container;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -11,7 +13,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
@@ -19,12 +21,12 @@ import net.minecraftforge.items.SlotItemHandler;
 import xyz.apex.forge.apexcore.lib.block.MultiBlockPattern;
 import xyz.apex.forge.apexcore.lib.block.entity.InventoryBlockEntity;
 import xyz.apex.forge.apexcore.lib.net.SyncContainerPacket;
+import xyz.apex.java.utility.api.function.QuadFunction;
 
 public class BaseMenu extends AbstractContainerMenu
 {
 	public final Player player;
 	public final BlockPos pos;
-	@Nullable public final BlockEntity blockEntity;
 
 	public BaseMenu(@Nullable MenuType<? extends BaseMenu> menuType, int windowId, Inventory playerInventory, FriendlyByteBuf buffer)
 	{
@@ -33,14 +35,27 @@ public class BaseMenu extends AbstractContainerMenu
 		player = playerInventory.player;
 
 		pos = buffer.readBlockPos();
-		blockEntity = player.level.getBlockEntity(pos);
 
 	}
 
 	@Nullable
-	public final <BLOCK_ENTITY extends BlockEntity> BLOCK_ENTITY getBlockEntity(BlockEntityType<BLOCK_ENTITY> blockEntityType)
+	protected IItemHandler getItemHandler()
 	{
-		return blockEntity != null && blockEntity.getType() == blockEntityType ? (BLOCK_ENTITY) blockEntity : null;
+		return null;
+	}
+
+	protected void onInventoryChanges()
+	{
+	}
+
+	public final void setBlockEntityChanged()
+	{
+		var blockEntity = player.level.getBlockEntity(pos);
+
+		if(blockEntity != null)
+			blockEntity.setChanged();
+		if(blockEntity instanceof InventoryBlockEntity inventoryBlockEntity)
+			SyncContainerPacket.sendToClient(inventoryBlockEntity);
 	}
 
 	@Override
@@ -56,33 +71,65 @@ public class BaseMenu extends AbstractContainerMenu
 		{
 			var stack1 = slot.getItem();
 			stack = stack1.copy();
-			IItemHandler itemHandler = null;
-
-			if(blockEntity != null)
-				itemHandler = blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).resolve().orElse(null);
+			IItemHandler itemHandler = getItemHandler();
 
 			if(itemHandler != null && itemHandler.getSlots() > 0)
 			{
-				var maxIndex = itemHandler.getSlots();
+				var itemStart = 0;
+				var itemEnd = itemHandler.getSlots() - 1;
 
-				if(slotIndex < maxIndex)
+				var playerStart = itemEnd + 1;
+				var playerEnd = playerStart + (9 * 3) - 1;
+
+				var hotStart = playerEnd + 1;
+				var hotEnd = hotStart + 8;
+
+				if(slotIndex >= itemStart && slotIndex <= itemEnd)
 				{
-					if(!moveItemStackTo(stack1, maxIndex, slots.size(), true))
+					if(!moveItemStackTo(stack1, playerStart, hotEnd, false))
 						return ItemStack.EMPTY;
 				}
-				else if(!moveItemStackTo(stack1, 0, maxIndex, false))
-					return ItemStack.EMPTY;
+				else if(slotIndex >= playerStart && slotIndex <= playerEnd)
+				{
+					if(!moveItemStackTo(stack1, itemStart, itemEnd, false) && !moveItemStackTo(stack1, hotStart, hotEnd, false))
+						return ItemStack.EMPTY;
+				}
+				else if(slotIndex >= hotStart && slotIndex <= hotEnd)
+				{
+					if(!moveItemStackTo(stack1, itemStart, itemEnd, false) && !moveItemStackTo(stack1, playerStart, playerEnd, false))
+						return ItemStack.EMPTY;
+				}
 			}
 			else
 			{
-				if(!moveItemStackTo(stack1, 0, slots.size(), false))
-					return ItemStack.EMPTY;
+				var playerStart = 0;
+				var playerEnd = playerStart + (9 * 3) - 1;
+
+				var hotStart = playerEnd + 1;
+				var hotEnd = hotStart + 8;
+
+				if(slotIndex >= playerStart && slotIndex <= playerEnd)
+				{
+					if(!moveItemStackTo(stack1, hotStart, hotEnd, false))
+						return ItemStack.EMPTY;
+				}
+				else if(slotIndex >= hotStart && slotIndex <= hotEnd)
+				{
+					if(!moveItemStackTo(stack1, playerStart, playerEnd, false))
+						return ItemStack.EMPTY;
+				}
 			}
 
 			if(stack1.isEmpty())
 				slot.set(ItemStack.EMPTY);
-			else
-				slot.setChanged();
+
+			slot.setChanged();
+
+			if(stack1.getCount() == stack.getCount())
+				return ItemStack.EMPTY;
+
+			slot.onTake(player, stack1);
+			broadcastChanges();
 		}
 
 		return stack;
@@ -98,12 +145,17 @@ public class BaseMenu extends AbstractContainerMenu
 	public void broadcastChanges()
 	{
 		super.broadcastChanges();
+		onInventoryChanges();
+	}
 
-		if(blockEntity != null)
-			blockEntity.setChanged();
+	protected static LazyOptional<IItemHandler> getItemHandlerFromBlockEntity(BlockEntity blockEntity, @Nullable Direction side)
+	{
+		return blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
+	}
 
-		if(blockEntity instanceof InventoryBlockEntity inventoryBlockEntity)
-			SyncContainerPacket.sendToClient(inventoryBlockEntity);
+	protected static LazyOptional<IItemHandler> getItemHandlerFromBlockEntity(BlockEntity blockEntity)
+	{
+		return getItemHandlerFromBlockEntity(blockEntity, null);
 	}
 
 	public static void bindItemHandlerSlots(BaseMenu menu, IItemHandler itemHandler, int rows, int cols, int x, int y, MultiBlockPattern.QuadFunction<IItemHandler, Integer, Integer, Integer, SlotItemHandler> slotFactory)
@@ -124,10 +176,20 @@ public class BaseMenu extends AbstractContainerMenu
 
 	public static void bindPlayerInventory(BaseMenu menu)
 	{
-		bindPlayerInventory(menu, 8, 84);
+		bindPlayerInventory(menu, Slot::new);
 	}
 
 	public static void bindPlayerInventory(BaseMenu menu, int x, int y)
+	{
+		bindPlayerInventory(menu, x, y, Slot::new);
+	}
+
+	public static void bindPlayerInventory(BaseMenu menu, QuadFunction<Container, Integer, Integer, Integer, Slot> factory)
+	{
+		bindPlayerInventory(menu, 8, 84, factory);
+	}
+
+	public static void bindPlayerInventory(BaseMenu menu, int x, int y, QuadFunction<Container, Integer, Integer, Integer, Slot> factory)
 	{
 		var playerInventory = menu.player.getInventory();
 
@@ -135,13 +197,13 @@ public class BaseMenu extends AbstractContainerMenu
 		{
 			for(int j = 0; j < 9; j++)
 			{
-				menu.addSlot(new Slot(playerInventory, j + i * 9 + 9, x + j * 18, y + i * 18));
+				menu.addSlot(factory.apply(playerInventory, j + i * 9 + 9, x + j * 18, y + i * 18));
 			}
 		}
 
 		for(int i = 0; i < 9; ++i)
 		{
-			menu.addSlot(new Slot(playerInventory, i, x + i * 18, y + 58));
+			menu.addSlot(factory.apply(playerInventory, i, x + i * 18, y + 58));
 		}
 	}
 }
