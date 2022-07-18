@@ -4,6 +4,7 @@ plugins {
 	id 'idea'
 	id 'maven-publish'
 
+	id 'com.matthewprenger.cursegradle' version '1.4.0'
 	id 'com.modrinth.minotaur' version '2.+'
 	id 'net.minecraftforge.gradle' version '5.1.+'
 	id 'org.spongepowered.mixin' version '0.7.+'
@@ -227,6 +228,28 @@ publishing {
 					password System.getenv('APEX_MODS_MAVEN_PASSWORD')
 				}
 			}
+		}
+	}
+}
+
+if(System.getenv('CURSEFORGE_TOKEN') != null) {
+	curseforge {
+		apiKey = System.getenv('CURSEFORGE_TOKEN')
+
+		project {
+			id = "${mod_curseforge_id}"
+			releaseType = "${mod_release_type}"
+			addGameVersion "${minecraft_version}"
+			changelogType = 'markdown'
+			changelog = file('.github/CHANGELOG.md').text
+
+			mainArtifact tasks.jarJar
+			addArtifact sourcesJar
+			addArtifact jar
+		}
+
+		options {
+			detectNewerJava = true
 		}
 	}
 }
