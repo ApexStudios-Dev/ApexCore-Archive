@@ -388,6 +388,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
+      - name: Download Changelog
+        uses: actions/download-artifact@v2
+        with:
+          name: changelog
+          path: .github
+
       - name: Setup Java
         uses: actions/setup-java@v2
         with:
