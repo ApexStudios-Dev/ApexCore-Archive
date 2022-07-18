@@ -17,6 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     outputs:
+      mod_id: ${{ steps.mod_name.outputs.value }}
       mod_name: ${{ steps.mod_name.outputs.value }}
       mod_version: ${{ steps.mod_version.outputs.value }}
       mod_release_type: ${{ steps.mod_release_type.outputs.value }}
@@ -32,6 +33,13 @@ jobs:
 
       - name: Unshallow Repository
         run: git fetch --prune --unshallow
+
+      - name: Mod ID
+        id: mod_id
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: './gradle.properties'
+          property: 'mod_id'
 
       - name: Mod Name
         id: mod_name
@@ -93,6 +101,7 @@ jobs:
 
       - name: View Variables
         run: |
+          echo "'mod_id': => '${{ steps.mod_id.outputs.value }}'"
           echo "'mod_name': => '${{ steps.mod_name.outputs.value }}'"
           echo "'mod_version': => '${{ steps.mod_version.outputs.value }}'"
           echo "'mod_release_type': => '${{ steps.mod_release_type.outputs.value }}'"
