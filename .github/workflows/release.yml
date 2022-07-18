@@ -354,8 +354,8 @@ jobs:
           token: ${{ secrets.CURSEFORGE_TOKEN }}
           project_id: ${{ needs.vars.outputs.mod_curseforge_id }}
           game_endpoint: minecraft
-          file_path: './build/libs/${{ steps.filename.outputs.fullpath }}'
-          game_versions: java:Java ${{ matrix.java }},Forge
+          file_path: './build/libs/${{ needs.vars.outputs.mod_id }}-${{ needs.vars.outputs.minecraft_version }}-${{ needs.vars.outputs.mod_version }}.jar'
+          game_versions: java:Java ${{ matrix.java }},Forge,Minecraft ${{ needs.vars.outputs.minecraft_version }},${{ needs.vars.outputs.minecraft_version }}
           release_type: ${{ needs.vars.outputs.mod_release_type }}
           display_name: '${{ needs.vars.outputs.mod_name }} - ${{ needs.vars.outputs.mod_version }} (${{ needs.vars.outputs.minecraft_version }}-${{ needs.vars.outputs.forge_version }})'
           changelog: ${{ steps.changelog.outputs.changelog }}
