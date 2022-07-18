@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     outputs:
-      mod_id: ${{ steps.mod_name.outputs.value }}
+      mod_id: ${{ steps.mod_id.outputs.value }}
       mod_name: ${{ steps.mod_name.outputs.value }}
       mod_version: ${{ steps.mod_version.outputs.value }}
       mod_release_type: ${{ steps.mod_release_type.outputs.value }}
