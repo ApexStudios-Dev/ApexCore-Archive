@@ -258,6 +258,7 @@ jobs:
         java: [ 17 ]
 
     runs-on: ${{ matrix.os }}
+    needs: [ compile ]
 
     steps:
       - name: Install JQ
@@ -379,6 +380,7 @@ jobs:
         java: [ 17 ]
 
     runs-on: ${{ matrix.os }}
+    needs: [ compile, changelog ]
 
     steps:
       - name: Install JQ
