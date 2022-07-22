@@ -19,8 +19,6 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
 import xyz.apex.forge.apexcore.lib.block.MultiBlockPattern;
-import xyz.apex.forge.apexcore.lib.block.entity.InventoryBlockEntity;
-import xyz.apex.forge.apexcore.lib.net.SyncContainerPacket;
 import xyz.apex.java.utility.api.function.QuadFunction;
 
 public class BaseMenu extends AbstractContainerMenu
@@ -54,8 +52,6 @@ public class BaseMenu extends AbstractContainerMenu
 
 		if(blockEntity != null)
 			blockEntity.setChanged();
-		if(blockEntity instanceof InventoryBlockEntity inventoryBlockEntity)
-			SyncContainerPacket.sendToClient(inventoryBlockEntity);
 	}
 
 	@Override
