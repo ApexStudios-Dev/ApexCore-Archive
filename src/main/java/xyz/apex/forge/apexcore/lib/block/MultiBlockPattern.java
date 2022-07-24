@@ -14,11 +14,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 
+import xyz.apex.forge.apexcore.lib.util.function.QuadFunction;
+import xyz.apex.forge.apexcore.lib.util.function.QuadPredicate;
+
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public final class MultiBlockPattern
 {
@@ -344,47 +345,6 @@ public final class MultiBlockPattern
 		public MultiBlockPattern build()
 		{
 			return new MultiBlockPattern(this);
-		}
-	}
-
-	@FunctionalInterface
-	public interface QuadFunction<A, B, C, D, RESULT>
-	{
-		RESULT apply(A a, B b, C c, D d);
-
-		default <RETURN> QuadFunction<A, B, C, D, RETURN> andThen(Function<? super RESULT, ? extends RETURN> after)
-		{
-			Objects.requireNonNull(after);
-			return (a, b, c, d) -> after.apply(apply(a, b, c, d));
-		}
-	}
-
-	@FunctionalInterface
-	public interface QuadPredicate<A, B, C, D> extends QuadFunction<A, B, C, D, Boolean>
-	{
-		boolean test(A a, B b, C c, D d);
-
-		@Override
-		default Boolean apply(A a, B b, C c, D d)
-		{
-			return test(a, b, c, d);
-		}
-
-		default QuadPredicate<A, B, C, D> and(QuadPredicate<? super A, ? super B, ? super C, ? super D> other)
-		{
-			Objects.requireNonNull(other);
-			return (a, b, c, d) -> test(a, b, c, d) && other.test(a, b, c, d);
-		}
-
-		default QuadPredicate<A, B, C, D> negate()
-		{
-			return (a, b, c, d) -> !test(a, b, c, d);
-		}
-
-		default QuadPredicate<A, B, C, D> or(QuadPredicate<? super A, ? super B, ? super C, ? super D> other)
-		{
-			Objects.requireNonNull(other);
-			return (a, b, c, d) -> test(a, b, c, d) || other.test(a, b, c, d);
 		}
 	}
 }

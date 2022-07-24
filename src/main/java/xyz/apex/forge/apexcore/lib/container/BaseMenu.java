@@ -18,7 +18,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
-import xyz.apex.forge.apexcore.lib.block.MultiBlockPattern;
+import xyz.apex.forge.apexcore.lib.util.function.QuadFunction;
 
 public abstract class BaseMenu extends AbstractContainerMenu
 {
@@ -153,7 +153,7 @@ public abstract class BaseMenu extends AbstractContainerMenu
 		return getItemHandlerFromBlockEntity(blockEntity, null);
 	}
 
-	public static void bindItemHandlerSlots(BaseMenu menu, IItemHandler itemHandler, int rows, int cols, int x, int y, MultiBlockPattern.QuadFunction<IItemHandler, Integer, Integer, Integer, SlotItemHandler> slotFactory)
+	public static void bindItemHandlerSlots(BaseMenu menu, IItemHandler itemHandler, int rows, int cols, int x, int y, QuadFunction<IItemHandler, Integer, Integer, Integer, SlotItemHandler> slotFactory)
 	{
 		for(var j = 0; j < rows; j++)
 		{
