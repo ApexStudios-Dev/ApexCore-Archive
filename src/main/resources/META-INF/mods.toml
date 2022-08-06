@@ -11,7 +11,7 @@ issueTrackerURL="https://github.com/ApexStudios-Dev/ApexCore/issues"
 	displayURL="https://apexstudios.dev/apexcore"
 	logoFile="banner.png"
 	credits="Apex - Programming"
-	authors="Apex"
+	authors="ApexStudios"
 	description="Utility mod for all of Apex's mods."
 	displayTest="MATCH_VERSION"
 
