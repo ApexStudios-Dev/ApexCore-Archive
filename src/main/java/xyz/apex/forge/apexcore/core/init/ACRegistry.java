@@ -2,6 +2,7 @@ package xyz.apex.forge.apexcore.core.init;
 
 import com.tterrag.registrate.AbstractRegistrate;
 
+import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import xyz.apex.forge.commonality.Mods;
@@ -12,6 +13,8 @@ public final class ACRegistry extends AbstractRegistrate<ACRegistry>
 {
 	public static final ACRegistry INSTANCE = new ACRegistry();
 	private static boolean bootstrap = false;
+
+	public static final EnchantmentCategory ENCHANTMENT_CATEGORY_NONE = EnchantmentCategory.create("%s:none".formatted(Mods.APEX_CORE), item -> false);
 
 	private ACRegistry()
 	{
