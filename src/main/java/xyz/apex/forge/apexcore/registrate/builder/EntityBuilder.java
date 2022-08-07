@@ -110,6 +110,12 @@ public final class EntityBuilder<
 		return this;
 	}
 
+	public EntityBuilder<OWNER, ENTITY, PARENT> category(MobCategory mobCategory)
+	{
+		this.mobCategory = mobCategory;
+		return this;
+	}
+
 	public EntityBuilder<OWNER, ENTITY, PARENT> spawnPlacement(SpawnPlacements.Type spawnPlacementType, Heightmap.Types heightMapType, SpawnPlacements.SpawnPredicate<ENTITY> spawnPredicate)
 	{
 		spawnPlacementData = new SpawnPlacementData<>(spawnPlacementType, heightMapType, spawnPredicate);
