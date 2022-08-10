@@ -97,7 +97,7 @@ public final class CreativeScreenHandler
 			var tabCount = categories.size();
 
 			if(tabCount > MAX_CATEGORY_TAB)
-				maxCategoryTabPages = (int) Math.ceil((tabCount - MAX_CATEGORY_TAB) / (MAX_CATEGORY_TAB - 2D));
+				maxCategoryTabPages = (int) Math.ceil((tabCount - MAX_CATEGORY_TAB) / 10D);
 		}
 	}
 
@@ -513,7 +513,7 @@ public final class CreativeScreenHandler
 		if(tabIndex < MAX_CATEGORY_TAB)
 			return 0;
 
-		return ((tabIndex - MAX_CATEGORY_TAB) / (MAX_CATEGORY_TAB - 2)) + 1;
+		return ((tabIndex - MAX_CATEGORY_TAB) / 10) + 1;
 	}
 
 	private static int getTabU(ItemGroupCategoryManager manager, ItemGroupCategory category)
