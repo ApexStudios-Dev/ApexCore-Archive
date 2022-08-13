@@ -42,7 +42,7 @@ issueTrackerURL="https://github.com/ApexStudios-Dev/ApexCore/issues"
 [[dependencies.apexcore]]
 	modId="jei"
 	mandatory=false
-	versionRange="[11.2.0.241,)"
+	versionRange="[11.2.0.247,)"
 	ordering="AFTER"
 	side="BOTH"
 	[dependencies.apexcore.custom.mc-publish]
