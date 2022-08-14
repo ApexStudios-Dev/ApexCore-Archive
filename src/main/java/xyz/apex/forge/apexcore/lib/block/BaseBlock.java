@@ -427,19 +427,22 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 		@Override
 		public void onRemove(BlockState blockState, Level level, BlockPos pos, BlockState newBlockState, boolean isMoving)
 		{
-			var blockEntity = getBlockEntity(blockState, level, pos);
-
-			if(blockEntity != null)
+			if(!blockState.is(newBlockState.getBlock()))
 			{
-				blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(itemHandler -> {
-					var blockEntityPos = getBlockEntityPos(blockState, pos);
+				var blockEntity = getBlockEntity(blockState, level, pos);
 
-					for(var i = 0; i < itemHandler.getSlots(); i++)
-					{
-						var stack = itemHandler.getStackInSlot(i);
-						Containers.dropItemStack(level, blockEntityPos.getX(), blockEntityPos.getY(), blockEntityPos.getZ(), stack);
-					}
-				});
+				if(blockEntity != null)
+				{
+					blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(itemHandler -> {
+						var blockEntityPos = getBlockEntityPos(blockState, pos);
+
+						for(var i = 0; i < itemHandler.getSlots(); i++)
+						{
+							var stack = itemHandler.getStackInSlot(i);
+							Containers.dropItemStack(level, blockEntityPos.getX(), blockEntityPos.getY(), blockEntityPos.getZ(), stack);
+						}
+					});
+				}
 			}
 
 			super.onRemove(blockState, level, pos, newBlockState, isMoving);
