@@ -12,7 +12,7 @@ issueTrackerURL="https://github.com/ApexStudios-Dev/ApexCore/issues"
 	logoFile="banner.png"
 	credits="Apex - Programming"
 	authors="ApexStudios"
-	description="Utility mod for all of Apex's mods."
+	description="Library Mod required by all of our Mods"
 	displayTest="MATCH_VERSION"
 
 [[dependencies.apexcore]]
