@@ -8,11 +8,12 @@ issueTrackerURL="https://github.com/ApexStudios-Dev/ApexCore/issues"
 	version="${file.jarVersion}"
 	displayName="ApexCore"
 	updateJSONURL="https://raw.githubusercontent.com/ApexStudios-Dev/Version/master/apexcore.json"
-	displayURL="https://www.curseforge.com/minecraft/mc-mods/apexcore"
+	displayURL="https://apexstudios.dev/apexcore"
 	logoFile="banner.png"
 	credits="Apex - Programming"
-	authors="Apex"
-	description="Utility mod for all of Apex's mods."
+	authors="ApexStudios"
+	description="Library Mod required by all of our Mods"
+	displayTest="MATCH_VERSION"
 
 [[dependencies.apexcore]]
 	modId="forge"
@@ -20,15 +21,29 @@ issueTrackerURL="https://github.com/ApexStudios-Dev/ApexCore/issues"
 	versionRange="[40.1.60,41)"
 	ordering="AFTER"
 	side="BOTH"
+	[dependencies.apexcore.custom.mc-publish]
+		ignore=true
 [[dependencies.apexcore]]
 	modId="minecraft"
 	mandatory=true
 	versionRange="[1.18.2,1.19)"
 	ordering="AFTER"
 	side="BOTH"
+	[dependencies.apexcore.custom.mc-publish]
+		ignore=true
+[[dependencies.apexcore]]
+	modId="commonality"
+	mandatory=true
+	versionRange="[1.2.1,2.0.0)"
+	ordering="AFTER"
+	side="BOTH"
+	[dependencies.apexcore.custom.mc-publish]
+		ignore=true
 [[dependencies.apexcore]]
 	modId="jei"
 	mandatory=false
 	versionRange="[10.1.3.+,)"
 	ordering="AFTER"
 	side="BOTH"
+	[dependencies.apexcore.custom.mc-publish]
+		curseforge="jei"
