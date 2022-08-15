@@ -83,13 +83,13 @@ public final class NetworkManager
 		var packetType = packet.packet.getClass();
 		Validate.isTrue(packetIdMap.containsKey(packetType), "Attempt to encode unregistered PacketType: '%s'", packetType);
 		var packetId = packetIdMap.get(packetType);
-		buffer.writeInt(packetId);
+		buffer.writeVarInt(packetId);
 		packet.packet.encode(buffer);
 	}
 
 	private PacketHolder decodePacket(FriendlyByteBuf buffer)
 	{
-		var packetId = buffer.readInt();
+		var packetId = buffer.readVarInt();
 		var packetType = packetIdMap.inverse().get(packetId);
 		AbstractPacket packet = null;
 

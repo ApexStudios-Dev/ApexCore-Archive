@@ -20,10 +20,10 @@ import net.minecraftforge.items.SlotItemHandler;
 
 import xyz.apex.forge.apexcore.lib.util.function.QuadFunction;
 
-public abstract class BaseMenu extends AbstractContainerMenu
+public class BaseMenu extends AbstractContainerMenu
 {
-	protected final Player player;
-	protected final BlockPos pos;
+	public final Player player;
+	public final BlockPos pos;
 
 	public BaseMenu(@Nullable MenuType<? extends BaseMenu> menuType, int windowId, Inventory playerInventory, FriendlyByteBuf buffer)
 	{
@@ -179,12 +179,12 @@ public abstract class BaseMenu extends AbstractContainerMenu
 		bindPlayerInventory(menu, x, y, Slot::new);
 	}
 
-	public static void bindPlayerInventory(BaseMenu menu, SlotFactory factory)
+	public static void bindPlayerInventory(BaseMenu menu, QuadFunction<Container, Integer, Integer, Integer, Slot> factory)
 	{
 		bindPlayerInventory(menu, 8, 84, factory);
 	}
 
-	public static void bindPlayerInventory(BaseMenu menu, int x, int y, SlotFactory factory)
+	public static void bindPlayerInventory(BaseMenu menu, int x, int y, QuadFunction<Container, Integer, Integer, Integer, Slot> factory)
 	{
 		var playerInventory = menu.player.getInventory();
 
@@ -192,19 +192,13 @@ public abstract class BaseMenu extends AbstractContainerMenu
 		{
 			for(int j = 0; j < 9; j++)
 			{
-				menu.addSlot(factory.create(playerInventory, j + i * 9 + 9, x + j * 18, y + i * 18));
+				menu.addSlot(factory.apply(playerInventory, j + i * 9 + 9, x + j * 18, y + i * 18));
 			}
 		}
 
 		for(int i = 0; i < 9; ++i)
 		{
-			menu.addSlot(factory.create(playerInventory, i, x + i * 18, y + 58));
+			menu.addSlot(factory.apply(playerInventory, i, x + i * 18, y + 58));
 		}
-	}
-
-	@FunctionalInterface
-	public interface SlotFactory
-	{
-		Slot create(Container container, int slotIndex, int x, int y);
 	}
 }

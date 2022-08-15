@@ -2,16 +2,24 @@ package xyz.apex.forge.apexcore.core.init;
 
 import com.tterrag.registrate.AbstractRegistrate;
 
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.enchantment.EnchantmentCategory;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import xyz.apex.forge.commonality.Mods;
+import xyz.apex.forge.commonality.tags.BlockTags;
 
+import static com.tterrag.registrate.providers.ProviderType.BLOCK_TAGS;
 import static com.tterrag.registrate.providers.ProviderType.LANG;
 
 public final class ACRegistry extends AbstractRegistrate<ACRegistry>
 {
 	public static final ACRegistry INSTANCE = new ACRegistry();
 	private static boolean bootstrap = false;
+
+	public static final EnchantmentCategory ENCHANTMENT_CATEGORY_NONE = EnchantmentCategory.create("%s:none".formatted(Mods.APEX_CORE), item -> false);
+	public static final TagKey<Block> TAG_VISUALIZER = BlockTags.tag(Mods.APEX_CORE, "visualizer");
 
 	private ACRegistry()
 	{
@@ -29,6 +37,8 @@ public final class ACRegistry extends AbstractRegistrate<ACRegistry>
 			provider.add(ACItemGroupCategories.WOOLS.getCategoryNameKey(), "Wools");
 			provider.add(ACItemGroupCategories.LOGS.getCategoryNameKey(), "Logs");
 		});
+
+		addDataGenerator(BLOCK_TAGS, provider -> provider.tag(TAG_VISUALIZER));
 	}
 
 	public static void bootstrap()

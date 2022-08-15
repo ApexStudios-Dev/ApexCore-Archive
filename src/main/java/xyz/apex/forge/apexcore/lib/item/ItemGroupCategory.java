@@ -14,6 +14,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.util.Lazy;
 
+import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
+
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -130,6 +132,12 @@ public final class ItemGroupCategory implements Predicate<ItemStack>
 	}
 
 	public <T extends AbstractRegistrate<T>> ItemGroupCategory addTranslationGenerator(T registrator, String englishName)
+	{
+		registrator.addDataGenerator(LANG, provider -> provider.add(getCategoryNameKey(), englishName));
+		return this;
+	}
+
+	public <T extends CoreRegistrate<T>> ItemGroupCategory addTranslationGenerator(T registrator, String englishName)
 	{
 		registrator.addDataGenerator(LANG, provider -> provider.add(getCategoryNameKey(), englishName));
 		return this;

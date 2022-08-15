@@ -33,7 +33,12 @@ public class BaseMenuScreen<MENU extends AbstractContainerMenu> extends Abstract
 	{
 		renderBackground(pose);
 		super.render(pose, mouseX, mouseY, partialTicks);
+		renderFg(pose, partialTicks, mouseX, mouseY);
 		renderTooltip(pose, mouseX, mouseY);
+	}
+
+	protected void renderFg(PoseStack pose, float partialTicks, int mouseX, int mouseY)
+	{
 	}
 
 	@Override

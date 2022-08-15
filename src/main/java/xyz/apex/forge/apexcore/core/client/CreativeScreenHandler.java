@@ -2,7 +2,6 @@ package xyz.apex.forge.apexcore.core.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -51,7 +50,7 @@ public final class CreativeScreenHandler
 	@Nullable private static Button buttonNextCategoryPage;
 
 	@SubscribeEvent
-	public static void onScreenInit(ScreenEvent.InitScreenEvent event)
+	public static void onScreenInit(ScreenEvent.InitScreenEvent.Post event)
 	{
 		if(event.getScreen() instanceof CreativeModeInventoryScreen screen)
 		{
@@ -72,8 +71,8 @@ public final class CreativeScreenHandler
 
 	private static void updatePages(CreativeModeInventoryScreen screen, @Nullable CreativeModeTab itemGroup)
 	{
-		Validate.notNull(buttonPreviousCategoryPage);
-		Validate.notNull(buttonNextCategoryPage);
+		if(buttonNextCategoryPage == null || buttonPreviousCategoryPage == null)
+			return;
 
 		var leftPos = screen.getGuiLeft();
 		var topPos = screen.getGuiTop();
@@ -99,7 +98,7 @@ public final class CreativeScreenHandler
 			var tabCount = categories.size();
 
 			if(tabCount > MAX_CATEGORY_TAB)
-				maxCategoryTabPages = (int) Math.ceil((tabCount - MAX_CATEGORY_TAB) / (MAX_CATEGORY_TAB - 2D));
+				maxCategoryTabPages = (int) Math.ceil((tabCount - MAX_CATEGORY_TAB) / 10D);
 		}
 	}
 
@@ -515,7 +514,7 @@ public final class CreativeScreenHandler
 		if(tabIndex < MAX_CATEGORY_TAB)
 			return 0;
 
-		return ((tabIndex - MAX_CATEGORY_TAB) / (MAX_CATEGORY_TAB - 2)) + 1;
+		return ((tabIndex - MAX_CATEGORY_TAB) / 10) + 1;
 	}
 
 	private static int getTabU(ItemGroupCategoryManager manager, ItemGroupCategory category)
