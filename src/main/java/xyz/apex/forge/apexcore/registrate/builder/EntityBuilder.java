@@ -136,7 +136,7 @@ public final class EntityBuilder<
 	public ItemBuilder<OWNER, ForgeSpawnEggItem, EntityBuilder<OWNER, ENTITY, PARENT>> spawnEgg(int backgroundColor, int highlightColor)
 	{
 		return owner
-				.item(this, "%s_%s".formatted(name, SPAWN_EGG_SUFFIX), properties -> new ForgeSpawnEggItem((Supplier<? extends EntityType<? extends Mob>>) (Supplier) asSupplier(), backgroundColor, highlightColor, properties))
+				.item(this, "%s%s".formatted(name, SPAWN_EGG_SUFFIX), properties -> new ForgeSpawnEggItem((Supplier<? extends EntityType<? extends Mob>>) (Supplier) asSupplier(), backgroundColor, highlightColor, properties))
 				.transform(ItemBuilder::applySpawnEggItemDefaults)
 		;
 	}
