@@ -1,6 +1,6 @@
 <div align="center">
 
-<a href="https://apexstudios.dev/apexcore"><img src="https://github.com/ApexStudios-Dev/.github/blob/master/apexcore_banner.png?raw=true"></a>
+<a href="https://apexstudios.dev/apexcore"><img src="./src/main/resources/banner.png"></a>
 
 <h1><i><b>Library Mod required by all of ApexStudios' mods</b></i></h1>
 <br>
