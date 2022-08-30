@@ -12,8 +12,10 @@ import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.world.item.CreativeModeTab;
 
 import xyz.apex.forge.apexcore.core.client.CreativeScreenHandler;
+import xyz.apex.forge.commonality.SideOnly;
 
 @Mixin(CreativeModeInventoryScreen.class)
+@SideOnly(SideOnly.Side.CLIENT)
 public abstract class CreativeScreenMixin
 {
 	@Shadow private float scrollOffs;

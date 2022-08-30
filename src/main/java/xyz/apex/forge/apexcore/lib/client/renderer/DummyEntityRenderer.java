@@ -10,6 +10,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
+import xyz.apex.forge.commonality.SideOnly;
+
+@SideOnly(SideOnly.Side.CLIENT)
 public class DummyEntityRenderer<ENTITY extends Entity> extends EntityRenderer<ENTITY>
 {
 	public DummyEntityRenderer(EntityRendererProvider.Context ctx)

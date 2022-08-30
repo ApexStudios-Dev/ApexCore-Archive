@@ -4,7 +4,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.eventbus.api.Event;
 
 import xyz.apex.forge.apexcore.core.client.BlockVisualizer;
+import xyz.apex.forge.commonality.SideOnly;
 
+@SideOnly(SideOnly.Side.CLIENT)
 public class BlockVisualizerEvent extends Event
 {
 	private final BlockVisualizer.Context context;

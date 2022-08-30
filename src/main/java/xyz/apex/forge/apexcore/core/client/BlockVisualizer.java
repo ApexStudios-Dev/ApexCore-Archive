@@ -40,11 +40,13 @@ import xyz.apex.forge.apexcore.lib.block.MultiBlockPattern;
 import xyz.apex.forge.apexcore.lib.event.client.BlockVisualizerEvent;
 import xyz.apex.forge.apexcore.lib.util.RegistryHelper;
 import xyz.apex.forge.commonality.Mods;
+import xyz.apex.forge.commonality.SideOnly;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
 
 @Mod.EventBusSubscriber(modid = Mods.APEX_CORE, value = Dist.CLIENT)
+@SideOnly(SideOnly.Side.CLIENT)
 public final class BlockVisualizer
 {
 	@Nullable private static MultiBufferSource.BufferSource ghostBuffers = null;

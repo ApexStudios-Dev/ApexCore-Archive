@@ -10,8 +10,10 @@ import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 
 import xyz.apex.forge.apexcore.core.client.CreativeScreenHandler;
+import xyz.apex.forge.commonality.SideOnly;
 
 @Mixin(EffectRenderingInventoryScreen.class)
+@SideOnly(SideOnly.Side.CLIENT)
 public abstract class DisplayEffectsScreenMixin
 {
 	@Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)

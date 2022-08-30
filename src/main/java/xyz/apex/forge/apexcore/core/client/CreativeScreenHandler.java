@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.Mod;
 import xyz.apex.forge.apexcore.lib.item.ItemGroupCategory;
 import xyz.apex.forge.apexcore.lib.item.ItemGroupCategoryManager;
 import xyz.apex.forge.commonality.Mods;
+import xyz.apex.forge.commonality.SideOnly;
 
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -33,6 +34,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 // Simple offloading class to allow hot swapping while using mixins
 @Mod.EventBusSubscriber(modid = Mods.APEX_CORE, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@SideOnly(SideOnly.Side.CLIENT)
 public final class CreativeScreenHandler
 {
 	private static final ResourceLocation CATEGORY_TABS_TEXTURE = new ResourceLocation(Mods.APEX_CORE, "textures/gui/container/creative_inventory/category_tabs.png");

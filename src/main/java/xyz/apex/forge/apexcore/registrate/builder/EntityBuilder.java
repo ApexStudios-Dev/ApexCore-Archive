@@ -7,6 +7,7 @@ import com.tterrag.registrate.util.OneTimeEventReceiver;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -31,7 +32,6 @@ import xyz.apex.forge.apexcore.registrate.builder.factory.EntityFactory;
 import xyz.apex.forge.apexcore.registrate.entry.EntityEntry;
 import xyz.apex.forge.apexcore.registrate.holder.EntityHolder;
 
-import javax.annotation.Nullable;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
