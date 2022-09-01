@@ -16,6 +16,8 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.FastColor;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -26,6 +28,7 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.RenderTypeHelper;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.common.MinecraftForge;
@@ -129,26 +132,26 @@ public final class BlockVisualizer
 
 		var direction = result.getDirection();
 		var renderPos = pos.relative(direction);
-		var ctx = new BlockVisualizer.Context(placeState, level, renderPos, player, hand, stack, direction);
+		var ctx = new BlockVisualizer.Context(placeState, level, renderPos, player, hand, stack, direction, 0);
 
 		if(defaultState)
-			ctx = modifyBlockState(ctx, BlockVisualizerEvent.ModifyBlockState.Reason.DEFAULT_BLOCKSTATE);
+			ctx = modifyBlockState(ctx, BlockVisualizerEvent.ModifyContext.Reason.DEFAULT_BLOCKSTATE);
 
-		ctx = modifyBlockState(ctx, BlockVisualizerEvent.ModifyBlockState.Reason.EXISTING_BLOCKSTATE);
+		ctx = modifyBlockState(ctx, BlockVisualizerEvent.ModifyContext.Reason.EXISTING_BLOCKSTATE);
 		placeState = BaseBlock.setWaterLogged(ctx.blockState, false);
 		return ctx.with(placeState);
 	}
 
-	private static Context modifyBlockState(Context ctx, BlockVisualizerEvent.ModifyBlockState.Reason reason)
+	private static Context modifyBlockState(Context ctx, BlockVisualizerEvent.ModifyContext.Reason reason)
 	{
-		var event = new BlockVisualizerEvent.ModifyBlockState(ctx, reason);
+		var event = new BlockVisualizerEvent.ModifyContext(ctx, reason);
 		MinecraftForge.EVENT_BUS.post(event);
-		var blockState = event.getBlockState();
+		ctx = event.getContext();
 
-		if(reason == BlockVisualizerEvent.ModifyBlockState.Reason.DEFAULT_BLOCKSTATE && blockState.getBlock() instanceof IMultiBlock multiBlock)
-			blockState = multiBlock.setMultiBlockIndex(blockState, MultiBlockPattern.INDEX_ORIGIN);
+		if(reason == BlockVisualizerEvent.ModifyContext.Reason.DEFAULT_BLOCKSTATE && ctx.blockState.getBlock() instanceof IMultiBlock multiBlock)
+			ctx = ctx.with(multiBlock.setMultiBlockIndex(ctx.blockState, MultiBlockPattern.INDEX_ORIGIN));
 
-		return ctx.with(blockState);
+		return ctx;
 	}
 
 	private static void renderBlock(Minecraft mc, BlockVisualizer.Context ctx, PoseStack pose, MultiBufferSource.BufferSource bufferSource)
@@ -197,46 +200,77 @@ public final class BlockVisualizer
 
 		pose.translate(x, y, z);
 		pose.pushPose();
-		mc.getBlockRenderer().renderSingleBlock(ctx.blockState, pose, bufferSource, LightTexture.FULL_BLOCK, overlay, ModelData.EMPTY, null);
+
+		var blockRenderer = mc.getBlockRenderer();
+
+		if(ctx.blockState.getRenderShape() == RenderShape.MODEL)
+		{
+			var model = blockRenderer.getBlockModel(ctx.blockState);
+			var blockColor = mc.getBlockColors().getColor(ctx.blockState, null, null, ctx.tintIndex);
+			var r = FastColor.ARGB32.red(blockColor) / 255F;
+			var g = FastColor.ARGB32.green(blockColor) / 255F;
+			var b = FastColor.ARGB32.blue(blockColor) / 255F;
+
+			for(var renderType : model.getRenderTypes(ctx.blockState, RandomSource.create(42), ModelData.EMPTY))
+			{
+				var last = pose.last();
+				var buffer = bufferSource.getBuffer(RenderTypeHelper.getEntityRenderType(renderType, false));
+
+				blockRenderer.getModelRenderer().renderModel(
+						last, buffer, ctx.blockState, model,
+						r, g, b,
+						LightTexture.FULL_BLOCK, overlay,
+						ModelData.EMPTY, renderType
+				);
+			}
+		}
+		else
+			blockRenderer.renderSingleBlock(ctx.blockState, pose, bufferSource, LightTexture.FULL_BLOCK, overlay, ModelData.EMPTY, null);
+
 		pose.popPose();
 		pose.translate(-x, -y, -z);
 	}
 
-	public record Context(BlockState blockState, ClientLevel level, BlockPos pos, LocalPlayer player, InteractionHand hand, ItemStack stack, Direction face)
+	public record Context(BlockState blockState, ClientLevel level, BlockPos pos, LocalPlayer player, InteractionHand hand, ItemStack stack, Direction face, int tintIndex)
 	{
 		public Context with(BlockState blockState)
 		{
-			return new Context(blockState, level, pos, player, hand, stack, face);
+			return new Context(blockState, level, pos, player, hand, stack, face, tintIndex);
 		}
 
 		public Context with(ClientLevel level)
 		{
-			return new Context(blockState, level, pos, player, hand, stack, face);
+			return new Context(blockState, level, pos, player, hand, stack, face, tintIndex);
 		}
 
 		public Context with(BlockPos pos)
 		{
-			return new Context(blockState, level, pos, player, hand, stack, face);
+			return new Context(blockState, level, pos, player, hand, stack, face, tintIndex);
 		}
 
 		public Context with(LocalPlayer player)
 		{
-			return new Context(blockState, level, pos, player, hand, stack, face);
+			return new Context(blockState, level, pos, player, hand, stack, face, tintIndex);
 		}
 
 		public Context with(InteractionHand hand)
 		{
-			return new Context(blockState, level, pos, player, hand, stack, face);
+			return new Context(blockState, level, pos, player, hand, stack, face, tintIndex);
 		}
 
 		public Context with(ItemStack stack)
 		{
-			return new Context(blockState, level, pos, player, hand, stack, face);
+			return new Context(blockState, level, pos, player, hand, stack, face, tintIndex);
 		}
 
 		public Context with(Direction face)
 		{
-			return new Context(blockState, level, pos, player, hand, stack, face);
+			return new Context(blockState, level, pos, player, hand, stack, face, tintIndex);
+		}
+
+		public Context with(int tintIndex)
+		{
+			return new Context(blockState, level, pos, player, hand, stack, face, tintIndex);
 		}
 	}
 
