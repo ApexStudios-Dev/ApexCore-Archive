@@ -121,13 +121,22 @@ public final class BlockVisualizer
 
 	private static Context getRenderBlockState(ClientLevel level, LocalPlayer player, InteractionHand hand, ItemStack stack, Block block, BlockPos pos, BlockHitResult result)
 	{
-		var placeState = block.getStateForPlacement(new BlockPlaceContext(new UseOnContext(level, player, hand, stack, result)));
+		var placeContext = new BlockPlaceContext(new UseOnContext(level, player, hand, stack, result));
+		var placeState = block.getStateForPlacement(placeContext);
 		var defaultState = false;
 
 		if(placeState == null)
 		{
 			defaultState = true;
 			placeState = block.defaultBlockState();
+
+			if(placeState.getBlock() instanceof BaseBlock base && BaseBlock.supportsFacing(placeState))
+			{
+				var facing = base.getFourWayFacing(placeContext);
+
+				if(facing != null)
+					placeState = BaseBlock.setFacing(placeState, facing);
+			}
 		}
 
 		var direction = result.getDirection();
@@ -169,6 +178,12 @@ public final class BlockVisualizer
 				var worldPos = multiBlock.getMultiBlockWorldSpaceFromLocalSpace(ctx.blockState, origin, localPos);
 				var renderState = multiBlock.setMultiBlockIndex(ctx.blockState, i);
 				var worldState = ctx.level.getBlockState(worldPos);
+
+				if(!renderState.canSurvive(ctx.level, worldPos))
+				{
+					isValid = false;
+					break;
+				}
 
 				if(!multiBlock.getMultiBlockPattern().passesPlacementTests(multiBlock, ctx.level, worldPos, renderState, worldState))
 				{
