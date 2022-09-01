@@ -1,13 +1,12 @@
 package xyz.apex.forge.apexcore.lib.event.client;
 
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.eventbus.api.Event;
 
 import xyz.apex.forge.apexcore.core.client.BlockVisualizer;
 
 public class BlockVisualizerEvent extends Event
 {
-	private final BlockVisualizer.Context context;
+	private BlockVisualizer.Context context;
 
 	protected BlockVisualizerEvent(BlockVisualizer.Context context)
 	{
@@ -17,6 +16,11 @@ public class BlockVisualizerEvent extends Event
 	public final BlockVisualizer.Context getContext()
 	{
 		return context;
+	}
+
+	protected void setContext(BlockVisualizer.Context context)
+	{
+		this.context = context;
 	}
 
 	public static class Render extends BlockVisualizerEvent
@@ -53,27 +57,21 @@ public class BlockVisualizerEvent extends Event
 		}
 	}
 
-	public static class ModifyBlockState extends BlockVisualizerEvent
+	public static class ModifyContext extends BlockVisualizerEvent
 	{
 		public final Reason reason;
-		private BlockState blockState;
 
-		public ModifyBlockState(BlockVisualizer.Context context, Reason reason)
+		public ModifyContext(BlockVisualizer.Context context, Reason reason)
 		{
 			super(context);
 
 			this.reason = reason;
-			blockState = context.blockState();
 		}
 
-		public BlockState getBlockState()
+		@Override
+		public void setContext(BlockVisualizer.Context context)
 		{
-			return blockState;
-		}
-
-		public void setBlockState(BlockState blockState)
-		{
-			this.blockState = blockState;
+			super.setContext(context);
 		}
 
 		public enum Reason

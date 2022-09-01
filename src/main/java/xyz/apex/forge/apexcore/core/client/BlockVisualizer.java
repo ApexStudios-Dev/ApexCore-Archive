@@ -10,12 +10,14 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -116,37 +118,46 @@ public final class BlockVisualizer
 
 	private static Context getRenderBlockState(ClientLevel level, LocalPlayer player, InteractionHand hand, ItemStack stack, Block block, BlockPos pos, BlockHitResult result)
 	{
-		var placeState = block.getStateForPlacement(new BlockPlaceContext(new UseOnContext(level, player, hand, stack, result)));
+		var placeContext = new BlockPlaceContext(new UseOnContext(level, player, hand, stack, result));
+		var placeState = block.getStateForPlacement(placeContext);
 		var defaultState = false;
 
 		if(placeState == null)
 		{
 			defaultState = true;
 			placeState = block.defaultBlockState();
+
+			if(placeState.getBlock() instanceof BaseBlock base && BaseBlock.supportsFacing(placeState))
+			{
+				var facing = base.getFourWayFacing(placeContext);
+
+				if(facing != null)
+					placeState = BaseBlock.setFacing(placeState, facing);
+			}
 		}
 
 		var direction = result.getDirection();
 		var renderPos = pos.relative(direction);
-		var ctx = new BlockVisualizer.Context(placeState, level, renderPos, player, hand, stack, direction);
+		var ctx = new BlockVisualizer.Context(placeState, level, renderPos, player, hand, stack, direction, 0);
 
 		if(defaultState)
-			ctx = modifyBlockState(ctx, BlockVisualizerEvent.ModifyBlockState.Reason.DEFAULT_BLOCKSTATE);
+			ctx = modifyBlockState(ctx, BlockVisualizerEvent.ModifyContext.Reason.DEFAULT_BLOCKSTATE);
 
-		ctx = modifyBlockState(ctx, BlockVisualizerEvent.ModifyBlockState.Reason.EXISTING_BLOCKSTATE);
+		ctx = modifyBlockState(ctx, BlockVisualizerEvent.ModifyContext.Reason.EXISTING_BLOCKSTATE);
 		placeState = BaseBlock.setWaterLogged(ctx.blockState, false);
 		return ctx.with(placeState);
 	}
 
-	private static Context modifyBlockState(Context ctx, BlockVisualizerEvent.ModifyBlockState.Reason reason)
+	private static Context modifyBlockState(Context ctx, BlockVisualizerEvent.ModifyContext.Reason reason)
 	{
-		var event = new BlockVisualizerEvent.ModifyBlockState(ctx, reason);
+		var event = new BlockVisualizerEvent.ModifyContext(ctx, reason);
 		MinecraftForge.EVENT_BUS.post(event);
-		var blockState = event.getBlockState();
+		ctx = event.getContext();
 
-		if(reason == BlockVisualizerEvent.ModifyBlockState.Reason.DEFAULT_BLOCKSTATE && blockState.getBlock() instanceof IMultiBlock multiBlock)
-			blockState = multiBlock.setMultiBlockIndex(blockState, MultiBlockPattern.INDEX_ORIGIN);
+		if(reason == BlockVisualizerEvent.ModifyContext.Reason.DEFAULT_BLOCKSTATE && ctx.blockState.getBlock() instanceof IMultiBlock multiBlock)
+			ctx = ctx.with(multiBlock.setMultiBlockIndex(ctx.blockState, MultiBlockPattern.INDEX_ORIGIN));
 
-		return ctx.with(blockState);
+		return ctx;
 	}
 
 	private static void renderBlock(Minecraft mc, BlockVisualizer.Context ctx, PoseStack pose, MultiBufferSource.BufferSource bufferSource)
@@ -164,6 +175,12 @@ public final class BlockVisualizer
 				var worldPos = multiBlock.getMultiBlockWorldSpaceFromLocalSpace(ctx.blockState, origin, localPos);
 				var renderState = multiBlock.setMultiBlockIndex(ctx.blockState, i);
 				var worldState = ctx.level.getBlockState(worldPos);
+
+				if(!renderState.canSurvive(ctx.level, worldPos))
+				{
+					isValid = false;
+					break;
+				}
 
 				if(!multiBlock.getMultiBlockPattern().passesPlacementTests(multiBlock, ctx.level, worldPos, renderState, worldState))
 				{
@@ -195,46 +212,73 @@ public final class BlockVisualizer
 
 		pose.translate(x, y, z);
 		pose.pushPose();
-		mc.getBlockRenderer().renderSingleBlock(ctx.blockState, pose, bufferSource, LightTexture.FULL_BLOCK, overlay, EmptyModelData.INSTANCE);
+
+		var blockRenderer = mc.getBlockRenderer();
+
+		if(ctx.blockState.getRenderShape() == RenderShape.MODEL)
+		{
+			var model = blockRenderer.getBlockModel(ctx.blockState);
+			var blockColor = mc.getBlockColors().getColor(ctx.blockState, null, null, ctx.tintIndex);
+			var r = FastColor.ARGB32.red(blockColor) / 255F;
+			var g = FastColor.ARGB32.green(blockColor) / 255F;
+			var b = FastColor.ARGB32.blue(blockColor) / 255F;
+
+			var last = pose.last();
+			var buffer = bufferSource.getBuffer(ItemBlockRenderTypes.getRenderType(ctx.blockState, false));
+
+			blockRenderer.getModelRenderer().renderModel(
+					last, buffer, ctx.blockState, model,
+					r, g, b,
+					LightTexture.FULL_BLOCK, overlay, EmptyModelData.INSTANCE
+			);
+		}
+		else
+			blockRenderer.renderSingleBlock(ctx.blockState, pose, bufferSource, LightTexture.FULL_BLOCK, overlay, EmptyModelData.INSTANCE);
+
 		pose.popPose();
 		pose.translate(-x, -y, -z);
 	}
 
-	public record Context(BlockState blockState, ClientLevel level, BlockPos pos, LocalPlayer player, InteractionHand hand, ItemStack stack, Direction face)
+	public record Context(BlockState blockState, ClientLevel level, BlockPos pos, LocalPlayer player, InteractionHand hand, ItemStack stack, Direction face, int tintIndex)
 	{
 		public Context with(BlockState blockState)
 		{
-			return new Context(blockState, level, pos, player, hand, stack, face);
+			return new Context(blockState, level, pos, player, hand, stack, face, tintIndex);
 		}
 
 		public Context with(ClientLevel level)
 		{
-			return new Context(blockState, level, pos, player, hand, stack, face);
+			return new Context(blockState, level, pos, player, hand, stack, face, tintIndex);
 		}
 
 		public Context with(BlockPos pos)
 		{
-			return new Context(blockState, level, pos, player, hand, stack, face);
+			return new Context(blockState, level, pos, player, hand, stack, face, tintIndex);
 		}
 
 		public Context with(LocalPlayer player)
 		{
-			return new Context(blockState, level, pos, player, hand, stack, face);
+			return new Context(blockState, level, pos, player, hand, stack, face, tintIndex);
 		}
 
 		public Context with(InteractionHand hand)
 		{
-			return new Context(blockState, level, pos, player, hand, stack, face);
+			return new Context(blockState, level, pos, player, hand, stack, face, tintIndex);
 		}
 
 		public Context with(ItemStack stack)
 		{
-			return new Context(blockState, level, pos, player, hand, stack, face);
+			return new Context(blockState, level, pos, player, hand, stack, face, tintIndex);
 		}
 
 		public Context with(Direction face)
 		{
-			return new Context(blockState, level, pos, player, hand, stack, face);
+			return new Context(blockState, level, pos, player, hand, stack, face, tintIndex);
+		}
+
+		public Context with(int tintIndex)
+		{
+			return new Context(blockState, level, pos, player, hand, stack, face, tintIndex);
 		}
 	}
 
