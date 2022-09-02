@@ -139,8 +139,13 @@ public final class BlockVisualizer
 			}
 		}
 
+		var levelState = level.getBlockState(pos);
+		var renderPos = pos;
 		var direction = result.getDirection();
-		var renderPos = pos.relative(direction);
+
+		if(!levelState.canBeReplaced(placeContext))
+			renderPos = pos.relative(direction);
+
 		var ctx = new BlockVisualizer.Context(placeState, level, renderPos, player, hand, stack, direction, 0);
 
 		if(defaultState)
