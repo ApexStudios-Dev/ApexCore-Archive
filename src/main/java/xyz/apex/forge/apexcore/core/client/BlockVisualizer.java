@@ -170,12 +170,12 @@ public final class BlockVisualizer
 
 	private static void renderBlock(Minecraft mc, BlockVisualizer.Context ctx, PoseStack pose, MultiBufferSource.BufferSource bufferSource)
 	{
+		var isValid = true;
+
 		if(ctx.blockState.getBlock() instanceof IMultiBlock multiBlock)
 		{
 			var origin = multiBlock.getMultiBlockOriginPos(ctx.blockState, ctx.pos);
 			var localPositions = multiBlock.getMultiBlockLocalPositions();
-
-			var isValid = true;
 
 			for(var i = 0; i < localPositions.size(); i++)
 			{
@@ -196,8 +196,21 @@ public final class BlockVisualizer
 					break;
 				}
 			}
+		}
+		else
+		{
+			var worldState = ctx.level.getBlockState(ctx.pos);
 
-			var overlay = isValid ? OverlayTexture.NO_OVERLAY : OverlayTexture.pack(OverlayTexture.NO_WHITE_U, OverlayTexture.RED_OVERLAY_V);
+			if(!worldState.getMaterial().isReplaceable())
+				isValid = false;
+		}
+
+		var overlay = isValid ? OverlayTexture.NO_OVERLAY : OverlayTexture.pack(OverlayTexture.NO_WHITE_U, OverlayTexture.RED_OVERLAY_V);
+
+		if(ctx.blockState.getBlock() instanceof IMultiBlock multiBlock)
+		{
+			var origin = multiBlock.getMultiBlockOriginPos(ctx.blockState, ctx.pos);
+			var localPositions = multiBlock.getMultiBlockLocalPositions();
 
 			for(var i = 0; i < localPositions.size(); i++)
 			{
@@ -209,14 +222,16 @@ public final class BlockVisualizer
 			}
 		}
 		else
-			renderBlockState(mc, ctx, pose, bufferSource, OverlayTexture.NO_OVERLAY);
+			renderBlockState(mc, ctx, pose, bufferSource, overlay);
 	}
 
 	private static void renderBlockState(Minecraft mc, BlockVisualizer.Context ctx, PoseStack pose, MultiBufferSource.BufferSource bufferSource, int overlay)
 	{
-		var x = ctx.pos.getX();
-		var y = ctx.pos.getY();
-		var z = ctx.pos.getZ();
+		var offset = ctx.blockState.getOffset(ctx.level, ctx.pos);
+
+		var x = ctx.pos.getX() + offset.x;
+		var y = ctx.pos.getY() + offset.y;
+		var z = ctx.pos.getZ() + offset.z;
 
 		pose.translate(x, y, z);
 		pose.pushPose();
