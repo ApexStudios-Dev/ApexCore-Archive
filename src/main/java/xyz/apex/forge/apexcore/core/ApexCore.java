@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.Mod;
 import xyz.apex.forge.apexcore.core.init.ACRegistry;
 import xyz.apex.forge.apexcore.lib.net.NetworkManager;
 import xyz.apex.forge.commonality.Mods;
+import xyz.apex.forge.commonality.trust.TrustManager;
 
 @Mod(Mods.APEX_CORE)
 public final class ApexCore
@@ -17,6 +18,7 @@ public final class ApexCore
 
 	public ApexCore()
 	{
+		TrustManager.throwIfUntrusted(Mods.APEX_CORE);
 		ACRegistry.bootstrap();
 	}
 }
