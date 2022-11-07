@@ -2,6 +2,8 @@ package xyz.apex.forge.apexcore.lib.block;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.errorprone.annotations.DoNotCall;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -247,6 +249,13 @@ public final class MultiBlockPattern
 		}
 
 		return worldSpace;
+	}
+
+	@ApiStatus.Internal
+	@DoNotCall("Provided for internal usages only, should not be used. Use one of the various helper methods to pull data based on the multi-block index")
+	public IntegerProperty getBlockProperty()
+	{
+		return blockProperty;
 	}
 	// endregion
 
