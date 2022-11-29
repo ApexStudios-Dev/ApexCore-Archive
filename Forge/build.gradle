@@ -155,11 +155,11 @@ publishing {
 			artifactId = "${project.archivesBaseName}"
 			version = "${project.version}"
 
-			from components.java
+			artifact jar
+			artifact sourcesJar
 		}
 	}
 	repositories {
-		// mavenLocal()
 		maven { url "file:///${rootProject.projectDir}/maven" }
 
 		if(System.getenv('APEX_MODS_MAVEN_USERNAME') != null && System.getenv('APEX_MODS_MAVEN_PASSWORD') != null) {
