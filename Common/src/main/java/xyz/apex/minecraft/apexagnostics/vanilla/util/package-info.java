@@ -1,0 +1,4 @@
+@MethodsReturnNotNullByDefault
+@FieldsAreNotNullByDefault
+@ParametersAreNotNullByDefault
+package xyz.apex.minecraft.apexagnostics.vanilla.util;
