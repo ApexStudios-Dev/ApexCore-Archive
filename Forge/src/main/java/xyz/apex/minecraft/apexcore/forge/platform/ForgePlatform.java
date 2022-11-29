@@ -1,41 +1,30 @@
-package xyz.apex.minecraft.apexcore.forge;
+package xyz.apex.minecraft.apexcore.forge.platform;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import org.apache.commons.lang3.Validate;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.GameRules;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 
-import xyz.apex.minecraft.apexcore.shared.Platform;
+import xyz.apex.minecraft.apexcore.shared.platform.Platform;
+import xyz.apex.minecraft.apexcore.shared.platform.PlatformGameRulesRegistry;
 import xyz.apex.minecraft.apexcore.shared.registry.ModdedRegistry;
 
-import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 public final class ForgePlatform implements Platform
 {
     private final Table<ResourceKey<? extends Registry<?>>, String, DeferredRegister<?>> modRegistries = HashBasedTable.create();
+    private final ForgeGameRulesRegistry gameRulesRegistry = new ForgeGameRulesRegistry(this);
 
     @Override
-    public <T extends GameRules.Value<T>> GameRules.Key<T> registerGameRule(String gameRuleName, GameRules.Category category, GameRules.Type<T> type)
+    public PlatformGameRulesRegistry gameRules()
     {
-        return GameRules.register(gameRuleName, category, type);
-    }
-
-    @Override
-    public GameRules.Type<GameRules.BooleanValue> registerGameRuleBooleanValue(Boolean defaultValue, BiConsumer<MinecraftServer, GameRules.BooleanValue> changeListener)
-    {
-        return GameRules.BooleanValue.create(defaultValue, changeListener);
-    }
-
-    @Override
-    public GameRules.Type<GameRules.IntegerValue> registerGameRuleIntegerValue(int defaultValue, BiConsumer<MinecraftServer, GameRules.IntegerValue> changeListener)
-    {
-        return GameRules.IntegerValue.create(defaultValue, changeListener);
+        return gameRulesRegistry;
     }
 
     @Override
@@ -52,6 +41,7 @@ public final class ForgePlatform implements Platform
 
         var modRegistry = DeferredRegister.create(type, modId);
         modRegistry.register(FMLJavaModLoadingContext.get().getModEventBus());
+        Validate.isTrue(ModLoadingContext.get().getActiveContainer().getModId().equals(modId), "ForgePlatform#getOrCreateModRegistry must be called during '%s' mod initialization", modId);
         return modRegistry;
     }
 }

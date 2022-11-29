@@ -15,7 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.LazyLoadedValue;
 
-import xyz.apex.minecraft.apexcore.shared.Platform;
+import xyz.apex.minecraft.apexcore.shared.platform.Platform;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.*;
