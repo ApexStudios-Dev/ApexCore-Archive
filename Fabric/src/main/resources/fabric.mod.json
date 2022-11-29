@@ -61,8 +61,7 @@
     },
     "mixins": [
         "${MOD_ID}.mixins.json",
-        "${MOD_ID}-common.mixins.json",
-        "${MOD_ID}-loom.mixins.json"
+        "${MOD_ID}-common.mixins.json"
     ],
     "depends": {
         "minecraft": "~${MINECRAFT_VERSION}",
