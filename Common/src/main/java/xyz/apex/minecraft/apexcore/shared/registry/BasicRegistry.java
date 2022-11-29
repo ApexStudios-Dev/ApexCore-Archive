@@ -1,4 +1,4 @@
-package xyz.apex.minecraft.apexagnostics.vanilla.registry;
+package xyz.apex.minecraft.apexcore.shared.registry;
 
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Maps;
@@ -15,7 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.LazyLoadedValue;
 
-import xyz.apex.minecraft.apexagnostics.vanilla.Platform;
+import xyz.apex.minecraft.apexcore.shared.Platform;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.*;

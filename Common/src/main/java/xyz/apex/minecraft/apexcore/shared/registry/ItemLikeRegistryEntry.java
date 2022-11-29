@@ -1,4 +1,4 @@
-package xyz.apex.minecraft.apexagnostics.vanilla.registry;
+package xyz.apex.minecraft.apexcore.shared.registry;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;

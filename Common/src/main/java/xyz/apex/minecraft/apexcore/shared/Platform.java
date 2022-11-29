@@ -1,11 +1,11 @@
-package xyz.apex.minecraft.apexagnostics.vanilla;
+package xyz.apex.minecraft.apexcore.shared;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
 
-import xyz.apex.minecraft.apexagnostics.vanilla.registry.ModdedRegistry;
+import xyz.apex.minecraft.apexcore.shared.registry.ModdedRegistry;
 
 import java.util.ServiceLoader;
 import java.util.function.BiConsumer;

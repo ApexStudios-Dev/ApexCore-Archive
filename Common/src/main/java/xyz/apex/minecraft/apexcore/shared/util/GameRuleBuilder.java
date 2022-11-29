@@ -1,4 +1,4 @@
-package xyz.apex.minecraft.apexagnostics.vanilla.util;
+package xyz.apex.minecraft.apexcore.shared.util;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
 
-import xyz.apex.minecraft.apexagnostics.vanilla.Platform;
+import xyz.apex.minecraft.apexcore.shared.Platform;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;

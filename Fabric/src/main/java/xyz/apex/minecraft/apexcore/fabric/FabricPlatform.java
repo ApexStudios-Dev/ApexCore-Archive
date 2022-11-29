@@ -1,4 +1,4 @@
-package xyz.apex.minecraft.apexagnostics.fabric;
+package xyz.apex.minecraft.apexcore.fabric;
 
 import com.google.common.base.Suppliers;
 import net.fabricmc.api.EnvType;
@@ -11,8 +11,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
 
-import xyz.apex.minecraft.apexagnostics.vanilla.Platform;
-import xyz.apex.minecraft.apexagnostics.vanilla.registry.ModdedRegistry;
+import xyz.apex.minecraft.apexcore.shared.Platform;
+import xyz.apex.minecraft.apexcore.shared.registry.ModdedRegistry;
 
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;

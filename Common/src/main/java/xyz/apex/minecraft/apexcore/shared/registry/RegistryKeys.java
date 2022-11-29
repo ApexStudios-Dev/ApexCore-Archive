@@ -1,4 +1,4 @@
-package xyz.apex.minecraft.apexagnostics.vanilla.registry;
+package xyz.apex.minecraft.apexcore.shared.registry;
 
 import com.mojang.serialization.Codec;
 

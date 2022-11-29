@@ -1,4 +1,4 @@
-package xyz.apex.minecraft.apexagnostics.forge;
+package xyz.apex.minecraft.apexcore.forge;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -10,8 +10,8 @@ import net.minecraft.world.level.GameRules;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 
-import xyz.apex.minecraft.apexagnostics.vanilla.Platform;
-import xyz.apex.minecraft.apexagnostics.vanilla.registry.ModdedRegistry;
+import xyz.apex.minecraft.apexcore.shared.Platform;
+import xyz.apex.minecraft.apexcore.shared.registry.ModdedRegistry;
 
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -45,7 +45,7 @@ public final class ForgePlatform implements Platform
         return registry.register(key.location().getPath(), factory);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "ConstantConditions" })
     private <T> DeferredRegister<T> getOrCreateModRegistry(ResourceKey<? extends Registry<T>> type, String modId)
     {
         if(modRegistries.contains(type, modId)) return (DeferredRegister<T>) modRegistries.get(type, modId);

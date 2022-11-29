@@ -1,4 +1,4 @@
-package xyz.apex.minecraft.apexagnostics.vanilla.registry;
+package xyz.apex.minecraft.apexcore.shared.registry;
 
 import com.google.common.base.Suppliers;
 import org.apache.commons.compress.utils.Lists;
@@ -42,6 +42,7 @@ public class BasicRegistryEntry<T> implements RegistryEntry<T>
         holder = Suppliers.memoize(() -> (Holder<T>) getVanillaRegistry().getHolder((ResourceKey) key).orElseThrow());
     }
 
+    @SuppressWarnings("ConstantConditions")
     private T onRegisterInternal()
     {
         if(!isPresent)

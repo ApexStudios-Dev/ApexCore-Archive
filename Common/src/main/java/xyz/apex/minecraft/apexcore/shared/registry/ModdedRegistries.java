@@ -1,4 +1,4 @@
-package xyz.apex.minecraft.apexagnostics.vanilla.registry;
+package xyz.apex.minecraft.apexcore.shared.registry;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;
@@ -19,7 +19,7 @@ public final class ModdedRegistries
     private final Table<ResourceKey<? extends Registry<?>>, String, ModdedRegistry<?>> registryTable = HashBasedTable.create();
     private final Map<ResourceKey<?>, List<ModdedRegistry.RegisterCallback<?>>> registerCallbackMap = Maps.newHashMap();
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "ConstantConditions" })
     public  <T, R extends ModdedRegistry<T>> R getOrCreate(ResourceKey<Registry<T>> type, String modId, Constructor<T, R> constructor)
     {
         if(INSTANCE.registryTable.contains(type, modId)) return (R) INSTANCE.registryTable.get(type, modId);
