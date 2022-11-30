@@ -6,25 +6,16 @@ import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
 
-import xyz.apex.minecraft.apexcore.shared.platform.Platform;
 import xyz.apex.minecraft.apexcore.shared.platform.PlatformGameRulesRegistry;
 
 import java.util.function.BiConsumer;
 
 @SuppressWarnings("NullableProblems")
-public final class FabricGameRulesRegistry implements PlatformGameRulesRegistry
+public final class FabricGameRulesRegistry extends FabricHolder implements PlatformGameRulesRegistry
 {
-    private final FabricPlatform platform;
-
     FabricGameRulesRegistry(FabricPlatform platform)
     {
-        this.platform = platform;
-    }
-
-    @Override
-    public Platform platform()
-    {
-        return platform;
+        super(platform);
     }
 
     @Override

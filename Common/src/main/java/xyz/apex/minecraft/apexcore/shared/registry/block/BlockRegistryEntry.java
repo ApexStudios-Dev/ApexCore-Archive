@@ -1,4 +1,4 @@
-package xyz.apex.minecraft.apexcore.shared.registry;
+package xyz.apex.minecraft.apexcore.shared.registry.block;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -7,6 +7,9 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+
+import xyz.apex.minecraft.apexcore.shared.registry.ModdedRegistry;
+import xyz.apex.minecraft.apexcore.shared.registry.item.ItemLikeRegistryEntry;
 
 import java.util.function.Supplier;
 

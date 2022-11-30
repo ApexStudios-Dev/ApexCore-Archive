@@ -1,4 +1,4 @@
-package xyz.apex.minecraft.apexcore.shared.registry;
+package xyz.apex.minecraft.apexcore.shared.registry.item;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -6,6 +6,10 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+
+import xyz.apex.minecraft.apexcore.shared.registry.BasicRegistry;
+import xyz.apex.minecraft.apexcore.shared.registry.ModdedRegistries;
+import xyz.apex.minecraft.apexcore.shared.registry.RegistryKeys;
 
 import java.util.function.Supplier;
 

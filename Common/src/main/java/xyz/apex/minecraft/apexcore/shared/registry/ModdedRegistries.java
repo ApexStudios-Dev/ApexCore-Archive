@@ -4,6 +4,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import org.apache.commons.compress.utils.Lists;
+import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -14,7 +15,8 @@ import java.util.function.Function;
 
 public final class ModdedRegistries
 {
-    static final ModdedRegistries INSTANCE = new ModdedRegistries();
+    @ApiStatus.Internal // internal usages only, modders should never use this
+    public static final ModdedRegistries INSTANCE = new ModdedRegistries();
 
     private final Table<ResourceKey<? extends Registry<?>>, String, ModdedRegistry<?>> registryTable = HashBasedTable.create();
     private final Map<ResourceKey<?>, List<ModdedRegistry.RegisterCallback<?>>> registerCallbackMap = Maps.newHashMap();

@@ -3,18 +3,15 @@ package xyz.apex.minecraft.apexcore.forge.platform;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
 
-import xyz.apex.minecraft.apexcore.shared.platform.Platform;
 import xyz.apex.minecraft.apexcore.shared.platform.PlatformGameRulesRegistry;
 
 import java.util.function.BiConsumer;
 
-public final class ForgeGameRulesRegistry implements PlatformGameRulesRegistry
+public final class ForgeGameRulesRegistry extends ForgeHolder implements PlatformGameRulesRegistry
 {
-    private final ForgePlatform platform;
-
     ForgeGameRulesRegistry(ForgePlatform platform)
     {
-        this.platform = platform;
+        super(platform);
     }
 
     @Override
@@ -33,11 +30,5 @@ public final class ForgeGameRulesRegistry implements PlatformGameRulesRegistry
     public GameRules.Type<GameRules.IntegerValue> createIntegerType(int defaultValue, BiConsumer<MinecraftServer, GameRules.IntegerValue> changeListener)
     {
         return GameRules.IntegerValue.create(defaultValue, changeListener);
-    }
-
-    @Override
-    public Platform platform()
-    {
-        return platform;
     }
 }

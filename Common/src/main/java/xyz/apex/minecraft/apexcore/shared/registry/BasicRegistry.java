@@ -132,7 +132,7 @@ public class BasicRegistry<T> implements ModdedRegistry<T>
 
         var entry = createRegistryEntry((ResourceKey<R>) key, supplier);
         ref.set(entry);
-        Platform.INSTANCE.register(asVanilla(), this, key, entry);
+        Platform.registries().register(asVanilla(), this, key, entry);
 
         entryMap.put(key, (RegistryEntry<T>) entry);
         keyMap.put((RegistryEntry<T>) entry, key);

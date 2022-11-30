@@ -1,9 +1,11 @@
-package xyz.apex.minecraft.apexcore.shared.registry;
+package xyz.apex.minecraft.apexcore.shared.registry.item;
 
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
+
+import xyz.apex.minecraft.apexcore.shared.registry.ModdedRegistry;
 
 import java.util.function.Supplier;
 

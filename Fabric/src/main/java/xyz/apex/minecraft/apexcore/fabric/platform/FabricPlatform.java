@@ -1,20 +1,13 @@
 package xyz.apex.minecraft.apexcore.fabric.platform;
 
-import com.google.common.base.Suppliers;
-
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
-
-import xyz.apex.minecraft.apexcore.shared.platform.Platform;
+import xyz.apex.minecraft.apexcore.shared.platform.ModPlatform;
 import xyz.apex.minecraft.apexcore.shared.platform.PlatformGameRulesRegistry;
-import xyz.apex.minecraft.apexcore.shared.registry.ModdedRegistry;
+import xyz.apex.minecraft.apexcore.shared.platform.PlatformRegistry;
 
-import java.util.function.Supplier;
-
-@SuppressWarnings("NullableProblems")
-public final class FabricPlatform implements Platform
+public final class FabricPlatform implements ModPlatform
 {
     private final FabricGameRulesRegistry gameRulesRegistry = new FabricGameRulesRegistry(this);
+    private final FabricRegistry registry = new FabricRegistry(this);
 
     @Override
     public PlatformGameRulesRegistry gameRules()
@@ -23,9 +16,8 @@ public final class FabricPlatform implements Platform
     }
 
     @Override
-    public <T, R extends T> Supplier<R> register(Registry<T> vanilla, ModdedRegistry<T> modded, ResourceKey<T> key, Supplier<R> factory)
+    public PlatformRegistry registries()
     {
-        var value = Registry.register(vanilla, key, factory.get());
-        return Suppliers.memoize(() -> value);
+        return registry;
     }
 }
