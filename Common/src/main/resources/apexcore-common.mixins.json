@@ -1,7 +1,9 @@
 {
     "required": true,
     "package": "${APEX_GROUP}.${MOD_ID}.shared.mixin",
-    "mixins": [ "MixinExplosion" ],
+    "mixins": [
+        "MixinExplosion", "MixinItem"
+    ],
     "client": [ ],
     "server": [ ],
     "minVersion": "${MIXIN_VERSION}"

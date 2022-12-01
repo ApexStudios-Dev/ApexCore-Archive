@@ -22,7 +22,7 @@ public final class ModdedRegistries
     private final Map<ResourceKey<?>, List<ModdedRegistry.RegisterCallback<?>>> registerCallbackMap = Maps.newHashMap();
 
     @SuppressWarnings({ "unchecked", "ConstantConditions" })
-    public  <T, R extends ModdedRegistry<T>> R getOrCreate(ResourceKey<Registry<T>> type, String modId, Constructor<T, R> constructor)
+    public <T, R extends ModdedRegistry<T>> R getOrCreate(ResourceKey<Registry<T>> type, String modId, Constructor<T, R> constructor)
     {
         if(INSTANCE.registryTable.contains(type, modId)) return (R) INSTANCE.registryTable.get(type, modId);
 
@@ -39,7 +39,7 @@ public final class ModdedRegistries
         registerCallbackMap.clear();
     }
 
-    public static <T> ModdedRegistry<T> create(ResourceKey<Registry<T>> type, String modId)
+    public static <T> ModdedRegistry<T> get(ResourceKey<Registry<T>> type, String modId)
     {
         return INSTANCE.<T, ModdedRegistry<T>>getOrCreate(type, modId, BasicRegistry::new);
     }

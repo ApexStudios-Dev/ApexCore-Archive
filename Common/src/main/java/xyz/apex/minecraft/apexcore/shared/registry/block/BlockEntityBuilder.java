@@ -11,9 +11,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import xyz.apex.minecraft.apexcore.shared.platform.Platform;
-import xyz.apex.minecraft.apexcore.shared.registry.ModdedRegistries;
-import xyz.apex.minecraft.apexcore.shared.registry.RegistryEntry;
-import xyz.apex.minecraft.apexcore.shared.registry.RegistryKeys;
+import xyz.apex.minecraft.apexcore.shared.registry.ModdedRegistry;
+import xyz.apex.minecraft.apexcore.shared.registry.RegistryEntryBuilder;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -21,18 +20,16 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
-public final class BlockEntityBuilder<T extends BlockEntity>
+public final class BlockEntityBuilder<T extends BlockEntity> extends RegistryEntryBuilder<BlockEntityType<?>, BlockEntityType<T>>
 {
     private final TriFunction<BlockEntityType<T>, BlockPos, BlockState, T> factory;
-    private final String name;
-    private final String modId;
 
     private final List<Supplier<Block>> validBlocks = Lists.newArrayList();
 
-    private BlockEntityBuilder(String modId, String name, TriFunction<BlockEntityType<T>, BlockPos, BlockState, T> factory)
+    private BlockEntityBuilder(ModdedRegistry<BlockEntityType<?>> registry, String name, TriFunction<BlockEntityType<T>, BlockPos, BlockState, T> factory)
     {
-        this.modId = modId;
-        this.name = name;
+        super(registry, name);
+
         this.factory = factory;
     }
 
@@ -56,17 +53,17 @@ public final class BlockEntityBuilder<T extends BlockEntity>
     }
 
     @SuppressWarnings("unchecked")
-    public RegistryEntry<BlockEntityType<T>> register()
+    @Override
+    protected BlockEntityType<T> build()
     {
-        return ModdedRegistries.create(RegistryKeys.BLOCK_ENTITY_TYPE, modId).register(name, () -> {
-            var blocks = ImmutableList.copyOf(validBlocks);
-            var ref = new AtomicReference<BlockEntityType<T>>();
-            return (BlockEntityType<T>) Platform.registries().blockEntityType(modId, name, (pos, blockState) -> factory.apply(ref.get(), pos, blockState), blocks, ref::set);
-        });
+        var blocks = ImmutableList.copyOf(validBlocks);
+        var ref = new AtomicReference<BlockEntityType<T>>();
+        var modId = registry.getRegistryName().getNamespace();
+        return (BlockEntityType<T>) Platform.registries().blockEntityType(modId, name, (pos, blockState) -> factory.apply(ref.get(), pos, blockState), blocks, ref::set);
     }
 
-    public static <T extends BlockEntity> BlockEntityBuilder<T> create(String modId, String name, TriFunction<BlockEntityType<T>, BlockPos, BlockState, T> factory)
+    public static <T extends BlockEntity> BlockEntityBuilder<T> create(ModdedRegistry<BlockEntityType<?>> registry, String name, TriFunction<BlockEntityType<T>, BlockPos, BlockState, T> factory)
     {
-        return new BlockEntityBuilder<>(modId, name, factory);
+        return new BlockEntityBuilder<>(registry, name, factory);
     }
 }
