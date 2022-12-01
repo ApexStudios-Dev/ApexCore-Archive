@@ -38,32 +38,32 @@ public final class ItemRegistry extends BasicRegistry<Item>
         return builder(name, Item::new);
     }
 
-    public <T extends Item, B extends Block> ItemBuilder<T> blockBuilder(String name, Supplier<B> block, BiFunction<B, Item.Properties, T> factory)
+    public <T extends Item, B extends Block> ItemBuilder<T> blockBuilder(String name, Supplier<? extends B> block, BiFunction<B, Item.Properties, T> factory)
     {
         return builder(name, properties -> factory.apply(block.get(), properties));
     }
 
-    public <T extends Item, B extends Block> ItemBuilder<T> blockBuilder(RegistryEntry<B> block, BiFunction<B, Item.Properties, T> factory)
+    public <T extends Item, B extends Block> ItemBuilder<T> blockBuilder(RegistryEntry<? extends B> block, BiFunction<B, Item.Properties, T> factory)
     {
         return blockBuilder(block.getRegistryName().getPath(), block, factory);
     }
 
-    public <T extends Item, B extends Block> ItemBuilder<T> blockBuilder(BlockRegistryEntry<B> block, BiFunction<B, Item.Properties, T> factory)
+    public <T extends Item, B extends Block> ItemBuilder<T> blockBuilder(BlockRegistryEntry<? extends B> block, BiFunction<B, Item.Properties, T> factory)
     {
         return blockBuilder(block.getRegistryName().getPath(), block, factory);
     }
 
-    public ItemBuilder<BlockItem> genericBlockBuilder(String name, Supplier<Block> block)
+    public ItemBuilder<BlockItem> genericBlockBuilder(String name, Supplier<? extends Block> block)
     {
         return blockBuilder(name, block, BlockItem::new);
     }
 
-    public ItemBuilder<BlockItem> genericBlockBuilder(RegistryEntry<Block> block)
+    public ItemBuilder<BlockItem> genericBlockBuilder(RegistryEntry<? extends Block> block)
     {
         return genericBlockBuilder(block.getRegistryName().getPath(), block);
     }
 
-    public ItemBuilder<BlockItem> genericBlockBuilder(BlockRegistryEntry<Block> block)
+    public ItemBuilder<BlockItem> genericBlockBuilder(BlockRegistryEntry<? extends Block> block)
     {
         return genericBlockBuilder(block.getRegistryName().getPath(), block);
     }
