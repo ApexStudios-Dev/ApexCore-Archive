@@ -5,12 +5,18 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
 import xyz.apex.minecraft.apexcore.shared.registry.BasicRegistry;
 import xyz.apex.minecraft.apexcore.shared.registry.ModdedRegistries;
+import xyz.apex.minecraft.apexcore.shared.registry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.shared.registry.RegistryKeys;
+import xyz.apex.minecraft.apexcore.shared.registry.block.BlockRegistryEntry;
 
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class ItemRegistry extends BasicRegistry<Item>
@@ -20,6 +26,46 @@ public final class ItemRegistry extends BasicRegistry<Item>
     private ItemRegistry(String modId)
     {
         super(TYPE, modId);
+    }
+
+    public <T extends Item> ItemBuilder<T> builder(String name, Function<Item.Properties, T> factory)
+    {
+        return new ItemBuilder<>(this, name, factory);
+    }
+
+    public ItemBuilder<Item> genericBuilder(String name)
+    {
+        return builder(name, Item::new);
+    }
+
+    public <T extends Item, B extends Block> ItemBuilder<T> blockBuilder(String name, Supplier<B> block, BiFunction<B, Item.Properties, T> factory)
+    {
+        return builder(name, properties -> factory.apply(block.get(), properties));
+    }
+
+    public <T extends Item, B extends Block> ItemBuilder<T> blockBuilder(RegistryEntry<B> block, BiFunction<B, Item.Properties, T> factory)
+    {
+        return blockBuilder(block.getRegistryName().getPath(), block, factory);
+    }
+
+    public <T extends Item, B extends Block> ItemBuilder<T> blockBuilder(BlockRegistryEntry<B> block, BiFunction<B, Item.Properties, T> factory)
+    {
+        return blockBuilder(block.getRegistryName().getPath(), block, factory);
+    }
+
+    public ItemBuilder<BlockItem> genericBlockBuilder(String name, Supplier<Block> block)
+    {
+        return blockBuilder(name, block, BlockItem::new);
+    }
+
+    public ItemBuilder<BlockItem> genericBlockBuilder(RegistryEntry<Block> block)
+    {
+        return genericBlockBuilder(block.getRegistryName().getPath(), block);
+    }
+
+    public ItemBuilder<BlockItem> genericBlockBuilder(BlockRegistryEntry<Block> block)
+    {
+        return genericBlockBuilder(block.getRegistryName().getPath(), block);
     }
 
     @Override

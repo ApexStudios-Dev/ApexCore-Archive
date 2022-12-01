@@ -6,11 +6,13 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import xyz.apex.minecraft.apexcore.shared.registry.BasicRegistry;
 import xyz.apex.minecraft.apexcore.shared.registry.ModdedRegistries;
 import xyz.apex.minecraft.apexcore.shared.registry.RegistryKeys;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class BlockRegistry extends BasicRegistry<Block>
@@ -20,6 +22,16 @@ public final class BlockRegistry extends BasicRegistry<Block>
     private BlockRegistry(String modId)
     {
         super(TYPE, modId);
+    }
+
+    public <T extends Block> BlockBuilder<T> builder(String name, Function<BlockBehaviour.Properties, T> factory)
+    {
+        return new BlockBuilder<>(this, name, factory);
+    }
+
+    public BlockBuilder<Block> generic(String name)
+    {
+        return builder(name, Block::new);
     }
 
     @Override

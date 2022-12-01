@@ -1,7 +1,5 @@
 package xyz.apex.minecraft.apexcore.shared.registry.block;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
@@ -13,7 +11,6 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 
 import xyz.apex.minecraft.apexcore.shared.registry.RegistryEntryBuilder;
-import xyz.apex.minecraft.apexcore.shared.registry.item.ItemBuilder;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -26,9 +23,7 @@ public final class BlockBuilder<T extends Block> extends RegistryEntryBuilder<Bl
     private Supplier<BlockBehaviour.Properties> properties = () -> BlockBehaviour.Properties.copy(Blocks.STONE);
     private Function<BlockBehaviour.Properties, BlockBehaviour.Properties> propertiesModifier = UnaryOperator.identity();
 
-    @Nullable private ItemBuilder<?> itemBuilder = null;
-
-    private BlockBuilder(BlockRegistry registry, String name, Function<BlockBehaviour.Properties, T> factory)
+    BlockBuilder(BlockRegistry registry, String name, Function<BlockBehaviour.Properties, T> factory)
     {
         super(registry, name);
 
@@ -208,15 +203,5 @@ public final class BlockBuilder<T extends Block> extends RegistryEntryBuilder<Bl
     public BlockRegistryEntry<T> register()
     {
         return (BlockRegistryEntry<T>) super.register();
-    }
-
-    public static <T extends Block> BlockBuilder<T> builder(BlockRegistry registry, String name, Function<BlockBehaviour.Properties, T> factory)
-    {
-        return new BlockBuilder<>(registry, name, factory);
-    }
-
-    public static BlockBuilder<Block> generic(BlockRegistry registry, String name)
-    {
-        return builder(registry, name, Block::new);
     }
 }

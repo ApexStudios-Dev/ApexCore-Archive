@@ -1,15 +1,15 @@
 package xyz.apex.minecraft.apexcore.shared.registry.item;
 
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.block.Block;
 
 import xyz.apex.minecraft.apexcore.shared.hooks.ItemHooks;
-import xyz.apex.minecraft.apexcore.shared.registry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.shared.registry.RegistryEntryBuilder;
 
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -20,7 +20,7 @@ public final class ItemBuilder<T extends Item> extends RegistryEntryBuilder<Item
     private Supplier<Item.Properties> properties = () -> ItemHooks.copyProperties(Items.STONE);
     private Function<Item.Properties, Item.Properties> propertiesModifier = UnaryOperator.identity();
 
-    private ItemBuilder(ItemRegistry registry, String name, Function<Item.Properties, T> factory)
+    ItemBuilder(ItemRegistry registry, String name, Function<Item.Properties, T> factory)
     {
         super(registry, name);
 
@@ -95,25 +95,5 @@ public final class ItemBuilder<T extends Item> extends RegistryEntryBuilder<Item
     public ItemRegistryEntry<T> register()
     {
         return (ItemRegistryEntry<T>) super.register();
-    }
-
-    public static <T extends Item> ItemBuilder<T> builder(ItemRegistry registry, String name, Function<Item.Properties, T> factory)
-    {
-        return new ItemBuilder<>(registry, name, factory);
-    }
-
-    public static ItemBuilder<Item> generic(ItemRegistry registry, String name)
-    {
-        return builder(registry, name, Item::new);
-    }
-
-    public static <T extends Item, E extends Block> ItemBuilder<T> forBlock(ItemRegistry registry, RegistryEntry<E> block, BiFunction<E, Item.Properties, T> factory)
-    {
-        return builder(registry, block.getRegistryName().getPath(), properties -> factory.apply(block.get(), properties));
-    }
-
-    public static ItemBuilder<BlockItem> forBlockGeneric(ItemRegistry registry, RegistryEntry<Block> block)
-    {
-        return forBlock(registry, block, BlockItem::new);
     }
 }
