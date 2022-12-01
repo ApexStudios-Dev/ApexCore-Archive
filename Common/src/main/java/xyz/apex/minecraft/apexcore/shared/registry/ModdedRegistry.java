@@ -22,7 +22,7 @@ public interface ModdedRegistry<T> extends Iterable<RegistryEntry<T>>, Comparabl
     ResourceKey<T> createKey(ResourceLocation id);
     ResourceKey<T> createKey(String name);
 
-    <R extends T> void addOnRegisterCallback(ResourceKey<T> key, RegisterCallback<R> callback);
+    void addOnRegisterCallback(ResourceKey<T> key, RegisterCallback<T> callback);
 
     <R extends T> RegistryEntry<R> register(ResourceKey<T> key, Supplier<R> factory);
     <R extends T> RegistryEntry<R> register(String name, Supplier<R> factory);

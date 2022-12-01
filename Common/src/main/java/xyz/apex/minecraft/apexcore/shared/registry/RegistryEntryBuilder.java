@@ -1,11 +1,15 @@
 package xyz.apex.minecraft.apexcore.shared.registry;
 
-import javax.annotation.OverridingMethodsMustInvokeSuper;
+import org.apache.commons.compress.utils.Lists;
 
-public abstract class RegistryEntryBuilder<T, E extends T>
+import javax.annotation.OverridingMethodsMustInvokeSuper;
+import java.util.List;
+
+public abstract class RegistryEntryBuilder<T, E extends T, B extends RegistryEntryBuilder<T, E, B>>
 {
     protected final String name;
     protected final ModdedRegistry<T> registry;
+    private final List<ModdedRegistry.RegisterCallback<T>> registerCallbacks = Lists.newArrayList();
 
     protected RegistryEntryBuilder(ModdedRegistry<T> registry, String name)
     {
@@ -13,11 +17,21 @@ public abstract class RegistryEntryBuilder<T, E extends T>
         this.name = name;
     }
 
+    @SuppressWarnings("unchecked")
+    public final B onRegister(ModdedRegistry.RegisterCallback<T> registerCallback)
+    {
+        registerCallbacks.add(registerCallback);
+        return (B) this;
+    }
+
     protected abstract E build();
 
+    @SuppressWarnings("unchecked")
     @OverridingMethodsMustInvokeSuper
     public RegistryEntry<E> register()
     {
-        return registry.register(name, this::build);
+        var entry = registry.register(name, this::build);
+        registerCallbacks.forEach(callback -> entry.addOnRegisterCallback((ModdedRegistry.RegisterCallback<E>) callback));
+        return entry;
     }
 }

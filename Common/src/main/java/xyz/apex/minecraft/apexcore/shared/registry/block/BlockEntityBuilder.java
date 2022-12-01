@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
-public final class BlockEntityBuilder<T extends BlockEntity> extends RegistryEntryBuilder<BlockEntityType<?>, BlockEntityType<T>>
+public final class BlockEntityBuilder<T extends BlockEntity> extends RegistryEntryBuilder<BlockEntityType<?>, BlockEntityType<T>, BlockEntityBuilder<T>>
 {
     private final TriFunction<BlockEntityType<T>, BlockPos, BlockState, T> factory;
 

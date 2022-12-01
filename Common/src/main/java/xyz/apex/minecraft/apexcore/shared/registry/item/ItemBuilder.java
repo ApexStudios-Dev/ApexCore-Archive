@@ -13,7 +13,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-public final class ItemBuilder<T extends Item> extends RegistryEntryBuilder<Item, T>
+public final class ItemBuilder<T extends Item> extends RegistryEntryBuilder<Item, T, ItemBuilder<T>>
 {
     private final Function<Item.Properties, T> factory;
     private Supplier<Item.Properties> properties = Item.Properties::new;

@@ -102,6 +102,17 @@ public class BasicRegistryEntry<T> implements RegistryEntry<T>
     }
 
     @Override
+    public final void addOnRegisterCallback(ModdedRegistry.RegisterCallback<T> callback)
+    {
+        ifPresentOrElse(
+                // immediately invoke the callback if already registered
+                value -> callback.onRegister(key, this, value),
+                // register the callback to be invoked later if not registered
+                () -> callbacks.add(callback)
+        );
+    }
+
+    @Override
     public final T get()
     {
         return onRegisterInternal();

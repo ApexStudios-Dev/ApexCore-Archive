@@ -31,7 +31,7 @@ public class BasicRegistry<T> implements ModdedRegistry<T>
     protected final ResourceLocation name;
     protected final String modId;
 
-    private final Map<ResourceKey<T>, List<RegisterCallback<? extends T>>> entryCallbackMap = Maps.newHashMap();
+    private final Map<ResourceKey<T>, List<RegisterCallback<T>>> entryCallbackMap = Maps.newHashMap();
     private final Map<ResourceKey<T>, RegistryEntry<T>> entryMap = Maps.newHashMap();
     private final Map<RegistryEntry<T>, ResourceKey<T>> keyMap = Maps.newHashMap();
     private final Collection<RegistryEntry<T>> values = Collections.unmodifiableCollection(keyMap.keySet());
@@ -107,9 +107,14 @@ public class BasicRegistry<T> implements ModdedRegistry<T>
     }
 
     @Override
-    public final <R extends T> void addOnRegisterCallback(ResourceKey<T> key, RegisterCallback<R> callback)
+    public final void addOnRegisterCallback(ResourceKey<T> key, RegisterCallback<T> callback)
     {
-        entryCallbackMap.computeIfAbsent(key, $ -> Lists.newArrayList()).add(callback);
+        lookupEntry(key).ifPresentOrElse(
+                // immediately invoke the callback if already registered
+                entry -> callback.onRegister(key, entry, entry.get()),
+                // register the callback to be invoked later if not registered
+                () -> entryCallbackMap.computeIfAbsent(key, $ -> Lists.newArrayList()).add(callback)
+        );
     }
 
     @SuppressWarnings({ "unchecked", "Guava" })

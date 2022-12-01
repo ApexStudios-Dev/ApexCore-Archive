@@ -23,6 +23,8 @@ public interface RegistryEntry<T> extends Comparable<RegistryEntry<?>>, Supplier
     Registry<? super T> getVanillaRegistry();
     Holder<T> getHolder();
 
+    void addOnRegisterCallback(ModdedRegistry.RegisterCallback<T> callback);
+
     @Override T get();
     boolean isPresent();
     void ifPresent(Consumer<? super T> action);

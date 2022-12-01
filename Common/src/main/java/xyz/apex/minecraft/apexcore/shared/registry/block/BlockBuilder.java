@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 import java.util.function.UnaryOperator;
 
-public final class BlockBuilder<T extends Block> extends RegistryEntryBuilder<Block, T>
+public final class BlockBuilder<T extends Block> extends RegistryEntryBuilder<Block, T, BlockBuilder<T>>
 {
     private final Function<BlockBehaviour.Properties, T> factory;
     private Supplier<BlockBehaviour.Properties> properties = () -> BlockBehaviour.Properties.copy(Blocks.STONE);
