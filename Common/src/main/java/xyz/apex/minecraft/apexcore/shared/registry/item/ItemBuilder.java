@@ -3,7 +3,6 @@ package xyz.apex.minecraft.apexcore.shared.registry.item;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.ItemLike;
 
@@ -17,7 +16,7 @@ import java.util.function.UnaryOperator;
 public final class ItemBuilder<T extends Item> extends RegistryEntryBuilder<Item, T>
 {
     private final Function<Item.Properties, T> factory;
-    private Supplier<Item.Properties> properties = () -> ItemHooks.copyProperties(Items.STONE);
+    private Supplier<Item.Properties> properties = Item.Properties::new;
     private Function<Item.Properties, Item.Properties> propertiesModifier = UnaryOperator.identity();
 
     ItemBuilder(ItemRegistry registry, String name, Function<Item.Properties, T> factory)
@@ -87,7 +86,7 @@ public final class ItemBuilder<T extends Item> extends RegistryEntryBuilder<Item
     @Override
     protected T build()
     {
-        var properties = propertiesModifier.apply(this.properties.get());
+        var properties = DefaultedItemProperties.apply(registry.getRegistryName().getNamespace(), this.properties.get(), propertiesModifier);
         return factory.apply(properties);
     }
 
