@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Explosion;
 
-import xyz.apex.minecraft.apexcore.shared.hooks.ExplosionHook;
+import xyz.apex.minecraft.apexcore.shared.hooks.acessors.ExplosionHook;
 
 @Mixin(Explosion.class)
 public abstract class MixinExplosion implements ExplosionHook

@@ -4,6 +4,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.ItemLike;
 
+import xyz.apex.minecraft.apexcore.shared.hooks.acessors.ItemHook;
+
 public interface ItemHooks
 {
     static Rarity getRarity(ItemLike itemLike)
