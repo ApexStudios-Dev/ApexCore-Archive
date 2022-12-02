@@ -11,6 +11,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 
 import xyz.apex.minecraft.apexcore.shared.registry.RegistryEntryBuilder;
+import xyz.apex.minecraft.apexcore.shared.util.FlammabilityRegistry;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -28,6 +29,11 @@ public final class BlockBuilder<T extends Block> extends RegistryEntryBuilder<Bl
         super(registry, name);
 
         this.factory = factory;
+    }
+
+    public BlockBuilder<T> flammability(int burnOdds, int igniteOdds)
+    {
+        return onRegister((key, entry, value) -> FlammabilityRegistry.register(key.location(), burnOdds, igniteOdds));
     }
 
     public BlockBuilder<T> initialProperties(Supplier<BlockBehaviour.Properties> properties)
