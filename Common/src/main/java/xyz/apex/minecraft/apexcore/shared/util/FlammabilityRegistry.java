@@ -21,8 +21,8 @@ public final class FlammabilityRegistry
 
     public static void register(ResourceLocation registryName, int burnOdds, int igniteOdds)
     {
-        Validate.inclusiveBetween(burnOdds, 0, 100, "Burn odds must be between 0-100 (inclusive)");
-        Validate.inclusiveBetween(igniteOdds, 0, 100, "Burn odds must be between 0-100 (inclusive)");
+        Validate.inclusiveBetween(0, 100, burnOdds, "Burn odds must be between 0-100 (inclusive)");
+        Validate.inclusiveBetween(0, 100, igniteOdds, "Burn odds must be between 0-100 (inclusive)");
         Validate.isTrue(!REGISTRY.containsKey(registryName), "Attempt to register duplicate flammability odds %s", registryName);
         LOGGER.info("Registering custom Flammability for Block: {} (BurnOdds: {}, IgniteOdds: {})", registryName, burnOdds, igniteOdds);
         REGISTRY.put(registryName, new Entry(burnOdds, igniteOdds));
