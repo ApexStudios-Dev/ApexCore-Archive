@@ -15,6 +15,38 @@ group = "${APEX_GROUP}.${MOD_ID}.forge"
 version = "${MOD_VERSION}+${MINECRAFT_VERSION}"
 archivesBaseName = "${MOD_ID}-forge"
 
+sourceSets {
+	datagen {
+		compileClasspath += configurations.getByName('minecraft')
+
+		compileClasspath += sourceSets.main.output
+		runtimeClasspath += sourceSets.main.output
+
+		compileClasspath += sourceSets.main.compileClasspath
+		runtimeClasspath += sourceSets.main.runtimeClasspath
+	}
+
+	testmod {
+		compileClasspath += configurations.getByName('minecraft')
+
+		compileClasspath += sourceSets.main.output
+		runtimeClasspath += sourceSets.main.output
+
+		compileClasspath += sourceSets.main.compileClasspath
+		runtimeClasspath += sourceSets.main.runtimeClasspath
+	}
+
+	testmodDatagen {
+		compileClasspath += configurations.getByName('minecraft')
+
+		compileClasspath += sourceSets.main.output
+		runtimeClasspath += sourceSets.main.output
+
+		compileClasspath += sourceSets.main.compileClasspath
+		runtimeClasspath += sourceSets.main.runtimeClasspath
+	}
+}
+
 minecraft {
 	mappings channel: 'parchment', version: "${PARCHMENT_MAPPINGS}-${MINECRAFT_VERSION}"
 	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -25,14 +57,26 @@ minecraft {
 			workingDirectory file('run/client')
 			property 'forge.logging.markers', ''
 			property 'forge.logging.console.level', 'debug'
-			ideaModule "${rootProject.name}.${project.name}.main"
+			ideaModule "${rootProject.name}.${project.name}.testmod"
 
 			mods {
 				"${MOD_ID}" {
 					source sourceSets.main
 					source project(':Common').sourceSets.main
 				}
+
+				"${TEST_MOD_ID}" {
+					source sourceSets.testmod
+					source project(':Common').sourceSets.testmod
+				}
 			}
+		}
+
+		clientLogin {
+			parent runs.client
+			main 'net.covers1624.devlogin.DevLogin'
+			args '--launch_target', '{LAUNCH_TARGET}'
+			lazyToken("LAUNCH_TARGET", { runs.client.main })
 		}
 
 		server {
@@ -41,12 +85,75 @@ minecraft {
 			property 'forge.logging.markers', ''
 			property 'forge.logging.console.level', 'debug'
 			args 'nogui'
-			ideaModule "${rootProject.name}.${project.name}.main"
+			ideaModule "${rootProject.name}.${project.name}.testmod"
 
 			mods {
 				"${MOD_ID}" {
 					source sourceSets.main
 					source project(':Common').sourceSets.main
+				}
+
+				"${TEST_MOD_ID}" {
+					source sourceSets.testmod
+					source project(':Common').sourceSets.testmod
+				}
+			}
+		}
+
+		data {
+			taskName 'data'
+			workingDirectory file('run/client')
+			property 'forge.logging.markers', ''
+			property 'forge.logging.console.level', 'debug'
+			ideaModule "${rootProject.name}.${project.name}.main"
+			source sourceSets.main
+			forceExit false
+
+			args '--mod', MOD_ID
+			args '--client', '--server', '--validate'
+			args '--input', file('src/datagen/blockbench')
+			args '--output', project(':Common').file('src/main/generated')
+			args '--existing', file('src/main/resources')
+			args '--existing', project(':Common').file('src/main/resources')
+
+			mods {
+				"${MOD_ID}" {
+					source sourceSets.main
+					source sourceSets.datagen
+					source project(':Common').sourceSets.main
+				}
+			}
+		}
+
+		dataTestmod {
+			taskName 'testmod-data'
+			workingDirectory file('run/client')
+			property 'forge.logging.markers', ''
+			property 'forge.logging.console.level', 'debug'
+			ideaModule "${rootProject.name}.${project.name}.testmod"
+			main 'cpw.mods.bootstraplauncher.BootstrapLauncher'
+			forceExit false
+
+			args '--mod', TEST_MOD_ID
+			args '--client', '--server', '--validate'
+			args '--input', file('src/testmodDatagen/blockbench')
+			args '--output', project(':Common').file('src/testmod/generated')
+			args '--existing', file('src/main/resources')
+			args '--existing', project(':Common').file('src/main/resources')
+			args '--existing', project(':Common').file('src/testmod/resources')
+			args '--existing-mod', MOD_ID
+
+			mods {
+				"${MOD_ID}" {
+					source sourceSets.main
+					source sourceSets.datagen
+					source project(':Common').sourceSets.main
+				}
+
+				"${TEST_MOD_ID}" {
+					source sourceSets.testmod
+					source sourceSets.testmodDatagen
+					source project(':Common').sourceSets.testmod
 				}
 			}
 		}
@@ -67,6 +174,7 @@ repositories {
 	maven { url 'https://maven.terraformersmc.com/releases/' }
 	maven { url 'https://dvs1.progwml6.com/files/maven/' }
 	maven { url 'https://modmaven.dev/' }
+	maven { url 'https://maven.covers1624.net/' }
 
 	maven {
 		url 'https://www.cursemaven.com'
@@ -81,13 +189,44 @@ repositories {
 
 dependencies {
 	minecraft "net.minecraftforge:forge:${MINECRAFT_VERSION}-${FORGE_VERSION}"
-	annotationProcessor "org.spongepowered:mixin:${MIXIN_VERSION}:processor"
-	compileOnly project(':Common')
 
+	// Main
+	annotationProcessor "org.spongepowered:mixin:${MIXIN_VERSION}:processor"
 	implementation fg.deobf("curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}") // Jade-1.19.1-forge-8.6.0
 	compileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}")
 	compileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}")
 	runtimeOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}")
+	runtimeClasspath "net.covers1624:DevLogin:${DEVLOGIN_VERSION}"
+
+	// Data Gen
+	datagenImplementation sourceSets.main.output
+	datagenImplementation project(':Common')
+	datagenImplementation fg.deobf("curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}") // Jade-1.19.1-forge-8.6.0
+	datagenCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}")
+	datagenCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}")
+	datagenRuntimeOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}")
+
+	// Test Mod
+	testmodAnnotationProcessor "org.spongepowered:mixin:${MIXIN_VERSION}:processor"
+	testmodImplementation sourceSets.main.output
+	testmodImplementation project(':Common')
+	testmodImplementation project(':Common').sourceSets.testmod.output
+	testmodImplementation fg.deobf("curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}") // Jade-1.19.1-forge-8.6.0
+	testmodCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}")
+	testmodCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}")
+	testmodRuntimeOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}")
+	testmodRuntimeClasspath "net.covers1624:DevLogin:${DEVLOGIN_VERSION}"
+
+	// Test Mod Data Gen
+	testmodDatagenImplementation sourceSets.main.output
+	testmodDatagenImplementation sourceSets.testmod.output
+	testmodDatagenImplementation sourceSets.datagen.output
+	testmodDatagenImplementation project(':Common')
+	testmodDatagenImplementation project(':Common').sourceSets.testmod.output
+	testmodDatagenImplementation fg.deobf("curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}") // Jade-1.19.1-forge-8.6.0
+	testmodDatagenCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}")
+	testmodDatagenCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}")
+	testmodDatagenRuntimeOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}")
 }
 
 processResources {
@@ -104,11 +243,29 @@ processResources {
 	from project(':Common').sourceSets.main.resources
 }
 
-tasks.withType(JavaCompile) {
+processTestmodResources {
+	duplicatesStrategy DuplicatesStrategy.WARN
+
+	project.properties.each { key, value ->
+		inputs.property "${key}", "${value}"
+	}
+
+	filesMatching([ '*.mixins.json', 'pack.mcmeta', 'META-INF/mods.toml' ]) {
+		expand project.properties
+	}
+
+	from project(':Common').sourceSets.testmod.resources
+}
+
+tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
 	options.release.set(JavaLanguageVersion.of("${JAVA_VERSION}").asInt())
 
-	source(project(':Common').sourceSets.main.allSource)
+	if(it.name.equals('compileJava')) {
+		source(project(':Common').sourceSets.main.allSource)
+	} else if(it.name.equals('compileTestmodJava')) {
+		source(project(':Common').sourceSets.testmod.allSource)
+	}
 
 	javaToolchains {
 		compilerFor {
@@ -116,7 +273,6 @@ tasks.withType(JavaCompile) {
 		}
 	}
 }
-
 
 java {
 	toolchain {

@@ -1,9 +1,9 @@
 {
     "schemaVersion": 1,
-    "id": "${MOD_ID}",
-    "version": "${MOD_VERSION}",
-    "name": "${MOD_NAME}",
-    "description": "${MOD_DESCRIPTION}",
+    "id": "${TEST_MOD_ID}",
+    "version": "${TEST_MOD_VERSION}",
+    "name": "${TEST_MOD_NAME}",
+    "description": "${TEST_MOD_DESCRIPTION}",
     "authors": [
         {
             "name": "ApexStudios",
@@ -22,7 +22,6 @@
             }
         }
     ],
-    "icon": "logo.png",
     "contact": {
         "homepage": "https://apexstudios.dev/",
         "issues": "https://discord.apexstudios.dev",
@@ -55,23 +54,21 @@
     "license": "GNU GENERAL PUBLIC LICENSE",
     "environment": "*",
     "entrypoints": {
-        "main": [ "${APEX_GROUP}.${MOD_ID}.fabric.${MOD_NAME}Fabric" ],
+        "main": [ "${APEX_GROUP}.${TEST_MOD_ID}.fabric.${TEST_MOD_NAME}Fabric" ],
         "client": [ ],
         "server": [ ]
     },
-    "mixins": [
-        "${MOD_ID}.mixins.json",
-        "${MOD_ID}-common.mixins.json"
-    ],
     "depends": {
         "minecraft": "~${MINECRAFT_VERSION}",
         "java": ">=${JAVA_VERSION}",
         "fabricloader": ">=${FABRIC_LOADER_VERSION}",
-        "fabric-api": ">=${FABRIC_VERSION}"
+        "fabric-api": ">=${FABRIC_VERSION}",
+        "${MOD_ID}": ">=${MOD_VERSION}"
     },
     "custom": {
         "modmenu": {
-            "modmenu.discord": "https://discord.apexstudios.dev/"
+            "modmenu.discord": "https://discord.apexstudios.dev/",
+            "parent": "${MOD_ID}"
         }
     }
 }

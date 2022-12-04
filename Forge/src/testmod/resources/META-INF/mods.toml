@@ -1,0 +1,32 @@
+modLoader="javafml"
+loaderVersion="[${FORGE_LOADER_VERSION},)"
+license="GNU General Public License v3.0"
+issueTrackerURL="https://discord.apexstudios.dev/"
+
+[[mods]]
+    modId="${TEST_MOD_ID}"
+    version="${TEST_MOD_VERSION}"
+    displayName="${TEST_MOD_NAME}"
+    displayURL="https://apexstudios.dev/apexcore"
+    credits="Apex - Programming"
+    authors="ApexStudios"
+    description="${TEST_MOD_DESCRIPTION}"
+
+[[dependencies.${TEST_MOD_ID}]]
+	modId="forge"
+	mandatory=true
+	versionRange="${FORGE_VERSION_RANGE}"
+	ordering="AFTER"
+	side="BOTH"
+[[dependencies.${TEST_MOD_ID}]]
+	modId="minecraft"
+	mandatory=true
+	versionRange="${MINECRAFT_VERSION_RANGE}"
+	ordering="AFTER"
+	side="BOTH"
+[[dependencies.${TEST_MOD_ID}]]
+	modId="${MOD_ID}"
+	mandatory=true
+	versionRange="[${MOD_VERSION}]"
+	ordering="AFTER"
+	side="BOTH"

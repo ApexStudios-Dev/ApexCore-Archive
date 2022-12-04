@@ -10,6 +10,22 @@ group = "${APEX_GROUP}.${MOD_ID}.shared"
 version = "${MOD_VERSION}+${MINECRAFT_VERSION}"
 archivesBaseName = "${MOD_ID}-shared"
 
+sourceSets {
+	main {
+		resources.srcDirs += 'src/main/generated'
+	}
+
+	testmod {
+		resources.srcDirs += 'src/testmod/generated'
+
+		compileClasspath += sourceSets.main.output
+		runtimeClasspath += sourceSets.main.output
+
+		compileClasspath += sourceSets.main.compileClasspath
+		runtimeClasspath += sourceSets.main.runtimeClasspath
+	}
+}
+
 minecraft {
 	version("${MINECRAFT_VERSION}")
 }
@@ -20,6 +36,8 @@ repositories {
 
 dependencies {
 	compileOnly "org.spongepowered:mixin:${MIXIN_VERSION}"
+
+	testmodImplementation sourceSets.main.output
 }
 
 processResources {
@@ -34,9 +52,27 @@ processResources {
 	}
 }
 
-tasks.withType(JavaCompile) {
+processTestmodResources {
+	duplicatesStrategy DuplicatesStrategy.WARN
+
+	project.properties.each { key, value ->
+		inputs.property "${key}", "${value}"
+	}
+
+	filesMatching([ '*.mixins.json', 'pack.mcmeta' ]) {
+		expand project.properties
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
 	options.release.set(JavaLanguageVersion.of("${JAVA_VERSION}").asInt())
+
+	if(it.name.equals('compileJava')) {
+		source(project(':Common').sourceSets.main.allSource)
+	} else if(it.name.equals('compileTestmodJava')) {
+		source(project(':Common').sourceSets.testmod.allSource)
+	}
 
 	javaToolchains {
 		compilerFor {

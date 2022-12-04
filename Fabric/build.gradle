@@ -3,7 +3,7 @@ plugins {
 	id 'idea'
 	id 'maven-publish'
 
-	id 'fabric-loom' version '0.12-SNAPSHOT'
+	id 'fabric-loom' version '1.0-SNAPSHOT'
 	id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1'
 }
 
@@ -13,9 +13,40 @@ group = "${APEX_GROUP}.${MOD_ID}.fabric"
 version = "${MOD_VERSION}+${MINECRAFT_VERSION}"
 archivesBaseName = "${MOD_ID}-fabric"
 
+sourceSets {
+	main {
+		resources.srcDirs += 'src/main/generated'
+	}
+
+	datagen {
+		compileClasspath += sourceSets.main.output
+		runtimeClasspath += sourceSets.main.output
+
+		compileClasspath += sourceSets.main.compileClasspath
+		runtimeClasspath += sourceSets.main.runtimeClasspath
+	}
+
+	testmod {
+		resources.srcDirs += 'src/testmod/generated'
+
+		compileClasspath += sourceSets.main.output
+		runtimeClasspath += sourceSets.main.output
+
+		compileClasspath += sourceSets.main.compileClasspath
+		runtimeClasspath += sourceSets.main.runtimeClasspath
+	}
+
+	testmodDatagen {
+		compileClasspath += sourceSets.main.output
+		runtimeClasspath += sourceSets.main.output
+
+		compileClasspath += sourceSets.main.compileClasspath
+		runtimeClasspath += sourceSets.main.runtimeClasspath
+	}
+}
+
 loom {
 	accessWidenerPath = file("src/main/resources/${MOD_ID}.accesswidener")
-	enableTransitiveAccessWideners = true
 
 	runs {
 		client {
@@ -23,6 +54,7 @@ loom {
 			setConfigName('fabric client')
 			ideConfigGenerated(true)
 			runDir('run')
+			source(sourceSets.testmod)
 		}
 
 		server {
@@ -30,15 +62,49 @@ loom {
 			setConfigName('fabric server')
 			ideConfigGenerated(true)
 			runDir('run')
+			source(sourceSets.testmod)
+		}
+
+		data {
+			inherit(client)
+			setConfigName('fabric data')
+			ideConfigGenerated(true)
+			runDir('run')
+			source(sourceSets.main)
+			vmArg('-Dfabric-api.datagen')
+			vmArg("-Dfabric-api.datagen.output-dir=${file('src/main/generated')}")
+			vmArg("-Dfabric-api.datagen.modid=${MOD_ID}")
+		}
+
+		testmodData {
+			inherit(client)
+			setConfigName('fabric testmod-data')
+			ideConfigGenerated(true)
+			runDir('run')
+			source(sourceSets.testmod)
+			vmArg('-Dfabric-api.datagen')
+			vmArg("-Dfabric-api.datagen.output-dir=${file('src/testmod/generated')}")
+			vmArg("-Dfabric-api.datagen.modid=${TEST_MOD_ID}")
 		}
 	}
 
 	mods {
 		"${MOD_ID}" {
 			sourceSet sourceSets.main
+			sourceSet sourceSets.datagen
 			sourceSet project(':Common').sourceSets.main
 		}
+
+		"${TEST_MOD_ID}" {
+			sourceSet sourceSets.testmod
+			sourceSet sourceSets.testmodDatagen
+			sourceSet project(':Common').sourceSets.testmod
+		}
 	}
+
+	createRemapConfigurations(sourceSets.datagen)
+	createRemapConfigurations(sourceSets.testmod)
+	createRemapConfigurations(sourceSets.testmodDatagen)
 }
 
 repositories {
@@ -67,17 +133,49 @@ dependencies {
 		parchment("org.parchmentmc.data:parchment-${MINECRAFT_VERSION}:${PARCHMENT_MAPPINGS}@zip")
 	}
 
+	// Main
 	modImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${FABRIC_VERSION}+${MINECRAFT_VERSION}"
-	compileOnly project(':Common')
-
-	modImplementation "com.terraformersmc:modmenu:${FABRIC_MOD_MENU_VERSION}"
 	modRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
-
+	implementation 'com.google.code.findbugs:jsr305:3.0.2'
+	modImplementation "com.terraformersmc:modmenu:${FABRIC_MOD_MENU_VERSION}"
 	modImplementation "curse.maven:jade-${JADE_CF_ID}:${FABRIC_JADE_CF_FILE_ID}" // Jade-1.19.1-fabric-8.6.0
 	modCompileOnlyApi "mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}"
 	modCompileOnlyApi "mezz.jei:jei-${MINECRAFT_VERSION}-fabric-api:${JEI_VERSION}"
 	modRuntimeOnly "mezz.jei:jei-${MINECRAFT_VERSION}-fabric:${JEI_VERSION}"
+
+	// Data Gen
+	modDatagenImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
+	modDatagenImplementation "net.fabricmc.fabric-api:fabric-api:${FABRIC_VERSION}+${MINECRAFT_VERSION}"
+	modDatagenRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
+	datagenImplementation sourceSets.main.output
+	datagenImplementation project(':Common')
+	datagenImplementation 'com.google.code.findbugs:jsr305:3.0.2'
+
+	// Test Mod
+	modTestmodImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
+	modTestmodImplementation "net.fabricmc.fabric-api:fabric-api:${FABRIC_VERSION}+${MINECRAFT_VERSION}"
+	modTestmodRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
+	testmodImplementation sourceSets.main.output
+	testmodImplementation project(':Common')
+	testmodImplementation project(':Common').sourceSets.testmod.output
+	testmodImplementation 'com.google.code.findbugs:jsr305:3.0.2'
+	modTestmodImplementation "com.terraformersmc:modmenu:${FABRIC_MOD_MENU_VERSION}"
+	modTestmodImplementation "curse.maven:jade-${JADE_CF_ID}:${FABRIC_JADE_CF_FILE_ID}" // Jade-1.19.1-fabric-8.6.0
+	modTestmodCompileOnly "mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}"
+	modTestmodCompileOnly "mezz.jei:jei-${MINECRAFT_VERSION}-fabric-api:${JEI_VERSION}"
+	modTestmodRuntimeOnly "mezz.jei:jei-${MINECRAFT_VERSION}-fabric:${JEI_VERSION}"
+
+	// Test Mod Data Gen
+	modTestmodDatagenImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
+	modTestmodDatagenImplementation "net.fabricmc.fabric-api:fabric-api:${FABRIC_VERSION}+${MINECRAFT_VERSION}"
+	modTestmodDatagenRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
+	testmodDatagenImplementation sourceSets.main.output
+	testmodDatagenImplementation sourceSets.testmod.output
+	testmodDatagenImplementation sourceSets.datagen.output
+	testmodDatagenImplementation project(':Common')
+	testmodDatagenImplementation project(':Common').sourceSets.testmod.output
+	testmodDatagenImplementation 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
 processResources {
@@ -94,11 +192,29 @@ processResources {
 	from project(':Common').sourceSets.main.resources
 }
 
-tasks.withType(JavaCompile) {
+processTestmodResources {
+	duplicatesStrategy DuplicatesStrategy.WARN
+
+	project.properties.each { key, value ->
+		inputs.property "${key}", "${value}"
+	}
+
+	filesMatching([ '*.mixins.json', 'pack.mcmeta', 'fabric.mod.json' ]) {
+		expand project.properties
+	}
+
+	from project(':Common').sourceSets.testmod.resources
+}
+
+tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
 	options.release.set(JavaLanguageVersion.of("${JAVA_VERSION}").asInt())
 
-	source(project(':Common').sourceSets.main.allSource)
+	if(it.name.equals('compileJava')) {
+		source(project(':Common').sourceSets.main.allSource)
+	} else if(it.name.equals('compileTestmodJava')) {
+		source(project(':Common').sourceSets.testmod.allSource)
+	}
 
 	javaToolchains {
 		compilerFor {
@@ -106,7 +222,6 @@ tasks.withType(JavaCompile) {
 		}
 	}
 }
-
 
 java {
 	toolchain {

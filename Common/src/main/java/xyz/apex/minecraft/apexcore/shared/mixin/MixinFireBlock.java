@@ -20,7 +20,8 @@ public abstract class MixinFireBlock
     @Inject(
             method = "getBurnOdds",
             at = @At("HEAD"),
-            cancellable = true
+            cancellable = true,
+            remap = false
     )
     private void ApexCore$getBurnOdds(BlockState blockState, CallbackInfoReturnable<Integer> cir)
     {
@@ -30,7 +31,8 @@ public abstract class MixinFireBlock
     @Inject(
             method = "getIgniteOdds(Lnet/minecraft/world/level/block/state/BlockState;)I",
             at = @At("HEAD"),
-            cancellable = true
+            cancellable = true,
+            remap = false
     )
     private void ApexCore$getIgniteOdds(BlockState blockState, CallbackInfoReturnable<Integer> cir)
     {

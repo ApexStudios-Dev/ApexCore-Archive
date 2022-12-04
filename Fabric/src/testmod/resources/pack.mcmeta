@@ -1,0 +1,6 @@
+{
+    "pack": {
+        "description": "${TEST_MOD_NAME} fabric-resources",
+        "pack_format": 9
+    }
+}
