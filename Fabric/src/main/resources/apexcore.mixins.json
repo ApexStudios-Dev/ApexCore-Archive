@@ -2,7 +2,7 @@
     "required": true,
     "package": "${APEX_GROUP}.${MOD_ID}.fabric.mixin",
     "mixins": [ "MixinExplosion" ],
-    "client": [ ],
+    "client": [ "client.MixinHumanoidArmorLayer" ],
     "server": [ ],
     "minVersion": "${MIXIN_VERSION}"
 }
