@@ -259,6 +259,8 @@ publishing {
 			artifactId = "${project.archivesBaseName}"
 			version = "${project.version}"
 
+			loom.disableDeprecatedPomGeneration(it)
+
 			artifact jar
 			artifact sourcesJar
 			artifact remapJar
