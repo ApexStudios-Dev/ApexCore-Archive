@@ -1,13 +1,20 @@
 package xyz.apex.minecraft.testmod.shared.init;
 
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.*;
 
 import xyz.apex.minecraft.apexcore.shared.registry.item.ItemRegistryEntry;
+import xyz.apex.minecraft.apexcore.shared.util.ArmorMaterialBuilder;
+import xyz.apex.minecraft.apexcore.shared.util.EnchancedTier;
 import xyz.apex.minecraft.apexcore.shared.util.Properties;
+import xyz.apex.minecraft.apexcore.shared.util.TierBuilder;
 import xyz.apex.minecraft.testmod.shared.TestMod;
 
 public interface AllItems
 {
+    EnchancedTier LEAD_ITEM_TIER = TierBuilder.builder().level(2).uses(250).speed(6F).attackDamageBonus(2F).enchantmentValue(14).repairItem(AllItems.LEAD_INGOT).toolLevelTag(BlockTags.NEEDS_IRON_TOOL).build();
+    ArmorMaterial LEAD_ARMOR_MATERIAL = ArmorMaterialBuilder.builder(TestMod.ID, "lead").durabilityFromModifier(15).defenseFromSlotProtections(2, 5, 6, 2).enchantmentValue(9).toughness(0F).knockbackResistance(0F).repairItem(AllItems.LEAD_INGOT).build();
+
     ItemRegistryEntry<BlockItem> LEAD_ORE = TestMod.Registries.ITEMS
             .blockBuilder(AllBlocks.LEAD_ORE)
             .tab(CreativeModeTab.TAB_BUILDING_BLOCKS)
@@ -30,55 +37,55 @@ public interface AllItems
 
     ItemRegistryEntry<SwordItem> LEAD_SWORD = TestMod.Registries.ITEMS
             .builders("lead_sword")
-            .sword(TestMod.LEAD_ITEM_TIER)
+            .sword(LEAD_ITEM_TIER)
             .initialProperties(Properties.ITEM_COMBAT)
     .register();
 
     ItemRegistryEntry<PickaxeItem> LEAD_PICKAXE = TestMod.Registries.ITEMS
             .builders("lead_pickaxe")
-            .pickaxeItem(TestMod.LEAD_ITEM_TIER)
+            .pickaxeItem(LEAD_ITEM_TIER)
             .initialProperties(Properties.ITEM_TOOL)
     .register();
 
     ItemRegistryEntry<AxeItem> LEAD_AXE = TestMod.Registries.ITEMS
             .builders("lead_axe")
-            .axeItem(TestMod.LEAD_ITEM_TIER)
+            .axeItem(LEAD_ITEM_TIER)
             .initialProperties(Properties.ITEM_TOOL)
     .register();
 
     ItemRegistryEntry<ShovelItem> LEAD_SHOVEL = TestMod.Registries.ITEMS
             .builders("lead_shovel")
-            .shovelItem(TestMod.LEAD_ITEM_TIER)
+            .shovelItem(LEAD_ITEM_TIER)
             .initialProperties(Properties.ITEM_TOOL)
     .register();
 
     ItemRegistryEntry<HoeItem> LEAD_HOE = TestMod.Registries.ITEMS
             .builders("lead_hoe")
-            .hoeItem(TestMod.LEAD_ITEM_TIER)
+            .hoeItem(LEAD_ITEM_TIER)
             .initialProperties(Properties.ITEM_TOOL)
     .register();
 
     ItemRegistryEntry<ArmorItem> LEAD_HELMET = TestMod.Registries.ITEMS
             .builders("lead_helmet")
-            .helmetItem(TestMod.LEAD_ITEM_TIER)
+            .helmetItem(LEAD_ARMOR_MATERIAL)
             .initialProperties(Properties.ITEM_COMBAT)
     .register();
 
     ItemRegistryEntry<ArmorItem> LEAD_CHESTPLATE = TestMod.Registries.ITEMS
             .builders("lead_chestplate")
-            .chestplateItem(TestMod.LEAD_ITEM_TIER)
+            .chestplateItem(LEAD_ARMOR_MATERIAL)
             .initialProperties(Properties.ITEM_COMBAT)
     .register();
 
     ItemRegistryEntry<ArmorItem> LEAD_LEGGINGS = TestMod.Registries.ITEMS
             .builders("lead_leggings")
-            .leggingItem(TestMod.LEAD_ITEM_TIER)
+            .leggingItem(LEAD_ARMOR_MATERIAL)
             .initialProperties(Properties.ITEM_COMBAT)
     .register();
 
     ItemRegistryEntry<ArmorItem> LEAD_BOOTS = TestMod.Registries.ITEMS
             .builders("lead_boots")
-            .bootsItem(TestMod.LEAD_ITEM_TIER)
+            .bootsItem(LEAD_ARMOR_MATERIAL)
             .initialProperties(Properties.ITEM_COMBAT)
     .register();
 

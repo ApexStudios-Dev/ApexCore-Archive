@@ -3,133 +3,130 @@ package xyz.apex.minecraft.apexcore.shared.platform;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
+
+import xyz.apex.minecraft.apexcore.shared.util.EnchancedTier;
 
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 
+/**
+ * Use {@link xyz.apex.minecraft.apexcore.shared.util.TierBuilder} or {@link xyz.apex.minecraft.apexcore.shared.util.ArmorMaterialBuilder}
+ *
+ * You should never need to directly make use of this
+ */
+@ApiStatus.Internal
 public interface PlatformTierRegistry extends PlatformHolder
 {
-    TierWithMiningLevel registerTier(String modId, String name, int uses, float speed, float attackDamageBonus, int level, int enchantmentValue, Supplier<Ingredient> repairIngredient, TagKey<Block> miningLevelTag);
-
-    ArmorMaterial registerArmorMaterial(String modId, String name, int enchantmentValue, Supplier<SoundEvent> equipSound, Supplier<Ingredient> repairIngredient, float toughness, float knockBackResistance, ToIntFunction<EquipmentSlot> durabilityForSlot, ToIntFunction<EquipmentSlot> defenseForSlot);
-
-    default ArmorMaterialTier registerMerged(
-            // Common
-            String modId, String name, int enchantmentValue, Supplier<Ingredient> repairIngredient,
-            // Tier
-            int uses, float speed, float attackDamageBonus, int level, TagKey<Block> miningLevelTag,
-            // ArmorMaterial
-            Supplier<SoundEvent> equipSound, float toughness, float knockBackResistance, ToIntFunction<EquipmentSlot> durabilityForSlot, ToIntFunction<EquipmentSlot> defenseForSlot
-    ) {
-        var tier = registerTier(modId, name, uses, speed, attackDamageBonus, level, enchantmentValue, repairIngredient, miningLevelTag);
-        var material = registerArmorMaterial(modId, name, enchantmentValue, equipSound, repairIngredient, toughness, knockBackResistance, durabilityForSlot, defenseForSlot);
-        return registerMerged(tier, material);
+    default EnchancedTier registerTier(int uses, float speed, float attackDamageBonus, int level, int enchantmentValue, Supplier<Ingredient> repairIngredient, @Nullable TagKey<Block> miningLevelTag)
+    {
+        return new BasicTier(uses, speed, attackDamageBonus, level, enchantmentValue, repairIngredient, miningLevelTag);
     }
 
-    @ApiStatus.Internal ArmorMaterialTier registerMerged(Tier tier, ArmorMaterial material);
-
-    interface TierWithMiningLevel extends Tier
+    default ArmorMaterial registerArmorMaterial(ResourceLocation registryName, int enchantmentValue, Supplier<SoundEvent> equipSound, Supplier<Ingredient> repairIngredient, float toughness, float knockbackResistance, ToIntFunction<EquipmentSlot> durabilityForSlot, ToIntFunction<EquipmentSlot> defenseForSlot)
     {
-        TagKey<Block> getMiningLevelTag();
-
-        @Deprecated @Override int getLevel();
+        return new BasicArmorMaterial(registryName, enchantmentValue, equipSound, repairIngredient, toughness, knockbackResistance, durabilityForSlot, defenseForSlot);
     }
 
-    interface ArmorMaterialTier extends TierWithMiningLevel, ArmorMaterial
+    record BasicTier(int uses, float speed, float attackDamageBonus, int level, int enchantmentValue, Supplier<Ingredient> repairIngredient, @Nullable TagKey<Block> miningLevelTag) implements EnchancedTier
     {
-        // region: Common
-        Tier tier();
-        ArmorMaterial armorMaterial();
-
         @Override
-        default int getEnchantmentValue()
+        public int getUses()
         {
-            return tier().getEnchantmentValue();
+            return uses;
         }
 
         @Override
-        default Ingredient getRepairIngredient()
+        public float getSpeed()
         {
-            return tier().getRepairIngredient();
-        }
-        // endregion
-
-        // region: Tier
-        @Override
-        default int getUses()
-        {
-            return tier().getUses();
+            return speed;
         }
 
         @Override
-        default float getSpeed()
+        public float getAttackDamageBonus()
         {
-            return tier().getSpeed();
+            return attackDamageBonus;
         }
 
         @Override
-        default float getAttackDamageBonus()
+        public int getLevel()
         {
-            return tier().getAttackDamageBonus();
+            return level;
         }
 
         @Override
-        default int getLevel()
+        public int getEnchantmentValue()
         {
-            return tier().getLevel();
+            return enchantmentValue;
         }
 
         @Override
-        @Nullable
-        default TagKey<Block> getMiningLevelTag()
+        public Ingredient getRepairIngredient()
         {
-            return tier() instanceof TierWithMiningLevel tier ? tier.getMiningLevelTag() : null;
-        }
-        // endregion
-
-        // region: ArmorMaterial
-        @Override
-        default int getDurabilityForSlot(EquipmentSlot slot)
-        {
-            return armorMaterial().getDurabilityForSlot(slot);
+            return repairIngredient.get();
         }
 
         @Override
-        default int getDefenseForSlot(EquipmentSlot slot)
+        public TagKey<Block> getMiningLevelTag()
         {
-            return armorMaterial().getDurabilityForSlot(slot);
+            return miningLevelTag;
+        }
+    }
+
+    record BasicArmorMaterial(ResourceLocation registryName, int enchantmentValue, Supplier<SoundEvent> equipSound, Supplier<Ingredient> repairIngredient, float toughness, float knockbackResistance, ToIntFunction<EquipmentSlot> durabilityForSlot, ToIntFunction<EquipmentSlot> defenseForSlot) implements ArmorMaterial
+    {
+        @Override
+        public int getDurabilityForSlot(EquipmentSlot slot)
+        {
+            return durabilityForSlot.applyAsInt(slot);
         }
 
         @Override
-        default SoundEvent getEquipSound()
+        public int getDefenseForSlot(EquipmentSlot slot)
         {
-            return armorMaterial().getEquipSound();
+            return defenseForSlot.applyAsInt(slot);
         }
 
         @Override
-        default String getName()
+        public int getEnchantmentValue()
         {
-            return armorMaterial().getName();
+            return enchantmentValue;
         }
 
         @Override
-        default float getToughness()
+        public SoundEvent getEquipSound()
         {
-            return armorMaterial().getToughness();
+            return equipSound.get();
         }
 
         @Override
-        default float getKnockbackResistance()
+        public Ingredient getRepairIngredient()
         {
-            return armorMaterial().getKnockbackResistance();
+            return repairIngredient.get();
         }
-        // endregion
+
+        @Override
+        public String getName()
+        {
+            return registryName.toString();
+        }
+
+        @Override
+        public float getToughness()
+        {
+            return toughness;
+        }
+
+        @Override
+        public float getKnockbackResistance()
+        {
+            return knockbackResistance;
+        }
     }
 }
