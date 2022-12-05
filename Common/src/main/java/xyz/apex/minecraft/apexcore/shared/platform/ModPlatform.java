@@ -7,4 +7,5 @@ public interface ModPlatform
 {
     PlatformGameRulesRegistry gameRules();
     PlatformRegistry registries();
+    PlatformTierRegistry tierRegistry();
 }

@@ -18,4 +18,9 @@ public interface Platform
     {
         return INSTANCE.registries();
     }
+
+    static PlatformTierRegistry tierRegistry()
+    {
+        return INSTANCE.tierRegistry();
+    }
 }

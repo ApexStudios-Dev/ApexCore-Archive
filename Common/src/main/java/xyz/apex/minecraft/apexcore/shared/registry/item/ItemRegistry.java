@@ -13,59 +13,45 @@ import xyz.apex.minecraft.apexcore.shared.registry.BasicRegistry;
 import xyz.apex.minecraft.apexcore.shared.registry.ModdedRegistries;
 import xyz.apex.minecraft.apexcore.shared.registry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.shared.registry.RegistryKeys;
-import xyz.apex.minecraft.apexcore.shared.registry.block.BlockRegistryEntry;
 
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class ItemRegistry extends BasicRegistry<Item>
 {
     public static final ResourceKey<Registry<Item>> TYPE = RegistryKeys.ITEM;
 
+    private final ItemBuilders builders;
+
     private ItemRegistry(String modId)
     {
         super(TYPE, modId);
+
+        builders = new ItemBuilders(this);
     }
 
-    public <T extends Item> ItemBuilder<T> builder(String name, Function<Item.Properties, T> factory)
+    public ItemBuilders builders(String name)
     {
-        return new ItemBuilder<>(this, name, factory);
+        return builders.pushName(name);
     }
 
-    public ItemBuilder<Item> genericBuilder(String name)
+    public <T extends Item, E extends Block> ItemBuilder<T> blockBuilder(String name, Supplier<? extends E> block, ItemBuilders.BlockItemFactory<T, E> factory)
     {
-        return builder(name, Item::new);
+        return builders(name).builder(properties -> factory.create(block, properties));
     }
 
-    public <T extends Item, B extends Block> ItemBuilder<T> blockBuilder(String name, Supplier<? extends B> block, BiFunction<B, Item.Properties, T> factory)
-    {
-        return builder(name, properties -> factory.apply(block.get(), properties));
-    }
-
-    public <T extends Item, B extends Block> ItemBuilder<T> blockBuilder(RegistryEntry<? extends B> block, BiFunction<B, Item.Properties, T> factory)
+    public <T extends Item, E extends Block> ItemBuilder<T> blockBuilder(RegistryEntry<? extends E> block, ItemBuilders.BlockItemFactory<T, E> factory)
     {
         return blockBuilder(block.getRegistryName().getPath(), block, factory);
     }
 
-    public <T extends Item, B extends Block> ItemBuilder<T> blockBuilder(BlockRegistryEntry<? extends B> block, BiFunction<B, Item.Properties, T> factory)
-    {
-        return blockBuilder(block.getRegistryName().getPath(), block, factory);
-    }
-
-    public ItemBuilder<BlockItem> genericBlockBuilder(String name, Supplier<? extends Block> block)
+    public <E extends Block> ItemBuilder<BlockItem> blockBuilder(String name, Supplier<? extends E> block)
     {
         return blockBuilder(name, block, BlockItem::new);
     }
 
-    public ItemBuilder<BlockItem> genericBlockBuilder(RegistryEntry<? extends Block> block)
+    public <E extends Block> ItemBuilder<BlockItem> blockBuilder(RegistryEntry<? extends E> block)
     {
-        return genericBlockBuilder(block.getRegistryName().getPath(), block);
-    }
-
-    public ItemBuilder<BlockItem> genericBlockBuilder(BlockRegistryEntry<? extends Block> block)
-    {
-        return genericBlockBuilder(block.getRegistryName().getPath(), block);
+        return blockBuilder(block.getRegistryName().getPath(), block);
     }
 
     @Override

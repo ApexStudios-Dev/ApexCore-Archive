@@ -15,11 +15,11 @@ import java.util.function.UnaryOperator;
 
 public final class ItemBuilder<T extends Item> extends RegistryEntryBuilder<Item, T, ItemBuilder<T>>
 {
-    private final Function<Item.Properties, T> factory;
+    private final ItemBuilders.ItemFactory<T> factory;
     private Supplier<Item.Properties> properties = Item.Properties::new;
     private Function<Item.Properties, Item.Properties> propertiesModifier = UnaryOperator.identity();
 
-    ItemBuilder(ItemRegistry registry, String name, Function<Item.Properties, T> factory)
+    ItemBuilder(ItemRegistry registry, String name, ItemBuilders.ItemFactory<T> factory)
     {
         super(registry, name);
 
@@ -87,7 +87,7 @@ public final class ItemBuilder<T extends Item> extends RegistryEntryBuilder<Item
     protected T build()
     {
         var properties = DefaultedItemProperties.apply(registry.getRegistryName().getNamespace(), this.properties.get(), propertiesModifier);
-        return factory.apply(properties);
+        return factory.create(properties);
     }
 
     @Override
