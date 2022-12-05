@@ -20,6 +20,7 @@ public interface Properties
     Supplier<BlockBehaviour.Properties> BLOCK_WOOL = () -> BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL);
     Supplier<BlockBehaviour.Properties> BLOCK_CARPET = () -> BlockBehaviour.Properties.copy(Blocks.WHITE_CARPET);
     Supplier<BlockBehaviour.Properties> BLOCK_DIRT = () -> BlockBehaviour.Properties.copy(Blocks.DIRT);
+    Supplier<BlockBehaviour.Properties> BLOCK_TORCH = () -> BlockBehaviour.Properties.copy(Blocks.TORCH);
 
     Supplier<BlockBehaviour.Properties> BLOCK_ORE = () -> BlockBehaviour.Properties.copy(Blocks.IRON_ORE);
     Supplier<BlockBehaviour.Properties> BLOCK_STORAGE = () -> BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK);
