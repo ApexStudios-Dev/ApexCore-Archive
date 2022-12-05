@@ -137,6 +137,7 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${FABRIC_VERSION}+${MINECRAFT_VERSION}"
 	modRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
+	implementation project(':Common')
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 	modImplementation "com.terraformersmc:modmenu:${FABRIC_MOD_MENU_VERSION}"
 	modImplementation "curse.maven:jade-${JADE_CF_ID}:${FABRIC_JADE_CF_FILE_ID}" // Jade-1.19.1-fabric-8.6.0

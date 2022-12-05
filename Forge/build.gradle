@@ -101,20 +101,11 @@ minecraft {
 		}
 
 		data {
-			taskName 'data'
+			taskName 'dummyData'
 			workingDirectory file('run/client')
 			property 'forge.logging.markers', ''
 			property 'forge.logging.console.level', 'debug'
-			ideaModule "${rootProject.name}.${project.name}.main"
-			source sourceSets.main
 			forceExit false
-
-			args '--mod', MOD_ID
-			args '--client', '--server', '--validate'
-			args '--input', file('src/datagen/blockbench')
-			args '--output', project(':Common').file('src/main/generated')
-			args '--existing', file('src/main/resources')
-			args '--existing', project(':Common').file('src/main/resources')
 
 			mods {
 				"${MOD_ID}" {
@@ -125,14 +116,27 @@ minecraft {
 			}
 		}
 
+		dataMod {
+			parent runs.data
+
+			taskName "${MOD_ID}-data"
+			ideaModule "${rootProject.name}.${project.name}.main"
+			source sourceSets.main
+
+			args '--mod', MOD_ID
+			args '--client', '--server', '--validate'
+			args '--input', file('src/datagen/blockbench')
+			args '--output', project(':Common').file('src/main/generated')
+			args '--existing', file('src/main/resources')
+			args '--existing', project(':Common').file('src/main/resources')
+		}
+
 		dataTestmod {
-			taskName 'testmod-data'
-			workingDirectory file('run/client')
-			property 'forge.logging.markers', ''
-			property 'forge.logging.console.level', 'debug'
+			parent runs.data
+
+			taskName "${TEST_MOD_ID}-data"
 			ideaModule "${rootProject.name}.${project.name}.testmod"
-			main 'cpw.mods.bootstraplauncher.BootstrapLauncher'
-			forceExit false
+			source sourceSets.testmod
 
 			args '--mod', TEST_MOD_ID
 			args '--client', '--server', '--validate'
@@ -144,12 +148,6 @@ minecraft {
 			args '--existing-mod', MOD_ID
 
 			mods {
-				"${MOD_ID}" {
-					source sourceSets.main
-					source sourceSets.datagen
-					source project(':Common').sourceSets.main
-				}
-
 				"${TEST_MOD_ID}" {
 					source sourceSets.testmod
 					source sourceSets.testmodDatagen
@@ -192,6 +190,7 @@ dependencies {
 
 	// Main
 	annotationProcessor "org.spongepowered:mixin:${MIXIN_VERSION}:processor"
+	implementation project(':Common')
 	implementation fg.deobf("curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}") // Jade-1.19.1-forge-8.6.0
 	compileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}")
 	compileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}")
