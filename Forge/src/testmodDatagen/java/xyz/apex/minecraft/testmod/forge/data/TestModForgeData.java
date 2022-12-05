@@ -13,5 +13,22 @@ public final class TestModForgeData
     @SubscribeEvent
     public static void onGatherData(GatherDataEvent event)
     {
+        var generator = event.getGenerator();
+
+        var client = event.includeClient();
+        var server = event.includeServer();
+
+        var blockTags = new BlockTagGenerator(event);
+
+        generator.addProvider(client, new BlockStateGenerator(event));
+        generator.addProvider(client, new ItemModelGenerator(event));
+
+        generator.addProvider(client, new LanguageGenerator(event));
+
+        generator.addProvider(server, blockTags);
+        generator.addProvider(server, new ItemTagGenerator(event, blockTags));
+
+        generator.addProvider(server, new LootTableGenerator(event));
+        generator.addProvider(server, new RecipeGenerator(event));
     }
 }
