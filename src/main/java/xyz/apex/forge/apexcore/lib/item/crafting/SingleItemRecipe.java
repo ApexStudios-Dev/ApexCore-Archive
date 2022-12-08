@@ -3,7 +3,7 @@ package xyz.apex.forge.apexcore.lib.item.crafting;
 import com.google.gson.JsonObject;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -121,7 +121,7 @@ public class SingleItemRecipe implements Recipe<Container>
 
 			var recipeResultName = GsonHelper.getAsString(json, JSON_RESULT);
 			var recipeResultCount = GsonHelper.getAsInt(json, JSON_COUNT);
-			var recipeResult = new ItemStack(Registry.ITEM.get(new ResourceLocation(recipeResultName)), recipeResultCount);
+			var recipeResult = new ItemStack(BuiltInRegistries.ITEM.get(new ResourceLocation(recipeResultName)), recipeResultCount);
 			return recipeFactory.create(recipeId, recipeGroup, recipeIngredient, recipeResult);
 		}
 

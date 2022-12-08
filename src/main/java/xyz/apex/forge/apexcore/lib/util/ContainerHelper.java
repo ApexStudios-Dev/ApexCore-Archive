@@ -8,7 +8,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 
 public final class ContainerHelper
@@ -28,7 +28,7 @@ public final class ContainerHelper
 		if(blockEntity instanceof IItemHandler itemHandler)
 			return getRedstoneSignalFromContainer(itemHandler);
 
-		return blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).map(ContainerHelper::getRedstoneSignalFromContainer).orElse(0);
+		return blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).map(ContainerHelper::getRedstoneSignalFromContainer).orElse(0);
 	}
 
 	public static int getRedstoneSignalFromContainer(@Nullable IItemHandler itemHandler)

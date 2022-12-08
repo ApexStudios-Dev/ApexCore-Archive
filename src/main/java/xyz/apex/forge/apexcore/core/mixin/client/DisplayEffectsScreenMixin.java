@@ -1,3 +1,5 @@
+// TODO: Revamp for new creative mode tab system
+/*
 package xyz.apex.forge.apexcore.core.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -29,4 +31,4 @@ public abstract class DisplayEffectsScreenMixin
 				ci.cancel();
 		}
 	}
-}
+}*/

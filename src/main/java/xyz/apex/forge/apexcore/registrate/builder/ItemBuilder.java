@@ -10,13 +10,11 @@ import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
-import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraftforge.api.distmarker.Dist;
@@ -148,10 +146,11 @@ public final class ItemBuilder<
 		return properties(properties -> properties.craftRemainder(craftingRemainingItem.get()));
 	}
 
-	public ItemBuilder<OWNER, ITEM, PARENT> tab(@Nullable CreativeModeTab creativeModeTab)
+	// TODO: See creativeModeTab todo in CoreRegistrate
+	/*public ItemBuilder<OWNER, ITEM, PARENT> tab(@Nullable CreativeModeTab creativeModeTab)
 	{
 		return properties(properties -> creativeModeTab == null ? properties : properties.tab(creativeModeTab));
-	}
+	}*/
 
 	public ItemBuilder<OWNER, ITEM, PARENT> rarity(Rarity rarity)
 	{
@@ -212,7 +211,8 @@ public final class ItemBuilder<
 	{
 		return builder
 				.transform(ItemBuilder::applyDefaults)
-				.tab(CreativeModeTab.TAB_MISC)
+				// TODO: See other creativeModeTab todo
+				// .tab(CreativeModeTab.TAB_MISC)
 				.model((ctx, provider) -> provider.withExistingParent(ctx.getName(), new ResourceLocation(Mods.MINECRAFT, "item/template_spawn_egg")))
 		;
 	}

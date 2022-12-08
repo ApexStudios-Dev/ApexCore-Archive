@@ -1,7 +1,6 @@
 package xyz.apex.forge.apexcore.registrate;
 
 import com.google.common.annotations.Beta;
-import com.google.common.base.Suppliers;
 import com.google.errorprone.annotations.OverridingMethodsMustInvokeSuper;
 import com.tterrag.registrate.builders.Builder;
 import com.tterrag.registrate.builders.BuilderCallback;
@@ -12,13 +11,11 @@ import com.tterrag.registrate.util.OneTimeEventReceiver;
 import com.tterrag.registrate.util.entry.RegistryEntry;
 import com.tterrag.registrate.util.nullness.*;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.NewRegistryEvent;
@@ -40,7 +37,8 @@ public class CoreRegistrate<OWNER extends CoreRegistrate<OWNER>>
 
 	protected final OWNER self = (OWNER) this;
 	public final String modId;
-	@Nullable private Supplier<? extends CreativeModeTab> currentTab = null;
+	// TODO: See later creativeModeTab TODO
+	// @Nullable private Supplier<? extends CreativeModeTab> currentTab = null;
 
 	protected CoreRegistrate(String modId)
 	{
@@ -71,11 +69,12 @@ public class CoreRegistrate<OWNER extends CoreRegistrate<OWNER>>
 		return backend.currentName();
 	}
 
-	@Nullable
+	// TODO: See later creativeModeTab TODO
+	/*@Nullable
 	public final Supplier<? extends CreativeModeTab> currentCreativeModeTab()
 	{
 		return currentTab;
-	}
+	}*/
 
 	public final <TYPE, VALUE extends TYPE> RegistryEntry<VALUE> get(ResourceKey<? extends Registry<TYPE>> registryType)
 	{
@@ -175,7 +174,8 @@ public class CoreRegistrate<OWNER extends CoreRegistrate<OWNER>>
 		return self;
 	}
 
-	public final OWNER creativeModeTab(NonNullSupplier<? extends CreativeModeTab> creativeModeTab)
+	// TODO: Bring back if tterrag manages to find away to implement these
+	/*public final OWNER creativeModeTab(NonNullSupplier<? extends CreativeModeTab> creativeModeTab)
 	{
 		backend.creativeModeTab(creativeModeTab);
 		return self;
@@ -185,7 +185,7 @@ public class CoreRegistrate<OWNER extends CoreRegistrate<OWNER>>
 	{
 		backend.creativeModeTab(creativeModeTab, name);
 		return self;
-	}
+	}*/
 
 	public final OWNER transform(NonNullUnaryOperator<OWNER> func)
 	{
@@ -291,11 +291,12 @@ public class CoreRegistrate<OWNER extends CoreRegistrate<OWNER>>
 			return super.currentName();
 		}
 
-		@Override
+		// TODO: See other creativeModeTab todo
+		/*@Override
 		public Backend creativeModeTab(NonNullSupplier<? extends CreativeModeTab> tab)
 		{
 			CoreRegistrate.this.currentTab = Suppliers.memoize(tab::get);
 			return super.creativeModeTab(tab);
-		}
+		}*/
 	}
 }

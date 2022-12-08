@@ -11,8 +11,8 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
@@ -57,7 +57,7 @@ public abstract class InventoryBlockEntity extends BaseBlockEntity.WithCustomNam
 	@Override
 	public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side)
 	{
-		if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+		if(cap == ForgeCapabilities.ITEM_HANDLER)
 			return itemHandlerCapability.cast();
 
 		return super.getCapability(cap, side);

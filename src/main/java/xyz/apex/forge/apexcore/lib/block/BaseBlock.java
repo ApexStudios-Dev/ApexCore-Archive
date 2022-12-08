@@ -37,8 +37,8 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.network.NetworkHooks;
 
 import xyz.apex.forge.apexcore.lib.util.ContainerHelper;
@@ -433,7 +433,7 @@ public class BaseBlock extends Block implements SimpleWaterloggedBlock
 
 				if(blockEntity != null)
 				{
-					blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(itemHandler -> {
+					blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(itemHandler -> {
 						var blockEntityPos = getBlockEntityPos(blockState, pos);
 
 						for(var i = 0; i < itemHandler.getSlots(); i++)

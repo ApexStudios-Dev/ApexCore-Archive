@@ -1,3 +1,5 @@
+// TODO: Revamp for new creative mode tab system
+/*
 package xyz.apex.forge.apexcore.core.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -155,7 +157,8 @@ public final class CreativeScreenHandler
 		screen.setBlitOffset(300);
 		itemRenderer.blitOffset = 300F;
 
-		/*var lines = new String[] {
+		*/
+/*var lines = new String[] {
 				"" + (categoryTabPage + 1),
 				"/",
 				"" + (maxCategoryTabPages + 1)
@@ -167,7 +170,8 @@ public final class CreativeScreenHandler
 		{
 			var lineWidth = font.width(line);
 			maxLineWidth = Math.max(lineWidth, maxLineWidth);
-		}*/
+		}*//*
+
 
 		var maxLineWidth = 6;
 
@@ -629,4 +633,4 @@ public final class CreativeScreenHandler
 			i += renderY;
 		}
 	}
-}
+}*/

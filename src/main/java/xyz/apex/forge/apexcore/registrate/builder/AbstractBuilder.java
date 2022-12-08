@@ -15,6 +15,8 @@ import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -63,7 +65,7 @@ public abstract class AbstractBuilder<
 	public final BUILDER tag(ProviderType<? extends RegistrateTagsProvider<TYPE>> providerType, TagKey<TYPE>... tags)
 	{
 		if(!tagsByType.containsKey(providerType))
-			setData(providerType, (ctx, provider) -> tagsByType.get(providerType).stream().map(tag -> (TagKey<TYPE>) tag).map(provider::tag).forEach(tag -> tag.add(asSupplier().get())));
+			setData(providerType, (ctx, provider) -> tagsByType.get(providerType).stream().map(tag -> (TagKey<TYPE>) tag).map(provider::tag).forEach(tag -> tag.add(TagEntry.element(new ResourceLocation(owner.modId, name)))));
 
 		tagsByType.putAll(providerType, Arrays.asList(tags));
 		return self;

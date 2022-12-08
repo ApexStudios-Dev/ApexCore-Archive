@@ -11,7 +11,6 @@ import xyz.apex.forge.commonality.Mods;
 import xyz.apex.forge.commonality.tags.BlockTags;
 
 import static com.tterrag.registrate.providers.ProviderType.BLOCK_TAGS;
-import static com.tterrag.registrate.providers.ProviderType.LANG;
 
 public final class ACRegistry extends AbstractRegistrate<ACRegistry>
 {
@@ -25,7 +24,8 @@ public final class ACRegistry extends AbstractRegistrate<ACRegistry>
 	{
 		super(Mods.APEX_CORE);
 
-		addDataGenerator(LANG, provider -> {
+		// TODO: Revamp for new creative mode tab system
+		/*addDataGenerator(LANG, provider -> {
 			provider.add(ACItemGroupCategories.ENCHANTED_BOOKS.getCategoryNameKey(), "Enchanted Books");
 			provider.add(ACItemGroupCategories.TOOLS.getCategoryNameKey(), "Tools");
 			provider.add(ACItemGroupCategories.WEAPONS.getCategoryNameKey(), "Weapons");
@@ -36,7 +36,7 @@ public final class ACRegistry extends AbstractRegistrate<ACRegistry>
 			provider.add(ACItemGroupCategories.STORAGE_BLOCKS.getCategoryNameKey(), "Storage Blocks");
 			provider.add(ACItemGroupCategories.WOOLS.getCategoryNameKey(), "Wools");
 			provider.add(ACItemGroupCategories.LOGS.getCategoryNameKey(), "Logs");
-		});
+		});*/
 
 		addDataGenerator(BLOCK_TAGS, provider -> provider.tag(TAG_VISUALIZER));
 	}

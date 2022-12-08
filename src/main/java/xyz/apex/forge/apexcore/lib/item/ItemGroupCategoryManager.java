@@ -1,3 +1,5 @@
+// TODO: Revamp for new creative mode tab system
+/*
 package xyz.apex.forge.apexcore.lib.item;
 
 import com.google.common.collect.Maps;
@@ -132,3 +134,4 @@ public final class ItemGroupCategoryManager
 		return categoryManagers.computeIfAbsent(itemGroup, ItemGroupCategoryManager::new);
 	}
 }
+*/

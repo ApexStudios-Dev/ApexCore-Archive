@@ -1,3 +1,5 @@
+// TODO: Revamp for new creative mode tab system
+/*
 package xyz.apex.forge.apexcore.core.init;
 
 import net.minecraft.world.item.*;
@@ -106,3 +108,4 @@ public final class ACItemGroupCategories
 		enabled = true;
 	}
 }
+*/
