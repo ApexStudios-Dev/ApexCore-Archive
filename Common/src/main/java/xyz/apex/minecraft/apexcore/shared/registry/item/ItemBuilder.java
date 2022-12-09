@@ -1,7 +1,6 @@
 package xyz.apex.minecraft.apexcore.shared.registry.item;
 
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.ItemLike;
@@ -66,11 +65,6 @@ public final class ItemBuilder<T extends Item> extends RegistryEntryBuilder<Item
     public ItemBuilder<T> craftRemainder(Supplier<ItemLike> craftRemainder)
     {
         return properties(properties -> properties.craftRemainder(craftRemainder.get().asItem()));
-    }
-
-    public ItemBuilder<T> tab(CreativeModeTab creativeModeTab)
-    {
-        return properties(properties -> properties.tab(creativeModeTab));
     }
 
     public ItemBuilder<T> rarity(Rarity rarity)

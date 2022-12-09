@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -49,7 +50,7 @@ public class BasicRegistry<T> implements ModdedRegistry<T>
     @SuppressWarnings("unchecked")
     protected BasicRegistry(ResourceKey<Registry<T>> type, String modId)
     {
-        this(type, modId, () -> (Registry<T>) Registry.REGISTRY.get(type.location()));
+        this(type, modId, () -> (Registry<T>) BuiltInRegistries.REGISTRY.get(type.location()));
     }
 
     @SuppressWarnings("unchecked")

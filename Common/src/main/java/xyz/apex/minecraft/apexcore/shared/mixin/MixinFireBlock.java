@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -43,7 +43,7 @@ public abstract class MixinFireBlock
     private void overrideFlammabilityOdds(BlockState blockState, boolean isBurn, IntConsumer oddsConsumer)
     {
         // obtain registry name for this block
-        var registryName = Registry.BLOCK.getKey(blockState.getBlock());
+        var registryName = BuiltInRegistries.BLOCK.getKey(blockState.getBlock());
         // look up the custom registered flammability odds, if they exist
         // redirect the returned value to use the custom registered ones, using the consumer
         (isBurn ? FlammabilityRegistry.lookupBurnOdds(registryName) : FlammabilityRegistry.lookupIgniteOdds(registryName)).ifPresent(oddsConsumer);

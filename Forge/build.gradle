@@ -1,3 +1,9 @@
+buildscript {
+	dependencies {
+		classpath 'org.parchmentmc:librarian:1.+'
+	}
+}
+
 plugins {
 	id 'java-library'
 	id 'idea'
@@ -5,8 +11,11 @@ plugins {
 
 	id 'net.minecraftforge.gradle' version '5.1.+'
 	id 'org.spongepowered.mixin' version '0.7.+'
-	id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 	id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1'
+}
+
+if(rootProject.hasProperty('PARCHMENT_MAPPINGS')) {
+	apply plugin: 'org.parchmentmc.librarian.forgegradle'
 }
 
 evaluationDependsOn(':Common')
@@ -48,12 +57,22 @@ sourceSets {
 }
 
 minecraft {
-	mappings channel: 'parchment', version: "${PARCHMENT_MAPPINGS}-${MINECRAFT_VERSION}"
-	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+	if(rootProject.hasProperty('PARCHMENT_MAPPINGS')) {
+		if(rootProject.hasProperty('PARCHMENT_MINECRAFT_VERSION')) {
+			mappings channel: 'parchment', version: "${PARCHMENT_MINECRAFT_VERSION}-${PARCHMENT_MAPPINGS}-${MINECRAFT_VERSION}"
+		} else {
+			mappings channel: 'parchment', version: "${PARCHMENT_MAPPINGS}-${MINECRAFT_VERSION}"
+		}
+	} else {
+		mappings channel: 'official', version: "${MINECRAFT_VERSION}"
+	}
+
+	if(file('src/main/resources/META-INF/accesstransformer.cfg').exists()) {
+		accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+	}
 
 	runs {
 		client {
-			taskName 'client'
 			workingDirectory file('run/client')
 			property 'forge.logging.markers', ''
 			property 'forge.logging.console.level', 'debug'
@@ -80,7 +99,6 @@ minecraft {
 		}
 
 		server {
-			taskName 'server'
 			workingDirectory file('run/server')
 			property 'forge.logging.markers', ''
 			property 'forge.logging.console.level', 'debug'
@@ -101,7 +119,6 @@ minecraft {
 		}
 
 		data {
-			taskName 'dummyData'
 			workingDirectory file('run/client')
 			property 'forge.logging.markers', ''
 			property 'forge.logging.console.level', 'debug'
@@ -119,7 +136,6 @@ minecraft {
 		dataMod {
 			parent runs.data
 
-			taskName "${MOD_ID}-data"
 			ideaModule "${rootProject.name}.${project.name}.main"
 			source sourceSets.main
 
@@ -134,7 +150,6 @@ minecraft {
 		dataTestmod {
 			parent runs.data
 
-			taskName "${TEST_MOD_ID}-data"
 			ideaModule "${rootProject.name}.${project.name}.testmod"
 			source sourceSets.testmod
 
@@ -191,29 +206,17 @@ dependencies {
 	// Main
 	annotationProcessor "org.spongepowered:mixin:${MIXIN_VERSION}:processor"
 	implementation project(':Common')
-	implementation fg.deobf("curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}") // Jade-1.19.1-forge-8.6.0
-	compileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}")
-	compileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}")
-	runtimeOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}")
 	runtimeClasspath "net.covers1624:DevLogin:${DEVLOGIN_VERSION}"
 
 	// Data Gen
 	datagenImplementation sourceSets.main.output
 	datagenImplementation project(':Common')
-	datagenImplementation fg.deobf("curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}") // Jade-1.19.1-forge-8.6.0
-	datagenCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}")
-	datagenCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}")
-	datagenRuntimeOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}")
 
 	// Test Mod
 	testmodAnnotationProcessor "org.spongepowered:mixin:${MIXIN_VERSION}:processor"
 	testmodImplementation sourceSets.main.output
 	testmodImplementation project(':Common')
 	testmodImplementation project(':Common').sourceSets.testmod.output
-	testmodImplementation fg.deobf("curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}") // Jade-1.19.1-forge-8.6.0
-	testmodCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}")
-	testmodCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}")
-	testmodRuntimeOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}")
 	testmodRuntimeClasspath "net.covers1624:DevLogin:${DEVLOGIN_VERSION}"
 
 	// Test Mod Data Gen
@@ -222,10 +225,33 @@ dependencies {
 	testmodDatagenImplementation sourceSets.datagen.output
 	testmodDatagenImplementation project(':Common')
 	testmodDatagenImplementation project(':Common').sourceSets.testmod.output
-	testmodDatagenImplementation fg.deobf("curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}") // Jade-1.19.1-forge-8.6.0
-	testmodDatagenCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}")
-	testmodDatagenCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}")
-	testmodDatagenRuntimeOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}")
+
+	// JEI
+	if(rootProject.hasProperty('JEI_VERSION')) {
+		compileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}")
+		compileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}")
+		runtimeOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}")
+
+		datagenCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}")
+		datagenCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}")
+		datagenRuntimeOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}")
+
+		testmodCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}")
+		testmodCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}")
+		testmodRuntimeOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}")
+
+		testmodDatagenCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}")
+		testmodDatagenCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}")
+		testmodDatagenRuntimeOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}")
+	}
+
+	// Jade
+	if(rootProject.hasProperty('JADE_CF_ID') && rootProject.hasProperty('FORGE_JADE_CF_FILE_ID')) {
+		implementation fg.deobf("curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}")
+		datagenImplementation fg.deobf("curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}")
+		testmodImplementation fg.deobf("curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}")
+		testmodDatagenImplementation fg.deobf("curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}")
+	}
 }
 
 processResources {

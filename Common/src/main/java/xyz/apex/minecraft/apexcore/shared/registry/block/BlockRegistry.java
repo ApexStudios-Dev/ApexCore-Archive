@@ -3,6 +3,7 @@ package xyz.apex.minecraft.apexcore.shared.registry.block;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
@@ -10,14 +11,13 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import xyz.apex.minecraft.apexcore.shared.registry.BasicRegistry;
 import xyz.apex.minecraft.apexcore.shared.registry.ModdedRegistries;
-import xyz.apex.minecraft.apexcore.shared.registry.RegistryKeys;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class BlockRegistry extends BasicRegistry<Block>
 {
-    public static final ResourceKey<Registry<Block>> TYPE = RegistryKeys.BLOCK;
+    public static final ResourceKey<Registry<Block>> TYPE = Registries.BLOCK;
 
     private BlockRegistry(String modId)
     {

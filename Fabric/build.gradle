@@ -46,12 +46,13 @@ sourceSets {
 }
 
 loom {
-	accessWidenerPath = file("src/main/resources/${MOD_ID}.accesswidener")
+	if(file("src/main/resources/${MOD_ID}.accesswidener").exists()) {
+		accessWidenerPath = file("src/main/resources/${MOD_ID}.accesswidener")
+	}
 
 	runs {
 		client {
 			client()
-			setConfigName('fabric client')
 			ideConfigGenerated(true)
 			runDir('run')
 			source(sourceSets.testmod)
@@ -59,7 +60,6 @@ loom {
 
 		server {
 			server()
-			setConfigName('fabric server')
 			ideConfigGenerated(true)
 			runDir('run')
 			source(sourceSets.testmod)
@@ -67,7 +67,6 @@ loom {
 
 		data {
 			inherit(client)
-			setConfigName('fabric data')
 			ideConfigGenerated(true)
 			runDir('run')
 			source(sourceSets.main)
@@ -78,7 +77,6 @@ loom {
 
 		testmodData {
 			inherit(client)
-			setConfigName('fabric testmod-data')
 			ideConfigGenerated(true)
 			runDir('run')
 			source(sourceSets.testmod)
@@ -130,25 +128,22 @@ dependencies {
 
 	mappings loom.layered() {
 		officialMojangMappings()
-		parchment("org.parchmentmc.data:parchment-${MINECRAFT_VERSION}:${PARCHMENT_MAPPINGS}@zip")
+
+		if(rootProject.hasProperty('PARCHMENT_MAPPINGS')) {
+			def mcVersion = rootProject.hasProperty('PARCHMENT_MINECRAFT_VERSION') ? "${PARCHMENT_MINECRAFT_VERSION}" : "${MINECRAFT_VERSION}"
+			parchment("org.parchmentmc.data:parchment-${mcVersion}:${PARCHMENT_MAPPINGS}@zip")
+		}
 	}
 
 	// Main
 	modImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${FABRIC_VERSION}+${MINECRAFT_VERSION}"
-	modRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
 	implementation project(':Common')
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
-	modImplementation "com.terraformersmc:modmenu:${FABRIC_MOD_MENU_VERSION}"
-	modImplementation "curse.maven:jade-${JADE_CF_ID}:${FABRIC_JADE_CF_FILE_ID}" // Jade-1.19.1-fabric-8.6.0
-	modCompileOnlyApi "mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}"
-	modCompileOnlyApi "mezz.jei:jei-${MINECRAFT_VERSION}-fabric-api:${JEI_VERSION}"
-	modRuntimeOnly "mezz.jei:jei-${MINECRAFT_VERSION}-fabric:${JEI_VERSION}"
 
 	// Data Gen
 	modDatagenImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
 	modDatagenImplementation "net.fabricmc.fabric-api:fabric-api:${FABRIC_VERSION}+${MINECRAFT_VERSION}"
-	modDatagenRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
 	datagenImplementation sourceSets.main.output
 	datagenImplementation project(':Common')
 	datagenImplementation 'com.google.code.findbugs:jsr305:3.0.2'
@@ -156,27 +151,51 @@ dependencies {
 	// Test Mod
 	modTestmodImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
 	modTestmodImplementation "net.fabricmc.fabric-api:fabric-api:${FABRIC_VERSION}+${MINECRAFT_VERSION}"
-	modTestmodRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
 	testmodImplementation sourceSets.main.output
 	testmodImplementation project(':Common')
 	testmodImplementation project(':Common').sourceSets.testmod.output
 	testmodImplementation 'com.google.code.findbugs:jsr305:3.0.2'
-	modTestmodImplementation "com.terraformersmc:modmenu:${FABRIC_MOD_MENU_VERSION}"
-	modTestmodImplementation "curse.maven:jade-${JADE_CF_ID}:${FABRIC_JADE_CF_FILE_ID}" // Jade-1.19.1-fabric-8.6.0
-	modTestmodCompileOnly "mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}"
-	modTestmodCompileOnly "mezz.jei:jei-${MINECRAFT_VERSION}-fabric-api:${JEI_VERSION}"
-	modTestmodRuntimeOnly "mezz.jei:jei-${MINECRAFT_VERSION}-fabric:${JEI_VERSION}"
 
 	// Test Mod Data Gen
 	modTestmodDatagenImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
 	modTestmodDatagenImplementation "net.fabricmc.fabric-api:fabric-api:${FABRIC_VERSION}+${MINECRAFT_VERSION}"
-	modTestmodDatagenRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
 	testmodDatagenImplementation sourceSets.main.output
 	testmodDatagenImplementation sourceSets.testmod.output
 	testmodDatagenImplementation sourceSets.datagen.output
 	testmodDatagenImplementation project(':Common')
 	testmodDatagenImplementation project(':Common').sourceSets.testmod.output
 	testmodDatagenImplementation 'com.google.code.findbugs:jsr305:3.0.2'
+
+	// JEI
+	if(rootProject.hasProperty('JEI_VERSION')) {
+		modCompileOnlyApi "mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}"
+		modCompileOnlyApi "mezz.jei:jei-${MINECRAFT_VERSION}-fabric-api:${JEI_VERSION}"
+		modRuntimeOnly "mezz.jei:jei-${MINECRAFT_VERSION}-fabric:${JEI_VERSION}"
+
+		modTestmodCompileOnly "mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}"
+		modTestmodCompileOnly "mezz.jei:jei-${MINECRAFT_VERSION}-fabric-api:${JEI_VERSION}"
+		modTestmodRuntimeOnly "mezz.jei:jei-${MINECRAFT_VERSION}-fabric:${JEI_VERSION}"
+	}
+
+	// Jade
+	if(rootProject.hasProperty('JADE_CF_ID') && rootProject.hasProperty('FABRIC_JADE_CF_FILE_ID')) {
+		modImplementation "curse.maven:jade-${JADE_CF_ID}:${FABRIC_JADE_CF_FILE_ID}"
+		modTestmodImplementation "curse.maven:jade-${JADE_CF_ID}:${FABRIC_JADE_CF_FILE_ID}"
+	}
+
+	// Lazy DFU
+	if(rootProject.hasProperty('FABRIC_LAZY_DFU_VERSION')) {
+		modRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
+		modDatagenRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
+		modTestmodRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
+		modTestmodDatagenRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
+	}
+
+	// ModMenu
+	if(rootProject.hasProperty('FABRIC_MOD_MENU_VERSION')) {
+		modImplementation "com.terraformersmc:modmenu:${FABRIC_MOD_MENU_VERSION}"
+		modTestmodImplementation "com.terraformersmc:modmenu:${FABRIC_MOD_MENU_VERSION}"
+	}
 }
 
 processResources {

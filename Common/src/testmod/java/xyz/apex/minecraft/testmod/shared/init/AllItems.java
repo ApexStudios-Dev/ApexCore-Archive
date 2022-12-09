@@ -17,22 +17,22 @@ public interface AllItems
 
     ItemRegistryEntry<BlockItem> LEAD_ORE = TestMod.Registries.ITEMS
             .blockBuilder(AllBlocks.LEAD_ORE)
-            .tab(CreativeModeTab.TAB_BUILDING_BLOCKS)
+            // .tab(CreativeModeTab.TAB_BUILDING_BLOCKS)
     .register();
 
     ItemRegistryEntry<BlockItem> DEEPSLATE_LEAD_ORE = TestMod.Registries.ITEMS
             .blockBuilder(AllBlocks.DEEPSLATE_LEAD_ORE)
-            .tab(CreativeModeTab.TAB_BUILDING_BLOCKS)
+            // .tab(CreativeModeTab.TAB_BUILDING_BLOCKS)
     .register();
 
     ItemRegistryEntry<BlockItem> LEAD_BLOCK = TestMod.Registries.ITEMS
             .blockBuilder(AllBlocks.LEAD_BLOCK)
-            .tab(CreativeModeTab.TAB_BUILDING_BLOCKS)
+            // .tab(CreativeModeTab.TAB_BUILDING_BLOCKS)
     .register();
 
     ItemRegistryEntry<BlockItem> RAW_LEAD_BLOCK = TestMod.Registries.ITEMS
             .blockBuilder(AllBlocks.RAW_LEAD_BLOCK)
-            .tab(CreativeModeTab.TAB_BUILDING_BLOCKS)
+            // .tab(CreativeModeTab.TAB_BUILDING_BLOCKS)
     .register();
 
     ItemRegistryEntry<SwordItem> LEAD_SWORD = TestMod.Registries.ITEMS

@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.testmod.forge.data;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -22,11 +23,11 @@ public final class ItemTagGenerator extends ItemTagsProvider
 
     public ItemTagGenerator(GatherDataEvent event, BlockTagGenerator blockTags)
     {
-        super(event.getGenerator(), blockTags, TestMod.ID, event.getExistingFileHelper());
+        super(event.getGenerator().getPackOutput(), event.getLookupProvider(), blockTags, TestMod.ID, event.getExistingFileHelper());
     }
 
     @Override
-    protected void addTags()
+    protected void addTags(HolderLookup.Provider provider)
     {
         var leadOre = AllBlocks.LEAD_ORE.asItem();
         var deepslateLeadOre = AllBlocks.DEEPSLATE_LEAD_ORE.asItem();

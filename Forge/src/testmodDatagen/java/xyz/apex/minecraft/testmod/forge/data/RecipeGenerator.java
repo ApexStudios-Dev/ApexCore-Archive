@@ -2,10 +2,7 @@ package xyz.apex.minecraft.testmod.forge.data;
 
 import com.google.common.collect.ImmutableList;
 
-import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
+import net.minecraft.data.recipes.*;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
@@ -20,16 +17,16 @@ public final class RecipeGenerator extends RecipeProvider
 {
     RecipeGenerator(GatherDataEvent event)
     {
-        super(event.getGenerator());
+        super(event.getGenerator().getPackOutput());
     }
 
     @Override
-    protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer)
+    protected void buildRecipes(Consumer<FinishedRecipe> consumer)
     {
         var leadSmeltables = ImmutableList.<ItemLike>of(AllBlocks.LEAD_ORE, AllBlocks.DEEPSLATE_LEAD_ORE, AllItems.RAW_LEAD);
 
         ShapedRecipeBuilder
-                .shaped(AllItems.LEAD_AXE)
+                .shaped(RecipeCategory.TOOLS, AllItems.LEAD_AXE)
                 .define('#', Items.STICK)
                 .define('X', ItemTagGenerator.LEAD_INGOT)
                 .pattern("XX")
@@ -40,7 +37,7 @@ public final class RecipeGenerator extends RecipeProvider
         ;
 
         ShapedRecipeBuilder
-                .shaped(AllItems.LEAD_BOOTS)
+                .shaped(RecipeCategory.COMBAT, AllItems.LEAD_BOOTS)
                 .define('X', ItemTagGenerator.LEAD_INGOT)
                 .pattern("X X")
                 .pattern("X X")
@@ -49,7 +46,7 @@ public final class RecipeGenerator extends RecipeProvider
         ;
 
         ShapedRecipeBuilder
-                .shaped(AllItems.LEAD_CHESTPLATE)
+                .shaped(RecipeCategory.COMBAT, AllItems.LEAD_CHESTPLATE)
                 .define('X', ItemTagGenerator.LEAD_INGOT)
                 .pattern("X X")
                 .pattern("XXX")
@@ -59,7 +56,7 @@ public final class RecipeGenerator extends RecipeProvider
         ;
 
         ShapedRecipeBuilder
-                .shaped(AllItems.LEAD_HELMET)
+                .shaped(RecipeCategory.COMBAT, AllItems.LEAD_HELMET)
                 .define('X', ItemTagGenerator.LEAD_INGOT)
                 .pattern("XXX")
                 .pattern("X X")
@@ -68,7 +65,7 @@ public final class RecipeGenerator extends RecipeProvider
         ;
 
         ShapedRecipeBuilder
-                .shaped(AllItems.LEAD_HOE)
+                .shaped(RecipeCategory.TOOLS, AllItems.LEAD_HOE)
                 .define('#', Items.STICK)
                 .define('X', ItemTagGenerator.LEAD_INGOT)
                 .pattern("XX")
@@ -78,12 +75,12 @@ public final class RecipeGenerator extends RecipeProvider
                 .save(consumer)
         ;
 
-        nineBlockStorageRecipesRecipesWithCustomUnpacking(consumer, AllItems.LEAD_INGOT, AllBlocks.LEAD_BLOCK, "lead_ingot_from_lead_block", "lead_ingot");
+        nineBlockStorageRecipesRecipesWithCustomUnpacking(consumer, RecipeCategory.MISC, AllItems.LEAD_INGOT, RecipeCategory.BUILDING_BLOCKS, AllBlocks.LEAD_BLOCK, "lead_ingot_from_lead_block", "lead_ingot");
 
-        nineBlockStorageRecipesWithCustomPacking(consumer, AllItems.LEAD_NUGGET, AllItems.LEAD_INGOT, "lead_ingot_from_nuggets", "lead_ingot");
+        nineBlockStorageRecipesWithCustomPacking(consumer, RecipeCategory.MISC, AllItems.LEAD_NUGGET, RecipeCategory.MISC, AllItems.LEAD_INGOT, "lead_ingot_from_nuggets", "lead_ingot");
 
         ShapedRecipeBuilder
-                .shaped(AllItems.LEAD_LEGGINGS)
+                .shaped(RecipeCategory.COMBAT, AllItems.LEAD_LEGGINGS)
                 .define('X', ItemTagGenerator.LEAD_INGOT)
                 .pattern("XXX")
                 .pattern("X X")
@@ -93,7 +90,7 @@ public final class RecipeGenerator extends RecipeProvider
         ;
 
         ShapedRecipeBuilder
-                .shaped(AllItems.LEAD_PICKAXE)
+                .shaped(RecipeCategory.TOOLS, AllItems.LEAD_PICKAXE)
                 .define('#', Items.STICK)
                 .define('X', ItemTagGenerator.LEAD_INGOT)
                 .pattern("XXX")
@@ -104,7 +101,7 @@ public final class RecipeGenerator extends RecipeProvider
         ;
 
         ShapedRecipeBuilder
-                .shaped(AllItems.LEAD_SHOVEL)
+                .shaped(RecipeCategory.TOOLS, AllItems.LEAD_SHOVEL)
                 .define('#', Items.STICK)
                 .define('X', ItemTagGenerator.LEAD_INGOT)
                 .pattern("X")
@@ -115,7 +112,7 @@ public final class RecipeGenerator extends RecipeProvider
         ;
 
         ShapedRecipeBuilder
-                .shaped(AllItems.LEAD_SWORD)
+                .shaped(RecipeCategory.COMBAT, AllItems.LEAD_SWORD)
                 .define('#', Items.STICK)
                 .define('X', ItemTagGenerator.LEAD_INGOT)
                 .pattern("X")
@@ -125,12 +122,12 @@ public final class RecipeGenerator extends RecipeProvider
                 .save(consumer)
         ;
 
-        oreSmelting(consumer, leadSmeltables, AllItems.LEAD_INGOT, .7F, 200, "lead_ingot");
+        oreSmelting(consumer, leadSmeltables, RecipeCategory.MISC, AllItems.LEAD_INGOT, .7F, 200, "lead_ingot");
 
-        nineBlockStorageRecipes(consumer, AllItems.RAW_LEAD, AllBlocks.RAW_LEAD_BLOCK);
+        nineBlockStorageRecipes(consumer, RecipeCategory.MISC, AllItems.RAW_LEAD, RecipeCategory.BUILDING_BLOCKS, AllBlocks.RAW_LEAD_BLOCK);
 
         SimpleCookingRecipeBuilder
-                .smelting(Ingredient.of(AllItems.LEAD_PICKAXE, AllItems.LEAD_SHOVEL, AllItems.LEAD_AXE, AllItems.LEAD_HOE, AllItems.LEAD_SWORD, AllItems.LEAD_HELMET, AllItems.LEAD_CHESTPLATE, AllItems.LEAD_LEGGINGS, AllItems.LEAD_BOOTS, AllItems.LEAD_HORSE_ARMOR), AllItems.LEAD_NUGGET, .1F, 200)
+                .smelting(Ingredient.of(AllItems.LEAD_PICKAXE, AllItems.LEAD_SHOVEL, AllItems.LEAD_AXE, AllItems.LEAD_HOE, AllItems.LEAD_SWORD, AllItems.LEAD_HELMET, AllItems.LEAD_CHESTPLATE, AllItems.LEAD_LEGGINGS, AllItems.LEAD_BOOTS, AllItems.LEAD_HORSE_ARMOR), RecipeCategory.MISC, AllItems.LEAD_NUGGET, .1F, 200)
                 .unlockedBy("has_lead_pickaxe", has(AllItems.LEAD_PICKAXE))
                 .unlockedBy("has_lead_shovel", has(AllItems.LEAD_SHOVEL))
                 .unlockedBy("has_lead_axe", has(AllItems.LEAD_AXE))
@@ -144,10 +141,10 @@ public final class RecipeGenerator extends RecipeProvider
                 .save(consumer, getSmeltingRecipeName(AllItems.LEAD_NUGGET))
         ;
 
-        oreBlasting(consumer, leadSmeltables, AllItems.LEAD_INGOT, .7F, 100, "lead_ingot");
+        oreBlasting(consumer, leadSmeltables, RecipeCategory.MISC, AllItems.LEAD_INGOT, .7F, 100, "lead_ingot");
 
         SimpleCookingRecipeBuilder
-                .blasting(Ingredient.of(AllItems.LEAD_PICKAXE, AllItems.LEAD_SHOVEL, AllItems.LEAD_AXE, AllItems.LEAD_HOE, AllItems.LEAD_SWORD, AllItems.LEAD_HELMET, AllItems.LEAD_CHESTPLATE, AllItems.LEAD_LEGGINGS, AllItems.LEAD_BOOTS, AllItems.LEAD_HORSE_ARMOR), AllItems.LEAD_NUGGET, .1F, 100)
+                .blasting(Ingredient.of(AllItems.LEAD_PICKAXE, AllItems.LEAD_SHOVEL, AllItems.LEAD_AXE, AllItems.LEAD_HOE, AllItems.LEAD_SWORD, AllItems.LEAD_HELMET, AllItems.LEAD_CHESTPLATE, AllItems.LEAD_LEGGINGS, AllItems.LEAD_BOOTS, AllItems.LEAD_HORSE_ARMOR), RecipeCategory.MISC, AllItems.LEAD_NUGGET, .1F, 100)
                 .unlockedBy("has_lead_pickaxe", has(AllItems.LEAD_PICKAXE))
                 .unlockedBy("has_lead_shovel", has(AllItems.LEAD_SHOVEL))
                 .unlockedBy("has_lead_axe", has(AllItems.LEAD_AXE))

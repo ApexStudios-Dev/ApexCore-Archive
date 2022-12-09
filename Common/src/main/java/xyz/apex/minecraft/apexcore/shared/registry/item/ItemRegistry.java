@@ -3,6 +3,7 @@ package xyz.apex.minecraft.apexcore.shared.registry.item;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -12,13 +13,12 @@ import net.minecraft.world.level.block.Block;
 import xyz.apex.minecraft.apexcore.shared.registry.BasicRegistry;
 import xyz.apex.minecraft.apexcore.shared.registry.ModdedRegistries;
 import xyz.apex.minecraft.apexcore.shared.registry.RegistryEntry;
-import xyz.apex.minecraft.apexcore.shared.registry.RegistryKeys;
 
 import java.util.function.Supplier;
 
 public final class ItemRegistry extends BasicRegistry<Item>
 {
-    public static final ResourceKey<Registry<Item>> TYPE = RegistryKeys.ITEM;
+    public static final ResourceKey<Registry<Item>> TYPE = Registries.ITEM;
 
     private final ItemBuilders builders;
 

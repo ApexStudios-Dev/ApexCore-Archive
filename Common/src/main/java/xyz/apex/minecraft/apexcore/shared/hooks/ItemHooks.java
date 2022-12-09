@@ -21,7 +21,6 @@ public interface ItemHooks
     @SuppressWarnings("DataFlowIssue")
     static Item.Properties copyProperties(Item item)
     {
-        var category = item.getItemCategory();
         var rarity = ItemHooks.getRarity(item);
         var maxDamage = item.getMaxDamage();
         var foodProperties = item.getFoodProperties();
@@ -33,7 +32,6 @@ public interface ItemHooks
 
         if(foodProperties != null) properties = properties.food(foodProperties);
         if(item.hasCraftingRemainingItem()) properties = properties.craftRemainder(item.getCraftingRemainingItem());
-        if(category != null) properties = properties.tab(category);
         if(item.isFireResistant()) properties = properties.fireResistant();
 
         return properties;

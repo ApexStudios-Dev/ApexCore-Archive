@@ -1,6 +1,5 @@
 package xyz.apex.minecraft.apexcore.shared.util;
 
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -32,7 +31,7 @@ public interface Properties
     Supplier<Item.Properties> ITEM_GENERIC = () -> ItemHooks.copyProperties(Items.STONE);
     Supplier<Item.Properties> ITEM_BUCKET = () -> ItemHooks.copyProperties(Items.BUCKET);
     Supplier<Item.Properties> ITEM_GLASS_BOTTLE = () -> ItemHooks.copyProperties(Items.GLASS_BOTTLE);
-    Supplier<Item.Properties> ITEM_TOOL = () -> new Item.Properties().stacksTo(1).tab(CreativeModeTab.TAB_TOOLS);
-    Supplier<Item.Properties> ITEM_COMBAT = () -> new Item.Properties().stacksTo(1).tab(CreativeModeTab.TAB_COMBAT);
+    Supplier<Item.Properties> ITEM_TOOL = () -> new Item.Properties().stacksTo(1);
+    Supplier<Item.Properties> ITEM_COMBAT = () -> new Item.Properties().stacksTo(1);
     // endregion
 }

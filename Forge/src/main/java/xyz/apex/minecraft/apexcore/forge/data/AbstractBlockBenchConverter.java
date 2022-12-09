@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraftforge.client.model.generators.*;
@@ -15,10 +16,12 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 public abstract class AbstractBlockBenchConverter implements DataProvider
 {
@@ -29,54 +32,37 @@ public abstract class AbstractBlockBenchConverter implements DataProvider
     protected final String modId;
     protected final BlockModelProvider blockModels;
     protected final ItemModelProvider itemModels;
+    private final Collection<Path> inputFolders;
 
     private final Map<ResourceLocation, BlockModelBuilder> blockModelBuilders = Maps.newHashMap();
     private final Map<ResourceLocation, Path> blockModelInputPaths = Maps.newHashMap();
     private final Map<ResourceLocation, ItemModelBuilder> itemModelBuilders = Maps.newHashMap();
     private final Map<ResourceLocation, Path> itemModelInputPaths = Maps.newHashMap();
 
-    protected AbstractBlockBenchConverter(DataGenerator generator, ExistingFileHelper existingFileHelper, @Nullable BlockModelProvider blockModels, @Nullable ItemModelProvider itemModels, String modId)
+    protected AbstractBlockBenchConverter(GatherDataEvent event, String modId)
     {
-        this.generator = generator;
-        this.existingFileHelper = existingFileHelper;
+        this(event, null, null, modId);
+    }
+
+    protected AbstractBlockBenchConverter(GatherDataEvent event, @Nullable BlockModelProvider blockModels, @Nullable ItemModelProvider itemModels, String modId)
+    {
+        generator = event.getGenerator();
+        existingFileHelper = event.getExistingFileHelper();
+        inputFolders = getDataGeneratorConfig(event).getInputs();
+
         this.modId = modId;
         this.blockModels = blockModels == null ? dummyBlockModels(generator, existingFileHelper, modId) : blockModels;
         this.itemModels = itemModels == null ? dummyItemModels(generator, existingFileHelper, modId) : itemModels;
     }
 
-    protected AbstractBlockBenchConverter(DataGenerator generator, ExistingFileHelper existingFileHelper, String modId)
-    {
-        this(generator, existingFileHelper, null, null, modId);
-    }
-
-    protected AbstractBlockBenchConverter(DataGenerator generator, ExistingFileHelper existingFileHelper, @Nullable BlockModelProvider blockModels, String modId)
-    {
-        this(generator, existingFileHelper, blockModels, null, modId);
-    }
-
-    protected AbstractBlockBenchConverter(DataGenerator generator, ExistingFileHelper existingFileHelper, @Nullable ItemModelProvider itemModels, String modId)
-    {
-        this(generator, existingFileHelper, null, itemModels, modId);
-    }
-
-    protected AbstractBlockBenchConverter(GatherDataEvent event, String modId)
-    {
-        this(event.getGenerator(), event.getExistingFileHelper(), null, null, modId);
-    }
-
-    protected AbstractBlockBenchConverter(GatherDataEvent event, @Nullable BlockModelProvider blockModels, @Nullable ItemModelProvider itemModels, String modId)
-    {
-        this(event.getGenerator(), event.getExistingFileHelper(), blockModels, itemModels, modId);
-    }
-
     protected AbstractBlockBenchConverter(GatherDataEvent event, @Nullable BlockModelProvider blockModels, String modId)
     {
-        this(event.getGenerator(), event.getExistingFileHelper(), blockModels, null, modId);
+        this(event, blockModels, null, modId);
     }
 
     protected AbstractBlockBenchConverter(GatherDataEvent event, @Nullable ItemModelProvider itemModels, String modId)
     {
-        this(event.getGenerator(), event.getExistingFileHelper(), null, itemModels, modId);
+        this(event, null, itemModels, modId);
     }
 
     protected abstract void convertModels();
@@ -124,34 +110,29 @@ public abstract class AbstractBlockBenchConverter implements DataProvider
     }
 
     @Override
-    public final void run(CachedOutput output) throws IOException
+    public final CompletableFuture<?> run(CachedOutput output)
     {
         blockModelBuilders.clear();
         itemModelBuilders.clear();
 
         convertModels();
+        var outputDir = generator.getPackOutput().getOutputFolder(PackOutput.Target.RESOURCE_PACK);
 
-        var outputDir = generator.getOutputFolder();
-
-        for(var entry : blockModelBuilders.entrySet())
-        {
-            generateModel(output, outputDir, entry.getKey(), entry.getValue());
-        }
-
-        for(var entry : itemModelBuilders.entrySet())
-        {
-            generateModel(output, outputDir, entry.getKey(), entry.getValue());
-        }
+        return CompletableFuture.allOf(Stream
+                .concat(blockModelBuilders.entrySet().stream(), itemModelBuilders.entrySet().stream())
+                .map(entry -> generateModel(output, outputDir, entry.getKey(), entry.getValue()))
+                .toArray(CompletableFuture[]::new)
+        );
     }
 
-    private <T extends ModelBuilder<T>> void generateModel(CachedOutput output, Path outputDir, ResourceLocation inputPath, T modelBuilder) throws IOException
+    private CompletableFuture<?> generateModel(CachedOutput output, Path outputDir, ResourceLocation inputPath, ModelBuilder<?> modelBuilder)
     {
         var json = modelBuilder.toJson();
         var outputPath = modelBuilder.getUncheckedLocation();
         LOGGER.info("Generating converted BlockBench model '{}' -> '{}'", inputPath, outputPath);
         var filePath = buildModelPath(outputDir, outputPath);
         existingFileHelper.trackGenerated(outputPath, PackType.CLIENT_RESOURCES, ".json", "models");
-        DataProvider.saveStable(output, json, filePath);
+        return DataProvider.saveStable(output, json, filePath);
     }
 
     @Override
@@ -163,7 +144,6 @@ public abstract class AbstractBlockBenchConverter implements DataProvider
     private Path buildModelPath(Path dir, ResourceLocation modelPath)
     {
         return dir
-                .resolve("assets")
                 .resolve(modelPath.getNamespace())
                 .resolve("models")
                 .resolve("%s.json".formatted(modelPath.getPath()))
@@ -172,7 +152,7 @@ public abstract class AbstractBlockBenchConverter implements DataProvider
 
     private Path findInputPath(ResourceLocation modelPath)
     {
-        for(var inputDir : generator.getInputFolders())
+        for(var inputDir : inputFolders)
         {
             var filePath = buildModelPath(inputDir, modelPath);
             if(Files.exists(filePath)) return filePath;
@@ -199,5 +179,19 @@ public abstract class AbstractBlockBenchConverter implements DataProvider
             {
             }
         };
+    }
+
+    private static GatherDataEvent.DataGeneratorConfig getDataGeneratorConfig(GatherDataEvent event)
+    {
+        try
+        {
+            var field = GatherDataEvent.class.getDeclaredField("config");
+            field.setAccessible(true);
+            return (GatherDataEvent.DataGeneratorConfig) field.get(event);
+        }
+        catch(NoSuchFieldException | IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

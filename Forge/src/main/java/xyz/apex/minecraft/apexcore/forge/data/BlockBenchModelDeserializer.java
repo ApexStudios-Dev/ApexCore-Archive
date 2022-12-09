@@ -165,16 +165,17 @@ public class BlockBenchModelDeserializer
     {
         // origin is multiplied by 0.0625 during deserialization
         // we divide by same value here to get back the raw values
-        var oX = rotation.origin.x() / .0625F;
-        var oY = rotation.origin.y() / .0625F;
-        var oZ = rotation.origin.z() / .0625F;
+        var rotationOrigin = rotation.origin();
+        var oX = rotationOrigin.x / .0625F;
+        var oY = rotationOrigin.y / .0625F;
+        var oZ = rotationOrigin.z / .0625F;
 
         elementBuilder
                 .rotation()
-                .angle(rotation.angle)
-                .axis(rotation.axis)
+                .angle(rotation.angle())
+                .axis(rotation.axis())
                 .origin(oX, oY, oZ)
-                .rescale(rotation.rescale)
+                .rescale(rotation.rescale())
                 .end()
         ;
     }

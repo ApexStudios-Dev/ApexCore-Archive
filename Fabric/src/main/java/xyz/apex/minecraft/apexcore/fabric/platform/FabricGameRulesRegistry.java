@@ -10,7 +10,6 @@ import xyz.apex.minecraft.apexcore.shared.platform.PlatformGameRulesRegistry;
 
 import java.util.function.BiConsumer;
 
-@SuppressWarnings("NullableProblems")
 public final class FabricGameRulesRegistry extends FabricHolder implements PlatformGameRulesRegistry
 {
     FabricGameRulesRegistry(FabricPlatform platform)

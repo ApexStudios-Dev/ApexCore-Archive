@@ -1,11 +1,12 @@
 package xyz.apex.minecraft.testmod.forge.data;
 
-import net.minecraft.data.tags.BlockTagsProvider;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.versions.forge.ForgeVersion;
 
@@ -19,11 +20,11 @@ public final class BlockTagGenerator extends BlockTagsProvider
 
     BlockTagGenerator(GatherDataEvent event)
     {
-        super(event.getGenerator(), TestMod.ID, event.getExistingFileHelper());
+        super(event.getGenerator().getPackOutput(), event.getLookupProvider(), TestMod.ID, event.getExistingFileHelper());
     }
 
     @Override
-    protected void addTags()
+    protected void addTags(HolderLookup.Provider provider)
     {
         var leadOre = AllBlocks.LEAD_ORE.get();
         var deepslateLeadOre = AllBlocks.DEEPSLATE_LEAD_ORE.get();
