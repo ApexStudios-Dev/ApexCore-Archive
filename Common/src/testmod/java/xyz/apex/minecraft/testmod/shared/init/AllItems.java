@@ -1,18 +1,8 @@
 package xyz.apex.minecraft.testmod.shared.init;
 
-import net.minecraft.tags.BlockTags;
-import net.minecraft.world.item.*;
-
-import xyz.apex.minecraft.apexcore.shared.registry.item.ItemRegistryEntry;
-import xyz.apex.minecraft.apexcore.shared.util.ArmorMaterialBuilder;
-import xyz.apex.minecraft.apexcore.shared.util.EnchancedTier;
-import xyz.apex.minecraft.apexcore.shared.util.Properties;
-import xyz.apex.minecraft.apexcore.shared.util.TierBuilder;
-import xyz.apex.minecraft.testmod.shared.TestMod;
-
 public interface AllItems
 {
-    EnchancedTier LEAD_ITEM_TIER = TierBuilder.builder().level(2).uses(250).speed(6F).attackDamageBonus(2F).enchantmentValue(14).repairItem(AllItems.LEAD_INGOT).toolLevelTag(BlockTags.NEEDS_IRON_TOOL).build();
+    /*EnchancedTier LEAD_ITEM_TIER = TierBuilder.builder().level(2).uses(250).speed(6F).attackDamageBonus(2F).enchantmentValue(14).repairItem(AllItems.LEAD_INGOT).toolLevelTag(BlockTags.NEEDS_IRON_TOOL).build();
     ArmorMaterial LEAD_ARMOR_MATERIAL = ArmorMaterialBuilder.builder(TestMod.ID, "lead").durabilityFromModifier(15).defenseFromSlotProtections(2, 5, 6, 2).enchantmentValue(9).toughness(0F).knockbackResistance(0F).repairItem(AllItems.LEAD_INGOT).build();
 
     ItemRegistryEntry<BlockItem> LEAD_ORE = TestMod.Registries.ITEMS
@@ -111,7 +101,7 @@ public interface AllItems
             .builders("raw_lead")
             .simpleItem()
             .initialProperties(Properties.ITEM_GENERIC)
-    .register();
+    .register();*/
 
     static void bootstrap()
     {

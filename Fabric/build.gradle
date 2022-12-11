@@ -18,25 +18,9 @@ sourceSets {
 		resources.srcDirs += 'src/main/generated'
 	}
 
-	datagen {
-		compileClasspath += sourceSets.main.output
-		runtimeClasspath += sourceSets.main.output
-
-		compileClasspath += sourceSets.main.compileClasspath
-		runtimeClasspath += sourceSets.main.runtimeClasspath
-	}
-
 	testmod {
 		resources.srcDirs += 'src/testmod/generated'
 
-		compileClasspath += sourceSets.main.output
-		runtimeClasspath += sourceSets.main.output
-
-		compileClasspath += sourceSets.main.compileClasspath
-		runtimeClasspath += sourceSets.main.runtimeClasspath
-	}
-
-	testmodDatagen {
 		compileClasspath += sourceSets.main.output
 		runtimeClasspath += sourceSets.main.output
 
@@ -64,45 +48,21 @@ loom {
 			runDir('run')
 			source(sourceSets.testmod)
 		}
-
-		data {
-			inherit(client)
-			ideConfigGenerated(true)
-			runDir('run')
-			source(sourceSets.main)
-			vmArg('-Dfabric-api.datagen')
-			vmArg("-Dfabric-api.datagen.output-dir=${file('src/main/generated')}")
-			vmArg("-Dfabric-api.datagen.modid=${MOD_ID}")
-		}
-
-		testmodData {
-			inherit(client)
-			ideConfigGenerated(true)
-			runDir('run')
-			source(sourceSets.testmod)
-			vmArg('-Dfabric-api.datagen')
-			vmArg("-Dfabric-api.datagen.output-dir=${file('src/testmod/generated')}")
-			vmArg("-Dfabric-api.datagen.modid=${TEST_MOD_ID}")
-		}
 	}
 
 	mods {
 		"${MOD_ID}" {
 			sourceSet sourceSets.main
-			sourceSet sourceSets.datagen
 			sourceSet project(':Common').sourceSets.main
 		}
 
 		"${TEST_MOD_ID}" {
 			sourceSet sourceSets.testmod
-			sourceSet sourceSets.testmodDatagen
 			sourceSet project(':Common').sourceSets.testmod
 		}
 	}
 
-	createRemapConfigurations(sourceSets.datagen)
 	createRemapConfigurations(sourceSets.testmod)
-	createRemapConfigurations(sourceSets.testmodDatagen)
 }
 
 repositories {
@@ -141,13 +101,6 @@ dependencies {
 	implementation project(':Common')
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
-	// Data Gen
-	modDatagenImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
-	modDatagenImplementation "net.fabricmc.fabric-api:fabric-api:${FABRIC_VERSION}+${MINECRAFT_VERSION}"
-	datagenImplementation sourceSets.main.output
-	datagenImplementation project(':Common')
-	datagenImplementation 'com.google.code.findbugs:jsr305:3.0.2'
-
 	// Test Mod
 	modTestmodImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
 	modTestmodImplementation "net.fabricmc.fabric-api:fabric-api:${FABRIC_VERSION}+${MINECRAFT_VERSION}"
@@ -155,16 +108,6 @@ dependencies {
 	testmodImplementation project(':Common')
 	testmodImplementation project(':Common').sourceSets.testmod.output
 	testmodImplementation 'com.google.code.findbugs:jsr305:3.0.2'
-
-	// Test Mod Data Gen
-	modTestmodDatagenImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
-	modTestmodDatagenImplementation "net.fabricmc.fabric-api:fabric-api:${FABRIC_VERSION}+${MINECRAFT_VERSION}"
-	testmodDatagenImplementation sourceSets.main.output
-	testmodDatagenImplementation sourceSets.testmod.output
-	testmodDatagenImplementation sourceSets.datagen.output
-	testmodDatagenImplementation project(':Common')
-	testmodDatagenImplementation project(':Common').sourceSets.testmod.output
-	testmodDatagenImplementation 'com.google.code.findbugs:jsr305:3.0.2'
 
 	// JEI
 	if(rootProject.hasProperty('JEI_VERSION')) {
@@ -186,9 +129,7 @@ dependencies {
 	// Lazy DFU
 	if(rootProject.hasProperty('FABRIC_LAZY_DFU_VERSION')) {
 		modRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
-		modDatagenRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
 		modTestmodRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
-		modTestmodDatagenRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
 	}
 
 	// ModMenu
