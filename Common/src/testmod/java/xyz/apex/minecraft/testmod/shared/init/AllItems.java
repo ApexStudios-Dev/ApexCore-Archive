@@ -1,7 +1,21 @@
 package xyz.apex.minecraft.testmod.shared.init;
 
+import net.minecraft.world.item.Item;
+
+import xyz.apex.minecraft.apexcore.shared.registry.ItemBuilder;
+import xyz.apex.minecraft.apexcore.shared.registry.entry.ItemEntry;
+import xyz.apex.minecraft.testmod.shared.TestMod;
+
 public interface AllItems
 {
+    ItemEntry<Item> LEAD_INGOT = ItemBuilder
+            .item(TestMod.ID, "lead_ingot")
+            .tag(
+                    AllTags.Items.Forge.INGOTS_LEAD,
+                    AllTags.Items.Fabric.LEAD_INGOT, AllTags.Items.Fabric.LEAD_INGOTS
+            )
+    .register();
+
     /*EnchancedTier LEAD_ITEM_TIER = TierBuilder.builder().level(2).uses(250).speed(6F).attackDamageBonus(2F).enchantmentValue(14).repairItem(AllItems.LEAD_INGOT).toolLevelTag(BlockTags.NEEDS_IRON_TOOL).build();
     ArmorMaterial LEAD_ARMOR_MATERIAL = ArmorMaterialBuilder.builder(TestMod.ID, "lead").durabilityFromModifier(15).defenseFromSlotProtections(2, 5, 6, 2).enchantmentValue(9).toughness(0F).knockbackResistance(0F).repairItem(AllItems.LEAD_INGOT).build();
 

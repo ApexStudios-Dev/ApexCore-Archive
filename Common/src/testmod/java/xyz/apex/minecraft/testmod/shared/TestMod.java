@@ -2,6 +2,7 @@ package xyz.apex.minecraft.testmod.shared;
 
 import xyz.apex.minecraft.testmod.shared.init.AllBlocks;
 import xyz.apex.minecraft.testmod.shared.init.AllItems;
+import xyz.apex.minecraft.testmod.shared.init.AllTags;
 
 public interface TestMod
 {
@@ -9,6 +10,7 @@ public interface TestMod
 
     static void bootstrap()
     {
+        AllTags.bootstrap();
         AllBlocks.bootstrap();
         AllItems.bootstrap();
     }
