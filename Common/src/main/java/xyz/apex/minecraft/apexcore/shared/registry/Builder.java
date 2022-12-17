@@ -28,6 +28,12 @@ public interface Builder<T, R extends T, P, B extends Builder<T, R, P, B, E>, E 
     ResourceKey<? extends Registry<T>> getRegistryType();
     ResourceKey<T> getRegistryKey();
 
+    @SuppressWarnings("unchecked")
+    private B self()
+    {
+        return (B) this;
+    }
+
     default R getEntry()
     {
         return get().get();
@@ -38,18 +44,22 @@ public interface Builder<T, R extends T, P, B extends Builder<T, R, P, B, E>, E 
         return this::getEntry;
     }
 
-    @SuppressWarnings("unchecked")
+    default <D extends DataProvider> B clearData(ProviderType<? extends D> providerType)
+    {
+        Generators.setDataGenerator(getModId(), getName(), getRegistryType(), providerType, provider -> { });
+        return self();
+    }
+
     default <D extends DataProvider> B setData(ProviderType<? extends D> providerType, BiConsumer<DataContext<R, E>, D> consumer)
     {
         Generators.setDataGenerator(getModId(), getName(), getRegistryType(), providerType, provider -> consumer.accept(new DataContext<>(get()), provider));
-        return (B) this;
+        return self();
     }
 
-    @SuppressWarnings("unchecked")
     default <D extends DataProvider> B addMiscData(ProviderType<? extends D> providerType, Consumer<? extends D> consumer)
     {
         Generators.addDataGenerator(getModId(), providerType, consumer);
-        return (B) this;
+        return self();
     }
 
     B tag(ProviderType<? extends TagsProvider<T>> providerType, TagKey<T>... tags);

@@ -27,8 +27,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 
-import xyz.apex.minecraft.apexcore.forge.data.ExtendedLanguageProvider;
-import xyz.apex.minecraft.apexcore.forge.data.ExtendedRecipeProvider;
 import xyz.apex.minecraft.apexcore.shared.data.Generators;
 import xyz.apex.minecraft.apexcore.shared.data.ProviderTypes;
 import xyz.apex.minecraft.apexcore.shared.platform.PlatformEvents;
@@ -207,27 +205,13 @@ public final class ForgeEvents extends ForgePlatformHolder implements PlatformEv
         var client = event.includeClient();
         var server = event.includeServer();
 
-        if(Generators.shouldRegister(modId, ProviderTypes.LANGUAGE))
-        {
-            generator.addProvider(client, new ExtendedLanguageProvider(generator, modId, "en_us") {
-                @Override
-                protected void addTranslations()
-                {
-                    Generators.processDataGenerator(modId, ProviderTypes.LANGUAGE, this);
-                }
-            });
-        }
-
-        if(Generators.shouldRegister(modId, ProviderTypes.RECIPES))
-        {
-            generator.<ExtendedRecipeProvider>addProvider(server, output -> new ExtendedRecipeProvider(output) {
-                @Override
-                protected void registerRecipes()
-                {
-                    Generators.processDataGenerator(modId, ProviderTypes.RECIPES, this);
-                }
-            });
-        }
+        Generators.registerDataGenerators(
+                modId,
+                generator::getPackOutput,
+                lookupProvider,
+                provider -> generator.addProvider(client, provider),
+                provider -> generator.addProvider(server, provider)
+        );
 
         AtomicReference<TagsProvider<Block>> blockTagsProvider = new AtomicReference<>();
 

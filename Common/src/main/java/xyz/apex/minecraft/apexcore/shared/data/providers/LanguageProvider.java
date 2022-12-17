@@ -1,11 +1,16 @@
 package xyz.apex.minecraft.apexcore.shared.data.providers;
 
+import com.google.common.collect.Maps;
+import com.google.gson.JsonObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
@@ -15,103 +20,226 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 
+import xyz.apex.minecraft.apexcore.shared.data.Generators;
+import xyz.apex.minecraft.apexcore.shared.data.ProviderTypes;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.RegistryEntry;
 
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public interface LanguageProvider extends DataProvider
+public final class LanguageProvider implements DataProvider
 {
-    void addBlock(Supplier<? extends Block> key, String name);
-    void add(Block key, String name);
-    void addItem(Supplier<? extends Item> key, String name);
-    void add(Item key, String name);
-    void addItemStack(Supplier<ItemStack> key, String name);
-    void add(ItemStack key, String name);
-    void addEnchantment(Supplier<? extends Enchantment> key, String name);
-    void add(Enchantment key, String name);
-    void addEffect(Supplier<? extends MobEffect> key, String name);
-    void add(MobEffect key, String name);
-    void addEntityType(Supplier<? extends EntityType<?>> key, String name);
-    void add(EntityType<?> key, String name);
-    void add(String key, String value);
+    private final Map<String, String> data = Maps.newTreeMap();
+    private final PackOutput output;
+    private final String modId;
 
-    default void addItemLike(Supplier<? extends ItemLike> key, String name)
+    @ApiStatus.Internal
+    public LanguageProvider(PackOutput output, String modId)
     {
-        add(key.get(), name);
+        this.output = output;
+        this.modId = modId;
     }
 
-    default void add(ItemLike key, String name)
+    @Override
+    public CompletableFuture<?> run(CachedOutput cache)
     {
-        add(key.asItem(), name);
+        Generators.processDataGenerator(modId, ProviderTypes.LANGUAGE, this);
+
+        var json = new JsonObject();
+        // assets/<modId>/lang/en_us.json
+        var outputPath = output.getOutputFolder(PackOutput.Target.RESOURCE_PACK).resolve(modId).resolve("lang").resolve("en_us.json");
+        data.forEach(json::addProperty);
+        return DataProvider.saveStable(cache, json, outputPath);
     }
 
-    default void addBlock(Supplier<? extends Block> key)
+    @Override
+    public String getName()
     {
-        addBlock(key, getAutomaticName(key, Registries.BLOCK));
+        return "Language: English-US";
     }
 
-    default void addItem(Supplier<? extends Item> key)
+    // region: Helpers
+    // region: Generic
+    public LanguageProvider add(String key, String name)
     {
-        addItem(key, getAutomaticName(key, Registries.ITEM));
+        if(data.put(key, name) != null) throw new IllegalStateException("Duplicate translation key: %s".formatted(key));
+        return this;
+    }
+    // endregion
+
+    // region: Block
+    public LanguageProvider addBlock(Supplier<? extends Block> key, String name)
+    {
+        return add(key.get(), name);
     }
 
-    default void addEnchantment(Supplier<? extends Enchantment> key)
+    public LanguageProvider add(Block key, String name)
     {
-        addEnchantment(key, getAutomaticName(key, Registries.ENCHANTMENT));
+        return add(key.getDescriptionId(), name);
     }
 
-    default void addEffect(Supplier<? extends MobEffect> key)
+    public LanguageProvider addBlock(Supplier<? extends Block> key)
     {
-        addEffect(key, getAutomaticName(key, Registries.MOB_EFFECT));
+        return add(key.get());
     }
 
-    default void addEntityType(Supplier<? extends EntityType<?>> key)
+    public LanguageProvider add(Block key)
     {
-        addEntityType(key, getAutomaticName(key, Registries.ENTITY_TYPE));
+        return add(key, getAutomaticName(key, Registries.BLOCK));
+    }
+    // endregion
+
+    // region: Item
+    public LanguageProvider addItem(Supplier<? extends Item> key, String name)
+    {
+        return add(key.get(), name);
     }
 
-    default void add(Block key)
+    public LanguageProvider add(Item key, String name)
     {
-        add(key, getAutomaticName(key, Registries.BLOCK));
+        return add(key.getDescriptionId(), name);
     }
 
-    default void add(Item key)
+    public LanguageProvider addItem(Supplier<? extends Item> key)
     {
-        add(key, getAutomaticName(key, Registries.ITEM));
+        return add(key.get());
     }
 
-    default void add(Enchantment key)
+    public LanguageProvider add(Item key)
     {
-        add(key, getAutomaticName(key, Registries.ENCHANTMENT));
+        return add(key, getAutomaticName(key, Registries.ITEM));
+    }
+    // endregion
+
+    // region: ItemStack
+    public LanguageProvider addItemStack(Supplier<ItemStack> key, String name)
+    {
+        return add(key.get(), name);
     }
 
-    default void add(MobEffect key)
+    public LanguageProvider add(ItemStack key, String name)
     {
-        add(key, getAutomaticName(key, Registries.MOB_EFFECT));
+        return add(key.getDescriptionId(), name);
     }
 
-    default void add(EntityType<?> key)
+    public LanguageProvider addItemStack(Supplier<ItemStack> key)
     {
-        add(key, getAutomaticName(key, Registries.ENTITY_TYPE));
+        return add(key.get());
     }
 
-    default <T> String getAutomaticName(Supplier<? extends T> supplier, ResourceKey<? extends Registry<T>> registryType)
+    public LanguageProvider add(ItemStack key)
+    {
+        return add(key, getAutomaticName(key.getItem(), Registries.ITEM));
+    }
+    // endregion
+
+    // region: Enchantment
+    public LanguageProvider addEnchantment(Supplier<? extends Enchantment> key, String name)
+    {
+        return add(key.get(), name);
+    }
+
+    public LanguageProvider add(Enchantment key, String name)
+    {
+        return add(key.getDescriptionId(), name);
+    }
+
+    public LanguageProvider addEnchantment(Supplier<? extends Enchantment> key)
+    {
+        return add(key.get());
+    }
+
+    public LanguageProvider add(Enchantment key)
+    {
+        return add(key, getAutomaticName(key, Registries.ENCHANTMENT));
+    }
+    // endregion
+
+    // region: MobEffect
+    public LanguageProvider addMobEffect(Supplier<? extends MobEffect> key, String name)
+    {
+        return add(key.get(), name);
+    }
+
+    public LanguageProvider add(MobEffect key, String name)
+    {
+        return add(key.getDescriptionId(), name);
+    }
+
+    public LanguageProvider addMobEffect(Supplier<? extends MobEffect> key)
+    {
+        return add(key.get());
+    }
+
+    public LanguageProvider add(MobEffect key)
+    {
+        return add(key, getAutomaticName(key, Registries.MOB_EFFECT));
+    }
+    // endregion
+
+    // region: EntityType
+    public LanguageProvider addEntityType(Supplier<? extends EntityType<?>> key, String name)
+    {
+        return add(key.get(), name);
+    }
+
+    public LanguageProvider add(EntityType<?> key, String name)
+    {
+        return add(key.getDescriptionId(), name);
+    }
+
+    public LanguageProvider addEntityType(Supplier<? extends EntityType<?>> key)
+    {
+        return add(key.get());
+    }
+
+    public LanguageProvider add(EntityType<?> key)
+    {
+        return add(key, getAutomaticName(key, Registries.ENTITY_TYPE));
+    }
+    // endregion
+
+    // region: ItemLike
+    public LanguageProvider addItemLike(Supplier<? extends ItemLike> key, String name)
+    {
+        return add(key.get(), name);
+    }
+
+    public LanguageProvider add(ItemLike key, String name)
+    {
+        return add(key.asItem(), name);
+    }
+
+    public LanguageProvider addItemLike(Supplier<? extends ItemLike> key)
+    {
+        return add(key.get());
+    }
+
+    public LanguageProvider add(ItemLike key)
+    {
+        return add(key, getAutomaticName(key.asItem(), Registries.ITEM));
+    }
+    // endregion
+
+    public <T> String getAutomaticName(Supplier<? extends T> supplier, ResourceKey<? extends Registry<T>> registryType)
     {
         return getAutomaticName(supplier.get(), registryType);
     }
 
-    default <T> String getAutomaticName(T type, ResourceKey<? extends Registry<T>> registryType)
+    public <T> String getAutomaticName(T type, ResourceKey<? extends Registry<T>> registryType)
     {
         var registry = RegistryEntry.getRegistryOrThrow(registryType);
         var registryName = registry.getKey(type);
         Validate.notNull(registryName);
         return toEnglishName(registryName.getPath());
     }
+    // endregion
 
-    static String toEnglishName(String internalName)
+    public static String toEnglishName(String internalName)
     {
         return Arrays.stream(internalName.toLowerCase(Locale.ROOT).split("_")).map(StringUtils::capitalize).collect(Collectors.joining(" "));
     }

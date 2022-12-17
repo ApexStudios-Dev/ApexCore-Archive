@@ -7,7 +7,9 @@ import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -15,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 
+import xyz.apex.minecraft.apexcore.shared.data.ProviderTypes;
 import xyz.apex.minecraft.apexcore.shared.platform.ForPlatform;
 import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
 import xyz.apex.minecraft.apexcore.shared.platform.Platform;
@@ -50,6 +53,25 @@ public final class BlockBuilder<R extends Block, P> extends AbstractBuilder<Bloc
     {
         var properties = propertiesModifier.apply(initialProperties.get());
         return blockFactory.create(properties);
+    }
+
+    public <T extends Item> ItemBuilder<T, BlockBuilder<R, P>> item(BlockItemFactory<T, R> itemFactory)
+    {
+        return ItemBuilder.builder(getModId(), getName(), this, properties -> itemFactory.create(getEntry(), properties))
+                .clearData(ProviderTypes.LANGUAGE)
+                // TODO
+                // .model((ctx, provider) -> provider.blockItem(get()))
+        ;
+    }
+
+    public ItemBuilder<BlockItem, BlockBuilder<R, P>> simpleItem()
+    {
+        return item(BlockItem::new);
+    }
+
+    public BlockBuilder<R, P> defaultItem()
+    {
+        return simpleItem().build();
     }
 
     public BlockBuilder<R, P> initialProperties(Supplier<BlockBehaviour.Properties> initialProperties)
@@ -136,5 +158,11 @@ public final class BlockBuilder<R extends Block, P> extends AbstractBuilder<Bloc
     public interface BlockFactory<T extends Block>
     {
         T create(BlockBehaviour.Properties properties);
+    }
+
+    @FunctionalInterface
+    public interface BlockItemFactory<I extends Item, B extends Block>
+    {
+        I create(B block, Item.Properties properties);
     }
 }

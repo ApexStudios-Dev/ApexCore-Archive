@@ -5,14 +5,20 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.data.DataProvider;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
 
+import xyz.apex.minecraft.apexcore.shared.data.providers.LanguageProvider;
+import xyz.apex.minecraft.apexcore.shared.data.providers.RecipeProvider;
 import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public final class Generators
 {
@@ -70,6 +76,13 @@ public final class Generators
     public static <D extends DataProvider> void processDataGenerator(String modId, ProviderType<D> providerType, D provider)
     {
         getInstance(modId).processDataGenerator(providerType, provider);
+    }
+
+    public static void registerDataGenerators(String modId, Supplier<PackOutput> output, CompletableFuture<HolderLookup.Provider> lookupProvider, Consumer<DataProvider> client, Consumer<DataProvider> server)
+    {
+        if(shouldRegister(modId, ProviderTypes.LANGUAGE)) client.accept(new LanguageProvider(output.get(), modId));
+
+        if(shouldRegister(modId, ProviderTypes.RECIPES)) server.accept(new RecipeProvider(output.get(), modId));
     }
 
     private static Generators getInstance(String modId)

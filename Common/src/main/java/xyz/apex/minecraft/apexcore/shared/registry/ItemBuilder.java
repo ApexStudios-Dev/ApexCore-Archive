@@ -85,18 +85,15 @@ public final class ItemBuilder<R extends Item, P> extends AbstractBuilder<Item, 
         return this;
     }
 
+    // TODO
     /*public ItemBuilder<R, P> defaultModel()
     {
-        return this;
-        // TODO:
-        // return model((ctx, provider) -> provider.generated());
-    }*/
+        return model((ctx, provider) -> provider.basicItem(get()));
+    }
 
-    /*public ItemBuilder<R, P> model(BiConsumer<ItemLikeContext<R, ItemEntry<R>>, ItemModelProvider> consumer)
+    public ItemBuilder<R, P> model(BiConsumer<ItemLikeContext<R, ItemEntry<R>>, ItemModelProvider> consumer)
     {
-        // TODO:
-        return this;
-        // return setData(ProviderTypes.ITEM_MODEL, consumer);
+        return setData(ProviderTypes.ITEM_MODELS, (ctx, provider) -> consumer.accept(new ItemLikeContext<>(ctx), provider));
     }*/
 
     public ItemBuilder<R, P> defaultLang()
