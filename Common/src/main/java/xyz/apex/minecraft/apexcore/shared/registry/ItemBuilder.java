@@ -13,6 +13,7 @@ import net.minecraft.world.item.Rarity;
 import xyz.apex.minecraft.apexcore.shared.data.ItemLikeContext;
 import xyz.apex.minecraft.apexcore.shared.data.ProviderTypes;
 import xyz.apex.minecraft.apexcore.shared.data.providers.RecipeProvider;
+import xyz.apex.minecraft.apexcore.shared.data.providers.model.ItemModelProvider;
 import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.ItemEntry;
 
@@ -33,8 +34,7 @@ public final class ItemBuilder<R extends Item, P> extends AbstractBuilder<Item, 
 
         this.itemFactory = itemFactory;
 
-        // TODO
-        defaultLang()/*.defaultModel()*/;
+        defaultLang().defaultModel();
     }
 
     public ItemBuilder<R, P> initialProperties(Supplier<Item.Properties> initialProperties)
@@ -85,16 +85,15 @@ public final class ItemBuilder<R extends Item, P> extends AbstractBuilder<Item, 
         return this;
     }
 
-    // TODO
-    /*public ItemBuilder<R, P> defaultModel()
+    public ItemBuilder<R, P> defaultModel()
     {
-        return model((ctx, provider) -> provider.basicItem(get()));
+        return model((ctx, provider) -> provider.basicItem(getRegistryName()));
     }
 
     public ItemBuilder<R, P> model(BiConsumer<ItemLikeContext<R, ItemEntry<R>>, ItemModelProvider> consumer)
     {
         return setData(ProviderTypes.ITEM_MODELS, (ctx, provider) -> consumer.accept(new ItemLikeContext<>(ctx), provider));
-    }*/
+    }
 
     public ItemBuilder<R, P> defaultLang()
     {

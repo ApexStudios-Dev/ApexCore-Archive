@@ -46,6 +46,11 @@ public final class BlockBuilder<R extends Block, P> extends AbstractBuilder<Bloc
             var renderTypes = this.renderTypes.stream().map(Supplier::get).map(Supplier::get).toArray(RenderType[]::new);
             GamePlatform.events().registerRenderTypes(asSupplier(), () -> () -> renderTypes);
         });
+
+        defaultLang();
+
+        // TODO: Change to blockstate
+        setData(ProviderTypes.BLOCK_MODELS, (ctx, provider) -> provider.cubeAll(ctx));
     }
 
     @Override
@@ -59,9 +64,18 @@ public final class BlockBuilder<R extends Block, P> extends AbstractBuilder<Bloc
     {
         return ItemBuilder.builder(getModId(), getName(), this, properties -> itemFactory.create(getEntry(), properties))
                 .clearData(ProviderTypes.LANGUAGE)
-                // TODO
-                // .model((ctx, provider) -> provider.blockItem(get()))
+                .model((ctx, provider) -> provider.blockItem(getRegistryName()))
         ;
+    }
+
+    public BlockBuilder<R, P> defaultLang()
+    {
+        return lang(Block::getDescriptionId);
+    }
+
+    public BlockBuilder<R, P> lang(String name)
+    {
+        return lang(Block::getDescriptionId, name);
     }
 
     public ItemBuilder<BlockItem, BlockBuilder<R, P>> simpleItem()

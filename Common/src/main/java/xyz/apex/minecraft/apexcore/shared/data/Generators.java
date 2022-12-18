@@ -13,6 +13,8 @@ import net.minecraft.resources.ResourceKey;
 
 import xyz.apex.minecraft.apexcore.shared.data.providers.LanguageProvider;
 import xyz.apex.minecraft.apexcore.shared.data.providers.RecipeProvider;
+import xyz.apex.minecraft.apexcore.shared.data.providers.model.BlockModelProvider;
+import xyz.apex.minecraft.apexcore.shared.data.providers.model.ItemModelProvider;
 import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
 
 import java.util.Map;
@@ -81,6 +83,8 @@ public final class Generators
     public static void registerDataGenerators(String modId, Supplier<PackOutput> output, CompletableFuture<HolderLookup.Provider> lookupProvider, Consumer<DataProvider> client, Consumer<DataProvider> server)
     {
         if(shouldRegister(modId, ProviderTypes.LANGUAGE)) client.accept(new LanguageProvider(output.get(), modId));
+        if(shouldRegister(modId, ProviderTypes.ITEM_MODELS)) client.accept(new ItemModelProvider(output.get(), modId));
+        if(shouldRegister(modId, ProviderTypes.BLOCK_MODELS)) client.accept(new BlockModelProvider(output.get(), modId));
 
         if(shouldRegister(modId, ProviderTypes.RECIPES)) server.accept(new RecipeProvider(output.get(), modId));
     }
