@@ -39,11 +39,6 @@ public abstract class ModelProvider<T extends ModelBuilder<T>> implements DataPr
         this(packOutput, modId, registryType.location().getPath(), modelFactory);
     }
 
-    protected void clear()
-    {
-        models.clear();
-    }
-
     protected abstract void registerModels();
 
     // region: Helpers
@@ -111,7 +106,6 @@ public abstract class ModelProvider<T extends ModelBuilder<T>> implements DataPr
     @Override
     public final CompletableFuture<?> run(CachedOutput cache)
     {
-        clear();
         registerModels();
         return CompletableFuture.allOf(models.values().stream().map(builder -> DataProvider.saveStable(cache, builder.toJson(), getModelPath(builder))).toArray(CompletableFuture[]::new));
     }

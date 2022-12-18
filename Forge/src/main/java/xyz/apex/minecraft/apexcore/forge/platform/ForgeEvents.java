@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
-import net.minecraft.data.DataProvider;
 import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
@@ -38,7 +37,6 @@ import xyz.apex.minecraft.apexcore.shared.platform.PlatformEvents;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public final class ForgeEvents extends ForgePlatformHolder implements PlatformEvents
@@ -207,46 +205,35 @@ public final class ForgeEvents extends ForgePlatformHolder implements PlatformEv
         var generator = event.getGenerator();
         var existingFileHelper = event.getExistingFileHelper();
         var lookupProvider = event.getLookupProvider();
+        var output = generator.getPackOutput();
 
         var client = event.includeClient();
         var server = event.includeServer();
 
-        if(Generators.shouldRegister(modId, ProviderTypes.LANGUAGE)) generator.addProvider(client, (DataProvider.Factory<LanguageProvider>) output -> new LanguageProvider(output, modId));
-        if(Generators.shouldRegister(modId, ProviderTypes.ITEM_MODELS)) generator.addProvider(client, (DataProvider.Factory<ItemModelProvider>) output -> new ItemModelProvider(output, modId));
-        if(Generators.shouldRegister(modId, ProviderTypes.BLOCK_MODELS)) generator.addProvider(client, (DataProvider.Factory<BlockModelProvider>) output -> new BlockModelProvider(output, modId));
+        var blockModels = new BlockModelProvider(output, modId);
 
-        if(Generators.shouldRegister(modId, ProviderTypes.RECIPES)) generator.addProvider(server, (DataProvider.Factory<RecipeProvider>) output -> new RecipeProvider(output, modId));
+        // Client
+        generator.addProvider(client, new LanguageProvider(output, modId));
+        generator.addProvider(client, new ItemModelProvider(output, modId));
+        // generator.addProvider(client, new BlockStateProvider(output, modId, blockModels));
+        generator.addProvider(client, blockModels); // must be after block state, as block state can request this provider to generate models
 
-        var blockTagsProvider = new AtomicReference<BlockTagsProvider>();
-
-        if(Generators.shouldRegister(modId, ProviderTypes.BLOCK_TAGS))
-        {
-            blockTagsProvider.set(generator.addProvider(server, (DataProvider.Factory<BlockTagsProvider>) output -> new BlockTagsProvider(output, lookupProvider, modId, existingFileHelper) {
-                @Override
-                protected void addTags(HolderLookup.Provider provider)
-                {
-                    Generators.processDataGenerator(modId, ProviderTypes.BLOCK_TAGS, this);
-                }
-            }));
-        }
-
-        if(Generators.shouldRegister(modId, ProviderTypes.ITEM_TAGS))
-        {
-            blockTagsProvider.compareAndSet(null, new BlockTagsProvider(generator.getPackOutput(), lookupProvider, modId, existingFileHelper) {
-                @Override
-                protected void addTags(HolderLookup.Provider provider)
-                {
-                }
-            });
-
-            generator.addProvider(server, (DataProvider.Factory<ItemTagsProvider>) output -> new ItemTagsProvider(output, lookupProvider, blockTagsProvider.get(), modId, existingFileHelper) {
-                @Override
-                protected void addTags(HolderLookup.Provider provider)
-                {
-                    Generators.processDataGenerator(modId, ProviderTypes.ITEM_TAGS, this);
-                }
-            });
-        }
+        // Server
+        generator.addProvider(server, new RecipeProvider(output, modId));
+        var blockTags = generator.addProvider(server, new BlockTagsProvider(output, lookupProvider, modId, existingFileHelper) {
+            @Override
+            protected void addTags(HolderLookup.Provider provider)
+            {
+                Generators.processDataGenerator(modId, ProviderTypes.BLOCK_TAGS, this);
+            }
+        });
+        generator.addProvider(server, new ItemTagsProvider(output, lookupProvider, blockTags, modId, existingFileHelper) {
+            @Override
+            protected void addTags(HolderLookup.Provider provider)
+            {
+                Generators.processDataGenerator(modId, ProviderTypes.ITEM_TAGS, this);
+            }
+        });
     }
 
     @SuppressWarnings({ "unchecked", "DataFlowIssue" })

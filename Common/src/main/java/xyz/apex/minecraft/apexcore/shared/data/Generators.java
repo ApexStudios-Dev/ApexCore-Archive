@@ -41,11 +41,6 @@ public final class Generators
         GamePlatform.events().registerDataGenerators(modId);
     }
 
-    private <D extends DataProvider> boolean shouldRegister(ProviderType<? extends D> providerType)
-    {
-        return gens.containsKey(providerType);
-    }
-
     @SuppressWarnings("unchecked")
     private <D extends DataProvider> void processDataGenerator(ProviderType<D> providerType, D provider)
     {
@@ -60,11 +55,6 @@ public final class Generators
     public static <D extends DataProvider> void addDataGenerator(String modId, ProviderType<? extends D> providerType, Consumer<? extends D> consumer)
     {
         getInstance(modId).addDataGenerator(providerType, consumer);
-    }
-
-    public static <D extends DataProvider> boolean shouldRegister(String modId, ProviderType<? extends D> providerType)
-    {
-        return getInstance(modId).shouldRegister(providerType);
     }
 
     public static <D extends DataProvider> void processDataGenerator(String modId, ProviderType<D> providerType, D provider)
