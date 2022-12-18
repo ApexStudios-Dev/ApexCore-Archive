@@ -21,5 +21,7 @@ public interface PlatformEvents extends PlatformHolder
 
     void registerBlockColor(Supplier<? extends Block> block, Supplier<Supplier<BlockColor>> colorHandler);
 
+    void register(String modId);
+
     @ApiStatus.Internal void registerDataGenerators(String modId);
 }

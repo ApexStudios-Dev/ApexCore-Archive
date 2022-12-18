@@ -24,8 +24,8 @@ public final class RecipeProvider extends net.minecraft.data.recipes.RecipeProvi
         this.modId = modId;
     }
 
-    @Override
-    protected void buildRecipes(Consumer<FinishedRecipe> consumer)
+    @Override // protected in common/forge | public in fabric | public here to match visiblity across all platforms
+    public void buildRecipes(Consumer<FinishedRecipe> consumer)
     {
         this.consumer = consumer;
         Generators.processDataGenerator(modId, ProviderTypes.RECIPES, this);

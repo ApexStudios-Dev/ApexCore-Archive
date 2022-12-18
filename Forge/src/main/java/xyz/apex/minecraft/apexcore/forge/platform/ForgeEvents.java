@@ -4,6 +4,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.compress.utils.Lists;
+import org.apache.commons.lang3.Validate;
 
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
@@ -11,8 +12,8 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
+import net.minecraft.data.DataProvider;
 import net.minecraft.data.tags.ItemTagsProvider;
-import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -29,6 +30,10 @@ import net.minecraftforge.registries.DeferredRegister;
 
 import xyz.apex.minecraft.apexcore.shared.data.Generators;
 import xyz.apex.minecraft.apexcore.shared.data.ProviderTypes;
+import xyz.apex.minecraft.apexcore.shared.data.providers.LanguageProvider;
+import xyz.apex.minecraft.apexcore.shared.data.providers.RecipeProvider;
+import xyz.apex.minecraft.apexcore.shared.data.providers.model.BlockModelProvider;
+import xyz.apex.minecraft.apexcore.shared.data.providers.model.ItemModelProvider;
 import xyz.apex.minecraft.apexcore.shared.platform.PlatformEvents;
 
 import java.util.List;
@@ -71,7 +76,7 @@ public final class ForgeEvents extends ForgePlatformHolder implements PlatformEv
     @Override
     public void registerRenderTypes(Supplier<? extends Block> block, Supplier<Supplier<RenderType[]>> renderTypes)
     {
-        register();
+        register(ModLoadingContext.get().getActiveNamespace());
         if(platform.isDedicatedServer()) return;
         ItemBlockRenderTypes.setRenderLayer(block.get(), ChunkRenderTypeSet.of(renderTypes.get().get()));
     }
@@ -79,7 +84,7 @@ public final class ForgeEvents extends ForgePlatformHolder implements PlatformEv
     @Override
     public void registerItemColor(Supplier<? extends Item> itemSupplier, Supplier<Supplier<ItemColor>> colorHandler)
     {
-        register();
+        register(ModLoadingContext.get().getActiveNamespace());
         if(platform.isDedicatedServer()) return;
 
         var modId = ModLoadingContext.get().getActiveNamespace();
@@ -99,7 +104,7 @@ public final class ForgeEvents extends ForgePlatformHolder implements PlatformEv
     @Override
     public void registerBlockColor(Supplier<? extends Block> blockSupplier, Supplier<Supplier<BlockColor>> colorHandler)
     {
-        register();
+        register(ModLoadingContext.get().getActiveNamespace());
         if(platform.isDedicatedServer()) return;
 
         var modId = ModLoadingContext.get().getActiveNamespace();
@@ -116,20 +121,21 @@ public final class ForgeEvents extends ForgePlatformHolder implements PlatformEv
         list.add(colorHandler);
     }
 
-    public void register()
+    @Override
+    public void register(String modId)
     {
-        var modId = ModLoadingContext.get().getActiveNamespace();
+        Validate.isTrue(ModLoadingContext.get().getActiveNamespace().equals(modId));
         var modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         if(registeredMods.contains(modId)) return;
 
         if(platform.isClient())
         {
-            modBus.addListener(EventPriority.NORMAL, false, FMLClientSetupEvent.class, event -> {
+            modBus.addListener(EventPriority.NORMAL, false, FMLClientSetupEvent.class, event -> event.enqueueWork(() -> {
                 clientRunnables.forEach(Runnable::run);
                 clientRunnables.clear();
                 clientRan = true;
-            });
+            }));
 
             modBus.addListener(EventPriority.NORMAL, false, RegisterColorHandlersEvent.Item.class, event -> {
                 if(itemColorHandlers.containsRow(modId))
@@ -172,11 +178,11 @@ public final class ForgeEvents extends ForgePlatformHolder implements PlatformEv
 
         if(platform.isDedicatedServer())
         {
-            modBus.addListener(EventPriority.NORMAL, false, FMLDedicatedServerSetupEvent.class, event -> {
+            modBus.addListener(EventPriority.NORMAL, false, FMLDedicatedServerSetupEvent.class, event -> event.enqueueWork(() -> {
                 serverRunnables.forEach(Runnable::run);
                 serverRunnables.clear();
                 serverRan = true;
-            });
+            }));
         }
 
         registeredMods.add(modId);
@@ -185,7 +191,7 @@ public final class ForgeEvents extends ForgePlatformHolder implements PlatformEv
     @Override
     public void registerDataGenerators(String modId)
     {
-        register();
+        register(modId);
         if(dataMods.contains(modId)) return;
         platform.getLogger().debug("Captured mod '{}' data generation registration!", modId);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onGatherData);
@@ -205,19 +211,17 @@ public final class ForgeEvents extends ForgePlatformHolder implements PlatformEv
         var client = event.includeClient();
         var server = event.includeServer();
 
-        Generators.registerDataGenerators(
-                modId,
-                generator::getPackOutput,
-                lookupProvider,
-                provider -> generator.addProvider(client, provider),
-                provider -> generator.addProvider(server, provider)
-        );
+        if(Generators.shouldRegister(modId, ProviderTypes.LANGUAGE)) generator.addProvider(client, (DataProvider.Factory<LanguageProvider>) output -> new LanguageProvider(output, modId));
+        if(Generators.shouldRegister(modId, ProviderTypes.ITEM_MODELS)) generator.addProvider(client, (DataProvider.Factory<ItemModelProvider>) output -> new ItemModelProvider(output, modId));
+        if(Generators.shouldRegister(modId, ProviderTypes.BLOCK_MODELS)) generator.addProvider(client, (DataProvider.Factory<BlockModelProvider>) output -> new BlockModelProvider(output, modId));
 
-        AtomicReference<TagsProvider<Block>> blockTagsProvider = new AtomicReference<>();
+        if(Generators.shouldRegister(modId, ProviderTypes.RECIPES)) generator.addProvider(server, (DataProvider.Factory<RecipeProvider>) output -> new RecipeProvider(output, modId));
+
+        var blockTagsProvider = new AtomicReference<BlockTagsProvider>();
 
         if(Generators.shouldRegister(modId, ProviderTypes.BLOCK_TAGS))
         {
-            blockTagsProvider.set(generator.<BlockTagsProvider>addProvider(server, output -> new BlockTagsProvider(output, lookupProvider, modId, existingFileHelper) {
+            blockTagsProvider.set(generator.addProvider(server, (DataProvider.Factory<BlockTagsProvider>) output -> new BlockTagsProvider(output, lookupProvider, modId, existingFileHelper) {
                 @Override
                 protected void addTags(HolderLookup.Provider provider)
                 {
@@ -235,7 +239,7 @@ public final class ForgeEvents extends ForgePlatformHolder implements PlatformEv
                 }
             });
 
-            generator.<ItemTagsProvider>addProvider(server, output -> new ItemTagsProvider(output, lookupProvider, blockTagsProvider.get(), modId, existingFileHelper) {
+            generator.addProvider(server, (DataProvider.Factory<ItemTagsProvider>) output -> new ItemTagsProvider(output, lookupProvider, blockTagsProvider.get(), modId, existingFileHelper) {
                 @Override
                 protected void addTags(HolderLookup.Provider provider)
                 {
@@ -248,8 +252,8 @@ public final class ForgeEvents extends ForgePlatformHolder implements PlatformEv
     @SuppressWarnings({ "unchecked", "DataFlowIssue" })
     <T> DeferredRegister<T> getModRegistry(ResourceKey<? extends Registry<T>> registryType)
     {
-        register();
         var modId = ModLoadingContext.get().getActiveNamespace();
+        register(modId);
 
         if(modRegistries.contains(modId, registryType)) return (DeferredRegister<T>) modRegistries.get(modId, registryType);
         else

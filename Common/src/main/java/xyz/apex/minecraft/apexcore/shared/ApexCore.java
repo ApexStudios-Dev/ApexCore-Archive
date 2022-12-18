@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.shared;
 
+import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
 import xyz.apex.minecraft.apexcore.shared.util.Tags;
 
 public interface ApexCore
@@ -9,5 +10,7 @@ public interface ApexCore
     static void bootstrap()
     {
         Tags.bootstrap();
+
+        GamePlatform.events().register(ApexCore.ID);
     }
 }
