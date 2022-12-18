@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.shared.data.providers.model;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -70,6 +71,8 @@ public class ModelBuilder<T extends ModelBuilder<T>>
     // region: Textures
     public final T texture(TextureSlot slot, ResourceLocation texture)
     {
+        Preconditions.checkNotNull(slot, "TextureSlot must not be null");
+        Preconditions.checkNotNull(texture, "ResourceLocation must not be null");
         textures.put(slot, ModelProvider.extendWith(texture, modelFolder));
         return self;
     }
@@ -83,11 +86,14 @@ public class ModelBuilder<T extends ModelBuilder<T>>
     // region: Parent
     public final T parent(String modId, String path)
     {
+        Preconditions.checkNotNull(modId, "String modId must not be null");
+        Preconditions.checkNotNull(path, "String path must not be null");
         return parent(new ResourceLocation(modId, path));
     }
 
     public final T parent(String path)
     {
+        Preconditions.checkNotNull(path, "String must not be null");
         return parent(new ResourceLocation(path));
     }
 
@@ -129,6 +135,7 @@ public class ModelBuilder<T extends ModelBuilder<T>>
 
     public final DisplaysBuilder.DisplayBuilder<T> display(ItemTransforms.TransformType transformType)
     {
+        Preconditions.checkNotNull(transformType, "TransformType must not be null");
         return displays().display(transformType);
     }
     // endregion

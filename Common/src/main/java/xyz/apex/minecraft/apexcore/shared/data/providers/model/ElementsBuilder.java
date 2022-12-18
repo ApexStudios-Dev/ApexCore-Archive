@@ -41,6 +41,7 @@ public final class ElementsBuilder<T extends ModelBuilder<T>> extends ModelBuild
 
     public ElementBuilder<T> element(int index)
     {
+        Preconditions.checkElementIndex(index, elements.size(), "Element index out of range: %d, Max: %d".formatted(index, elements.size()));
         return elements.get(index);
     }
     // endregion
@@ -74,26 +75,40 @@ public final class ElementsBuilder<T extends ModelBuilder<T>> extends ModelBuild
         // region: From
         public ElementBuilder<T> from(Vector3f from)
         {
+            Preconditions.checkNotNull(from, "Vector3F must not be null");
+            Preconditions.checkArgument(from.x <= 32F && from.x >= -16F, "Invalid from x-coord, Must be between [-16, 32]: ", from.x);
+            Preconditions.checkArgument(from.y <= 32F && from.y >= -16F, "Invalid from y-coord, Must be between [-16, 32]: ", from.y);
+            Preconditions.checkArgument(from.z <= 32F && from.z >= -16F, "Invalid from z-coord, Must be between [-16, 32]: ", from.z);
             this.from.set(from);
             return this;
         }
 
         public ElementBuilder<T> from(float x, float y, float z)
         {
+            Preconditions.checkArgument(from.x <= 32F && from.x >= -16F, "Invalid from x-coord, Must be between [-16, 32]: ", from.x);
+            Preconditions.checkArgument(from.y <= 32F && from.y >= -16F, "Invalid from y-coord, Must be between [-16, 32]: ", from.y);
+            Preconditions.checkArgument(from.z <= 32F && from.z >= -16F, "Invalid from z-coord, Must be between [-16, 32]: ", from.z);
             from.set(x, y, z);
             return this;
         }
         // endregion
 
         // region: To
-        public ElementBuilder<T> to(Vector3f from)
+        public ElementBuilder<T> to(Vector3f to)
         {
-            this.to.set(from);
+            Preconditions.checkNotNull(to, "Vector3F must not be null");
+            Preconditions.checkArgument(to.x <= 32F && to.x >= -16F, "Invalid to x-coord, Must be between [-16, 32]: ", to.x);
+            Preconditions.checkArgument(to.y <= 32F && to.y >= -16F, "Invalid to y-coord, Must be between [-16, 32]: ", to.y);
+            Preconditions.checkArgument(to.z <= 32F && to.z >= -16F, "Invalid to z-coord, Must be between [-16, 32]: ", to.z);
+            this.to.set(to);
             return this;
         }
 
         public ElementBuilder<T> to(float x, float y, float z)
         {
+            Preconditions.checkArgument(x <= 32F && x >= -16F, "Invalid to x-coord, Must be between [-16, 32]: ", x);
+            Preconditions.checkArgument(y <= 32F && y >= -16F, "Invalid to y-coord, Must be between [-16, 32]: ", y);
+            Preconditions.checkArgument(z <= 32F && z >= -16F, "Invalid to z-coord, Must be between [-16, 32]: ", z);
             to.set(x, y, z);
             return this;
         }
@@ -125,6 +140,7 @@ public final class ElementsBuilder<T extends ModelBuilder<T>> extends ModelBuild
         // region: Faces
         public FaceBuilder<T> face(Direction face)
         {
+            Preconditions.checkNotNull(face, "Direction must not be null");
             return faces.computeIfAbsent(face, $ -> new FaceBuilder<>(this));
         }
 
@@ -191,6 +207,7 @@ public final class ElementsBuilder<T extends ModelBuilder<T>> extends ModelBuild
         // region: Origin
         public RotationBuilder<T> origin(Vector3f origin)
         {
+            Preconditions.checkNotNull(origin, "Vector3F must not be null");
             this.origin.set(origin);
             return this;
         }
@@ -204,6 +221,7 @@ public final class ElementsBuilder<T extends ModelBuilder<T>> extends ModelBuild
 
         public RotationBuilder<T> axis(Direction.Axis axis)
         {
+            Preconditions.checkNotNull(axis, "Axis must not be null");
             this.axis = axis;
             return this;
         }
@@ -235,7 +253,7 @@ public final class ElementsBuilder<T extends ModelBuilder<T>> extends ModelBuild
 
     public static final class FaceBuilder<T extends ModelBuilder<T>> extends ModelBuilder.Builder<FaceBuilder<T>, ElementBuilder<T>>
     {
-        private final float[] uv = new float[] { 0F, 0F, 16F, 16F };
+        private final float[] uv = new float[] { 0F, 0F, 0F, 0F };
         @Nullable private TextureSlot textureSlot;
         @Nullable private Direction cullface;
         private Rotation rotation = Rotation.NONE;
@@ -249,6 +267,11 @@ public final class ElementsBuilder<T extends ModelBuilder<T>> extends ModelBuild
 
         public FaceBuilder<T> uv(float minU, float minV, float maxU, float maxV)
         {
+            Preconditions.checkArgument(minU <= 16F && minU >= 0F, "Invalid minU property: %f", minU);
+            Preconditions.checkArgument(minV <= 16F && minV >= 0F, "Invalid minV property: %f", minV);
+            Preconditions.checkArgument(maxU <= 16F && maxU >= 0F, "Invalid maxU property: %f", maxU);
+            Preconditions.checkArgument(maxV <= 16F && maxV >= 0F, "Invalid maxV property: %f", maxV);
+
             uv[0] = minU;
             uv[1] = minV;
             uv[2] = maxU;
@@ -258,18 +281,21 @@ public final class ElementsBuilder<T extends ModelBuilder<T>> extends ModelBuild
 
         public FaceBuilder<T> texture(TextureSlot textureSlot)
         {
+            Preconditions.checkNotNull(textureSlot, "TextureSlot must not be null");
             this.textureSlot = textureSlot;
             return this;
         }
 
         public FaceBuilder<T> cullface(Direction cullface)
         {
+            Preconditions.checkNotNull(cullface, "Direction must not be null");
             this.cullface = cullface;
             return this;
         }
 
         public FaceBuilder<T> rotation(Rotation rotation)
         {
+            Preconditions.checkNotNull(rotation, "Rotation must not be null");
             this.rotation = rotation;
             return this;
         }

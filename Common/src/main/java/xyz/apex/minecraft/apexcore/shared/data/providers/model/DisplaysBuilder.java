@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.shared.data.providers.model;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -24,6 +25,7 @@ public final class DisplaysBuilder<T extends ModelBuilder<T>> extends ModelBuild
 
     public DisplayBuilder<T> display(ItemTransforms.TransformType transformType)
     {
+        Preconditions.checkNotNull(transformType, "TransformType must not be null");
         return builders.computeIfAbsent(transformType, $ -> new DisplayBuilder<>(this));
     }
 
@@ -55,6 +57,7 @@ public final class DisplaysBuilder<T extends ModelBuilder<T>> extends ModelBuild
         // region: Left
         public DisplayBuilder<T> leftRotation(Vector3f leftRotation)
         {
+            Preconditions.checkNotNull(leftRotation, "Vector3F must not be null");
             this.leftRotation.set(leftRotation);
             return this;
         }
@@ -67,6 +70,7 @@ public final class DisplaysBuilder<T extends ModelBuilder<T>> extends ModelBuild
 
         public DisplayBuilder<T> rotation(Vector3f leftRotation)
         {
+            Preconditions.checkNotNull(leftRotation, "Vector3F must not be null");
             return leftRotation(leftRotation);
         }
 
@@ -79,6 +83,7 @@ public final class DisplaysBuilder<T extends ModelBuilder<T>> extends ModelBuild
         // region: Right
         public DisplayBuilder<T> rightRotation(Vector3f rightRotation)
         {
+            Preconditions.checkNotNull(rightRotation, "Vector3F must not be null");
             this.rightRotation.set(rightRotation);
             return this;
         }
@@ -94,6 +99,7 @@ public final class DisplaysBuilder<T extends ModelBuilder<T>> extends ModelBuild
         // region: Translation
         public DisplayBuilder<T> translation(Vector3f translation)
         {
+            Preconditions.checkNotNull(translation, "Vector3F must not be null");
             this.translation.set(translation);
             return this;
         }
@@ -108,6 +114,7 @@ public final class DisplaysBuilder<T extends ModelBuilder<T>> extends ModelBuild
         // region: Scale
         public DisplayBuilder<T> scale(Vector3f scale)
         {
+            Preconditions.checkNotNull(scale, "Vector3F must not be null");
             this.scale.set(scale);
             return this;
         }

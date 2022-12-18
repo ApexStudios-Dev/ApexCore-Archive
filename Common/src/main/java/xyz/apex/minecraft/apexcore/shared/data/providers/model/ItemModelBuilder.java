@@ -34,6 +34,7 @@ public final class ItemModelBuilder extends ModelBuilder<ItemModelBuilder>
 
     public OverrideBuilder override(int index)
     {
+        Preconditions.checkElementIndex(index, overrides.size(), "Override index %d out of range, Max: %d".formatted(index, overrides.size()));
         return overrides.get(index);
     }
     // endregion
@@ -52,40 +53,49 @@ public final class ItemModelBuilder extends ModelBuilder<ItemModelBuilder>
         // region: Model
         public OverrideBuilder model(ResourceLocation modelPath)
         {
+            Preconditions.checkNotNull(modelPath, "ResourceLocation must not be null");
             this.modelPath = modelPath;
             return this;
         }
 
         public OverrideBuilder model(String namespace, String path)
         {
+            Preconditions.checkNotNull(namespace, "String namespace must not be null");
+            Preconditions.checkNotNull(path, "String path must not be null");
             return model(new ResourceLocation(namespace, path));
         }
 
         public OverrideBuilder model(String path)
         {
+            Preconditions.checkNotNull(path, "String must not be null");
             return model(new ResourceLocation(path));
         }
 
         public OverrideBuilder model(ModelBuilder<?> model)
         {
+            Preconditions.checkNotNull(model, "ModelBuilder must not be null");
             return model(model.getModelPath());
         }
         // endregion
 
-        // region
+        // region: Predicate
         public OverrideBuilder predicate(ResourceLocation name, float value)
         {
+            Preconditions.checkNotNull(name, "ResourceLocation must not be null");
             predicates.put(name, value);
             return this;
         }
 
         public OverrideBuilder predicate(String modId, String name, float value)
         {
+            Preconditions.checkNotNull(modId, "String modId must not be null");
+            Preconditions.checkNotNull(name, "String name must not be null");
             return predicate(new ResourceLocation(modId, name), value);
         }
 
         public OverrideBuilder predicate(String name, float value)
         {
+            Preconditions.checkNotNull(name, "String must not be null");
             return predicate(new ResourceLocation(name), value);
         }
         // endregion

@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.shared.data.providers.model;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -26,12 +27,15 @@ public final class BlockModelBuilder extends ModelBuilder<BlockModelBuilder>
     @ForPlatform(Platform.Type.FORGE)
     public BlockModelBuilder renderType(String modId, String name)
     {
+        Preconditions.checkNotNull(modId, "String modId must not be null");
+        Preconditions.checkNotNull(name, "String name must not be null");
         return renderType(new ResourceLocation(modId, name));
     }
 
     @ForPlatform(Platform.Type.FORGE)
     public BlockModelBuilder renderType(String name)
     {
+        Preconditions.checkNotNull(name, "String must not be null");
         return renderType(new ResourceLocation(name));
     }
 
@@ -40,6 +44,7 @@ public final class BlockModelBuilder extends ModelBuilder<BlockModelBuilder>
     @ForPlatform(Platform.Type.FORGE)
     public BlockModelBuilder renderType(@Nullable ResourceLocation renderType)
     {
+        Preconditions.checkNotNull(renderType, "ResourceLocation modId must not be null");
         this.renderType = renderType;
         return self;
     }
