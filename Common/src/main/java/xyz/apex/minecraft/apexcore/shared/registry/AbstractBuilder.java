@@ -52,7 +52,6 @@ public abstract class AbstractBuilder<T, R extends T, P, B extends AbstractBuild
             var value = construct();
             var registry = RegistryEntry.getRegistryOrThrow(registryType);
             var holder = registry.wrapAsHolder(value);
-            GamePlatform.EVENTS.call(new RegisterEvent<>(registry, registryKey, value));
             registryEntry.updateReference(value, holder);
             return value;
         });
