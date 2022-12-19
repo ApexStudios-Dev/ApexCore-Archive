@@ -10,16 +10,12 @@ import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
-import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.ChunkRenderTypeSet;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
-import net.minecraftforge.common.data.BlockTagsProvider;
-import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -27,12 +23,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 
-import xyz.apex.minecraft.apexcore.shared.data.Generators;
-import xyz.apex.minecraft.apexcore.shared.data.ProviderTypes;
-import xyz.apex.minecraft.apexcore.shared.data.providers.LanguageProvider;
-import xyz.apex.minecraft.apexcore.shared.data.providers.RecipeProvider;
-import xyz.apex.minecraft.apexcore.shared.data.providers.model.BlockModelProvider;
-import xyz.apex.minecraft.apexcore.shared.data.providers.model.ItemModelProvider;
+import xyz.apex.minecraft.apexcore.forge.platform.data.DataGenerators;
 import xyz.apex.minecraft.apexcore.shared.platform.PlatformEvents;
 
 import java.util.List;
@@ -41,7 +32,6 @@ import java.util.function.Supplier;
 
 public final class ForgeEvents extends ForgePlatformHolder implements PlatformEvents
 {
-    private final Set<String> dataMods = Sets.newHashSet();
     private final Set<String> registeredMods = Sets.newHashSet();
     private final Table<String, ResourceKey<? extends Registry<?>>, DeferredRegister<?>> modRegistries = HashBasedTable.create();
     private final Table<String, Item, List<Supplier<Supplier<ItemColor>>>> itemColorHandlers = HashBasedTable.create();
@@ -190,50 +180,8 @@ public final class ForgeEvents extends ForgePlatformHolder implements PlatformEv
     public void registerDataGenerators(String modId)
     {
         register(modId);
-        if(dataMods.contains(modId)) return;
         platform.getLogger().debug("Captured mod '{}' data generation registration!", modId);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onGatherData);
-        dataMods.add(modId);
-    }
-
-    private void onGatherData(GatherDataEvent event)
-    {
-        var modId = event.getModContainer().getModId();
-        if(!dataMods.contains(modId)) return;
-        platform.getLogger().info("Registering mod '{}' DataGenerators...", modId);
-
-        var generator = event.getGenerator();
-        var existingFileHelper = event.getExistingFileHelper();
-        var lookupProvider = event.getLookupProvider();
-        var output = generator.getPackOutput();
-
-        var client = event.includeClient();
-        var server = event.includeServer();
-
-        var blockModels = new BlockModelProvider(output, modId);
-
-        // Client
-        generator.addProvider(client, new LanguageProvider(output, modId));
-        generator.addProvider(client, new ItemModelProvider(output, modId));
-        // generator.addProvider(client, new BlockStateProvider(output, modId, blockModels));
-        generator.addProvider(client, blockModels); // must be after block state, as block state can request this provider to generate models
-
-        // Server
-        generator.addProvider(server, new RecipeProvider(output, modId));
-        var blockTags = generator.addProvider(server, new BlockTagsProvider(output, lookupProvider, modId, existingFileHelper) {
-            @Override
-            protected void addTags(HolderLookup.Provider provider)
-            {
-                Generators.processDataGenerator(modId, ProviderTypes.BLOCK_TAGS, this);
-            }
-        });
-        generator.addProvider(server, new ItemTagsProvider(output, lookupProvider, blockTags, modId, existingFileHelper) {
-            @Override
-            protected void addTags(HolderLookup.Provider provider)
-            {
-                Generators.processDataGenerator(modId, ProviderTypes.ITEM_TAGS, this);
-            }
-        });
+        DataGenerators.register(modId);
     }
 
     @SuppressWarnings({ "unchecked", "DataFlowIssue" })

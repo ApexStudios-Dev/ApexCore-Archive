@@ -1,24 +1,22 @@
 package xyz.apex.minecraft.apexcore.shared.data;
 
-import net.minecraft.data.tags.ItemTagsProvider;
-import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.world.level.block.Block;
 
-import xyz.apex.minecraft.apexcore.shared.data.providers.LanguageProvider;
-import xyz.apex.minecraft.apexcore.shared.data.providers.RecipeProvider;
-import xyz.apex.minecraft.apexcore.shared.data.providers.model.BlockModelProvider;
-import xyz.apex.minecraft.apexcore.shared.data.providers.model.ItemModelProvider;
+import xyz.apex.minecraft.apexcore.shared.data.providers.Language;
+import xyz.apex.minecraft.apexcore.shared.data.providers.Model;
+import xyz.apex.minecraft.apexcore.shared.data.providers.Recipe;
+import xyz.apex.minecraft.apexcore.shared.data.providers.Tag;
 
 public interface ProviderTypes
 {
     // Client
-    ProviderType<LanguageProvider> LANGUAGE = new ProviderType<>("language");
-    ProviderType<ItemModelProvider> ITEM_MODELS = new ProviderType<>("item_models");
-    ProviderType<BlockModelProvider> BLOCK_MODELS = new ProviderType<>("block_models");
+    ProviderType<Language> LANGUAGE = new ProviderType<>("language");
+    ProviderType<Model.ItemModel<?>> ITEM_MODELS = new ProviderType<>("item_models");
+    ProviderType<Model.BlockModel<?>> BLOCK_MODELS = new ProviderType<>("block_models");
 
     // Server
-    ProviderType<RecipeProvider> RECIPES = new ProviderType<>("recipes");
+    ProviderType<Recipe> RECIPES = new ProviderType<>("recipes");
 
-    ProviderType<ItemTagsProvider> ITEM_TAGS = new ProviderType<>("item_tags");
-    ProviderType<TagsProvider<Block>> BLOCK_TAGS = new ProviderType<>("block_tags");
+    ProviderType<Tag.ItemTag> ITEM_TAGS = new ProviderType<>("item_tags");
+    ProviderType<Tag<Block>> BLOCK_TAGS = new ProviderType<>("block_tags");
 }

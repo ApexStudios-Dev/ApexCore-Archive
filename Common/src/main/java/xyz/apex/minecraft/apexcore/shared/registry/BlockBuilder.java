@@ -7,6 +7,7 @@ import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
@@ -63,8 +64,8 @@ public final class BlockBuilder<R extends Block, P> extends AbstractBuilder<Bloc
     public <T extends Item> ItemBuilder<T, BlockBuilder<R, P>> item(BlockItemFactory<T, R> itemFactory)
     {
         return ItemBuilder.builder(getModId(), getName(), this, properties -> itemFactory.create(getEntry(), properties))
-                .clearData(ProviderTypes.LANGUAGE)
-                .model((ctx, provider) -> provider.blockItem(getRegistryName()))
+                          .clearData(ProviderTypes.LANGUAGE)
+                          .model((ctx, provider) -> provider.blockItem(getRegistryName()))
         ;
     }
 
@@ -146,6 +147,17 @@ public final class BlockBuilder<R extends Block, P> extends AbstractBuilder<Bloc
     {
         GamePlatform.events().registerBlockColor(asSupplier(), colorHandler);
         return this;
+    }
+
+    @SafeVarargs
+    public final BlockBuilder<R, P> tag(TagKey<Block>... tags)
+    {
+        return tag(ProviderTypes.BLOCK_TAGS, tags);
+    }
+
+    public BlockBuilder<R, P> removeTag(TagKey<Block>... tags)
+    {
+        return removeTag(ProviderTypes.BLOCK_TAGS, tags);
     }
 
     public static <R extends Block, P> BlockBuilder<R, P> builder(String modId, String name, P parent, BlockFactory<R> blockFactory)

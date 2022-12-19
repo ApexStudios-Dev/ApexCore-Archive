@@ -2,7 +2,6 @@ package xyz.apex.minecraft.apexcore.shared.registry;
 
 import net.minecraft.core.Registry;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -11,7 +10,8 @@ import xyz.apex.minecraft.apexcore.shared.data.DataContext;
 import xyz.apex.minecraft.apexcore.shared.data.Generators;
 import xyz.apex.minecraft.apexcore.shared.data.ProviderType;
 import xyz.apex.minecraft.apexcore.shared.data.ProviderTypes;
-import xyz.apex.minecraft.apexcore.shared.data.providers.LanguageProvider;
+import xyz.apex.minecraft.apexcore.shared.data.providers.Language;
+import xyz.apex.minecraft.apexcore.shared.data.providers.Tag;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.shared.util.LazyLike;
 
@@ -62,23 +62,23 @@ public interface Builder<T, R extends T, P, B extends Builder<T, R, P, B, E>, E 
         return self();
     }
 
-    B tag(ProviderType<? extends TagsProvider<T>> providerType, TagKey<T>... tags);
+    B tag(ProviderType<? extends Tag<T>> providerType, TagKey<T>... tags);
 
-    B removeTag(ProviderType<? extends TagsProvider<T>> providerType, TagKey<T>... tags);
+    B removeTag(ProviderType<? extends Tag<T>> providerType, TagKey<T>... tags);
 
-    default B lang(Function<T, String> langKeyProvider)
+    default B lang(Function<R, String> langKeyProvider)
     {
-        return lang(langKeyProvider, (p, t) -> p.getAutomaticName(t, getRegistryType()));
+        return lang(langKeyProvider, (ctx, provider) -> Language.toEnglishName(getName()));
     }
 
-    default B lang(Function<T, String> langKeyProvider, String name)
+    default B lang(Function<R, String> langKeyProvider, String name)
     {
         return lang(langKeyProvider, (p, s) -> name);
     }
 
-    default B lang(Function<T, String> langKeyProvider, BiFunction<LanguageProvider, Supplier<? extends T>, String> localizedNameProvider)
+    default B lang(Function<R, String> langKeyProvider, BiFunction<R, Language, String> localizedNameProvider)
     {
-        return setData(ProviderTypes.LANGUAGE, (ctx, provider) -> provider.add(langKeyProvider.apply(ctx.get()), localizedNameProvider.apply(provider, ctx)));
+        return setData(ProviderTypes.LANGUAGE, (ctx, provider) -> provider.add(langKeyProvider.apply(ctx.get()), localizedNameProvider.apply(ctx.get(), provider)));
     }
 
     default P build()

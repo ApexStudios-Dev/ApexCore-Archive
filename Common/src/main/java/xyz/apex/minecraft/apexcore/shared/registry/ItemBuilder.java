@@ -12,8 +12,8 @@ import net.minecraft.world.item.Rarity;
 
 import xyz.apex.minecraft.apexcore.shared.data.ItemLikeContext;
 import xyz.apex.minecraft.apexcore.shared.data.ProviderTypes;
-import xyz.apex.minecraft.apexcore.shared.data.providers.RecipeProvider;
-import xyz.apex.minecraft.apexcore.shared.data.providers.model.ItemModelProvider;
+import xyz.apex.minecraft.apexcore.shared.data.providers.Model;
+import xyz.apex.minecraft.apexcore.shared.data.providers.Recipe;
 import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.ItemEntry;
 
@@ -90,7 +90,7 @@ public final class ItemBuilder<R extends Item, P> extends AbstractBuilder<Item, 
         return model((ctx, provider) -> provider.basicItem(getRegistryName()));
     }
 
-    public ItemBuilder<R, P> model(BiConsumer<ItemLikeContext<R, ItemEntry<R>>, ItemModelProvider> consumer)
+    public ItemBuilder<R, P> model(BiConsumer<ItemLikeContext<R, ItemEntry<R>>, Model.ItemModel<?>> consumer)
     {
         return setData(ProviderTypes.ITEM_MODELS, (ctx, provider) -> consumer.accept(new ItemLikeContext<>(ctx), provider));
     }
@@ -105,7 +105,7 @@ public final class ItemBuilder<R extends Item, P> extends AbstractBuilder<Item, 
         return lang(Item::getDescriptionId, name);
     }
 
-    public ItemBuilder<R, P> recipe(BiConsumer<ItemLikeContext<R, ItemEntry<R>>, RecipeProvider> consumer)
+    public ItemBuilder<R, P> recipe(BiConsumer<ItemLikeContext<R, ItemEntry<R>>, Recipe> consumer)
     {
         return setData(ProviderTypes.RECIPES, (ctx, provider) -> consumer.accept(new ItemLikeContext<>(ctx), provider));
     }

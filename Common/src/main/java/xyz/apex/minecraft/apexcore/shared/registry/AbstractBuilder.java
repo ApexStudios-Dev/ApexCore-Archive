@@ -6,12 +6,12 @@ import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.Registry;
-import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 
 import xyz.apex.minecraft.apexcore.shared.data.ProviderType;
+import xyz.apex.minecraft.apexcore.shared.data.providers.Tag;
 import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.shared.util.Lazy;
@@ -27,7 +27,7 @@ public abstract class AbstractBuilder<T, R extends T, P, B extends AbstractBuild
     @Nullable protected final P parent;
     private final E registryEntry;
 
-    private final Multimap<ProviderType<? extends TagsProvider<?>>, TagKey<?>> tagsByType = HashMultimap.create();
+    private final Multimap<ProviderType<? extends Tag<?>>, TagKey<?>> tagsByType = HashMultimap.create();
 
     protected AbstractBuilder(ResourceKey<? extends Registry<T>> registryType, ResourceLocation registryName, @Nullable P parent, RegistryEntryFactoryEX<T, R, E> registryEntryFactory)
     {
@@ -104,7 +104,7 @@ public abstract class AbstractBuilder<T, R extends T, P, B extends AbstractBuild
 
     @SuppressWarnings("unchecked")
     @Override
-    public B tag(ProviderType<? extends TagsProvider<T>> providerType, TagKey<T>... tags)
+    public B tag(ProviderType<? extends Tag<T>> providerType, TagKey<T>... tags)
     {
         if(!tagsByType.containsKey(providerType))
         {
@@ -123,7 +123,7 @@ public abstract class AbstractBuilder<T, R extends T, P, B extends AbstractBuild
 
     @SuppressWarnings("unchecked")
     @Override
-    public B removeTag(ProviderType<? extends TagsProvider<T>> providerType, TagKey<T>... tags)
+    public B removeTag(ProviderType<? extends Tag<T>> providerType, TagKey<T>... tags)
     {
         if(tagsByType.containsKey(providerType))
         {
