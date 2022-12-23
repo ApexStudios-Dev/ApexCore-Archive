@@ -1,0 +1,4 @@
+accessWidener   v1  named
+# Exists to match Common
+accessible class net/minecraft/data/tags/TagsProvider$TagAppender
+accessible method net/minecraft/data/tags/TagsProvider tag (Lnet/minecraft/tags/TagKey;)Lnet/minecraft/data/tags/TagsProvider$TagAppender;

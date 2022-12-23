@@ -24,6 +24,6 @@ pluginManagement {
 
 include 'Common'
 include 'Forge'
-include 'Fabric'
+// include 'Fabric'
 
 rootProject.name = "${MOD_NAME}-${MINECRAFT_VERSION}"

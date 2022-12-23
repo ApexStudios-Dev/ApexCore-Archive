@@ -28,6 +28,11 @@ sourceSets {
 
 minecraft {
 	version("${MINECRAFT_VERSION}")
+
+	if(file("src/main/resources/${MOD_ID}.accesswidener").exists()) {
+		accessWideners("src/main/resources/${MOD_ID}.accesswidener")
+	}
+
 }
 
 repositories {
@@ -35,6 +40,8 @@ repositories {
 }
 
 dependencies {
+	compileOnly "org.spongepowered:mixin:${MIXIN_VERSION}"
+
 	testmodImplementation sourceSets.main.output
 }
 
