@@ -20,18 +20,17 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public class RegistryEntry<T> implements Supplier<T>, LazyLike<T>, Comparable<RegistryEntry<?>>
+public class RegistryEntry<T> implements LazyLike<T>, Comparable<RegistryEntry<?>>
 {
     protected final ResourceKey<? extends Registry<? super T>> registryType;
     protected final ResourceKey<T> registryKey;
     @Nullable private T value;
     @Nullable private Holder<? super T> holder;
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public RegistryEntry(ResourceKey<? extends Registry<? super T>> registryType, ResourceLocation registryName)
+    public RegistryEntry(ResourceKey<? extends Registry<? super T>> registryType, ResourceKey<T> registryKey)
     {
         this.registryType = registryType;
-        registryKey = ResourceKey.create((ResourceKey) registryType, registryName);
+        this.registryKey = registryKey;
     }
 
     public final ResourceKey<? extends Registry<? super T>> getRegistryType()

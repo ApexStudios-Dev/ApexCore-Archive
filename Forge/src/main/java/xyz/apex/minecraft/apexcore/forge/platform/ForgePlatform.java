@@ -3,31 +3,36 @@ package xyz.apex.minecraft.apexcore.forge.platform;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
 import net.minecraftforge.data.loading.DatagenModLoader;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.forgespi.language.IModInfo;
 
+import xyz.apex.minecraft.apexcore.shared.platform.Environment;
 import xyz.apex.minecraft.apexcore.shared.platform.Platform;
-import xyz.apex.minecraft.apexcore.shared.platform.PlatformEvents;
+import xyz.apex.minecraft.apexcore.shared.platform.PlatformRegistries;
+import xyz.apex.minecraft.apexcore.shared.platform.PlatformType;
 
 import java.nio.file.Path;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public final class ForgePlatform implements Platform
 {
-    private final ForgeEvents events = new ForgeEvents(this);
-    private final Logger logger = LogManager.getLogger();
+    private final Logger logger = LogManager.getLogger("ApexCore/Forge");
+    private final ForgePlatformRegistries registries = new ForgePlatformRegistries(this);
+    protected final ForgePlatformModEvents modEvents = new ForgePlatformModEvents(this);
+
+    public ForgePlatform()
+    {
+        logger.debug("Initializing ForgePlatform...");
+    }
 
     @Override
-    public PlatformEvents events()
+    public PlatformRegistries registries()
     {
-        return events;
+        return registries;
     }
 
     @Override
@@ -38,27 +43,31 @@ public final class ForgePlatform implements Platform
     }
 
     @Override
+    public boolean isProduction()
+    {
+        return FMLEnvironment.production;
+    }
+
+    @Override
     public boolean isDataGeneration()
     {
         return DatagenModLoader.isRunningDataGen();
     }
 
     @Override
-    public boolean isClient()
+    public PlatformType getPlatformType()
     {
-        return FMLEnvironment.dist.isClient();
+        return PlatformType.FORGE;
     }
 
     @Override
-    public boolean isDedicatedServer()
+    public Environment getEnvironment()
     {
-        return FMLEnvironment.dist.isDedicatedServer();
-    }
-
-    @Override
-    public Type getPlatformType()
-    {
-        return Type.FORGE;
+        return switch(FMLEnvironment.dist) {
+            case CLIENT -> Environment.CLIENT;
+            case DEDICATED_SERVER -> Environment.DEDICATED_SERVER;
+            default -> throw new IllegalStateException("Unknown FML Environment: %s".formatted(FMLEnvironment.dist));
+        };
     }
 
     @Override
@@ -89,12 +98,5 @@ public final class ForgePlatform implements Platform
     public boolean isModInstalled(String modId)
     {
         return ModList.get().isLoaded(modId);
-    }
-
-    @Override
-    public <T, R extends T> Supplier<R> register(ResourceKey<? extends Registry<T>> registryType, ResourceKey<T> registryKey, Supplier<R> factory)
-    {
-        var modRegistry = events.getModRegistry(registryType);
-        return modRegistry.register(registryKey.location().getPath(), factory);
     }
 }

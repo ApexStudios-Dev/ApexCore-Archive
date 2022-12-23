@@ -1,183 +1,254 @@
 package xyz.apex.minecraft.apexcore.shared.registry;
 
-import com.google.common.collect.Lists;
-import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.client.color.block.BlockColor;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.flag.FeatureFlag;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 
-import xyz.apex.minecraft.apexcore.shared.data.ProviderTypes;
-import xyz.apex.minecraft.apexcore.shared.platform.ForPlatform;
-import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
-import xyz.apex.minecraft.apexcore.shared.platform.Platform;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.BlockEntry;
+import xyz.apex.minecraft.apexcore.shared.util.Properties;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.ToIntFunction;
 import java.util.function.UnaryOperator;
 
-public final class BlockBuilder<R extends Block, P> extends AbstractBuilder<Block, R, P, BlockBuilder<R, P>, BlockEntry<R>>
+public final class BlockBuilder<T extends Block> extends AbstractBuilder<Block, T, BlockBuilder<T>, BlockEntry<T>>
 {
-    private final BlockFactory<R> blockFactory;
-    private Supplier<BlockBehaviour.Properties> initialProperties = () -> BlockBehaviour.Properties.copy(Blocks.STONE);
+    private final BlockFactory<T> factory;
+
+    private Supplier<BlockBehaviour.Properties> initialProperties = Properties.BLOCK_STONE;
     private Function<BlockBehaviour.Properties, BlockBehaviour.Properties> propertiesModifier = Function.identity();
-    private final List<Supplier<Supplier<RenderType>>> renderTypes = Lists.newArrayList();
 
-    private BlockBuilder(ResourceLocation registryName, @Nullable P parent, BlockFactory<R> blockFactory)
+    BlockBuilder(String modId, String registryName, BlockFactory<T> factory)
     {
-        super(Registries.BLOCK, registryName, parent, BlockEntry::new);
+        super(Registries.BLOCK, modId, registryName, BlockEntry::new);
 
-        this.blockFactory = blockFactory;
+        this.factory = factory;
 
-        GamePlatform.events().onClientSetup(() -> {
-            var renderTypes = this.renderTypes.stream().map(Supplier::get).map(Supplier::get).toArray(RenderType[]::new);
-            GamePlatform.events().registerRenderTypes(asSupplier(), () -> () -> renderTypes);
-        });
-
-        defaultLang();
-
-        // TODO: Change to blockstate
-        setData(ProviderTypes.BLOCK_MODELS, (ctx, provider) -> provider.cubeAll(ctx));
+        simpleItem();
     }
 
     @Override
-    protected R construct()
+    protected T construct()
     {
-        var properties = propertiesModifier.apply(initialProperties.get());
-        return blockFactory.create(properties);
+        return factory.create(propertiesModifier.apply(initialProperties.get()));
     }
 
-    public <T extends Item> ItemBuilder<T, BlockBuilder<R, P>> item(BlockItemFactory<T, R> itemFactory)
+    public <I extends Item> BlockBuilder<T> item(BlockItemFactory<I, T> itemFactory, Function<ItemBuilder<I>, ItemBuilder<I>> action)
     {
-        return ItemBuilder.builder(getModId(), getName(), this, properties -> itemFactory.create(getEntry(), properties))
-                          .clearData(ProviderTypes.LANGUAGE)
-                          .model((ctx, provider) -> provider.blockItem(getRegistryName()))
-        ;
+        return child(Registries.ITEM, (modId, registryName) -> action.apply(ItemBuilders.builder(modId, registryName, properties -> itemFactory.create(asSupplier().get(), properties))));
     }
 
-    public BlockBuilder<R, P> defaultLang()
+    public BlockBuilder<T> simpleItem()
     {
-        return lang(Block::getDescriptionId);
+        return item(BlockItem::new, Function.identity());
     }
 
-    public BlockBuilder<R, P> lang(String name)
+    public BlockBuilder<T> noItem()
     {
-        return lang(Block::getDescriptionId, name);
+        return removeChild(Registries.ITEM);
     }
 
-    public ItemBuilder<BlockItem, BlockBuilder<R, P>> simpleItem()
-    {
-        return item(BlockItem::new);
-    }
-
-    public BlockBuilder<R, P> defaultItem()
-    {
-        return simpleItem().build();
-    }
-
-    public BlockBuilder<R, P> initialProperties(Supplier<BlockBehaviour.Properties> initialProperties)
+    public BlockBuilder<T> initialProperties(Supplier<BlockBehaviour.Properties> initialProperties)
     {
         this.initialProperties = initialProperties;
         return this;
     }
 
-    public BlockBuilder<R, P> initialProperties(Material material)
+    public BlockBuilder<T> initialProperties(BlockBehaviour.Properties properties)
     {
-        return initialProperties(() -> BlockBehaviour.Properties.of(material));
+        return initialProperties(() -> properties);
     }
 
-    public BlockBuilder<R, P> initialProperties(Material material, DyeColor color)
-    {
-        return initialProperties(() -> BlockBehaviour.Properties.of(material, color));
-    }
-
-    public BlockBuilder<R, P> initialProperties(Material material, MaterialColor color)
-    {
-        return initialProperties(() -> BlockBehaviour.Properties.of(material, color));
-    }
-
-    public BlockBuilder<R, P> initialProperties(Material material, Function<BlockState, MaterialColor> colorFunction)
-    {
-        return initialProperties(() -> BlockBehaviour.Properties.of(material, colorFunction));
-    }
-
-    public BlockBuilder<R, P> copyPropertiesFrom(Supplier<Block> block)
+    public BlockBuilder<T> copyFrom(Supplier<? extends Block> block)
     {
         return initialProperties(() -> BlockBehaviour.Properties.copy(block.get()));
     }
 
-    public BlockBuilder<R, P> properties(UnaryOperator<BlockBehaviour.Properties> propertiesModifier)
+    public BlockBuilder<T> initialProperties(Material material)
+    {
+        return initialProperties(() -> BlockBehaviour.Properties.of(material));
+    }
+
+    public BlockBuilder<T> initialProperties(Material material, DyeColor materialColor)
+    {
+        return initialProperties(() -> BlockBehaviour.Properties.of(material, materialColor));
+    }
+
+    public BlockBuilder<T> initialProperties(Material material, MaterialColor materialColor)
+    {
+        return initialProperties(() -> BlockBehaviour.Properties.of(material, materialColor));
+    }
+
+    public BlockBuilder<T> initialProperties(Material material, Function<BlockState, MaterialColor> materialColorFunction)
+    {
+        return initialProperties(() -> BlockBehaviour.Properties.of(material, materialColorFunction));
+    }
+
+    public BlockBuilder<T> properties(UnaryOperator<BlockBehaviour.Properties> propertiesModifier)
     {
         this.propertiesModifier = this.propertiesModifier.andThen(propertiesModifier);
         return this;
     }
 
-    // forge has this set directly in the model json files
-    // other platforms do not allow this and need the render types registered manually
-    @ForPlatform(Platform.Type.FABRIC)
-    public BlockBuilder<R, P> renderType(Supplier<Supplier<RenderType>> renderType)
+    public BlockBuilder<T> noCollission()
     {
-        renderTypes.add(renderType);
-        return this;
+        return properties(BlockBehaviour.Properties::noCollission);
     }
 
-    @ForPlatform(Platform.Type.FABRIC)
-    public BlockBuilder<R, P> renderType(Supplier<Supplier<RenderType>> renderType, Supplier<Supplier<RenderType>>... renderTypes)
+    public BlockBuilder<T> noOcclusion()
     {
-        this.renderTypes.add(renderType);
-        Collections.addAll(this.renderTypes, renderTypes);
-        return this;
+        return properties(BlockBehaviour.Properties::noOcclusion);
     }
 
-    public BlockBuilder<R, P> color(Supplier<Supplier<BlockColor>> colorHandler)
+    public BlockBuilder<T> friction(float friction)
     {
-        GamePlatform.events().registerBlockColor(asSupplier(), colorHandler);
-        return this;
+        return properties(properties -> properties.friction(friction));
     }
 
-    @SafeVarargs
-    public final BlockBuilder<R, P> tag(TagKey<Block>... tags)
+    public BlockBuilder<T> speedFactor(float speedFactor)
     {
-        return tag(ProviderTypes.BLOCK_TAGS, tags);
+        return properties(properties -> properties.speedFactor(speedFactor));
     }
 
-    public BlockBuilder<R, P> removeTag(TagKey<Block>... tags)
+    public BlockBuilder<T> jumpFactor(float jumpFactor)
     {
-        return removeTag(ProviderTypes.BLOCK_TAGS, tags);
+        return properties(properties -> properties.jumpFactor(jumpFactor));
     }
 
-    public static <R extends Block, P> BlockBuilder<R, P> builder(String modId, String name, P parent, BlockFactory<R> blockFactory)
+    public BlockBuilder<T> sound(SoundType soundType)
     {
-        return new BlockBuilder<>(new ResourceLocation(modId, name), parent, blockFactory);
+        return properties(properties -> properties.sound(soundType));
     }
 
-    public static <R extends Block> BlockBuilder<R, Object> builder(String modId, String name, BlockFactory<R> blockFactory)
+    public BlockBuilder<T> lightLevel(ToIntFunction<BlockState> lightLevelFunction)
     {
-        return new BlockBuilder<>(new ResourceLocation(modId, name), null, blockFactory);
+        return properties(properties -> properties.lightLevel(lightLevelFunction));
     }
 
-    public static <P> BlockBuilder<Block, P> block(String modId, String name, P parent)
+    public BlockBuilder<T> strength(float destroyTime, float explosionResistance)
     {
-        return builder(modId, name, parent, Block::new);
+        return properties(properties -> properties.strength(destroyTime, explosionResistance));
     }
 
-    public static BlockBuilder<Block, Object> block(String modId, String name)
+    public BlockBuilder<T> instabreak()
     {
-        return builder(modId, name, Block::new);
+        return properties(BlockBehaviour.Properties::instabreak);
+    }
+
+    public BlockBuilder<T> strength(float strength)
+    {
+        return properties(properties -> properties.strength(strength));
+    }
+
+    public BlockBuilder<T> randomTicks()
+    {
+        return properties(BlockBehaviour.Properties::randomTicks);
+    }
+
+    public BlockBuilder<T> dynamicShape()
+    {
+        return properties(BlockBehaviour.Properties::dynamicShape);
+    }
+
+    public BlockBuilder<T> noLootTable()
+    {
+        return properties(BlockBehaviour.Properties::noLootTable);
+    }
+
+    @Deprecated
+    public BlockBuilder<T> dropsLike(Block block)
+    {
+        return properties(properties -> properties.dropsLike(block));
+    }
+
+    public BlockBuilder<T> dropsLike(Supplier<? extends Block> block)
+    {
+        return properties(properties -> properties.dropsLike(block.get()));
+    }
+
+    public BlockBuilder<T> air()
+    {
+        return properties(BlockBehaviour.Properties::air);
+    }
+
+    public BlockBuilder<T> isValidSpawn(BlockBehaviour.StateArgumentPredicate<EntityType<?>> predicate)
+    {
+        return properties(properties -> properties.isValidSpawn(predicate));
+    }
+
+    public BlockBuilder<T> isRedstoneConductor(BlockBehaviour.StatePredicate predicate)
+    {
+        return properties(properties -> properties.isRedstoneConductor(predicate));
+    }
+
+    public BlockBuilder<T> isSuffocating(BlockBehaviour.StatePredicate predicate)
+    {
+        return properties(properties -> properties.isSuffocating(predicate));
+    }
+
+    public BlockBuilder<T> isViewBlocking(BlockBehaviour.StatePredicate predicate)
+    {
+        return properties(properties -> properties.isViewBlocking(predicate));
+    }
+
+    public BlockBuilder<T> hasPostProcess(BlockBehaviour.StatePredicate predicate)
+    {
+        return properties(properties -> properties.hasPostProcess(predicate));
+    }
+
+    public BlockBuilder<T> emissiveRendering(BlockBehaviour.StatePredicate predicate)
+    {
+        return properties(properties -> properties.emissiveRendering(predicate));
+    }
+
+    public BlockBuilder<T> requiresCorrectToolForDrops()
+    {
+        return properties(BlockBehaviour.Properties::requiresCorrectToolForDrops);
+    }
+
+    public BlockBuilder<T> color(MaterialColor materialColor)
+    {
+        return properties(properties -> properties.color(materialColor));
+    }
+
+    public BlockBuilder<T> destroyTime(float destroyTime)
+    {
+        return properties(properties -> properties.destroyTime(destroyTime));
+    }
+
+    public BlockBuilder<T> explosionResistance(float explosionResistance)
+    {
+        return properties(properties -> properties.explosionResistance(explosionResistance));
+    }
+
+    public BlockBuilder<T> offsetType(BlockBehaviour.OffsetType offsetType)
+    {
+        return properties(properties -> properties.offsetType(offsetType));
+    }
+
+    public BlockBuilder<T> offsetType(Function<BlockState, BlockBehaviour.OffsetType> offsetTypeFunction)
+    {
+        return properties(properties -> properties.offsetType(offsetTypeFunction));
+    }
+
+    public BlockBuilder<T> noParticlesOnBreak()
+    {
+        return properties(BlockBehaviour.Properties::noParticlesOnBreak);
+    }
+
+    public BlockBuilder<T> requiredFeatures(FeatureFlag... flags)
+    {
+        return properties(properties -> properties.requiredFeatures(flags));
     }
 
     @FunctionalInterface

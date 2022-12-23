@@ -3,7 +3,7 @@ package xyz.apex.minecraft.apexcore.forge.platform;
 import xyz.apex.minecraft.apexcore.shared.platform.Platform;
 import xyz.apex.minecraft.apexcore.shared.platform.PlatformHolder;
 
-class ForgePlatformHolder implements PlatformHolder
+public class ForgePlatformHolder implements PlatformHolder
 {
     protected final ForgePlatform platform;
 

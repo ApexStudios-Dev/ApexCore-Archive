@@ -1,146 +1,107 @@
 package xyz.apex.minecraft.apexcore.shared.registry;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import org.apache.commons.lang3.Validate;
-import org.jetbrains.annotations.Nullable;
+import com.google.common.collect.Maps;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 
-import xyz.apex.minecraft.apexcore.shared.data.ProviderType;
-import xyz.apex.minecraft.apexcore.shared.data.providers.Tag;
-import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
+import xyz.apex.minecraft.apexcore.shared.platform.Platform;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.shared.util.Lazy;
 
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-public abstract class AbstractBuilder<T, R extends T, P, B extends AbstractBuilder<T, R, P, B, E>, E extends RegistryEntry<R>> implements Builder<T, R, P, B, E>
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public abstract class AbstractBuilder<
+        T,
+        R extends T,
+        B extends AbstractBuilder<T, R, B, E>,
+        E extends RegistryEntry<R>
+>
 {
-    protected final ResourceKey<? extends Registry<T>> registryType;
-    protected final ResourceKey<T> registryKey;
-    @Nullable protected final P parent;
-    private final E registryEntry;
+    private final String modId;
+    private final String registryName;
+    private final ResourceLocation internalName;
+    private final ResourceKey<? extends Registry<T>> registryType;
+    private final ResourceKey<R> registryKey;
+    private final Supplier<R> supplier = Lazy.of(this::construct);
 
-    private final Multimap<ProviderType<? extends Tag<?>>, TagKey<?>> tagsByType = HashMultimap.create();
+    private final Function<ResourceKey<R>, E> registryEntryFactory;
+    private final Map<ResourceKey<? extends Registry<?>>, Supplier<? extends AbstractBuilder<?, ?, ?, ?>>> children = Maps.newHashMap();
 
-    protected AbstractBuilder(ResourceKey<? extends Registry<T>> registryType, ResourceLocation registryName, @Nullable P parent, RegistryEntryFactoryEX<T, R, E> registryEntryFactory)
+    protected AbstractBuilder(ResourceKey<? extends Registry<T>> registryType, String modId, String registryName, Function<ResourceKey<R>, E> registryEntryFactory)
     {
         this.registryType = registryType;
-        this.parent = parent;
+        this.modId = modId;
+        this.registryName = registryName;
+        this.registryEntryFactory = registryEntryFactory;
 
-        registryKey = ResourceKey.create(registryType, registryName);
-        registryEntry = registryEntryFactory.create(registryType, registryName);
-    }
-
-    protected AbstractBuilder(ResourceKey<? extends Registry<T>> registryType, ResourceLocation registryName, @Nullable P parent, RegistryEntryFactory<R, E> registryEntryFactory)
-    {
-        this(registryType, registryName, parent, createEntryFromSimpleFactory(registryType, registryEntryFactory));
+        internalName = new ResourceLocation(modId, registryName);
+        registryKey = ResourceKey.create((ResourceKey) registryType, internalName);
     }
 
     protected abstract R construct();
 
-    @Override
-    public final E register()
+    protected final <T1, R1 extends T1, B1 extends AbstractBuilder<T1, R1, B1, E1>, E1 extends RegistryEntry<R1>> B child(ResourceKey<? extends Registry<T1>> registryType, BiFunction<String, String, B1> builderFactory)
     {
-        Supplier<R> hookedRegistryValue = Lazy.of(() -> {
-            var value = construct();
-            var registry = RegistryEntry.getRegistryOrThrow(registryType);
-            var holder = registry.wrapAsHolder(value);
-            registryEntry.updateReference(value, holder);
-            return value;
-        });
-
-        GamePlatform.INSTANCE.register(registryType, registryKey, hookedRegistryValue);
-        return registryEntry;
+        children.put(registryType, () -> builderFactory.apply(modId, registryName));
+        return (B) this;
     }
 
-    @Override
-    public final E get()
+    protected final <T1> B removeChild(ResourceKey<? extends Registry<T1>> registryType)
     {
-        return registryEntry;
+        children.remove(registryType);
+        return (B) this;
     }
 
-    @Override
-    public final P getParent()
-    {
-        return Objects.requireNonNull(parent);
-    }
-
-    @Override
     public final String getModId()
     {
-        return getRegistryName().getNamespace();
+        return modId;
     }
 
-    @Override
-    public final String getName()
+    public final String getRegistryName()
     {
-        return getRegistryName().getPath();
+        return registryName;
     }
 
-    @Override
-    public final ResourceLocation getRegistryName()
+    public final ResourceLocation getInternalName()
     {
-        return registryKey.location();
+        return internalName;
     }
 
-    @Override
     public final ResourceKey<? extends Registry<T>> getRegistryType()
     {
         return registryType;
     }
 
-    @Override
-    public final ResourceKey<T> getRegistryKey()
+    public final ResourceKey<R> getRegistryKey()
     {
         return registryKey;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public B tag(ProviderType<? extends Tag<T>> providerType, TagKey<T>... tags)
+    public final Supplier<R> asSupplier()
     {
-        if(!tagsByType.containsKey(providerType))
-        {
-            setData(providerType, (ctx, provider) -> tagsByType
-                    .get(providerType)
-                    .stream()
-                    .map(t -> (TagKey<T>) t)
-                    .map(provider::tag)
-                    .forEach(b -> b.add(registryKey))
-            );
-        }
-
-        tagsByType.putAll(providerType, Arrays.asList(tags));
-        return (B) this;
+        return supplier;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public B removeTag(ProviderType<? extends Tag<T>> providerType, TagKey<T>... tags)
+    public final E register()
     {
-        if(tagsByType.containsKey(providerType))
+        var entry = registryEntryFactory.apply(registryKey);
+        var logger = Platform.INSTANCE.getLogger();
+        logger.info("Registering {}: {}", registryType.location(), internalName);
+        Platform.INSTANCE.registries().register(registryType, entry, supplier);
+
+        if(!children.isEmpty())
         {
-            for(var tag : tags)
-            {
-                tagsByType.remove(providerType, tag);
-            }
+            logger.debug("Registering children for {}", internalName);
+            children.forEach((key, value) -> value.get().register());
+            children.clear();
         }
 
-        return (B) this;
-    }
-
-    private static <T, R extends T, E extends RegistryEntry<R>> RegistryEntryFactoryEX<T, R, E> createEntryFromSimpleFactory(ResourceKey<? extends Registry<T>> registryType, RegistryEntryFactory<R, E> entryFactory)
-    {
-        return (registryType1, registryName) -> {
-            Validate.isTrue(registryType == registryType1);
-            return entryFactory.create(registryName);
-        };
+        return entry;
     }
 }

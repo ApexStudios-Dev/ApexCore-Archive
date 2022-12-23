@@ -11,7 +11,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 
-import xyz.apex.minecraft.apexcore.shared.platform.Platform;
+import xyz.apex.minecraft.apexcore.shared.platform.PlatformType;
 
 @SuppressWarnings({ "JavadocReference", "JavadocBlankLines" })
 public interface Tags
@@ -344,9 +344,9 @@ public interface Tags
 
         private static void bootstrap()
         {
-            Biomes.Forge.bootstrap();
-            Biomes.Fabric.bootstrap();
-            Biomes.Vanilla.bootstrap();
+            Forge.bootstrap();
+            Fabric.bootstrap();
+            Vanilla.bootstrap();
         }
     }
 
@@ -789,9 +789,9 @@ public interface Tags
 
         private static void bootstrap()
         {
-            Biomes.Forge.bootstrap();
-            Biomes.Fabric.bootstrap();
-            Biomes.Vanilla.bootstrap();
+            Forge.bootstrap();
+            Fabric.bootstrap();
+            Vanilla.bootstrap();
         }
     }
 
@@ -841,9 +841,9 @@ public interface Tags
 
         private static void bootstrap()
         {
-            Biomes.Forge.bootstrap();
-            Biomes.Fabric.bootstrap();
-            Biomes.Vanilla.bootstrap();
+            Forge.bootstrap();
+            Fabric.bootstrap();
+            Vanilla.bootstrap();
         }
     }
 
@@ -895,9 +895,9 @@ public interface Tags
 
         private static void bootstrap()
         {
-            Biomes.Forge.bootstrap();
-            Biomes.Fabric.bootstrap();
-            Biomes.Vanilla.bootstrap();
+            Forge.bootstrap();
+            Fabric.bootstrap();
+            Vanilla.bootstrap();
         }
     }
 
@@ -1060,15 +1060,20 @@ public interface Tags
 
     static <T> TagKey<T> forge(ResourceKey<? extends Registry<T>> registryType, String name)
     {
-        return Platform.Type.FORGE.tag(registryType, name);
+        return PlatformType.FORGE.tag(registryType, name);
     }
 
     static <T> TagKey<T> fabric(ResourceKey<? extends Registry<T>> registryType, String name)
     {
-        return Platform.Type.FABRIC.tag(registryType, name);
+        return PlatformType.FABRIC.tag(registryType, name);
     }
 
     static void bootstrap()
     {
+        Blocks.bootstrap();
+        Items.bootstrap();
+        Fluids.bootstrap();
+        EntityTypes.bootstrap();
+        Biomes.bootstrap();
     }
 }

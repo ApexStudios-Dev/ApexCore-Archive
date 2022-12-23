@@ -6,7 +6,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -16,9 +15,9 @@ import java.util.Objects;
 
 public class ItemLikeEntry<T extends ItemLike> extends RegistryEntry<T> implements ItemLike
 {
-    protected ItemLikeEntry(ResourceKey<? extends Registry<? super T>> registryType, ResourceLocation registryName)
+    protected ItemLikeEntry(ResourceKey<? extends Registry<? super T>> registryType, ResourceKey<T> registryKey)
     {
-        super(registryType, registryName);
+        super(registryType, registryKey);
     }
 
     @Override

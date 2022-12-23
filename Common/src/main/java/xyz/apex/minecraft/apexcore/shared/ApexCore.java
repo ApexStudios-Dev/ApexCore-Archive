@@ -1,6 +1,6 @@
 package xyz.apex.minecraft.apexcore.shared;
 
-import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
+import xyz.apex.minecraft.apexcore.shared.platform.Platform;
 import xyz.apex.minecraft.apexcore.shared.util.Tags;
 
 public interface ApexCore
@@ -9,8 +9,7 @@ public interface ApexCore
 
     static void bootstrap()
     {
+        Platform.INSTANCE.getLogger().debug("Bootstrapping common types...");
         Tags.bootstrap();
-
-        GamePlatform.events().register(ApexCore.ID);
     }
 }

@@ -3,16 +3,16 @@ package xyz.apex.minecraft.apexcore.shared.registry.entry;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 public final class BlockEntry<T extends Block> extends ItemLikeEntry<T>
 {
-    public BlockEntry(ResourceLocation registryName)
+    public BlockEntry(ResourceKey<T> registryKey)
     {
-        super(Registries.BLOCK, registryName);
+        super(Registries.BLOCK, registryKey);
     }
 
     public boolean isBlock(@Nullable Block block)

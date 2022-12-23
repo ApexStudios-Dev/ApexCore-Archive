@@ -175,7 +175,9 @@ minecraft {
 
 mixin {
 	add sourceSets.main, "${MOD_ID}.refmap.json"
+	add sourceSets.main, "${MOD_ID}-common.refmap.json"
 	config "${MOD_ID}.mixins.json"
+	config "${MOD_ID}-common.mixins.json"
 }
 
 repositories {
@@ -314,7 +316,7 @@ jar {
 				'Implementation-Version': "${project.version}",
 				'Implementation-Vendor': 'ApexStudios',
 				'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-				'MixinConfigs': "${MOD_ID}.mixins.json"
+				'MixinConfigs': "${MOD_ID}.mixins.json,${MOD_ID}-common.mixins.json"
 		])
 	}
 }

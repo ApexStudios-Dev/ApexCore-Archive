@@ -1,15 +1,14 @@
 package xyz.apex.minecraft.apexcore.shared.util;
 
-import com.google.common.base.Suppliers;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public final class Lazy<T> implements Supplier<T>
+public final class Lazy<T> implements LazyLike<T>
 {
     private Supplier<T> supplier;
-    @Nullable private T value;
+    @Nullable private T value = null;
     private boolean initialized = false;
 
     private Lazy(Supplier<T> supplier)
@@ -20,7 +19,7 @@ public final class Lazy<T> implements Supplier<T>
     private Lazy(T value)
     {
         this.value = value;
-        supplier = Suppliers.memoize(() -> value);
+        supplier = () -> value;
         initialized = true;
     }
 
@@ -30,7 +29,7 @@ public final class Lazy<T> implements Supplier<T>
         if(!initialized)
         {
             value = supplier.get();
-            supplier = Suppliers.memoize(() -> value);
+            supplier = () -> value;
             initialized = true;
         }
 

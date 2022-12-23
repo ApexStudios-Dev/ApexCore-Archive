@@ -1,78 +1,75 @@
 package xyz.apex.minecraft.apexcore.shared.platform;
 
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.ApiStatus;
-
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 
 import java.nio.file.Path;
+import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.function.Supplier;
 
 public interface Platform
 {
-    PlatformEvents events();
+    Platform INSTANCE = ServiceLoader.load(Platform.class).findFirst().orElseThrow();
+
+    PlatformRegistries registries();
 
     boolean isDevelopment();
-    boolean isDataGeneration();
-    boolean isClient();
-    boolean isDedicatedServer();
 
-    Type getPlatformType();
+    default boolean isProduction()
+    {
+        return !isDevelopment();
+    }
+
+    boolean isDataGeneration();
+
+    default boolean isClient()
+    {
+        return isRunningOn(Environment.CLIENT);
+    }
+
+    default boolean isDedicatedServer()
+    {
+        return isRunningOn(Environment.DEDICATED_SERVER);
+    }
+
+    PlatformType getPlatformType();
+
+    Environment getEnvironment();
+
     Logger getLogger();
 
-    default boolean isRunningOn(Type platform)
+    default boolean isRunningOn(PlatformType platformType)
     {
-        return getPlatformType() == platform;
+        return getPlatformType() == platformType;
+    }
+
+    default boolean isRunningOn(Environment environment)
+    {
+        return getEnvironment() == environment;
+    }
+
+    default boolean isRunningOn(PlatformType platformType, Environment environment)
+    {
+        return isRunningOn(platformType) && isRunningOn(environment);
     }
 
     default boolean isForge()
     {
-        return isRunningOn(Type.FORGE);
+        return isRunningOn(PlatformType.FORGE);
     }
 
     default boolean isFabric()
     {
-        return isRunningOn(Type.FABRIC);
+        return isRunningOn(PlatformType.FABRIC);
     }
 
     Path getGameDir();
-    Path getModsDir();
+
+    default Path getModsDir()
+    {
+        return getGameDir().resolve("mods");
+    }
 
     Set<String> getMods();
+
     boolean isModInstalled(String modId);
-
-    <T, R extends T> Supplier<R> register(ResourceKey<? extends Registry<T>> registryType, ResourceKey<T> registryKey, Supplier<R> factory);
-
-    enum Type
-    {
-        FABRIC("fabric", "c"), // for some reason fabric has all compat tags under 'c'
-        FORGE("forge"),
-        // Internal platform, never used in production
-        // internal-private usages only
-        @ApiStatus.Internal
-        VANILLA("minecraft");
-
-        public final String modId;
-        private final String tagNamespace;
-
-        Type(String modId, String tagNamespace)
-        {
-            this.modId = modId;
-            this.tagNamespace = tagNamespace;
-        }
-
-        Type(String modId)
-        {
-            this(modId, modId);
-        }
-
-        public <T> TagKey<T> tag(ResourceKey<? extends Registry<T>> registryType, String name)
-        {
-            return TagKey.create(registryType, new ResourceLocation(tagNamespace, name));
-        }
-    }
 }

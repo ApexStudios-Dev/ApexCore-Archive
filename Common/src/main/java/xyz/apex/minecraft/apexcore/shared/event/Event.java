@@ -1,9 +1,23 @@
 package xyz.apex.minecraft.apexcore.shared.event;
 
-public abstract class Event
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.function.Consumer;
+
+public interface Event<T>
 {
-    public String getName()
+    void addListener(Consumer<T> listener);
+
+    default void addAllListeners(Consumer<T>... listeners)
     {
-        return getClass().getSimpleName();
+        addAllListeners(Arrays.asList(listeners));
     }
+
+    void addAllListeners(Collection<Consumer<T>> listeners);
+
+    void removeListener(Consumer<T> listener);
+
+    void removeAllOccurrences(Consumer<T> listener);
+
+    void post(T event);
 }

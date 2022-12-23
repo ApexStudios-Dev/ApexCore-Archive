@@ -1,6 +1,5 @@
 package xyz.apex.minecraft.apexcore.fabric.platform;
 
-import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -8,26 +7,30 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
-
+import xyz.apex.minecraft.apexcore.shared.platform.Environment;
 import xyz.apex.minecraft.apexcore.shared.platform.Platform;
-import xyz.apex.minecraft.apexcore.shared.platform.PlatformEvents;
+import xyz.apex.minecraft.apexcore.shared.platform.PlatformRegistries;
+import xyz.apex.minecraft.apexcore.shared.platform.PlatformType;
 
 import java.nio.file.Path;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public final class FabricPlatform implements Platform
 {
-    private final FabricEvents events = new FabricEvents(this);
-    private final Logger logger = LogManager.getLogger();
+    private final Logger logger = LogManager.getLogger("ApexCore/Fabric");
+    private final FabricPlatformRegistries registries = new FabricPlatformRegistries(this);
+    protected final FabricPlatformModEvents modEvents = new FabricPlatformModEvents(this);
+
+    public FabricPlatform()
+    {
+        logger.debug("Initializing FabricPlatform...");
+    }
 
     @Override
-    public PlatformEvents events()
+    public PlatformRegistries registries()
     {
-        return events;
+        return registries;
     }
 
     @Override
@@ -43,21 +46,21 @@ public final class FabricPlatform implements Platform
     }
 
     @Override
-    public boolean isClient()
+    public PlatformType getPlatformType()
     {
-        return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
+        return PlatformType.FORGE;
     }
 
     @Override
-    public boolean isDedicatedServer()
+    public Environment getEnvironment()
     {
-        return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
-    }
+        var environmentType = FabricLoader.getInstance().getEnvironmentType();
 
-    @Override
-    public Type getPlatformType()
-    {
-        return Type.FABRIC;
+        return switch(environmentType) {
+            case CLIENT -> Environment.CLIENT;
+            case SERVER -> Environment.DEDICATED_SERVER;
+            default -> throw new IllegalStateException("Unknown FML Environment: %s".formatted(environmentType));
+        };
     }
 
     @Override
@@ -73,12 +76,6 @@ public final class FabricPlatform implements Platform
     }
 
     @Override
-    public Path getModsDir()
-    {
-        return getGameDir().resolve("mods");
-    }
-
-    @Override
     public Set<String> getMods()
     {
         return FabricLoader.getInstance().getAllMods().stream().map(ModContainer::getMetadata).map(ModMetadata::getId).collect(Collectors.toSet());
@@ -88,11 +85,5 @@ public final class FabricPlatform implements Platform
     public boolean isModInstalled(String modId)
     {
         return FabricLoader.getInstance().isModLoaded(modId);
-    }
-
-    @Override
-    public <T, R extends T> Supplier<R> register(ResourceKey<? extends Registry<T>> registryType, ResourceKey<T> registryKey, Supplier<R> factory)
-    {
-        return events.register(registryType, registryKey, factory);
     }
 }

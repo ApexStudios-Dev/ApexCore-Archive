@@ -59,7 +59,7 @@
         "client": [ ],
         "server": [ ]
     },
-    "mixins": [ "${MOD_ID}.mixins.json" ],
+    "mixins": [ "${MOD_ID}.mixins.json", "${MOD_ID}-common.mixins.json" ],
     "depends": {
         "minecraft": "~${MINECRAFT_VERSION}",
         "java": ">=${JAVA_VERSION}",

@@ -1,151 +1,100 @@
 package xyz.apex.minecraft.apexcore.shared.registry;
 
-import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
+import net.minecraft.world.flag.FeatureFlag;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.ItemLike;
 
-import xyz.apex.minecraft.apexcore.shared.data.ItemLikeContext;
-import xyz.apex.minecraft.apexcore.shared.data.ProviderTypes;
-import xyz.apex.minecraft.apexcore.shared.data.providers.Model;
-import xyz.apex.minecraft.apexcore.shared.data.providers.Recipe;
-import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.ItemEntry;
+import xyz.apex.minecraft.apexcore.shared.util.Properties;
 
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-public final class ItemBuilder<R extends Item, P> extends AbstractBuilder<Item, R, P, ItemBuilder<R, P>, ItemEntry<R>>
+public final class ItemBuilder<T extends Item> extends AbstractBuilder<Item, T, ItemBuilder<T>, ItemEntry<T>>
 {
-    private final ItemFactory<R> itemFactory;
-    private Supplier<Item.Properties> initialProperties = Item.Properties::new;
+    private final ItemFactory<T> factory;
+
+    private Supplier<Item.Properties> initialProperties = Properties.ITEM_GENERIC;
     private Function<Item.Properties, Item.Properties> propertiesModifier = Function.identity();
 
-    private ItemBuilder(ResourceLocation registryName, @Nullable P parent, ItemFactory<R> itemFactory)
+    ItemBuilder(String modId, String registryName, ItemFactory<T> factory)
     {
-        super(Registries.ITEM, registryName, parent, ItemEntry::new);
+        super(Registries.ITEM, modId, registryName, ItemEntry::new);
 
-        this.itemFactory = itemFactory;
-
-        defaultLang().defaultModel();
+        this.factory = factory;
     }
 
-    public ItemBuilder<R, P> initialProperties(Supplier<Item.Properties> initialProperties)
+    @Override
+    protected T construct()
+    {
+        return factory.create(propertiesModifier.apply(initialProperties.get()));
+    }
+
+    public ItemBuilder<T> initialProperties(Supplier<Item.Properties> initialProperties)
     {
         this.initialProperties = initialProperties;
         return this;
     }
 
-    public ItemBuilder<R, P> properties(UnaryOperator<Item.Properties> propertiesModifier)
+    public ItemBuilder<T> initialProperties(Item.Properties properties)
+    {
+        return initialProperties(() -> properties);
+    }
+
+    public ItemBuilder<T> properties(UnaryOperator<Item.Properties> propertiesModifier)
     {
         this.propertiesModifier = this.propertiesModifier.andThen(propertiesModifier);
         return this;
     }
 
-    public ItemBuilder<R, P> food(FoodProperties foodProperties)
+    public ItemBuilder<T> food(FoodProperties foodProperties)
     {
         return properties(properties -> properties.food(foodProperties));
     }
 
-    public ItemBuilder<R, P> stacksTo(int stackSize)
+    public ItemBuilder<T> stacksTo(int maxStackSize)
     {
-        return properties(properties -> properties.stacksTo(stackSize));
+        return properties(properties -> properties.stacksTo(maxStackSize));
     }
 
-    public ItemBuilder<R, P> defaultDurability(int durability)
+    public ItemBuilder<T> defaultDurability(int durability)
     {
         return properties(properties -> properties.defaultDurability(durability));
     }
 
-    public ItemBuilder<R, P> durability(int durability)
+    public ItemBuilder<T> durability(int durability)
     {
         return properties(properties -> properties.durability(durability));
     }
 
-    public ItemBuilder<R, P> rarity(Rarity rarity)
+    @Deprecated
+    public ItemBuilder<T> craftRemainder(Item craftingRemainingItem)
+    {
+        return properties(properties -> properties.craftRemainder(craftingRemainingItem));
+    }
+
+    public ItemBuilder<T> craftRemainder(Supplier<? extends ItemLike> craftingRemainingItem)
+    {
+        return properties(properties -> properties.craftRemainder(craftingRemainingItem.get().asItem()));
+    }
+
+    public ItemBuilder<T> rarity(Rarity rarity)
     {
         return properties(properties -> properties.rarity(rarity));
     }
 
-    public ItemBuilder<R, P> fireResistant()
+    public ItemBuilder<T> fireResistant()
     {
         return properties(Item.Properties::fireResistant);
     }
 
-    public ItemBuilder<R, P> color(Supplier<Supplier<ItemColor>> colorHandler)
+    public ItemBuilder<T> requiredFeatures(FeatureFlag... flags)
     {
-        GamePlatform.events().registerItemColor(asSupplier(), colorHandler);
-        return this;
-    }
-
-    public ItemBuilder<R, P> defaultModel()
-    {
-        return model((ctx, provider) -> provider.basicItem(getRegistryName()));
-    }
-
-    public ItemBuilder<R, P> model(BiConsumer<ItemLikeContext<R, ItemEntry<R>>, Model.ItemModel<?>> consumer)
-    {
-        return setData(ProviderTypes.ITEM_MODELS, (ctx, provider) -> consumer.accept(new ItemLikeContext<>(ctx), provider));
-    }
-
-    public ItemBuilder<R, P> defaultLang()
-    {
-        return lang(Item::getDescriptionId);
-    }
-
-    public ItemBuilder<R, P> lang(String name)
-    {
-        return lang(Item::getDescriptionId, name);
-    }
-
-    public ItemBuilder<R, P> recipe(BiConsumer<ItemLikeContext<R, ItemEntry<R>>, Recipe> consumer)
-    {
-        return setData(ProviderTypes.RECIPES, (ctx, provider) -> consumer.accept(new ItemLikeContext<>(ctx), provider));
-    }
-
-    @SafeVarargs
-    public final ItemBuilder<R, P> tag(TagKey<Item>... tags)
-    {
-        return tag(ProviderTypes.ITEM_TAGS, tags);
-    }
-
-    public ItemBuilder<R, P> removeTag(TagKey<Item>... tags)
-    {
-        return removeTag(ProviderTypes.ITEM_TAGS, tags);
-    }
-
-    @Override
-    protected R construct()
-    {
-        var properties = propertiesModifier.apply(initialProperties.get());
-        return itemFactory.create(properties);
-    }
-
-    public static <R extends Item, P> ItemBuilder<R, P> builder(String modId, String name, P parent, ItemFactory<R> itemFactory)
-    {
-        return new ItemBuilder<>(new ResourceLocation(modId, name), parent, itemFactory);
-    }
-
-    public static <R extends Item> ItemBuilder<R, Object> builder(String modId, String name, ItemFactory<R> itemFactory)
-    {
-        return new ItemBuilder<>(new ResourceLocation(modId, name), null, itemFactory);
-    }
-
-    public static <P> ItemBuilder<Item, P> item(String modId, String name, P parent)
-    {
-        return builder(modId, name, parent, Item::new);
-    }
-
-    public static ItemBuilder<Item, Object> item(String modId, String name)
-    {
-        return builder(modId, name, Item::new);
+        return properties(properties -> properties.requiredFeatures(flags));
     }
 
     @FunctionalInterface
