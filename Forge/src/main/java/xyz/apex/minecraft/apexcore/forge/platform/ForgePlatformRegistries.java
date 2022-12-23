@@ -70,7 +70,7 @@ public final class ForgePlatformRegistries extends ForgePlatformHolder implement
     public ArmorMaterial registerArmorMaterial(ArmorMaterialBuilder builder)
     {
         platform.getLogger().debug("Registering ArmorMaterial: {}:{}", builder.getModId(), builder.getRegistryName());
-        return new ForgeArmorMaterial(builder);
+        return new EnhancedForgeArmorMaterial(builder);
     }
 
     @SuppressWarnings({ "unchecked", "DataFlowIssue" })
@@ -167,7 +167,7 @@ public final class ForgePlatformRegistries extends ForgePlatformHolder implement
         }
     }
 
-    private static final class ForgeArmorMaterial implements EnhancedArmorMaterial
+    private static final class EnhancedForgeArmorMaterial implements EnhancedArmorMaterial
     {
         private final ResourceLocation registryName;
         private final ToIntFunction<EquipmentSlot> durabilityForSlot;
@@ -178,7 +178,7 @@ public final class ForgePlatformRegistries extends ForgePlatformHolder implement
         private final float toughness;
         private final float knockbackResistance;
 
-        private ForgeArmorMaterial(ArmorMaterialBuilder builder)
+        private EnhancedForgeArmorMaterial(ArmorMaterialBuilder builder)
         {
             registryName = new ResourceLocation(builder.getModId(), builder.getRegistryName());
             durabilityForSlot = builder.getDurabilityForSlot();
