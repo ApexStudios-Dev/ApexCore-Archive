@@ -27,6 +27,7 @@ public final class BlockTagGenerator extends BlockTagsProvider
 
         tag(Tags.Blocks.Forge.ORES).addTag(AllTags.Blocks.Forge.ORES_LEAD);
         tag(Tags.Blocks.Forge.STORAGE_BLOCKS).addTag(AllTags.Blocks.Forge.STORAGE_BLOCKS_LEAD);
+        tag(Tags.Blocks.Fabric.ORES).addTags(AllTags.Blocks.Fabric.LEAD_ORE, AllTags.Blocks.Fabric.LEAD_ORES);
 
         tag(AllTags.Blocks.Forge.ORES_LEAD).add(leadOre, deepslateLeadOre);
         tag(AllTags.Blocks.Fabric.LEAD_ORE).add(leadOre, deepslateLeadOre);

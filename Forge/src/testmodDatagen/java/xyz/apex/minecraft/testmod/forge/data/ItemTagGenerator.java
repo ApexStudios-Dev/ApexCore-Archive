@@ -29,16 +29,28 @@ public final class ItemTagGenerator extends ItemTagsProvider
 
     private void leadArmorTools()
     {
-        tag(Tags.Items.Forge.TOOLS_SWORDS).add(AllItems.LEAD_SWORD.get());
-        tag(Tags.Items.Forge.TOOLS_PICKAXES).add(AllItems.LEAD_PICKAXE.get());
-        tag(Tags.Items.Forge.TOOLS_AXES).add(AllItems.LEAD_AXE.get());
-        tag(Tags.Items.Forge.TOOLS_SHOVELS).add(AllItems.LEAD_SHOVEL.get());
-        tag(Tags.Items.Forge.TOOLS_HOES).add(AllItems.LEAD_HOE.get());
+        var leadSword = AllItems.LEAD_SWORD.get();
+        var leadPickaxe = AllItems.LEAD_PICKAXE.get();
+        var leadAxe = AllItems.LEAD_AXE.get();
+        var leadShovel = AllItems.LEAD_SHOVEL.get();
+        var leadHoe = AllItems.LEAD_HOE.get();
+
+        tag(Tags.Items.Forge.TOOLS_SWORDS).add(leadSword);
+        tag(Tags.Items.Forge.TOOLS_PICKAXES).add(leadPickaxe);
+        tag(Tags.Items.Forge.TOOLS_AXES).add(leadAxe);
+        tag(Tags.Items.Forge.TOOLS_SHOVELS).add(leadShovel);
+        tag(Tags.Items.Forge.TOOLS_HOES).add(leadHoe);
         tag(Tags.Items.Forge.ARMORS_HELMETS).add(AllItems.LEAD_HELMET.get());
         tag(Tags.Items.Forge.ARMORS_CHESTPLATES).add(AllItems.LEAD_CHESTPLATE.get());
         tag(Tags.Items.Forge.ARMORS_LEGGINGS).add(AllItems.LEAD_LEGGINGS.get());
         tag(Tags.Items.Forge.ARMORS_BOOTS).add(AllItems.LEAD_BOOTS.get());
         tag(Tags.Items.Forge.ARMORS).add(AllItems.LEAD_HORSE_ARMOR.get());
+
+        tag(Tags.Items.Fabric.SWORDS).add(leadSword);
+        tag(Tags.Items.Fabric.PICKAXES).add(leadPickaxe);
+        tag(Tags.Items.Fabric.AXES).add(leadAxe);
+        tag(Tags.Items.Fabric.SHOVELS).add(leadShovel);
+        tag(Tags.Items.Fabric.HOES).add(leadHoe);
     }
 
     private void leadIngot()
@@ -68,6 +80,10 @@ public final class ItemTagGenerator extends ItemTagsProvider
 
     private void copyBlockTags()
     {
+        copy(Tags.Blocks.Forge.ORES, Tags.Items.Forge.ORES);
+        copy(Tags.Blocks.Forge.STORAGE_BLOCKS, Tags.Items.Forge.STORAGE_BLOCKS);
+        copy(Tags.Blocks.Fabric.ORES, Tags.Items.Fabric.ORES);
+
         copy(AllTags.Blocks.Forge.ORES_LEAD, AllTags.Items.Forge.ORES_LEAD);
         copy(AllTags.Blocks.Forge.STORAGE_BLOCKS_LEAD, AllTags.Items.Forge.STORAGE_BLOCKS_LEAD);
 
