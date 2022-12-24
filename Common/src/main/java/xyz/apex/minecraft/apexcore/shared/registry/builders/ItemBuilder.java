@@ -1,4 +1,4 @@
-package xyz.apex.minecraft.apexcore.shared.registry;
+package xyz.apex.minecraft.apexcore.shared.registry.builders;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.flag.FeatureFlag;

@@ -1,4 +1,4 @@
-package xyz.apex.minecraft.apexcore.shared.registry;
+package xyz.apex.minecraft.apexcore.shared.registry.builders;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

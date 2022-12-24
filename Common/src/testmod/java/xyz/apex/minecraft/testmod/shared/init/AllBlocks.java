@@ -3,7 +3,7 @@ package xyz.apex.minecraft.testmod.shared.init;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DropExperienceBlock;
 
-import xyz.apex.minecraft.apexcore.shared.registry.BlockBuilders;
+import xyz.apex.minecraft.apexcore.shared.registry.builders.BlockBuilders;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.BlockEntry;
 import xyz.apex.minecraft.apexcore.shared.util.Properties;
 import xyz.apex.minecraft.testmod.shared.TestMod;

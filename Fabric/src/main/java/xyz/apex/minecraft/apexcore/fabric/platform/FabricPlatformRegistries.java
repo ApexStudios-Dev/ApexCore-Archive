@@ -17,8 +17,8 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 
 import xyz.apex.minecraft.apexcore.shared.platform.PlatformRegistries;
-import xyz.apex.minecraft.apexcore.shared.registry.ArmorMaterialBuilder;
-import xyz.apex.minecraft.apexcore.shared.registry.TierBuilder;
+import xyz.apex.minecraft.apexcore.shared.registry.builders.ArmorMaterialBuilder;
+import xyz.apex.minecraft.apexcore.shared.registry.builders.TierBuilder;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.shared.util.EnhancedArmorMaterial;
 import xyz.apex.minecraft.apexcore.shared.util.EnhancedTier;

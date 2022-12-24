@@ -4,9 +4,9 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.*;
 
 import xyz.apex.minecraft.apexcore.shared.item.CustomHorseArmorItem;
-import xyz.apex.minecraft.apexcore.shared.registry.ArmorMaterialBuilder;
-import xyz.apex.minecraft.apexcore.shared.registry.ItemBuilders;
-import xyz.apex.minecraft.apexcore.shared.registry.TierBuilder;
+import xyz.apex.minecraft.apexcore.shared.registry.builders.ArmorMaterialBuilder;
+import xyz.apex.minecraft.apexcore.shared.registry.builders.ItemBuilders;
+import xyz.apex.minecraft.apexcore.shared.registry.builders.TierBuilder;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.ItemEntry;
 import xyz.apex.minecraft.apexcore.shared.util.EnhancedTier;
 import xyz.apex.minecraft.testmod.shared.TestMod;
