@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.*;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
@@ -161,6 +162,20 @@ public interface Tags
 
         interface Fabric
         {
+            TagKey<Block> QUARTZ_ORES = fabric("quartz_ores");
+            TagKey<Block> ORES = fabric("ores");
+            TagKey<Block> CHESTS = fabric("chests");
+            TagKey<Block> BOOKSHELVES = fabric("bookshelves");
+            TagKey<Block> GLASS_BLOCKS = fabric("glass_blocks");
+            TagKey<Block> GLASS_PANES = fabric("glass_panes");
+            TagKey<Block> SHULKER_BOXES = fabric("shulker_boxes");
+            /**
+             * Blocks should be included in this tag if their movement can cause serious issues such as world corruption
+             * upon being moved, such as chunk loaders or pipes,
+             * for mods that move blocks but do not respect {@link AbstractBlock.AbstractBlockState#getPistonBehavior}.
+             */
+            TagKey<Block> MOVEMENT_RESTRICTED = fabric("movement_restricted");
+
             private static void bootstrap() {}
         }
 
@@ -682,6 +697,77 @@ public interface Tags
 
         interface Fabric
         {
+            // Tool tags
+            TagKey<Item> PICKAXES = fabric("pickaxes");
+            TagKey<Item> SHOVELS = fabric("shovels");
+            TagKey<Item> HOES = fabric("hoes");
+            TagKey<Item> AXES = fabric("axes");
+            TagKey<Item> SHEARS = fabric("shears");
+            /**
+             * For throwable weapons, like Minecraft tridents.
+             */
+            TagKey<Item> SPEARS = fabric("spears");
+            TagKey<Item> SWORDS = fabric("swords");
+            TagKey<Item> BOWS = fabric("bows");
+            TagKey<Item> SHIELDS = fabric("shields");
+            // Ores and ingots
+            TagKey<Item> IRON_INGOTS = fabric("iron_ingots");
+            TagKey<Item> RAW_IRON_ORES = fabric("raw_iron_ores");
+            TagKey<Item> RAW_IRON_BLOCKS = fabric("raw_iron_blocks");
+            TagKey<Item> RAW_GOLD_ORES = fabric("raw_gold_ores");
+            TagKey<Item> RAW_GOLD_BLOCKS = fabric("raw_gold_blocks");
+            TagKey<Item> GOLD_INGOTS = fabric("gold_ingots");
+            TagKey<Item> REDSTONE_DUSTS = fabric("redstone_dusts");
+            TagKey<Item> COPPER_INGOTS = fabric("copper_ingots");
+            TagKey<Item> RAW_COPPER_ORES = fabric("raw_copper_ores");
+            TagKey<Item> RAW_COPPER_BLOCKS = fabric("raw_copper_blocks");
+            TagKey<Item> ORES = fabric("ores");
+            TagKey<Item> NETHERITE_INGOTS = fabric("netherite_ingots");
+            TagKey<Item> QUARTZ_ORES = fabric("quartz_ores");
+            TagKey<Item> QUARTZ = fabric("quartz");
+            TagKey<Item> LAPIS = fabric("lapis");
+            TagKey<Item> DIAMONDS = fabric("diamonds");
+            TagKey<Item> EMERALDS = fabric("emeralds");
+            TagKey<Item> COAL = fabric("coal");
+            // Consumables
+            TagKey<Item> FOODS = fabric("foods");
+            TagKey<Item> POTIONS = fabric("potions");
+            // Buckets
+            TagKey<Item> WATER_BUCKETS = fabric("water_buckets");
+            TagKey<Item> LAVA_BUCKETS = fabric("lava_buckets");
+            TagKey<Item> MILK_BUCKETS = fabric("milk_buckets");
+            TagKey<Item> EMPTY_BUCKETS = fabric("empty_buckets");
+            TagKey<Item> GLASS_BLOCKS = fabric("glass_blocks");
+            TagKey<Item> GLASS_PANES = fabric("glass_panes");
+            TagKey<Item> SHULKER_BOXES = fabric("shulker_boxes");
+            // Dyes
+            TagKey<Item> DYES = fabric("dyes");
+            TagKey<Item> BLACK_DYES = fabric("black_dyes");
+            TagKey<Item> BLUE_DYES = fabric("blue_dyes");
+            TagKey<Item> BROWN_DYES = fabric("brown_dyes");
+            TagKey<Item> CYAN_DYES = fabric("cyan_dyes");
+            TagKey<Item> GRAY_DYES = fabric("gray_dyes");
+            TagKey<Item> GREEN_DYES = fabric("green_dyes");
+            TagKey<Item> LIGHT_BLUE_DYES = fabric("light_blue_dyes");
+            TagKey<Item> LIGHT_GRAY_DYES = fabric("light_gray_dyes");
+            TagKey<Item> LIME_DYES = fabric("lime_dyes");
+            TagKey<Item> MAGENTA_DYES = fabric("magenta_dyes");
+            TagKey<Item> ORANGE_DYES = fabric("orange_dyes");
+            TagKey<Item> PINK_DYES = fabric("pink_dyes");
+            TagKey<Item> PURPLE_DYES = fabric("purple_dyes");
+            TagKey<Item> RED_DYES = fabric("red_dyes");
+            TagKey<Item> WHITE_DYES = fabric("white_dyes");
+            TagKey<Item> YELLOW_DYES = fabric("yellow_dyes");
+            // Deprecated
+            /** @deprecated Replaced with {@link #WATER_BUCKETS}. */
+            @Deprecated(forRemoval = true) TagKey<Item> WATER_BUCKET = WATER_BUCKETS;
+            /** @deprecated Replaced with {@link #LAVA_BUCKETS}. */
+            @Deprecated(forRemoval = true) TagKey<Item> LAVA_BUCKET = LAVA_BUCKETS;
+            /** @deprecated Replaced with {@link #MILK_BUCKETS}. */
+            @Deprecated(forRemoval = true) TagKey<Item> MILK_BUCKET = MILK_BUCKETS;
+            /** @deprecated Replaced with {@link #EMPTY_BUCKETS}. */
+            @Deprecated(forRemoval = true) TagKey<Item> EMPTY_BUCKET = EMPTY_BUCKETS;
+
             private static void bootstrap() {}
         }
 
@@ -813,6 +899,11 @@ public interface Tags
 
         interface Fabric
         {
+            TagKey<Fluid> LAVA = fabric("lava");
+            TagKey<Fluid> WATER = fabric("water");
+            TagKey<Fluid> MILK = fabric("milk");
+            TagKey<Fluid> HONEY = fabric("honey");
+
             private static void bootstrap() {}
         }
 
@@ -858,6 +949,13 @@ public interface Tags
 
         interface Fabric
         {
+            /**
+             * Tag containing entity types that display a boss health bar.
+             */
+            TagKey<EntityType<?>> BOSSES = fabric("bosses");
+            TagKey<EntityType<?>> MINECARTS = fabric("minecarts");
+            TagKey<EntityType<?>> BOATS = fabric("boats");
+
             private static void bootstrap() {}
         }
 
@@ -957,6 +1055,106 @@ public interface Tags
 
         interface Fabric
         {
+            /**
+             * Biomes that spawn in the Overworld.
+             */
+            TagKey<Biome> IN_OVERWORLD = fabric("in_overworld");
+            // The following are based on Biome categories, see Biome$Category for details
+            /**
+             * Biomes that spawn in the End.
+             */
+            TagKey<Biome> IN_THE_END = fabric("in_the_end");
+            /**
+             * Biomes that spawn in the Nether.
+             */
+            TagKey<Biome> IN_NETHER = fabric("in_nether");
+            TagKey<Biome> TAIGA = fabric("taiga");
+            TagKey<Biome> EXTREME_HILLS = fabric("extreme_hills");
+            TagKey<Biome> JUNGLE = fabric("jungle");
+            TagKey<Biome> MESA = fabric("mesa");
+            /**
+             * For temperate or warmer plains-like biomes.
+             * For snowy plains-like biomes, see {@link ConventionalBiomeTags#SNOWY_PLAINS}.
+             */
+            TagKey<Biome> PLAINS = fabric("plains");
+            TagKey<Biome> SAVANNA = fabric("savanna");
+            /**
+             * For land biomes where ice naturally spawns.
+             * For biomes where snow alone spawns, see {@link ConventionalBiomeTags#SNOWY}.
+             */
+            TagKey<Biome> ICY = fabric("icy");
+            /**
+             * For water biomes where ice naturally spawns.
+             * For biomes where snow alone spawns, see {@link ConventionalBiomeTags#SNOWY}.
+             */
+            TagKey<Biome> AQUATIC_ICY = fabric("aquatic_icy");
+            /**
+             * Biomes that exist on the shoreline of a body of water.
+             */
+            TagKey<Biome> BEACH = fabric("beach");
+            /**
+             * Biomes densely populated with deciduous trees.
+             */
+            TagKey<Biome> FOREST = fabric("forest");
+            TagKey<Biome> OCEAN = fabric("ocean");
+            TagKey<Biome> DESERT = fabric("desert");
+            TagKey<Biome> RIVER = fabric("river");
+            TagKey<Biome> SWAMP = fabric("swamp");
+            TagKey<Biome> MUSHROOM = fabric("mushroom");
+            TagKey<Biome> UNDERGROUND = fabric("underground");
+            TagKey<Biome> MOUNTAIN = fabric("mountain");
+            TagKey<Biome> CLIMATE_HOT = fabric("climate_hot");
+            TagKey<Biome> CLIMATE_TEMPERATE = fabric("climate_temperate");
+            TagKey<Biome> CLIMATE_COLD = fabric("climate_cold");
+            TagKey<Biome> CLIMATE_WET = fabric("climate_wet");
+            TagKey<Biome> CLIMATE_DRY = fabric("climate_dry");
+            TagKey<Biome> VEGETATION_SPARSE = fabric("vegetation_sparse");
+            TagKey<Biome> VEGETATION_DENSE = fabric("vegetation_dense");
+            TagKey<Biome> TREE_CONIFEROUS = fabric("tree_coniferous");
+            TagKey<Biome> TREE_SAVANNA = fabric("tree_savanna");
+            TagKey<Biome> TREE_JUNGLE = fabric("tree_jungle");
+            TagKey<Biome> TREE_DECIDUOUS = fabric("tree_deciduous");
+            TagKey<Biome> VOID = fabric("void");
+            TagKey<Biome> MOUNTAIN_PEAK = fabric("mountain_peak");
+            TagKey<Biome> MOUNTAIN_SLOPE = fabric("mountain_slope");
+            /**
+             * Biomes consisting primarily of water.
+             */
+            TagKey<Biome> AQUATIC = fabric("aquatic");
+            /**
+             * Barren biomes that lack vegetation.
+             */
+            TagKey<Biome> WASTELAND = fabric("wasteland");
+            /**
+             * Biomes whose flora primarily consists of dead or decaying vegetation.
+             */
+            TagKey<Biome> DEAD = fabric("dead");
+            /**
+             * Biomes with a large amount of flowers.
+             */
+            TagKey<Biome> FLORAL = fabric("floral");
+            /**
+             * For biomes where snow, and not ice, naturally spawns as a predominant feature.
+             * For biomes where ice is a predominant feature, see {@link ConventionalBiomeTags#ICY}.
+             */
+            TagKey<Biome> SNOWY = fabric("snowy");
+            TagKey<Biome> BADLANDS = fabric("badlands");
+            TagKey<Biome> CAVES = fabric("caves");
+            /**
+             * Biomes that spawn as or on islands in the End.
+             */
+            TagKey<Biome> END_ISLANDS = fabric("end_islands");
+            TagKey<Biome> NETHER_FORESTS = fabric("nether_forests");
+            /**
+             * For snowy plains-like biomes.
+             * For warmer plains-like biomes, see {@link ConventionalBiomeTags#PLAINS}.
+             */
+            TagKey<Biome> SNOWY_PLAINS = fabric("snowy_plains");
+            TagKey<Biome> STONY_SHORES = fabric("stony_shores");
+            TagKey<Biome> FLOWER_FORESTS = fabric("flower_forests");
+            TagKey<Biome> DEEP_OCEAN = fabric("deep_ocean");
+            TagKey<Biome> SHALLOW_OCEAN = fabric("shallow_ocean");
+
             private static void bootstrap() {}
         }
 
@@ -1053,6 +1251,69 @@ public interface Tags
         }
     }
 
+    interface Enchantments
+    {
+        interface Forge
+        {
+            private static void bootstrap() {}
+        }
+
+        interface Fabric
+        {
+            /**
+             * A tag containing enchantments that increase the amount or
+             * quality of drops from blocks, such as {@link net.minecraft.enchantment.Enchantments#FORTUNE}.
+             */
+            TagKey<Enchantment> INCREASES_BLOCK_DROPS = fabric("fortune");
+            /**
+             * A tag containing enchantments that increase the amount or
+             * quality of drops from entities, such as {@link net.minecraft.enchantment.Enchantments#LOOTING}.
+             */
+            TagKey<Enchantment> INCREASES_ENTITY_DROPS = fabric("looting");
+            /**
+             * For enchantments that increase the damage dealt by an item.
+             */
+            TagKey<Enchantment> WEAPON_DAMAGE_ENHANCEMENT = fabric("weapon_damage_enhancement");
+            /**
+             * For enchantments that increase movement speed or otherwise benefit the entity wearing armor enchanted with it.
+             */
+            TagKey<Enchantment> ENTITY_MOVEMENT_ENHANCEMENT = fabric("entity_movement_enhancement");
+            /**
+             * For enchantments that decrease damage taken or otherwise benefit, in regard to damage, the entity wearing armor enchanted with it.
+             */
+            TagKey<Enchantment> ENTITY_DEFENSE_ENHANCEMENT = fabric("entity_defense_enhancement");
+
+            private static void bootstrap() {}
+        }
+
+        interface Vanilla
+        {
+            private static void bootstrap() {}
+        }
+
+        static TagKey<Enchantment> tag(String namespace, String name)
+        {
+            return Tags.tag(Registries.ENCHANTMENT, namespace, name);
+        }
+
+        static TagKey<Enchantment> forge(String name)
+        {
+            return Tags.forge(Registries.ENCHANTMENT, name);
+        }
+
+        static TagKey<Enchantment> fabric(String name)
+        {
+            return Tags.fabric(Registries.ENCHANTMENT, name);
+        }
+
+        private static void bootstrap()
+        {
+            Forge.bootstrap();
+            Fabric.bootstrap();
+            Vanilla.bootstrap();
+        }
+    }
+
     static <T> TagKey<T> tag(ResourceKey<? extends Registry<T>> registryType, String namespace, String name)
     {
         return TagKey.create(registryType, new ResourceLocation(namespace, name));
@@ -1075,5 +1336,6 @@ public interface Tags
         Fluids.bootstrap();
         EntityTypes.bootstrap();
         Biomes.bootstrap();
+        Enchantments.bootstrap();
     }
 }
