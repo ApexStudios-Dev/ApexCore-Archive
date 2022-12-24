@@ -7,11 +7,13 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
 public final class ForgePlatformRegistries extends ForgePlatformHolder implements PlatformRegistries
 {
     private final Table<String, ResourceKey<? extends Registry<?>>, DeferredRegister<?>> modRegistries = HashBasedTable.create();
+    private final ForgePlatformGameRules gameRules = new ForgePlatformGameRules(platform);
 
     ForgePlatformRegistries(ForgePlatform platform)
     {
@@ -70,6 +73,12 @@ public final class ForgePlatformRegistries extends ForgePlatformHolder implement
         return new EnhancedForgeArmorMaterial(builder);
     }
 
+    @Override
+    public PlatformGameRules gameRules()
+    {
+        return gameRules;
+    }
+
     @SuppressWarnings({ "unchecked", "DataFlowIssue" })
     private <T> DeferredRegister<T> getModRegistry(ResourceKey<? extends Registry<T>> registryType, String modId)
     {
@@ -81,6 +90,34 @@ public final class ForgePlatformRegistries extends ForgePlatformHolder implement
             modRegistries.put(modId, registryType, modRegistry);
             platform.getLogger().debug("Constructed DeferredRegister for mod: {}", modId);
             return modRegistry;
+        }
+    }
+
+    private static final class ForgePlatformGameRules extends ForgePlatformHolder implements PlatformGameRules
+    {
+        ForgePlatformGameRules(ForgePlatform platform)
+        {
+            super(platform);
+        }
+
+        @Override
+        public <T extends GameRules.Value<T>> GameRules.Key<T> register(String modId, String registryName, GameRules.Category category, GameRules.Type<T> type)
+        {
+            var internalName = "%s:%s".formatted(modId, registryName);
+            platform.getLogger().debug("Registering GameRule: {}", internalName);
+            return GameRules.register(internalName, category, type);
+        }
+
+        @Override
+        public GameRules.Type<GameRules.BooleanValue> createBooleanType(boolean defaultValue, BiConsumer<MinecraftServer, GameRules.BooleanValue> changeListener)
+        {
+            return GameRules.BooleanValue.create(defaultValue, changeListener);
+        }
+
+        @Override
+        public GameRules.Type<GameRules.IntegerValue> createIntegerType(int defaultValue, BiConsumer<MinecraftServer, GameRules.IntegerValue> changeListener)
+        {
+            return GameRules.IntegerValue.create(defaultValue, changeListener);
         }
     }
 

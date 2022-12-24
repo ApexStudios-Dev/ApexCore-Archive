@@ -1,15 +1,19 @@
 package xyz.apex.minecraft.apexcore.fabric.platform;
 
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 
 import xyz.apex.minecraft.apexcore.shared.platform.PlatformRegistries;
@@ -29,6 +33,8 @@ import java.util.stream.Collectors;
 
 public final class FabricPlatformRegistries extends FabricPlatformHolder implements PlatformRegistries
 {
+    private final FabricPlatformGameRules gameRules = new FabricPlatformGameRules(platform);
+
     FabricPlatformRegistries(FabricPlatform platform)
     {
         super(platform);
@@ -64,6 +70,40 @@ public final class FabricPlatformRegistries extends FabricPlatformHolder impleme
         platform.modEvents.register(builder.getModId());
         platform.getLogger().debug("Registering ArmorMaterial: {}:{}", builder.getModId(), builder.getRegistryName());
         return new EnhancedFabricArmorMaterial(builder);
+    }
+
+    @Override
+    public PlatformGameRules gameRules()
+    {
+        return gameRules;
+    }
+
+    private static final class FabricPlatformGameRules extends FabricPlatformHolder implements PlatformGameRules
+    {
+        FabricPlatformGameRules(FabricPlatform platform)
+        {
+            super(platform);
+        }
+
+        @Override
+        public <T extends GameRules.Value<T>> GameRules.Key<T> register(String modId, String registryName, GameRules.Category category, GameRules.Type<T> type)
+        {
+            var internalName = "%s:%s".formatted(modId, registryName);
+            platform.getLogger().debug("Registering GameRule: {}", internalName);
+            return GameRuleRegistry.register(internalName, category, type);
+        }
+
+        @Override
+        public GameRules.Type<GameRules.BooleanValue> createBooleanType(boolean defaultValue, BiConsumer<MinecraftServer, GameRules.BooleanValue> changeListener)
+        {
+            return GameRuleFactory.createBooleanRule(defaultValue, changeListener);
+        }
+
+        @Override
+        public GameRules.Type<GameRules.IntegerValue> createIntegerType(int defaultValue, BiConsumer<MinecraftServer, GameRules.IntegerValue> changeListener)
+        {
+            return GameRuleFactory.createIntRule(defaultValue, changeListener);
+        }
     }
 
     private static final class EnhancedFabricTier implements EnhancedTier
