@@ -1,14 +1,25 @@
 package xyz.apex.minecraft.testmod.forge.data;
 
+import org.apache.logging.log4j.LogManager;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import xyz.apex.minecraft.apexcore.shared.util.Tags;
 import xyz.apex.minecraft.testmod.shared.TestMod;
 import xyz.apex.minecraft.testmod.shared.init.AllItems;
 import xyz.apex.minecraft.testmod.shared.init.AllTags;
+
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 public final class ItemTagGenerator extends ItemTagsProvider
 {
@@ -29,53 +40,44 @@ public final class ItemTagGenerator extends ItemTagsProvider
 
     private void leadArmorTools()
     {
-        var leadSword = AllItems.LEAD_SWORD.get();
-        var leadPickaxe = AllItems.LEAD_PICKAXE.get();
-        var leadAxe = AllItems.LEAD_AXE.get();
-        var leadShovel = AllItems.LEAD_SHOVEL.get();
-        var leadHoe = AllItems.LEAD_HOE.get();
+        tag(Tags.Items.Forge.TOOLS_SWORDS, AllItems.LEAD_SWORD);
+        tag(Tags.Items.Forge.TOOLS_PICKAXES, AllItems.LEAD_PICKAXE);
+        tag(Tags.Items.Forge.TOOLS_AXES, AllItems.LEAD_AXE);
+        tag(Tags.Items.Forge.TOOLS_SHOVELS, AllItems.LEAD_SHOVEL);
+        tag(Tags.Items.Forge.TOOLS_HOES, AllItems.LEAD_HOE);
+        tag(Tags.Items.Forge.ARMORS_HELMETS, AllItems.LEAD_HELMET);
+        tag(Tags.Items.Forge.ARMORS_CHESTPLATES, AllItems.LEAD_CHESTPLATE);
+        tag(Tags.Items.Forge.ARMORS_LEGGINGS, AllItems.LEAD_LEGGINGS);
+        tag(Tags.Items.Forge.ARMORS_BOOTS, AllItems.LEAD_BOOTS);
+        tag(Tags.Items.Forge.ARMORS, AllItems.LEAD_HORSE_ARMOR);
 
-        tag(Tags.Items.Forge.TOOLS_SWORDS).add(leadSword);
-        tag(Tags.Items.Forge.TOOLS_PICKAXES).add(leadPickaxe);
-        tag(Tags.Items.Forge.TOOLS_AXES).add(leadAxe);
-        tag(Tags.Items.Forge.TOOLS_SHOVELS).add(leadShovel);
-        tag(Tags.Items.Forge.TOOLS_HOES).add(leadHoe);
-        tag(Tags.Items.Forge.ARMORS_HELMETS).add(AllItems.LEAD_HELMET.get());
-        tag(Tags.Items.Forge.ARMORS_CHESTPLATES).add(AllItems.LEAD_CHESTPLATE.get());
-        tag(Tags.Items.Forge.ARMORS_LEGGINGS).add(AllItems.LEAD_LEGGINGS.get());
-        tag(Tags.Items.Forge.ARMORS_BOOTS).add(AllItems.LEAD_BOOTS.get());
-        tag(Tags.Items.Forge.ARMORS).add(AllItems.LEAD_HORSE_ARMOR.get());
-
-        tag(Tags.Items.Fabric.SWORDS).add(leadSword);
-        tag(Tags.Items.Fabric.PICKAXES).add(leadPickaxe);
-        tag(Tags.Items.Fabric.AXES).add(leadAxe);
-        tag(Tags.Items.Fabric.SHOVELS).add(leadShovel);
-        tag(Tags.Items.Fabric.HOES).add(leadHoe);
+        tag(Tags.Items.Fabric.SWORDS, AllItems.LEAD_SWORD);
+        tag(Tags.Items.Fabric.PICKAXES, AllItems.LEAD_PICKAXE);
+        tag(Tags.Items.Fabric.AXES, AllItems.LEAD_AXE);
+        tag(Tags.Items.Fabric.SHOVELS, AllItems.LEAD_SHOVEL);
+        tag(Tags.Items.Fabric.HOES, AllItems.LEAD_HOE);
     }
 
     private void leadIngot()
     {
-        var leadIngot = AllItems.LEAD_INGOT.get();
-        tag(Tags.Items.Forge.INGOTS).addTag(AllTags.Items.Forge.INGOTS_LEAD);
-        tag(AllTags.Items.Forge.INGOTS_LEAD).add(leadIngot);
-        tag(AllTags.Items.Fabric.LEAD_INGOT).add(leadIngot);
-        tag(AllTags.Items.Fabric.LEAD_INGOTS).add(leadIngot);
+        tag(Tags.Items.Forge.INGOTS, AllTags.Items.Forge.INGOTS_LEAD);
+        tag(AllTags.Items.Forge.INGOTS_LEAD, AllItems.LEAD_INGOT);
+        tag(AllTags.Items.Fabric.LEAD_INGOT, AllItems.LEAD_INGOT);
+        tag(AllTags.Items.Fabric.LEAD_INGOTS, AllItems.LEAD_INGOT);
     }
 
     private void leadNugget()
     {
-        var leadNugget = AllItems.LEAD_NUGGET.get();
-        tag(Tags.Items.Forge.NUGGETS).addTag(AllTags.Items.Forge.NUGGETS_LEAD);
-        tag(AllTags.Items.Forge.NUGGETS_LEAD).add(leadNugget);
-        tag(AllTags.Items.Fabric.LEAD_NUGGET).add(leadNugget);
-        tag(AllTags.Items.Fabric.LEAD_NUGGETS).add(leadNugget);
+        tag(Tags.Items.Forge.NUGGETS, AllTags.Items.Forge.NUGGETS_LEAD);
+        tag(AllTags.Items.Forge.NUGGETS_LEAD, AllItems.LEAD_NUGGET);
+        tag(AllTags.Items.Fabric.LEAD_NUGGET, AllItems.LEAD_NUGGET);
+        tag(AllTags.Items.Fabric.LEAD_NUGGETS, AllItems.LEAD_NUGGET);
     }
 
     private void rawLeadOre()
     {
-        var rawLead = AllItems.RAW_LEAD.get();
-        tag(AllTags.Items.Fabric.RAW_LEAD_ORE).add(rawLead);
-        tag(AllTags.Items.Fabric.RAW_LEAD_ORES).add(rawLead);
+        tag(AllTags.Items.Fabric.RAW_LEAD_ORE, AllItems.RAW_LEAD);
+        tag(AllTags.Items.Fabric.RAW_LEAD_ORES, AllItems.RAW_LEAD);
     }
 
     private void copyBlockTags()
@@ -93,5 +95,28 @@ public final class ItemTagGenerator extends ItemTagsProvider
         copy(AllTags.Blocks.Fabric.LEAD_BLOCKS, AllTags.Items.Fabric.LEAD_BLOCKS);
         copy(AllTags.Blocks.Fabric.RAW_LEAD_BLOCK, AllTags.Items.Fabric.RAW_LEAD_BLOCK);
         copy(AllTags.Blocks.Fabric.RAW_LEAD_BLOCKS, AllTags.Items.Fabric.RAW_LEAD_BLOCKS);
+    }
+
+    private void tag(TagKey<Item> tag, @Nullable Object... values)
+    {
+        if(values == null || values.length == 0) return;
+        var builder = tag(tag);
+        Arrays.stream(values).filter(Objects::nonNull).forEach(value -> tag(builder, value));
+    }
+
+    private void tag(IntrinsicTagAppender<Item> builder, Object obj)
+    {
+        if(obj instanceof TagKey<?> valueTag)
+        {
+            if(valueTag.isFor(ForgeRegistries.Keys.ITEMS)) builder.addOptionalTag(valueTag.location());
+        }
+        else if(obj instanceof Item item)
+        {
+            var registryName = ForgeRegistries.ITEMS.getKey(item);
+            if(registryName != null) builder.addOptional(registryName);
+        }
+        else if(obj instanceof ItemLike itemLike) tag(builder, itemLike.asItem()); // should wrap back around to Item instanceof branch
+        else if(obj instanceof Supplier<?> supplier) tag(builder, supplier.get()); // should wrap back around to Item instanceof branch
+        else LogManager.getLogger().error("Unknown ObjectType: {}", obj.getClass().getCanonicalName());
     }
 }
