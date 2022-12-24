@@ -7,6 +7,7 @@ import net.minecraftforge.eventbus.api.Event;
 
 import xyz.apex.minecraft.apexcore.shared.event.EventType;
 import xyz.apex.minecraft.apexcore.shared.event.events.ExplosionEvents;
+import xyz.apex.minecraft.apexcore.shared.mixin.accessors.ExplosionAccessor;
 
 final class ForgeEvents extends ForgePlatformHolder
 {
@@ -37,6 +38,7 @@ final class ForgeEvents extends ForgePlatformHolder
                 event.getLevel(),
                 new BlockPos(explosion.getPosition()),
                 explosion,
+                ((ExplosionAccessor) explosion).getSize(),
                 event.getAffectedEntities(),
                 event.getAffectedBlocks()
         ));

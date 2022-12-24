@@ -23,7 +23,7 @@ public interface ExplosionEvents
         Explosion getExplosion();
     }
 
-    record Detonate(Level level, BlockPos pos, Explosion explosion, List<Entity> affectedEntities, List<BlockPos> affectedBlocks) implements Base
+    record Detonate(Level level, BlockPos pos, Explosion explosion, float size, List<Entity> affectedEntities, List<BlockPos> affectedBlocks) implements Base
     {
         @Override
         public Level getLevel()

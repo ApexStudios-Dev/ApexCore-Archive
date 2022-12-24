@@ -38,7 +38,7 @@ public abstract class ExplosionMixin
     )
     private void ApexCore$explode(
             CallbackInfo ci,
-            Set<BlockPos> affectedBlocks, int i, float f, int k1, int l1, int i2, int i1, int j2, int j1, List<Entity> affectedEntities
+            Set<BlockPos> affectedBlocks, int i, float diameter, int k1, int l1, int i2, int i1, int j2, int j1, List<Entity> affectedEntities
     )
     {
         var explosion = (Explosion) (Object) this;
@@ -52,6 +52,7 @@ public abstract class ExplosionMixin
                 level,
                 new BlockPos(x, y, z),
                 explosion,
+                diameter / 2F, // diameter => Explosion#radius * 2
                 affectedEntities,
                 toBlow
         ));
