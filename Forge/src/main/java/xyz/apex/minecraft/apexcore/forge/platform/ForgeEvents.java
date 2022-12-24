@@ -5,7 +5,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.eventbus.api.Event;
 
-import xyz.apex.minecraft.apexcore.shared.event.ResultantEvent;
+import xyz.apex.minecraft.apexcore.shared.event.EventType;
 import xyz.apex.minecraft.apexcore.shared.event.events.ExplosionEvents;
 
 final class ForgeEvents extends ForgePlatformHolder
@@ -42,7 +42,7 @@ final class ForgeEvents extends ForgePlatformHolder
         ));
     }
 
-    public static <T> boolean processEvent(ResultantEvent<T> event, T val, Event forgeEvent)
+    public static <T extends xyz.apex.minecraft.apexcore.shared.event.Event> boolean processEvent(EventType<T> event, T val, Event forgeEvent)
     {
         var canceled = event.post(val);
         if(canceled && forgeEvent.isCancelable()) forgeEvent.setCanceled(canceled);

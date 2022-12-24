@@ -6,7 +6,7 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 
 import xyz.apex.minecraft.apexcore.shared.event.Event;
-import xyz.apex.minecraft.apexcore.shared.event.SimpleEvent;
+import xyz.apex.minecraft.apexcore.shared.event.EventType;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -14,8 +14,8 @@ import java.util.function.Consumer;
 
 public interface CreativeModeTabEvent
 {
-    Event<Register> REGISTER = new SimpleEvent<>();
-    Event<BuildContents> BUILD_CONTENTS = new SimpleEvent<>();
+    EventType<Register> REGISTER = EventType.simple();
+    EventType<BuildContents> BUILD_CONTENTS = EventType.simple();
 
     @FunctionalInterface
     interface Registrar
@@ -23,7 +23,7 @@ public interface CreativeModeTabEvent
         CreativeModeTab registerCreativeModeTab(String registryName, List<Object> beforeEntries, List<Object> afterEntries, Consumer<CreativeModeTab.Builder> configurator);
     }
 
-    record Register(Registrar registrar)
+    record Register(Registrar registrar) implements Event
     {
         private static final List<Object> DEFAULT_AFTER_ENTRIES = List.of(CreativeModeTabs.SPAWN_EGGS);
 
@@ -38,7 +38,7 @@ public interface CreativeModeTabEvent
         }
     }
 
-    final class BuildContents implements CreativeModeTab.Output
+    final class BuildContents implements Event, CreativeModeTab.Output
     {
         private final CreativeModeTab tab;
         private final FeatureFlagSet flags;
