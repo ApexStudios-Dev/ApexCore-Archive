@@ -179,6 +179,8 @@ mixin {
 
 	add project(':Common').sourceSets.main, "${MOD_ID}-common.refmap.json"
 	config "${MOD_ID}-common.mixins.json"
+
+	debug.export = true
 }
 
 repositories {
