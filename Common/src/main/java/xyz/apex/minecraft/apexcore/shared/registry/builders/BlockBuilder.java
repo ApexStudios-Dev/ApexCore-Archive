@@ -1,5 +1,7 @@
 package xyz.apex.minecraft.apexcore.shared.registry.builders;
 
+import org.apache.commons.lang3.Validate;
+
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlag;
@@ -13,6 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 
+import xyz.apex.minecraft.apexcore.shared.registry.FlammabilityRegistry;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.BlockEntry;
 import xyz.apex.minecraft.apexcore.shared.util.Properties;
 
@@ -27,6 +30,8 @@ public final class BlockBuilder<T extends Block> extends AbstractBuilder<Block, 
 
     private Supplier<BlockBehaviour.Properties> initialProperties = Properties.BLOCK_STONE;
     private Function<BlockBehaviour.Properties, BlockBehaviour.Properties> propertiesModifier = Function.identity();
+    private int burnOdds = -1;
+    private int igniteOdds = -1;
 
     BlockBuilder(String modId, String registryName, BlockFactory<T> factory)
     {
@@ -38,9 +43,27 @@ public final class BlockBuilder<T extends Block> extends AbstractBuilder<Block, 
     }
 
     @Override
+    protected void onRegister(T value)
+    {
+        super.onRegister(value);
+
+        if(burnOdds != -1 && igniteOdds != -1) FlammabilityRegistry.register(getInternalName(), burnOdds, igniteOdds);
+    }
+
+    @Override
     protected T construct()
     {
         return factory.create(propertiesModifier.apply(initialProperties.get()));
+    }
+
+    public BlockBuilder<T> flammability(int burnOdds, int igniteOdds)
+    {
+        Validate.inclusiveBetween(0, 100, burnOdds, "Burn odds must be between 0-100 (inclusive)");
+        Validate.inclusiveBetween(0, 100, igniteOdds, "Burn odds must be between 0-100 (inclusive)");
+
+        this.burnOdds = burnOdds;
+        this.igniteOdds = igniteOdds;
+        return this;
     }
 
     public <I extends Item> BlockBuilder<T> item(BlockItemFactory<I, T> itemFactory, Function<ItemBuilder<I>, ItemBuilder<I>> action)

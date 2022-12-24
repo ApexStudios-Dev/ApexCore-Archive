@@ -2,6 +2,8 @@
     "required": true,
     "package": "${APEX_GROUP}.${MOD_ID}.shared.mixin",
     "mixins": [
+        "MixinFireBlock",
+
         "accessors.ArmorMaterialsAccessor",
         "accessors.ExplosionAccessor"
     ],
