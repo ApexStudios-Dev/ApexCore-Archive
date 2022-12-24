@@ -1,9 +1,13 @@
 package xyz.apex.minecraft.apexcore.fabric.platform;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -76,6 +80,14 @@ public final class FabricPlatformRegistries extends FabricPlatformHolder impleme
     public PlatformGameRules gameRules()
     {
         return gameRules;
+    }
+
+    @Environment(EnvType.CLIENT)
+    @Override
+    public void registerRenderType(String modId, Block block, Supplier<Supplier<RenderType>> renderTypeSupplier)
+    {
+        var renderType = renderTypeSupplier.get().get();
+        if(renderType != null) BlockRenderLayerMap.INSTANCE.putBlock(block, renderType);
     }
 
     private static final class FabricPlatformGameRules extends FabricPlatformHolder implements PlatformGameRules

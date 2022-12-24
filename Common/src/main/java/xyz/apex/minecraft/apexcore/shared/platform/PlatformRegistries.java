@@ -1,10 +1,12 @@
 package xyz.apex.minecraft.apexcore.shared.platform;
 
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.block.Block;
 
 import xyz.apex.minecraft.apexcore.shared.registry.builders.ArmorMaterialBuilder;
 import xyz.apex.minecraft.apexcore.shared.registry.builders.TierBuilder;
@@ -26,6 +28,8 @@ public interface PlatformRegistries extends PlatformHolder
     ArmorMaterial registerArmorMaterial(ArmorMaterialBuilder builder);
 
     PlatformGameRules gameRules();
+
+    default void registerRenderType(String modId, Block block, Supplier<Supplier<RenderType>> renderTypeSupplier) {}
 
     interface PlatformGameRules extends PlatformHolder
     {

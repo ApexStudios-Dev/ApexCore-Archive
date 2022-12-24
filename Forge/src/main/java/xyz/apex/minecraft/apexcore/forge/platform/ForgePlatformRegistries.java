@@ -4,6 +4,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -15,6 +16,8 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -77,6 +80,13 @@ public final class ForgePlatformRegistries extends ForgePlatformHolder implement
     public PlatformGameRules gameRules()
     {
         return gameRules;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public void registerRenderType(String modId, Block block, Supplier<Supplier<RenderType>> renderTypeSupplier)
+    {
+        platform.modEvents.registerRenderType(modId, block, renderTypeSupplier);
     }
 
     @SuppressWarnings({ "unchecked", "DataFlowIssue" })

@@ -2,6 +2,7 @@ package xyz.apex.minecraft.apexcore.shared.registry.builders;
 
 import org.apache.commons.lang3.Validate;
 
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlag;
@@ -15,6 +16,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 
+import xyz.apex.minecraft.apexcore.shared.platform.EnvironmentExecutor;
+import xyz.apex.minecraft.apexcore.shared.platform.Platform;
 import xyz.apex.minecraft.apexcore.shared.registry.FlammabilityRegistry;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.BlockEntry;
 import xyz.apex.minecraft.apexcore.shared.util.Properties;
@@ -32,6 +35,7 @@ public final class BlockBuilder<T extends Block> extends AbstractBuilder<Block, 
     private Function<BlockBehaviour.Properties, BlockBehaviour.Properties> propertiesModifier = Function.identity();
     private int burnOdds = -1;
     private int igniteOdds = -1;
+    private Supplier<Supplier<RenderType>> renderTypeSupplier = () -> () -> null;
 
     BlockBuilder(String modId, String registryName, BlockFactory<T> factory)
     {
@@ -48,6 +52,8 @@ public final class BlockBuilder<T extends Block> extends AbstractBuilder<Block, 
         super.onRegister(value);
 
         if(burnOdds != -1 && igniteOdds != -1) FlammabilityRegistry.register(getInternalName(), burnOdds, igniteOdds);
+
+        EnvironmentExecutor.runForClient(() -> () -> Platform.INSTANCE.registries().registerRenderType(getModId(), value, renderTypeSupplier));
     }
 
     @Override
@@ -63,6 +69,12 @@ public final class BlockBuilder<T extends Block> extends AbstractBuilder<Block, 
 
         this.burnOdds = burnOdds;
         this.igniteOdds = igniteOdds;
+        return this;
+    }
+
+    public BlockBuilder<T> renderType(Supplier<Supplier<RenderType>> renderTypeSupplier)
+    {
+        this.renderTypeSupplier = renderTypeSupplier;
         return this;
     }
 
