@@ -10,13 +10,14 @@ import xyz.apex.minecraft.apexcore.shared.registry.entry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.shared.util.EnhancedTier;
 
 import java.util.Collection;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 public interface PlatformRegistries extends PlatformHolder
 {
     <T> Collection<T> getAllKnown(ResourceKey<? extends Registry<T>> registryType, String modId);
 
-    <T, R extends T> void register(ResourceKey<? extends Registry<T>> registryType, RegistryEntry<R> registryEntry, Supplier<R> factory);
+    <T, R extends T, E extends RegistryEntry<R>> void register(ResourceKey<? extends Registry<T>> registryType, E registryEntry, Supplier<R> factory, BiConsumer<E, R> onRegister);
 
     EnhancedTier registerTier(TierBuilder builder);
 

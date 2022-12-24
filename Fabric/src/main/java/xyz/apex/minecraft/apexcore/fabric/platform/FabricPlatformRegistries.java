@@ -22,6 +22,7 @@ import xyz.apex.minecraft.apexcore.shared.util.Lazy;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
@@ -41,13 +42,12 @@ public final class FabricPlatformRegistries extends FabricPlatformHolder impleme
     }
 
     @Override
-    public <T, R extends T> void register(ResourceKey<? extends Registry<T>> registryType, RegistryEntry<R> registryEntry, Supplier<R> factory)
+    public <T, R extends T, E extends RegistryEntry<R>> void register(ResourceKey<? extends Registry<T>> registryType, E registryEntry, Supplier<R> factory, BiConsumer<E, R> onRegister)
     {
         platform.modEvents.register(registryEntry.getModId());
         var registry = RegistryEntry.getRegistryOrThrow(registryType);
-        var value = factory.get();
-        registryEntry.updateReference(value, registry.wrapAsHolder(value));
-        Registry.register(registry, registryEntry.getRegistryName(), value);
+        var result = Registry.register(registry, registryEntry.getRegistryName(), factory.get());
+        onRegister.accept(registryEntry, result);
     }
 
     @Override

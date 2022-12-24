@@ -25,6 +25,7 @@ import xyz.apex.minecraft.apexcore.shared.util.EnhancedTier;
 import xyz.apex.minecraft.apexcore.shared.util.Lazy;
 
 import java.util.Collection;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
@@ -46,15 +47,11 @@ public final class ForgePlatformRegistries extends ForgePlatformHolder implement
     }
 
     @Override
-    public <T, R extends T> void register(ResourceKey<? extends Registry<T>> registryType, RegistryEntry<R> registryEntry, Supplier<R> factory)
+    public <T, R extends T, E extends RegistryEntry<R>> void register(ResourceKey<? extends Registry<T>> registryType, E registryEntry, Supplier<R> factory, BiConsumer<E, R> onRegister)
     {
-        var modRegistry = getModRegistry(registryType, registryEntry.getModId());
-
-        modRegistry.register(registryEntry.getName(), () -> {
-            platform.getLogger().debug("Updating RegistryEntry reference: {}: {}", registryType.location(), registryEntry.getRegistryName());
+        getModRegistry(registryType, registryEntry.getModId()).register(registryEntry.getName(), () -> {
             var result = factory.get();
-            var holder = RegistryEntry.getRegistryOrThrow(registryType).wrapAsHolder(result);
-            registryEntry.updateReference(result, holder);
+            onRegister.accept(registryEntry, result);
             return result;
         });
     }
