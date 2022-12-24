@@ -48,6 +48,16 @@ public final class BlockBuilder<T extends Block> extends AbstractBuilder<Block, 
         return child(Registries.ITEM, (modId, registryName) -> action.apply(ItemBuilders.builder(modId, registryName, properties -> itemFactory.create(asSupplier().get(), properties))));
     }
 
+    public BlockBuilder<T> item(Function<ItemBuilder<Item>, ItemBuilder<Item>> action)
+    {
+        return item(BlockItem::new, action);
+    }
+
+    public <I extends Item> BlockBuilder<T> item(BlockItemFactory<I, T> itemFactory)
+    {
+        return item(itemFactory, Function.identity());
+    }
+
     public BlockBuilder<T> simpleItem()
     {
         return item(BlockItem::new, Function.identity());
