@@ -23,6 +23,7 @@ public final class ForgePlatform implements Platform
     private final Logger logger = LogManager.getLogger("ApexCore/Forge");
     private final ForgePlatformRegistries registries = new ForgePlatformRegistries(this);
     protected final ForgePlatformModEvents modEvents = new ForgePlatformModEvents(this);
+    private final ForgeEvents forgeEvents = new ForgeEvents(this);
 
     public ForgePlatform()
     {
