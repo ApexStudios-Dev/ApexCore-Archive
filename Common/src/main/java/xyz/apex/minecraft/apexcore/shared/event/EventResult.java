@@ -8,12 +8,6 @@ public enum EventResult
     PASS,
 
     /**
-     * Stop other event listeners from receiving the event
-     * but still allow the event to happen
-     */
-    INTERRUPT,
-
-    /**
      * Cancel the event from happening
      * other event listeners can still re-enable the event by changing the result
      *

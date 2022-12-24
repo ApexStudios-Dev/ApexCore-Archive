@@ -3,7 +3,9 @@ package xyz.apex.minecraft.apexcore.forge.platform;
 import net.minecraft.core.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.level.ExplosionEvent;
+import net.minecraftforge.eventbus.api.Event;
 
+import xyz.apex.minecraft.apexcore.shared.event.ResultantEvent;
 import xyz.apex.minecraft.apexcore.shared.event.events.ExplosionEvents;
 
 final class ForgeEvents extends ForgePlatformHolder
@@ -13,9 +15,21 @@ final class ForgeEvents extends ForgePlatformHolder
         super(platform);
 
         MinecraftForge.EVENT_BUS.addListener(this::onExplosionDetonate);
+        MinecraftForge.EVENT_BUS.addListener(this::onExplosionStart);
     }
 
-    void onExplosionDetonate(ExplosionEvent.Detonate event)
+    private void onExplosionStart(ExplosionEvent.Start event)
+    {
+        var explosion = event.getExplosion();
+
+        processEvent(ExplosionEvents.START, new ExplosionEvents.Start(
+                event.getLevel(),
+                new BlockPos(explosion.getPosition()),
+                explosion
+        ), event);
+    }
+
+    private void onExplosionDetonate(ExplosionEvent.Detonate event)
     {
         var explosion = event.getExplosion();
 
@@ -26,5 +40,12 @@ final class ForgeEvents extends ForgePlatformHolder
                 event.getAffectedEntities(),
                 event.getAffectedBlocks()
         ));
+    }
+
+    public static <T> boolean processEvent(ResultantEvent<T> event, T val, Event forgeEvent)
+    {
+        var canceled = event.post(val);
+        if(canceled && forgeEvent.isCancelable()) forgeEvent.setCanceled(canceled);
+        return canceled;
     }
 }
