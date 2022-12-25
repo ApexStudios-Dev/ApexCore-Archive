@@ -23,7 +23,7 @@ public interface TestMod
             if(tab == CreativeModeTabs.BUILDING_BLOCKS) builder.accept(AllBlocks.LEAD_BLOCK);
             else if(tab == CreativeModeTabs.NATURAL_BLOCKS)
             {
-                builder.accept(AllBlocks.LEAD_BLOCK);
+                builder.accept(AllBlocks.LEAD_ORE);
                 builder.accept(AllBlocks.DEEPSLATE_LEAD_ORE);
                 builder.accept(AllBlocks.RAW_LEAD_BLOCK);
             }
