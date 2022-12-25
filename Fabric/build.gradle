@@ -40,7 +40,7 @@ loom {
 			ideConfigGenerated(true)
 			runDir('run')
 			source(sourceSets.testmod)
-			vmArgs '-Dmixin.debug.export=true'
+			vmArgs('-Dmixin.debug.export=true', '-Dfabric.log.level=debug')
 		}
 
 		server {
@@ -48,6 +48,7 @@ loom {
 			ideConfigGenerated(true)
 			runDir('run')
 			source(sourceSets.testmod)
+			vmArgs('-Dfabric.log.level=debug')
 		}
 	}
 
