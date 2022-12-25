@@ -64,41 +64,49 @@ public final class MultiBlockType
         blockProperty = IntegerProperty.create("multiblock_index", 0, localPositions.size());
     }
 
+    private BlockState modifyBlockStateForPlacement(BlockState blockState, int index, BlockPos pos)
+    {
+        var result = setIndex(blockState, index);
+        return placementStateModifier.apply(this, pos, result, index);
+    }
+
     @Nullable
     public BlockState getStateForPlacement(MultiBlock multiBlock, BlockState placementBlockState, BlockPlaceContext ctx)
     {
         var level = ctx.getLevel();
         var origin = ctx.getClickedPos();
+        var result = placementBlockState;
 
         for(var i = 0; i < localPositions.size(); i++)
         {
             var localSpace = localPositions.get(i);
             var worldSpace = getWorldSpaceFromLocalSpace(multiBlock, placementBlockState, origin, localSpace);
-            var testBlockstate = setIndex(placementBlockState, i);
+            var testBlockstate = modifyBlockStateForPlacement(placementBlockState, i, worldSpace);
             var worldBlockState = level.getBlockState(worldSpace);
 
             if(!passesPlacementTests(multiBlock, level, worldSpace, testBlockstate, worldBlockState)) return null;
+            if(origin.equals(worldSpace)) result = testBlockstate;
         }
 
-        return placementBlockState;
+        return result;
     }
 
     public boolean canSurvive(MultiBlock multiBlock, LevelReader level, BlockPos pos, BlockState blockState)
     {
-        var index = getIndex(blockState);
-        var origin = getOriginFromWorldSpace(multiBlock, blockState, pos, localPositions.get(index));
+        if(!multiBlock.isSameBlockTypeForMultiBlock(blockState)) return false;
 
-        for(var i = 0; i < localPositions.size(); i++)
+        if(isOrigin(blockState))
         {
-            var localSpace = localPositions.get(i);
-            var worldSpace = getWorldSpaceFromLocalSpace(multiBlock, blockState, origin, localSpace);
-            var testBlockState = setIndex(blockState, i);
-            var worldBlockState = level.getBlockState(worldSpace);
-
-            if(!passesPlacementTests(multiBlock, level, worldSpace, testBlockState, worldBlockState)) return false;
+            var worldBlockState = level.getBlockState(pos);
+            return passesPlacementTests(multiBlock, level, pos, blockState, worldBlockState);
         }
 
-        return true;
+        // delegate all other locations back to origin point
+        // if origin point can exist, so can all the others
+        // override canSurvive in your block type
+        // if specific positions need specific survival checks
+        var origin = getOriginPos(multiBlock, blockState, pos);
+        return level.getBlockState(origin).canSurvive(level, origin);
     }
 
     public void onPlace(MultiBlock multiBlock, BlockState blockState, Level level, BlockPos origin, BlockState oldBlockState)
@@ -112,11 +120,8 @@ public final class MultiBlockType
             {
                 var localSpace = localPositions.get(i);
                 var worldSpace = getWorldSpaceFromLocalSpace(multiBlock, blockState, origin, localSpace);
-                var placementBlockState = setIndex(blockState, i);
-                placementBlockState = placementStateModifier.apply(this, worldSpace, placementBlockState, i);
-
+                var placementBlockState = modifyBlockStateForPlacement(blockState, i, worldSpace);
                 level.setBlock(worldSpace, placementBlockState, Block.UPDATE_ALL_IMMEDIATE);
-
                 if(placeSoundPerBlock) level.playSound(null, worldSpace, placeSound, SoundSource.BLOCKS, (soundType.volume + 1F) / 2F, soundType.pitch * .8F);
             }
         }
@@ -151,9 +156,11 @@ public final class MultiBlockType
 
     public boolean passesPlacementTests(MultiBlock multiBlock, LevelReader level, BlockPos pos, BlockState multiBlockState, BlockState worldBlockState)
     {
+        if(multiBlock.isSameBlockTypeForMultiBlock(worldBlockState)) return true;
+
         if(!worldBlockState.getMaterial().isReplaceable()) return false;
-        if(placementPredicate.test(multiBlock, level, pos, multiBlockState)) return true;
-        return false;
+        if(!placementPredicate.test(multiBlock, level, pos, multiBlockState)) return false;
+        return true;
     }
 
     public int getWidth()
