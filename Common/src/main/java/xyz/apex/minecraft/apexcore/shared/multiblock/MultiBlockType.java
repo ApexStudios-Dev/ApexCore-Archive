@@ -11,7 +11,6 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -25,7 +24,6 @@ import java.util.function.Consumer;
 public final class MultiBlockType
 {
     public static final int ORIGIN_INDEX = 0;
-    private static final DirectionProperty FACING_PROPERTY = BlockStateProperties.FACING;
 
     private final int width;
     private final int height;
@@ -222,6 +220,11 @@ public final class MultiBlockType
         return getOriginFromWorldSpace(multiBlock, blockState, worldSpace, localSpace);
     }
 
+    public Builder clone()
+    {
+        return builder(width, height, depth).copy(this);
+    }
+
     public static Builder builder(int width, int height, int depth)
     {
         return new Builder(width, height, depth);
@@ -232,19 +235,14 @@ public final class MultiBlockType
         return builder(width, height, depth).build();
     }
 
-    private static BlockPos rotateLocalSpace(MultiBlock multiBlock, MultiBlockType multiBlockType, BlockState blockState, BlockPos pos)
+    private static BlockPos rotateForFacing(BlockState blockState, BlockPos pos, DirectionProperty facingProperty)
     {
-        if(blockState.hasProperty(FACING_PROPERTY))
-        {
-            return switch(blockState.getValue(FACING_PROPERTY)) {
-                case NORTH -> pos.rotate(Rotation.CLOCKWISE_90);
-                case SOUTH -> pos.rotate(Rotation.COUNTERCLOCKWISE_90);
-                case EAST -> pos.rotate(Rotation.CLOCKWISE_180);
-                default -> pos;
-            };
-        }
-
-        return pos;
+        return switch(blockState.getValue(facingProperty)) {
+            case NORTH -> pos.rotate(Rotation.CLOCKWISE_90);
+            case SOUTH -> pos.rotate(Rotation.COUNTERCLOCKWISE_90);
+            case EAST -> pos.rotate(Rotation.CLOCKWISE_180);
+            default -> pos;
+        };
     }
 
     public static final class Builder
@@ -252,7 +250,7 @@ public final class MultiBlockType
         private final int width;
         private final int height;
         private final int depth;
-        private QuadFunction<MultiBlock, MultiBlockType, BlockState, BlockPos, BlockPos> rotateLocalSpace = MultiBlockType::rotateLocalSpace;
+        private QuadFunction<MultiBlock, MultiBlockType, BlockState, BlockPos, BlockPos> rotateLocalSpace = (multiBlock, multiBlockType, blockState, pos) -> pos;
         private QuadFunction<MultiBlockType, BlockPos, BlockState, Integer, BlockState> placementStateModifier = (multiBlockType, pos, blockState, integer) -> blockState;
         private QuadPredicate<MultiBlock, LevelReader, BlockPos, BlockState> placementPredicate = (multiBlock, levelReader, pos, blockState) -> true;
         private boolean placeSoundPerBlock = false;
@@ -264,10 +262,31 @@ public final class MultiBlockType
             this.depth = depth;
         }
 
+        public Builder copy(Builder other)
+        {
+            if(other.placeSoundPerBlock) placeSoundPerBlock();
+            return rotateLocalSpace(other.rotateLocalSpace)
+                    .placementStateModifier(other.placementStateModifier)
+                    .placementPredicate(other.placementPredicate);
+        }
+
+        public Builder copy(MultiBlockType multiBlockType)
+        {
+            if(multiBlockType.placeSoundPerBlock) placeSoundPerBlock();
+            return rotateLocalSpace(multiBlockType.rotateLocalSpace)
+                    .placementStateModifier(multiBlockType.placementStateModifier)
+                    .placementPredicate(multiBlockType.placementPredicate);
+        }
+
         public Builder rotateLocalSpace(QuadFunction<MultiBlock, MultiBlockType, BlockState, BlockPos, BlockPos> rotateLocalSpace)
         {
             this.rotateLocalSpace = rotateLocalSpace;
             return this;
+        }
+
+        public Builder rotateLocalSpaceForFacing(DirectionProperty facingProperty)
+        {
+            return rotateLocalSpace((multiBlock, multiBlockType, blockState, pos) -> MultiBlockType.rotateForFacing(blockState, pos, facingProperty));
         }
 
         public Builder placementStateModifier(QuadFunction<MultiBlockType, BlockPos, BlockState, Integer, BlockState> placementStateModifier)
