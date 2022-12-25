@@ -27,6 +27,7 @@ public final class BlockLootGenerator extends BlockLootSubProvider
 
         dropSelf(AllBlocks.LEAD_BLOCK.get());
         dropSelf(AllBlocks.RAW_LEAD_BLOCK.get());
+        dropSelf(AllBlocks.MULTI_BLOCK.get());
     }
 
     @Override

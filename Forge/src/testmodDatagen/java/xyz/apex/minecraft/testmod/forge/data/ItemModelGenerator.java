@@ -30,6 +30,7 @@ public final class ItemModelGenerator extends ItemModelProvider
         blockItem(AllBlocks.DEEPSLATE_LEAD_ORE);
         blockItem(AllBlocks.LEAD_BLOCK);
         blockItem(AllBlocks.RAW_LEAD_BLOCK);
+        blockItem(AllBlocks.MULTI_BLOCK);
 
         handHeldItem(AllItems.LEAD_SWORD);
         handHeldItem(AllItems.LEAD_PICKAXE);

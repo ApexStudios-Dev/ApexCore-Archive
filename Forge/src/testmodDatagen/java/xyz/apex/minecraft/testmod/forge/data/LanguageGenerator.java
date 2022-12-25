@@ -21,6 +21,7 @@ public final class LanguageGenerator extends LanguageProvider
         addBlock(AllBlocks.DEEPSLATE_LEAD_ORE, "Deepslate Lead Ore");
         addBlock(AllBlocks.LEAD_BLOCK, "Lead Block");
         addBlock(AllBlocks.RAW_LEAD_BLOCK, "Block of Raw Lead");
+        addBlock(AllBlocks.MULTI_BLOCK, "Multi Block");
 
         addItem(AllItems.LEAD_SWORD, "Lead Sword");
         addItem(AllItems.LEAD_PICKAXE, "Lead Pickaxe");

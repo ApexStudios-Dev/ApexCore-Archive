@@ -43,6 +43,8 @@ public final class BlockTagGenerator extends BlockTagsProvider
         tag(AllTags.Blocks.Fabric.LEAD_BLOCKS, AllBlocks.LEAD_BLOCK);
         tag(AllTags.Blocks.Fabric.RAW_LEAD_BLOCK, AllBlocks.RAW_LEAD_BLOCK);
         tag(AllTags.Blocks.Fabric.RAW_LEAD_BLOCKS, AllBlocks.RAW_LEAD_BLOCK);
+
+        tag(Tags.Blocks.Fabric.MOVEMENT_RESTRICTED, AllBlocks.MULTI_BLOCK);
     }
 
     private void tag(TagKey<Block> tag, @Nullable Object... values)
