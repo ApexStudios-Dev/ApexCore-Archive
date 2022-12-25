@@ -220,6 +220,11 @@ public final class MultiBlockType
         return new Builder(width, height, depth);
     }
 
+    public static MultiBlockType simple(int width, int height, int depth)
+    {
+        return builder(width, height, depth).build();
+    }
+
     private static BlockPos rotateLocalSpace(MultiBlock multiBlock, MultiBlockType multiBlockType, BlockState blockState, BlockPos pos)
     {
         if(blockState.hasProperty(FACING_PROPERTY))
