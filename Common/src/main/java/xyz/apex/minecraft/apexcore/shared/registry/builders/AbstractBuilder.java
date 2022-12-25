@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public abstract class AbstractBuilder<
@@ -46,6 +47,11 @@ public abstract class AbstractBuilder<
 
         internalName = new ResourceLocation(modId, registryName);
         registryKey = ResourceKey.create((ResourceKey) registryType, internalName);
+    }
+
+    public final B transform(UnaryOperator<B> transformer)
+    {
+        return transformer.apply((B) this);
     }
 
     protected void onRegister(R value)
