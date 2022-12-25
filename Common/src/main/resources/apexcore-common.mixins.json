@@ -3,9 +3,10 @@
     "package": "${APEX_GROUP}.${MOD_ID}.shared.mixin",
     "mixins": [
         "MixinFireBlock",
-
         "accessors.ArmorMaterialsAccessor",
-        "accessors.ExplosionAccessor"
+        "accessors.BlockAccessor",
+        "accessors.ExplosionAccessor",
+        "invokers.BlockInvoker"
     ],
     "client": [ ],
     "server": [ ],
