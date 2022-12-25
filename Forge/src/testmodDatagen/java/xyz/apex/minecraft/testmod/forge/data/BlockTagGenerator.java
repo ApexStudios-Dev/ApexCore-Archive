@@ -30,24 +30,19 @@ public final class BlockTagGenerator extends BlockTagsProvider
     @Override
     protected void addTags(HolderLookup.Provider pProvider)
     {
-        var leadOre = AllBlocks.LEAD_ORE.get();
-        var deepslateLeadOre = AllBlocks.DEEPSLATE_LEAD_ORE.get();
-        var leadBlock = AllBlocks.LEAD_BLOCK.get();
-        var rawLeadBlock = AllBlocks.RAW_LEAD_BLOCK.get();
-
         tag(Tags.Blocks.Forge.ORES, AllTags.Blocks.Forge.ORES_LEAD);
         tag(Tags.Blocks.Forge.STORAGE_BLOCKS, AllTags.Blocks.Forge.STORAGE_BLOCKS_LEAD);
         tag(Tags.Blocks.Fabric.ORES, AllTags.Blocks.Fabric.LEAD_ORE, AllTags.Blocks.Fabric.LEAD_ORES);
 
-        tag(AllTags.Blocks.Forge.ORES_LEAD, leadOre, deepslateLeadOre);
-        tag(AllTags.Blocks.Fabric.LEAD_ORE, leadOre, deepslateLeadOre);
-        tag(AllTags.Blocks.Fabric.LEAD_ORES, leadOre, deepslateLeadOre);
+        tag(AllTags.Blocks.Forge.ORES_LEAD, AllBlocks.LEAD_ORE, AllBlocks.DEEPSLATE_LEAD_ORE);
+        tag(AllTags.Blocks.Fabric.LEAD_ORE, AllBlocks.LEAD_ORE, AllBlocks.DEEPSLATE_LEAD_ORE);
+        tag(AllTags.Blocks.Fabric.LEAD_ORES, AllBlocks.LEAD_ORE, AllBlocks.DEEPSLATE_LEAD_ORE);
 
-        tag(AllTags.Blocks.Forge.STORAGE_BLOCKS_LEAD, leadBlock, rawLeadBlock);
-        tag(AllTags.Blocks.Fabric.LEAD_BLOCK, leadBlock);
-        tag(AllTags.Blocks.Fabric.LEAD_BLOCKS, leadBlock);
-        tag(AllTags.Blocks.Fabric.RAW_LEAD_BLOCK, rawLeadBlock);
-        tag(AllTags.Blocks.Fabric.RAW_LEAD_BLOCKS, rawLeadBlock);
+        tag(AllTags.Blocks.Forge.STORAGE_BLOCKS_LEAD, AllBlocks.LEAD_BLOCK, AllBlocks.RAW_LEAD_BLOCK);
+        tag(AllTags.Blocks.Fabric.LEAD_BLOCK, AllBlocks.LEAD_BLOCK);
+        tag(AllTags.Blocks.Fabric.LEAD_BLOCKS, AllBlocks.LEAD_BLOCK);
+        tag(AllTags.Blocks.Fabric.RAW_LEAD_BLOCK, AllBlocks.RAW_LEAD_BLOCK);
+        tag(AllTags.Blocks.Fabric.RAW_LEAD_BLOCKS, AllBlocks.RAW_LEAD_BLOCK);
     }
 
     private void tag(TagKey<Block> tag, @Nullable Object... values)
