@@ -1,6 +1,7 @@
 package xyz.apex.minecraft.apexcore.shared.registry.builders;
 
 import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.Registries;
@@ -15,10 +16,12 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import xyz.apex.minecraft.apexcore.shared.platform.EnvironmentExecutor;
 import xyz.apex.minecraft.apexcore.shared.platform.Platform;
 import xyz.apex.minecraft.apexcore.shared.registry.FlammabilityRegistry;
+import xyz.apex.minecraft.apexcore.shared.registry.HitBoxRegistry;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.BlockEntry;
 import xyz.apex.minecraft.apexcore.shared.util.Properties;
 
@@ -36,6 +39,8 @@ public final class BlockBuilder<T extends Block> extends AbstractBuilder<Block, 
     private int burnOdds = -1;
     private int igniteOdds = -1;
     private Supplier<Supplier<RenderType>> renderTypeSupplier = () -> () -> null;
+    @Nullable private Supplier<VoxelShape> hitbox = null;
+    private HitBoxRegistry.Modifier<T> hitboxModifier = HitBoxRegistry.Modifier.identity();
 
     BlockBuilder(String modId, String registryName, BlockFactory<T> factory)
     {
@@ -52,14 +57,26 @@ public final class BlockBuilder<T extends Block> extends AbstractBuilder<Block, 
         super.onRegister(value);
 
         if(burnOdds != -1 && igniteOdds != -1) FlammabilityRegistry.register(getInternalName(), burnOdds, igniteOdds);
-
         EnvironmentExecutor.runForClient(() -> () -> Platform.INSTANCE.registries().registerRenderType(getModId(), value, renderTypeSupplier));
+        if(hitbox != null) HitBoxRegistry.register(getInternalName(), hitbox, hitboxModifier);
     }
 
     @Override
     protected T construct()
     {
         return factory.create(propertiesModifier.apply(initialProperties.get()));
+    }
+
+    public BlockBuilder<T> hitbox(Supplier<VoxelShape> hitbox)
+    {
+        return hitbox(hitbox, HitBoxRegistry.Modifier.identity());
+    }
+
+    public BlockBuilder<T> hitbox(Supplier<VoxelShape> hitbox, HitBoxRegistry.Modifier<T> hitboxModifier)
+    {
+        this.hitbox = hitbox;
+        this.hitboxModifier = hitboxModifier;
+        return this;
     }
 
     public BlockBuilder<T> flammability(int burnOdds, int igniteOdds)

@@ -33,8 +33,12 @@ public interface AllBlocks
     .register();
 
     BlockEntry<SimpleMultiBlock> MULTI_BLOCK = BlockBuilders
-            .multiBlock(TestMod.ID, "multi_block", MultiBlockTypes.MB_2x2x1)
+            .multiBlock(TestMod.ID, "multi_block", MultiBlockTypes.MB_1x2x1)
             .initialProperties(Properties.BLOCK_DIRT)
+            .hitbox(() -> Block.box(0D, 0D, 0D, 16D, 32D, 16D), (current, block, blockState) -> {
+                if(block.getMultiBlockType().isOrigin(blockState)) return current;
+                return current.move(0D, -1D, 0D);
+            })
     .register();
 
     static void bootstrap()
