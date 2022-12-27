@@ -5,19 +5,28 @@ import com.google.common.collect.Table;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -31,6 +40,7 @@ import xyz.apex.minecraft.apexcore.shared.util.Lazy;
 
 import java.util.Collection;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
@@ -87,6 +97,26 @@ public final class ForgePlatformRegistries extends ForgePlatformHolder implement
     public void registerRenderType(String modId, Block block, Supplier<Supplier<RenderType>> renderTypeSupplier)
     {
         platform.modEvents.registerRenderType(modId, block, renderTypeSupplier);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public <T extends Entity> void registerEntityRenderer(String modId, Supplier<EntityType<T>> entityType, Supplier<Function<EntityRendererProvider.Context, EntityRenderer<T>>> entityRenderer)
+    {
+        platform.modEvents.registerEntityRenderer(modId, entityType, entityRenderer);
+    }
+
+    @Override
+    public <T extends Entity> void registerEntityAttributes(String modId, Supplier<EntityType<T>> entityType, Supplier<AttributeSupplier.Builder> attributes)
+    {
+        platform.modEvents.registerEntityAttributes(modId, entityType, attributes);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends Entity> SpawnEggItem createSpawnEggItem(Supplier<? extends EntityType<? extends T>> entityType, int primaryColor, int secondaryColor, Item.Properties properties)
+    {
+        return new ForgeSpawnEggItem((Supplier<? extends EntityType<? extends Mob>>) entityType, primaryColor, secondaryColor, properties);
     }
 
     @SuppressWarnings({ "unchecked", "DataFlowIssue" })

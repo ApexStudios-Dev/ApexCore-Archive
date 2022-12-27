@@ -3,11 +3,15 @@ package xyz.apex.minecraft.apexcore.forge.platform;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.world.entity.Entity;
 import net.minecraftforge.data.loading.DatagenModLoader;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.forgespi.language.IModInfo;
+import net.minecraftforge.network.NetworkHooks;
 
 import xyz.apex.minecraft.apexcore.shared.platform.Environment;
 import xyz.apex.minecraft.apexcore.shared.platform.Platform;
@@ -99,5 +103,11 @@ public final class ForgePlatform implements Platform
     public boolean isModInstalled(String modId)
     {
         return ModList.get().isLoaded(modId);
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getEntityClientSpawnPacket(Entity entity)
+    {
+        return NetworkHooks.getEntitySpawningPacket(entity);
     }
 }

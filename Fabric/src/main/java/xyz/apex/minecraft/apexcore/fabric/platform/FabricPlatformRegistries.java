@@ -3,19 +3,26 @@ package xyz.apex.minecraft.apexcore.fabric.platform;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
@@ -31,6 +38,7 @@ import xyz.apex.minecraft.apexcore.shared.util.Lazy;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
@@ -88,6 +96,27 @@ public final class FabricPlatformRegistries extends FabricPlatformHolder impleme
     {
         var renderType = renderTypeSupplier.get().get();
         if(renderType != null) BlockRenderLayerMap.INSTANCE.putBlock(block, renderType);
+    }
+
+    @Environment(EnvType.CLIENT)
+    @Override
+    public <T extends Entity> void registerEntityRenderer(String modId, Supplier<EntityType<T>> entityType, Supplier<Function<EntityRendererProvider.Context, EntityRenderer<T>>> entityRenderer)
+    {
+        EntityRendererRegistry.register(entityType.get(), entityRenderer.get()::apply);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends Entity> void registerEntityAttributes(String modId, Supplier<EntityType<T>> entityType, Supplier<AttributeSupplier.Builder> attributes)
+    {
+        FabricDefaultAttributeRegistry.register((EntityType<? extends LivingEntity>) entityType.get(), attributes.get());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends Entity> SpawnEggItem createSpawnEggItem(Supplier<? extends EntityType<? extends T>> entityType, int primaryColor, int secondaryColor, Item.Properties properties)
+    {
+        return new SpawnEggItem((EntityType<? extends Mob>) entityType.get(), primaryColor, secondaryColor, properties);
     }
 
     private static final class FabricPlatformGameRules extends FabricPlatformHolder implements PlatformGameRules

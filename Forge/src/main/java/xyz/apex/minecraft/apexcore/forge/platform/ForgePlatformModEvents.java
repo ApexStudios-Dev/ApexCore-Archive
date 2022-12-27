@@ -7,27 +7,33 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.event.CreativeModeTabEvent;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-import xyz.apex.minecraft.apexcore.shared.platform.PlatformHolder;
-
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 final class ForgePlatformModEvents extends ForgePlatformHolder
 {
     private final Map<String, ModEvents> modBuses = Maps.newHashMap();
-    private final Map<String, List<Pair<Block, Supplier<Supplier<RenderType>>>>> renderTypeRegistrations = Maps.newHashMap();
 
     ForgePlatformModEvents(ForgePlatform platform)
     {
@@ -37,12 +43,23 @@ final class ForgePlatformModEvents extends ForgePlatformHolder
     @OnlyIn(Dist.CLIENT)
     void registerRenderType(String modId, Block block, Supplier<Supplier<RenderType>> renderTypeSupplier)
     {
-        renderTypeRegistrations.computeIfAbsent(modId, $ -> Lists.newArrayList()).add(Pair.of(block, renderTypeSupplier));
+        getModEvents(modId).renderTypeRegistrations.add(Pair.of(block, renderTypeSupplier));
     }
 
-    IEventBus getModBus(String modId)
+    @OnlyIn(Dist.CLIENT)
+    <T extends Entity> void registerEntityRenderer(String modId, Supplier<EntityType<T>> entityType, Supplier<Function<EntityRendererProvider.Context, EntityRenderer<T>>> entityRenderer)
     {
-        if(modBuses.containsKey(modId)) return modBuses.get(modId).modBus;
+        getModEvents(modId).entityRendererRegistrations.add(new EntityRendererRegistration<>(entityType, entityRenderer));
+    }
+
+    public <T extends Entity> void registerEntityAttributes(String modId, Supplier<EntityType<T>> entityType, Supplier<AttributeSupplier.Builder> attributes)
+    {
+        getModEvents(modId).entityAttributeRegistrations.add(new EntityAttributeRegistration<>(entityType, attributes));
+    }
+
+    private ModEvents getModEvents(String modId)
+    {
+        if(modBuses.containsKey(modId)) return modBuses.get(modId);
         else
         {
             // this *MUST* match inorder to obtain the correct IEventBus
@@ -50,20 +67,41 @@ final class ForgePlatformModEvents extends ForgePlatformHolder
 
             var modEvents = new ModEvents(platform, modId, FMLJavaModLoadingContext.get().getModEventBus());
             modBuses.put(modId, modEvents);
-            return modEvents.modBus;
+            return modEvents;
         }
     }
 
-    private record ModEvents(ForgePlatform platform, String modId, IEventBus modBus) implements PlatformHolder
+    IEventBus getModBus(String modId)
     {
-        private ModEvents
+        return getModEvents(modId).modBus;
+    }
+
+    private static final class ModEvents extends ForgePlatformHolder
+    {
+        private final List<Pair<Block, Supplier<Supplier<RenderType>>>> renderTypeRegistrations = Lists.newArrayList();
+        private final List<EntityRendererRegistration<? extends Entity>> entityRendererRegistrations = Lists.newArrayList();
+        private final List<EntityAttributeRegistration<? extends Entity>> entityAttributeRegistrations = Lists.newArrayList();
+
+        private final String modId;
+        private final IEventBus modBus;
+
+        private ModEvents(ForgePlatform platform, String modId, IEventBus modBus)
         {
+            super(platform);
+
+            this.modId = modId;
+            this.modBus = modBus;
+
             platform.getLogger().debug("Registering IModBus events for mod: {}", modId);
 
             modBus.addListener(this::onRegisterCreativeModeTab);
             modBus.addListener(this::onBuildCreativeModeTabContents);
+            modBus.addListener(this::onRegisterEntityAttributes);
 
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> modBus.addListener(this::onClientSetup));
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+                modBus.addListener(this::onClientSetup);
+                modBus.addListener(this::onRegisterEntityRenderers);
+            });
         }
 
         private void onRegisterCreativeModeTab(CreativeModeTabEvent.Register event)
@@ -90,13 +128,52 @@ final class ForgePlatformModEvents extends ForgePlatformHolder
         @OnlyIn(Dist.CLIENT)
         private void onClientSetup(FMLClientSetupEvent event)
         {
-            var registrations = platform.modEvents.renderTypeRegistrations.get(modId);
-            if(registrations == null || registrations.isEmpty()) return;
+            if(!renderTypeRegistrations.isEmpty())
+            {
+                renderTypeRegistrations.forEach(entry -> {
+                    var renderType = entry.getRight().get().get();
+                    if(renderType != null) ItemBlockRenderTypes.setRenderLayer(entry.getLeft(), renderType);
+                });
 
-            registrations.forEach(entry -> {
-                var renderType = entry.getRight().get().get();
-                if(renderType != null) ItemBlockRenderTypes.setRenderLayer(entry.getLeft(), renderType);
-            });
+                renderTypeRegistrations.clear();
+            }
+        }
+
+        @OnlyIn(Dist.CLIENT)
+        private void onRegisterEntityRenderers(EntityRenderersEvent.RegisterRenderers event)
+        {
+            if(!entityRendererRegistrations.isEmpty())
+            {
+                entityRendererRegistrations.forEach(entry -> entry.register(event));
+                entityRendererRegistrations.clear();
+            }
+        }
+
+        private void onRegisterEntityAttributes(EntityAttributeCreationEvent event)
+        {
+            if(!entityAttributeRegistrations.isEmpty())
+            {
+                entityAttributeRegistrations.forEach(entry -> entry.register(event));
+                entityAttributeRegistrations.clear();
+            }
+        }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private record EntityRendererRegistration<T extends Entity>(Supplier<EntityType<T>> entityType, Supplier<Function<EntityRendererProvider.Context, EntityRenderer<T>>> entityRenderer)
+    {
+        private void register(EntityRenderersEvent.RegisterRenderers event)
+        {
+            event.registerEntityRenderer(entityType.get(), entityRenderer.get()::apply);
+        }
+    }
+
+    private record EntityAttributeRegistration<T extends Entity>(Supplier<EntityType<T>> entityType, Supplier<AttributeSupplier.Builder> attributes)
+    {
+        @SuppressWarnings("unchecked")
+        private void register(EntityAttributeCreationEvent event)
+        {
+            event.put((EntityType<? extends LivingEntity>) entityType.get(), attributes.get().build());
         }
     }
 }

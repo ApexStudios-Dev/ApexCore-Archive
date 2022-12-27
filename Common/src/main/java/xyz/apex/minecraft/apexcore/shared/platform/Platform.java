@@ -2,6 +2,11 @@ package xyz.apex.minecraft.apexcore.shared.platform;
 
 import org.apache.logging.log4j.Logger;
 
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.world.entity.Entity;
+
 import java.nio.file.Path;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -72,4 +77,11 @@ public interface Platform
     Set<String> getMods();
 
     boolean isModInstalled(String modId);
+
+    boolean isFakePlayer(Entity entity);
+
+    default Packet<ClientGamePacketListener> getEntityClientSpawnPacket(Entity entity)
+    {
+        return new ClientboundAddEntityPacket(entity);
+    }
 }
