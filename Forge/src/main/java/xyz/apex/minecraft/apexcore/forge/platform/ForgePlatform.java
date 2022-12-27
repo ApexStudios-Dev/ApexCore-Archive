@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.entity.Entity;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.data.loading.DatagenModLoader;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -103,6 +104,12 @@ public final class ForgePlatform implements Platform
     public boolean isModInstalled(String modId)
     {
         return ModList.get().isLoaded(modId);
+    }
+
+    @Override
+    public boolean isFakePlayer(Entity entity)
+    {
+        return entity instanceof FakePlayer;
     }
 
     @Override

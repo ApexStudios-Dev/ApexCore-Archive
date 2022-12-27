@@ -7,6 +7,8 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import net.minecraft.world.entity.Entity;
+
 import xyz.apex.minecraft.apexcore.shared.platform.Environment;
 import xyz.apex.minecraft.apexcore.shared.platform.Platform;
 import xyz.apex.minecraft.apexcore.shared.platform.PlatformRegistries;
@@ -85,5 +87,16 @@ public final class FabricPlatform implements Platform
     public boolean isModInstalled(String modId)
     {
         return FabricLoader.getInstance().isModLoaded(modId);
+    }
+
+    @Override
+    public boolean isFakePlayer(Entity entity)
+    {
+        // everything in fabric is implemented on a mod by mod basis
+        // so theres no real way of checking of a given entity is a
+        // *FakePlayer* - some entity to automate player based tasks without needing a player
+        // deployers, harvesters, planters, milkers etc
+        // fabric also does not currently have a entity type tag for this
+        return false;
     }
 }
