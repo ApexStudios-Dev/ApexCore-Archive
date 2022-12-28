@@ -11,6 +11,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 
 import java.util.function.Consumer;
@@ -59,5 +60,10 @@ public final class EntityEntry<T extends Entity> extends RegistryEntry<EntityTyp
     public T create(Level level)
     {
         return get().create(level);
+    }
+
+    public <I extends Item> ItemEntry<I> asItem()
+    {
+        return getSibling(Registries.ITEM);
     }
 }

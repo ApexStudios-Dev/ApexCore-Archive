@@ -70,7 +70,7 @@ public final class BlockBuilder<T extends Block> extends AbstractBuilder<Block, 
 
     public <B extends BlockEntity> BlockBuilder<T> blockEntity(BlockEntityBuilder.BlockEntityFactory<B> blockEntityFactory, UnaryOperator<BlockEntityBuilder<B>> builder)
     {
-        return child(Registries.BLOCK_ENTITY_TYPE, (modId, registryName) -> builder.apply(BlockEntityBuilders.builder(modId, registryName, blockEntityFactory)));
+        return child(Registries.BLOCK_ENTITY_TYPE, (modId, registryName) -> builder.apply(BlockEntityBuilders.builder(modId, registryName, blockEntityFactory).validBlock(asSupplier())));
     }
 
     public <B extends BlockEntity> BlockBuilder<T> blockEntity(BlockEntityBuilder.BlockEntityFactory<B> blockEntityFactory)

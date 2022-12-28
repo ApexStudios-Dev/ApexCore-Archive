@@ -1,5 +1,7 @@
 package xyz.apex.minecraft.apexcore.shared.registry.entry;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,6 +24,8 @@ import java.util.stream.Stream;
 
 public class RegistryEntry<T> implements LazyLike<T>, Comparable<RegistryEntry<?>>
 {
+    private static final Table<ResourceKey<? extends Registry<?>>, ResourceLocation, RegistryEntry<?>> REGISTRY_ENTRY_TABLE = HashBasedTable.create();
+
     protected final ResourceKey<? extends Registry<? super T>> registryType;
     protected final ResourceKey<T> registryKey;
     @Nullable private T value;
@@ -31,6 +35,16 @@ public class RegistryEntry<T> implements LazyLike<T>, Comparable<RegistryEntry<?
     {
         this.registryType = registryType;
         this.registryKey = registryKey;
+        REGISTRY_ENTRY_TABLE.put(registryType, registryKey.location(), this);
+    }
+
+    @SuppressWarnings({ "DataFlowIssue", "unchecked" })
+    @ApiStatus.Internal
+    public final <T1, R extends T1, E extends RegistryEntry<R>> E getSibling(ResourceKey<? extends Registry<T1>> registryType)
+    {
+        var registryName = getRegistryName();
+        if(REGISTRY_ENTRY_TABLE.contains(registryType, registryName)) return (E) REGISTRY_ENTRY_TABLE.get(registryType, registryName);
+        throw new IllegalStateException("No Sibling registered for '%s' of type: '%s'".formatted(registryName, registryType.location()));
     }
 
     public final ResourceKey<? extends Registry<? super T>> getRegistryType()
