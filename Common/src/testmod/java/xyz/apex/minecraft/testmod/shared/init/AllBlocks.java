@@ -6,9 +6,12 @@ import net.minecraft.world.level.block.DropExperienceBlock;
 import xyz.apex.minecraft.apexcore.shared.multiblock.MultiBlockTypes;
 import xyz.apex.minecraft.apexcore.shared.multiblock.SimpleMultiBlock;
 import xyz.apex.minecraft.apexcore.shared.registry.builders.BlockBuilders;
+import xyz.apex.minecraft.apexcore.shared.registry.entry.BlockEntityEntry;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.BlockEntry;
 import xyz.apex.minecraft.apexcore.shared.util.Properties;
 import xyz.apex.minecraft.testmod.shared.TestMod;
+import xyz.apex.minecraft.testmod.shared.block.TestBlock;
+import xyz.apex.minecraft.testmod.shared.block.entity.TestBlockEntity;
 
 public interface AllBlocks
 {
@@ -40,6 +43,14 @@ public interface AllBlocks
                 return current.move(0D, -1D, 0D);
             })
     .register();
+
+    BlockEntry<TestBlock> TEST_BLOCK = BlockBuilders
+            .builder(TestMod.ID, "test_block", TestBlock::new)
+            .initialProperties(Properties.BLOCK_PLANKS)
+            .blockEntity(TestBlockEntity::new)
+    .register();
+
+    BlockEntityEntry<TestBlockEntity> TEST_BLOCK_ENTITY = TEST_BLOCK.asBlockEntity();
 
     static void bootstrap()
     {

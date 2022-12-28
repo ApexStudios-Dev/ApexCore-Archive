@@ -31,6 +31,7 @@ public final class ItemModelGenerator extends ItemModelProvider
         blockItem(AllBlocks.LEAD_BLOCK);
         blockItem(AllBlocks.RAW_LEAD_BLOCK);
         blockItem(AllBlocks.MULTI_BLOCK);
+        blockItem(AllBlocks.TEST_BLOCK);
 
         handHeldItem(AllItems.LEAD_SWORD);
         handHeldItem(AllItems.LEAD_PICKAXE);

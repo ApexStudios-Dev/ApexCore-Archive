@@ -50,7 +50,11 @@ public interface TestMod
                 builder.accept(AllItems.LEAD_NUGGET);
                 builder.accept(AllItems.LEAD_INGOT);
             }
-            else if(tab == CreativeModeTabs.OP_BLOCKS) builder.accept(AllBlocks.MULTI_BLOCK);
+            else if(tab == CreativeModeTabs.OP_BLOCKS)
+            {
+                builder.accept(AllBlocks.MULTI_BLOCK);
+                builder.accept(AllBlocks.TEST_BLOCK);
+            }
         });
     }
 }

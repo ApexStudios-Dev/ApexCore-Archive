@@ -22,5 +22,6 @@ public final class BlockStateGenerator extends BlockStateProvider
         simpleBlock(AllBlocks.LEAD_BLOCK.get());
         simpleBlock(AllBlocks.RAW_LEAD_BLOCK.get());
         simpleBlock(AllBlocks.MULTI_BLOCK.get());
+        simpleBlock(AllBlocks.TEST_BLOCK.get());
     }
 }
