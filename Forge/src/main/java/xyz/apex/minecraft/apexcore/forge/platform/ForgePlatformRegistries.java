@@ -5,6 +5,8 @@ import com.google.common.collect.Table;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.Registry;
@@ -24,6 +26,8 @@ import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeSpawnEggItem;
@@ -117,6 +121,13 @@ public final class ForgePlatformRegistries extends ForgePlatformHolder implement
     public <T extends Entity> SpawnEggItem createSpawnEggItem(Supplier<? extends EntityType<? extends T>> entityType, int primaryColor, int secondaryColor, Item.Properties properties)
     {
         return new ForgeSpawnEggItem((Supplier<? extends EntityType<? extends Mob>>) entityType, primaryColor, secondaryColor, properties);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public <T extends BlockEntity> void registerBlockEntityRenderer(String modId, Supplier<BlockEntityType<T>> blockEntityType, Supplier<Function<BlockEntityRendererProvider.Context, BlockEntityRenderer<T>>> blockEntityRenderer)
+    {
+        platform.modEvents.registerBlockEntityRenderer(modId, blockEntityType, blockEntityRenderer);
     }
 
     @SuppressWarnings({ "unchecked", "DataFlowIssue" })

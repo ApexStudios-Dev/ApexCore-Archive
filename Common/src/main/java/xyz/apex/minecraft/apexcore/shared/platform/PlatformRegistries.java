@@ -1,6 +1,8 @@
 package xyz.apex.minecraft.apexcore.shared.platform;
 
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.Registry;
@@ -14,6 +16,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import xyz.apex.minecraft.apexcore.shared.registry.builders.ArmorMaterialBuilder;
 import xyz.apex.minecraft.apexcore.shared.registry.builders.TierBuilder;
@@ -44,6 +48,8 @@ public interface PlatformRegistries extends PlatformHolder
     <T extends Entity> void registerEntityAttributes(String modId, Supplier<EntityType<T>> entityType, Supplier<AttributeSupplier.Builder> attributes);
 
     <T extends Entity> SpawnEggItem createSpawnEggItem(Supplier<? extends EntityType<? extends T>> entityType, int primaryColor, int secondaryColor, Item.Properties properties);
+
+    default <T extends BlockEntity> void registerBlockEntityRenderer(String modId, Supplier<BlockEntityType<T>> blockEntityType, Supplier<Function<BlockEntityRendererProvider.Context, BlockEntityRenderer<T>>> blockEntityRenderer) {}
 
     interface PlatformGameRules extends PlatformHolder
     {

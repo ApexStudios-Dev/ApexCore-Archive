@@ -12,6 +12,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
@@ -65,6 +66,21 @@ public final class BlockBuilder<T extends Block> extends AbstractBuilder<Block, 
     protected T construct()
     {
         return factory.create(propertiesModifier.apply(initialProperties.get()));
+    }
+
+    public <B extends BlockEntity> BlockBuilder<T> blockEntity(BlockEntityBuilder.BlockEntityFactory<B> blockEntityFactory, UnaryOperator<BlockEntityBuilder<B>> builder)
+    {
+        return child(Registries.BLOCK_ENTITY_TYPE, (modId, registryName) -> builder.apply(BlockEntityBuilders.builder(modId, registryName, blockEntityFactory)));
+    }
+
+    public <B extends BlockEntity> BlockBuilder<T> blockEntity(BlockEntityBuilder.BlockEntityFactory<B> blockEntityFactory)
+    {
+        return blockEntity(blockEntityFactory, UnaryOperator.identity());
+    }
+
+    public BlockBuilder<T> noBlockEntity()
+    {
+        return removeChild(Registries.BLOCK_ENTITY_TYPE);
     }
 
     public BlockBuilder<T> hitbox(Supplier<VoxelShape> hitbox)

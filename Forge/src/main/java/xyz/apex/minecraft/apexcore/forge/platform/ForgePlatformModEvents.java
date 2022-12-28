@@ -7,6 +7,8 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
@@ -15,6 +17,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -57,6 +61,12 @@ final class ForgePlatformModEvents extends ForgePlatformHolder
         getModEvents(modId).entityAttributeRegistrations.add(new EntityAttributeRegistration<>(entityType, attributes));
     }
 
+    @OnlyIn(Dist.CLIENT)
+    <T extends BlockEntity> void registerBlockEntityRenderer(String modId, Supplier<BlockEntityType<T>> blockEntityType, Supplier<Function<BlockEntityRendererProvider.Context, BlockEntityRenderer<T>>> blockEntityRenderer)
+    {
+        getModEvents(modId).blockEntityRendererRegistrations.add(new BlockEntityRendererRegistration<>(blockEntityType, blockEntityRenderer));
+    }
+
     private ModEvents getModEvents(String modId)
     {
         if(modBuses.containsKey(modId)) return modBuses.get(modId);
@@ -81,6 +91,7 @@ final class ForgePlatformModEvents extends ForgePlatformHolder
         private final List<Pair<Block, Supplier<Supplier<RenderType>>>> renderTypeRegistrations = Lists.newArrayList();
         private final List<EntityRendererRegistration<? extends Entity>> entityRendererRegistrations = Lists.newArrayList();
         private final List<EntityAttributeRegistration<? extends Entity>> entityAttributeRegistrations = Lists.newArrayList();
+        private final List<BlockEntityRendererRegistration<? extends BlockEntity>> blockEntityRendererRegistrations = Lists.newArrayList();
 
         private final String modId;
         private final IEventBus modBus;
@@ -147,6 +158,12 @@ final class ForgePlatformModEvents extends ForgePlatformHolder
                 entityRendererRegistrations.forEach(entry -> entry.register(event));
                 entityRendererRegistrations.clear();
             }
+
+            if(!blockEntityRendererRegistrations.isEmpty())
+            {
+                blockEntityRendererRegistrations.forEach(entry -> entry.register(event));
+                blockEntityRendererRegistrations.clear();
+            }
         }
 
         private void onRegisterEntityAttributes(EntityAttributeCreationEvent event)
@@ -174,6 +191,15 @@ final class ForgePlatformModEvents extends ForgePlatformHolder
         private void register(EntityAttributeCreationEvent event)
         {
             event.put((EntityType<? extends LivingEntity>) entityType.get(), attributes.get().build());
+        }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private record BlockEntityRendererRegistration<T extends BlockEntity>(Supplier<BlockEntityType<T>> blockEntityType, Supplier<Function<BlockEntityRendererProvider.Context, BlockEntityRenderer<T>>> blockEntityRenderer)
+    {
+        private void register(EntityRenderersEvent.RegisterRenderers event)
+        {
+            event.registerBlockEntityRenderer(blockEntityType.get(), blockEntityRenderer.get()::apply);
         }
     }
 }

@@ -3,6 +3,7 @@ package xyz.apex.minecraft.apexcore.fabric.platform;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
@@ -10,6 +11,8 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRe
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.Registry;
@@ -26,6 +29,8 @@ import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import xyz.apex.minecraft.apexcore.shared.platform.PlatformRegistries;
 import xyz.apex.minecraft.apexcore.shared.registry.builders.ArmorMaterialBuilder;
@@ -117,6 +122,13 @@ public final class FabricPlatformRegistries extends FabricPlatformHolder impleme
     public <T extends Entity> SpawnEggItem createSpawnEggItem(Supplier<? extends EntityType<? extends T>> entityType, int primaryColor, int secondaryColor, Item.Properties properties)
     {
         return new SpawnEggItem((EntityType<? extends Mob>) entityType.get(), primaryColor, secondaryColor, properties);
+    }
+
+    @Environment(EnvType.CLIENT)
+    @Override
+    public <T extends BlockEntity> void registerBlockEntityRenderer(String modId, Supplier<BlockEntityType<T>> blockEntityType, Supplier<Function<BlockEntityRendererProvider.Context, BlockEntityRenderer<T>>> blockEntityRenderer)
+    {
+        BlockEntityRendererRegistry.register(blockEntityType.get(), blockEntityRenderer.get()::apply);
     }
 
     private static final class FabricPlatformGameRules extends FabricPlatformHolder implements PlatformGameRules
