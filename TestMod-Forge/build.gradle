@@ -3,27 +3,51 @@ plugins {
 	id 'idea'
 	id 'maven-publish'
 
+	id 'com.github.johnrengelman.shadow' version '7.1.2'
 	id 'architectury-plugin' version '3.4-SNAPSHOT'
 	id 'dev.architectury.loom' version '0.12.0-SNAPSHOT'
+	id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1'
 }
 
-group = "${APEX_GROUP}.${MOD_ID}.shared"
-version = "${MOD_VERSION}+${MINECRAFT_VERSION}"
-archivesBaseName = "${MOD_ID}-shared"
+evaluationDependsOn(':Common')
+evaluationDependsOn(':Forge')
+evaluationDependsOn(':TestMod-Common')
 
-sourceSets {
-	main {
-		resources.srcDirs += 'src/main/generated'
-	}
+group = "${APEX_GROUP}.${TEST_MOD_ID}.forge"
+version = "${TEST_MOD_VERSION}+${MINECRAFT_VERSION}"
+archivesBaseName = "${TEST_MOD_ID}-forge"
+
+configurations {
+	common
+	shadowCommon
+	compileClasspath.extendsFrom common
+	runtimeClasspath.extendsFrom common
+	developmentForge.extendsFrom common
 }
 
 architectury {
-	common(['forge', 'fabric'])
+	platformSetupLoomIde()
+	forge()
 }
 
 loom {
 	silentMojangMappingsLicense()
-	accessWidenerPath = file("src/main/resources/${MOD_ID}.accesswidener")
+	accessWidenerPath = project(':Common').loom.accessWidenerPath
+
+	mods {
+		"${MOD_ID}" {
+			sourceSet project(':Common').sourceSets.main
+			sourceSet project(':Forge').sourceSets.main
+		}
+	}
+
+	forge {
+		convertAccessWideners = true
+		extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
+
+		mixinConfig "${TEST_MOD_ID}.mixins.json"
+		mixinConfig "${TEST_MOD_ID}-common.mixins.json"
+	}
 }
 
 repositories {
@@ -57,13 +81,39 @@ dependencies {
 		}
 	})
 
-	compileOnly "org.spongepowered:mixin:${MIXIN_VERSION}"
-	modApi "dev.architectury:architectury:${ARCHITECTURY_VERSION}"
+	forge "net.minecraftforge:forge:${MINECRAFT_VERSION}-${FORGE_VERSION}"
+	modApi "dev.architectury:architectury-forge:${ARCHITECTURY_VERSION}"
+
+	// Main
+	common(project(path: ':Common', configuration: 'namedElements')) { transitive false }
+	implementation(project(path: ':Forge', configuration: 'namedElements')) { transitive false }
+	common(project(path: ':TestMod-Common', configuration: 'namedElements')) { transitive false }
+	shadowCommon(project(path: ':TestMod-Common', configuration: 'transformProductionForge')) { transitive false }
 
 	// JEI
 	if(rootProject.hasProperty('JEI_VERSION')) {
 		modCompileOnlyApi "mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}"
+		modCompileOnlyApi "mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}"
+		modRuntimeOnly "mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}"
 	}
+
+	// Jade
+	if(rootProject.hasProperty('JADE_CF_ID') && rootProject.hasProperty('FORGE_JADE_CF_FILE_ID')) {
+		modImplementation "curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}"
+	}
+}
+
+shadowJar {
+	exclude 'fabric.mod.json'
+	exclude 'architectury.common.json'
+	configurations = [ project.configurations.shadowCommon ]
+	classifier 'dev-shadow'
+}
+
+remapJar {
+	input.set shadowJar.archiveFile
+	dependsOn shadowJar
+	classifier null
 }
 
 processResources {
@@ -73,9 +123,11 @@ processResources {
 		inputs.property "${key}", "${value}"
 	}
 
-	filesMatching([ '*.mixins.json', 'pack.mcmeta' ]) {
+	filesMatching([ '*.mixins.json', 'pack.mcmeta', 'META-INF/mods.toml' ]) {
 		expand project.properties
 	}
+
+	from project(':TestMod-Common').sourceSets.main.resources
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -98,9 +150,11 @@ java {
 }
 
 jar {
+	classifier 'dev'
+
 	manifest {
 		attributes([
-				'Specification-Title': "${MOD_ID}",
+				'Specification-Title': "${TEST_MOD_ID}",
 				'Specification-Vendor': 'ApexStudios',
 				'Specification-Version': '1',
 				'Implementation-Title': "${project.name}",
@@ -111,9 +165,21 @@ jar {
 	}
 }
 
+sourcesJar {
+	def commonSources = project(':TestMod-Common').sourcesJar
+	dependsOn commonSources
+	from commonSources.archiveFile.map { zipTree(it) }
+}
+
+components.java {
+	withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+		skip()
+	}
+}
+
 publishing {
 	publications {
-		mavenCommon(MavenPublication) {
+		mavenForge(MavenPublication) {
 			groupId = "${project.group}"
 			artifactId = "${project.archivesBaseName}"
 			version = "${project.version}"
@@ -136,4 +202,8 @@ publishing {
 			}
 		}
 	}
+}
+
+idea.module {
+	excludeDirs << file('run')
 }

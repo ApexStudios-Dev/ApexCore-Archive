@@ -7,9 +7,11 @@ plugins {
 	id 'dev.architectury.loom' version '0.12.0-SNAPSHOT'
 }
 
-group = "${APEX_GROUP}.${MOD_ID}.shared"
-version = "${MOD_VERSION}+${MINECRAFT_VERSION}"
-archivesBaseName = "${MOD_ID}-shared"
+evaluationDependsOn(':Common')
+
+group = "${APEX_GROUP}.${TEST_MOD_ID}.shared"
+version = "${TEST_MOD_VERSION}+${MINECRAFT_VERSION}"
+archivesBaseName = "${TEST_MOD_ID}-shared"
 
 sourceSets {
 	main {
@@ -23,7 +25,13 @@ architectury {
 
 loom {
 	silentMojangMappingsLicense()
-	accessWidenerPath = file("src/main/resources/${MOD_ID}.accesswidener")
+	accessWidenerPath = project(':Common').loom.accessWidenerPath
+
+	mods {
+		"${MOD_ID}" {
+			sourceSet project(':Common').sourceSets.main
+		}
+	}
 }
 
 repositories {
@@ -59,6 +67,7 @@ dependencies {
 
 	compileOnly "org.spongepowered:mixin:${MIXIN_VERSION}"
 	modApi "dev.architectury:architectury:${ARCHITECTURY_VERSION}"
+	implementation(project(path: ':Common', configuration: 'namedElements')) { transitive false }
 
 	// JEI
 	if(rootProject.hasProperty('JEI_VERSION')) {
@@ -100,7 +109,7 @@ java {
 jar {
 	manifest {
 		attributes([
-				'Specification-Title': "${MOD_ID}",
+				'Specification-Title': "${TEST_MOD_ID}",
 				'Specification-Vendor': 'ApexStudios',
 				'Specification-Version': '1',
 				'Implementation-Title': "${project.name}",

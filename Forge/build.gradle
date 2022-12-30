@@ -1,21 +1,12 @@
-buildscript {
-	dependencies {
-		classpath 'org.parchmentmc:librarian:1.+'
-	}
-}
-
 plugins {
 	id 'java-library'
 	id 'idea'
 	id 'maven-publish'
 
-	id 'net.minecraftforge.gradle' version '5.1.+'
-	id 'org.spongepowered.mixin' version '0.7.+'
+	id 'com.github.johnrengelman.shadow' version '7.1.2'
+	id 'architectury-plugin' version '3.4-SNAPSHOT'
+	id 'dev.architectury.loom' version '0.12.0-SNAPSHOT'
 	id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1'
-}
-
-if(rootProject.hasProperty('PARCHMENT_MAPPINGS')) {
-	apply plugin: 'org.parchmentmc.librarian.forgegradle'
 }
 
 evaluationDependsOn(':Common')
@@ -24,163 +15,30 @@ group = "${APEX_GROUP}.${MOD_ID}.forge"
 version = "${MOD_VERSION}+${MINECRAFT_VERSION}"
 archivesBaseName = "${MOD_ID}-forge"
 
-sourceSets {
-	datagen {
-		compileClasspath += configurations.getByName('minecraft')
-
-		compileClasspath += sourceSets.main.output
-		runtimeClasspath += sourceSets.main.output
-
-		compileClasspath += sourceSets.main.compileClasspath
-		runtimeClasspath += sourceSets.main.runtimeClasspath
-	}
-
-	testmod {
-		compileClasspath += configurations.getByName('minecraft')
-
-		compileClasspath += sourceSets.main.output
-		runtimeClasspath += sourceSets.main.output
-
-		compileClasspath += sourceSets.main.compileClasspath
-		runtimeClasspath += sourceSets.main.runtimeClasspath
-	}
-
-	testmodDatagen {
-		compileClasspath += configurations.getByName('minecraft')
-
-		compileClasspath += sourceSets.main.output
-		runtimeClasspath += sourceSets.main.output
-
-		compileClasspath += sourceSets.main.compileClasspath
-		runtimeClasspath += sourceSets.main.runtimeClasspath
-	}
+configurations {
+	common
+	shadowCommon
+	compileClasspath.extendsFrom common
+	runtimeClasspath.extendsFrom common
+	developmentForge.extendsFrom common
 }
 
-minecraft {
-	if(rootProject.hasProperty('PARCHMENT_MAPPINGS')) {
-		if(rootProject.hasProperty('PARCHMENT_MINECRAFT_VERSION')) {
-			mappings channel: 'parchment', version: "${PARCHMENT_MINECRAFT_VERSION}-${PARCHMENT_MAPPINGS}-${MINECRAFT_VERSION}"
-		} else {
-			mappings channel: 'parchment', version: "${PARCHMENT_MAPPINGS}-${MINECRAFT_VERSION}"
-		}
-	} else {
-		mappings channel: 'official', version: "${MINECRAFT_VERSION}"
-	}
-
-	if(file('src/main/resources/META-INF/accesstransformer.cfg').exists()) {
-		accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-	}
-
-	runs {
-		client {
-			workingDirectory file('run/client')
-			property 'forge.logging.markers', ''
-			property 'forge.logging.console.level', 'debug'
-			ideaModule "${rootProject.name}.${project.name}.testmod"
-
-			mods {
-				"${MOD_ID}" {
-					source sourceSets.main
-					source project(':Common').sourceSets.main
-				}
-
-				"${TEST_MOD_ID}" {
-					source sourceSets.testmod
-					source project(':Common').sourceSets.testmod
-				}
-			}
-		}
-
-		clientLogin {
-			parent runs.client
-			main 'net.covers1624.devlogin.DevLogin'
-			args '--launch_target', '{LAUNCH_TARGET}'
-			lazyToken("LAUNCH_TARGET", { runs.client.main })
-		}
-
-		server {
-			workingDirectory file('run/server')
-			property 'forge.logging.markers', ''
-			property 'forge.logging.console.level', 'debug'
-			args 'nogui'
-			ideaModule "${rootProject.name}.${project.name}.testmod"
-
-			mods {
-				"${MOD_ID}" {
-					source sourceSets.main
-					source project(':Common').sourceSets.main
-				}
-
-				"${TEST_MOD_ID}" {
-					source sourceSets.testmod
-					source project(':Common').sourceSets.testmod
-				}
-			}
-		}
-
-		data {
-			workingDirectory file('run/client')
-			property 'forge.logging.markers', ''
-			property 'forge.logging.console.level', 'debug'
-			forceExit false
-
-			mods {
-				"${MOD_ID}" {
-					source sourceSets.main
-					source sourceSets.datagen
-					source project(':Common').sourceSets.main
-				}
-			}
-		}
-
-		dataMod {
-			parent runs.data
-
-			ideaModule "${rootProject.name}.${project.name}.main"
-			source sourceSets.main
-
-			args '--mod', MOD_ID
-			args '--client', '--server', '--validate'
-			args '--input', file('src/datagen/blockbench')
-			args '--output', project(':Common').file('src/main/generated')
-			args '--existing', file('src/main/resources')
-			args '--existing', project(':Common').file('src/main/resources')
-		}
-
-		dataTestmod {
-			parent runs.data
-
-			ideaModule "${rootProject.name}.${project.name}.testmod"
-			source sourceSets.testmod
-
-			args '--mod', TEST_MOD_ID
-			args '--client', '--server', '--validate'
-			args '--input', file('src/testmodDatagen/blockbench')
-			args '--output', project(':Common').file('src/testmod/generated')
-			args '--existing', file('src/main/resources')
-			args '--existing', project(':Common').file('src/main/resources')
-			args '--existing', project(':Common').file('src/testmod/resources')
-			args '--existing-mod', MOD_ID
-
-			mods {
-				"${TEST_MOD_ID}" {
-					source sourceSets.testmod
-					source sourceSets.testmodDatagen
-					source project(':Common').sourceSets.testmod
-				}
-			}
-		}
-	}
+architectury {
+	platformSetupLoomIde()
+	forge()
 }
 
-mixin {
-	add sourceSets.main, "${MOD_ID}.refmap.json"
-	config "${MOD_ID}.mixins.json"
+loom {
+	silentMojangMappingsLicense()
+	accessWidenerPath = project(':Common').loom.accessWidenerPath
 
-	add project(':Common').sourceSets.main, "${MOD_ID}-common.refmap.json"
-	config "${MOD_ID}-common.mixins.json"
+	forge {
+		convertAccessWideners = true
+		extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
 
-	debug.export = true
+		mixinConfig "${MOD_ID}.mixins.json"
+		mixinConfig "${MOD_ID}-common.mixins.json"
+	}
 }
 
 repositories {
@@ -203,57 +61,48 @@ repositories {
 }
 
 dependencies {
-	minecraft "net.minecraftforge:forge:${MINECRAFT_VERSION}-${FORGE_VERSION}"
+	minecraft "com.mojang:minecraft:${MINECRAFT_VERSION}"
+
+	mappings(loom.layered {
+		officialMojangMappings()
+
+		if(rootProject.hasProperty('PARCHMENT_MAPPINGS')) {
+			def mcVersion = rootProject.hasProperty('PARCHMENT_MINECRAFT_VERSION') ? "${PARCHMENT_MINECRAFT_VERSION}" : "${MINECRAFT_VERSION}"
+			parchment("org.parchmentmc.data:parchment-${mcVersion}:${PARCHMENT_MAPPINGS}@zip")
+		}
+	})
+
+	forge "net.minecraftforge:forge:${MINECRAFT_VERSION}-${FORGE_VERSION}"
+	modApi "dev.architectury:architectury-forge:${ARCHITECTURY_VERSION}"
 
 	// Main
-	annotationProcessor "org.spongepowered:mixin:${MIXIN_VERSION}:processor"
-	implementation project(':Common')
-	runtimeClasspath "net.covers1624:DevLogin:${DEVLOGIN_VERSION}"
-
-	// Data Gen
-	datagenImplementation sourceSets.main.output
-	datagenImplementation project(':Common')
-
-	// Test Mod
-	testmodAnnotationProcessor "org.spongepowered:mixin:${MIXIN_VERSION}:processor"
-	testmodImplementation sourceSets.main.output
-	testmodImplementation project(':Common')
-	testmodImplementation project(':Common').sourceSets.testmod.output
-	testmodRuntimeClasspath "net.covers1624:DevLogin:${DEVLOGIN_VERSION}"
-
-	// Test Mod Data Gen
-	testmodDatagenImplementation sourceSets.main.output
-	testmodDatagenImplementation sourceSets.testmod.output
-	testmodDatagenImplementation sourceSets.datagen.output
-	testmodDatagenImplementation project(':Common')
-	testmodDatagenImplementation project(':Common').sourceSets.testmod.output
+	common(project(path: ':Common', configuration: 'namedElements')) { transitive false }
+	shadowCommon(project(path: ':Common', configuration: 'transformProductionForge')) { transitive false }
 
 	// JEI
 	if(rootProject.hasProperty('JEI_VERSION')) {
-		compileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}")
-		compileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}")
-		runtimeOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}")
-
-		datagenCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}")
-		datagenCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}")
-		datagenRuntimeOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}")
-
-		testmodCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}")
-		testmodCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}")
-		testmodRuntimeOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}")
-
-		testmodDatagenCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}")
-		testmodDatagenCompileOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}")
-		testmodDatagenRuntimeOnly fg.deobf("mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}")
+		modCompileOnlyApi "mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}"
+		modCompileOnlyApi "mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}"
+		modRuntimeOnly "mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}"
 	}
 
 	// Jade
 	if(rootProject.hasProperty('JADE_CF_ID') && rootProject.hasProperty('FORGE_JADE_CF_FILE_ID')) {
-		implementation fg.deobf("curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}")
-		datagenImplementation fg.deobf("curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}")
-		testmodImplementation fg.deobf("curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}")
-		testmodDatagenImplementation fg.deobf("curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}")
+		modImplementation "curse.maven:jade-${JADE_CF_ID}:${FORGE_JADE_CF_FILE_ID}"
 	}
+}
+
+shadowJar {
+	exclude 'fabric.mod.json'
+	exclude 'architectury.common.json'
+	configurations = [ project.configurations.shadowCommon ]
+	classifier 'dev-shadow'
+}
+
+remapJar {
+	input.set shadowJar.archiveFile
+	dependsOn shadowJar
+	classifier null
 }
 
 processResources {
@@ -270,29 +119,9 @@ processResources {
 	from project(':Common').sourceSets.main.resources
 }
 
-processTestmodResources {
-	duplicatesStrategy DuplicatesStrategy.WARN
-
-	project.properties.each { key, value ->
-		inputs.property "${key}", "${value}"
-	}
-
-	filesMatching([ '*.mixins.json', 'pack.mcmeta', 'META-INF/mods.toml' ]) {
-		expand project.properties
-	}
-
-	from project(':Common').sourceSets.testmod.resources
-}
-
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
 	options.release.set(JavaLanguageVersion.of("${JAVA_VERSION}").asInt())
-
-	if(it.name.equals('compileJava')) {
-		source(project(':Common').sourceSets.main.allSource)
-	} else if(it.name.equals('compileTestmodJava')) {
-		source(project(':Common').sourceSets.testmod.allSource)
-	}
 
 	javaToolchains {
 		compilerFor {
@@ -310,6 +139,8 @@ java {
 }
 
 jar {
+	classifier 'dev'
+
 	manifest {
 		attributes([
 				'Specification-Title': "${MOD_ID}",
@@ -318,28 +149,31 @@ jar {
 				'Implementation-Title': "${project.name}",
 				'Implementation-Version': "${project.version}",
 				'Implementation-Vendor': 'ApexStudios',
-				'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-				'MixinConfigs': "${MOD_ID}.mixins.json,${MOD_ID}-common.mixins.json"
+				'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
 		])
 	}
 }
 
-artifacts {
-	archives jar
-	archives sourcesJar
+sourcesJar {
+	def commonSources = project(':Common').sourcesJar
+	dependsOn commonSources
+	from commonSources.archiveFile.map { zipTree(it) }
 }
 
-jar.finalizedBy('reobfJar')
+components.java {
+	withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+		skip()
+	}
+}
 
 publishing {
 	publications {
-		mavenJava(MavenPublication) {
+		mavenForge(MavenPublication) {
 			groupId = "${project.group}"
 			artifactId = "${project.archivesBaseName}"
 			version = "${project.version}"
 
-			artifact jar
-			artifact sourcesJar
+			from components.java
 		}
 	}
 	repositories {

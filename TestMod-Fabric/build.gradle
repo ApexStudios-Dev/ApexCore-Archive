@@ -10,10 +10,12 @@ plugins {
 }
 
 evaluationDependsOn(':Common')
+evaluationDependsOn(':Fabric')
+evaluationDependsOn(':TestMod-Common')
 
-group = "${APEX_GROUP}.${MOD_ID}.fabric"
-version = "${MOD_VERSION}+${MINECRAFT_VERSION}"
-archivesBaseName = "${MOD_ID}-fabric"
+group = "${APEX_GROUP}.${TEST_MOD_ID}.fabric"
+version = "${TEST_MOD_VERSION}+${MINECRAFT_VERSION}"
+archivesBaseName = "${TEST_MOD_ID}-fabric"
 
 configurations {
 	common
@@ -31,6 +33,13 @@ architectury {
 loom {
 	silentMojangMappingsLicense()
 	accessWidenerPath = project(':Common').loom.accessWidenerPath
+
+	mods {
+		"${MOD_ID}" {
+			sourceSet project(':Common').sourceSets.main
+			sourceSet project(':Fabric').sourceSets.main
+		}
+	}
 }
 
 repositories {
@@ -69,7 +78,9 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${FABRIC_VERSION}+${MINECRAFT_VERSION}"
 	modApi "dev.architectury:architectury-fabric:${ARCHITECTURY_VERSION}"
 	common(project(path: ':Common', configuration: 'namedElements')) { transitive false }
-	shadowCommon(project(path: ':Common', configuration: 'transformProductionFabric')) { transitive false }
+	implementation(project(path: ':Fabric', configuration: 'namedElements')) { transitive false }
+	common(project(path: ':TestMod-Common', configuration: 'namedElements')) { transitive false }
+	shadowCommon(project(path: ':TestMod-Common', configuration: 'transformProductionFabric')) { transitive false }
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
 	// JEI
@@ -119,7 +130,7 @@ processResources {
 		expand project.properties
 	}
 
-	from project(':Common').sourceSets.main.resources
+	from project(':TestMod-Common').sourceSets.main.resources
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -146,7 +157,7 @@ jar {
 
 	manifest {
 		attributes([
-				'Specification-Title': "${MOD_ID}",
+				'Specification-Title': "${TEST_MOD_ID}",
 				'Specification-Vendor': 'ApexStudios',
 				'Specification-Version': '1',
 				'Implementation-Title': "${project.name}",
@@ -158,7 +169,7 @@ jar {
 }
 
 sourcesJar {
-	def commonSources = project(':Common').sourcesJar
+	def commonSources = project(':TestMod-Common').sourcesJar
 	dependsOn commonSources
 	from commonSources.archiveFile.map { zipTree(it) }
 }

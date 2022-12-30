@@ -8,6 +8,7 @@ pluginManagement {
 		maven { url 'https://maven.fabricmc.net' }
 		maven { url 'https://repo.spongepowered.org/repository/maven-public' }
 		maven { url 'https://maven.quiltmc.org/repository/release' }
+		maven { url 'https://maven.architectury.dev/' }
 	}
 
 	resolutionStrategy {
@@ -26,5 +27,9 @@ pluginManagement {
 include 'Common'
 include 'Forge'
 include 'Fabric'
+
+include 'TestMod-Common'
+include 'TestMod-Forge'
+include 'TestMod-Fabric'
 
 rootProject.name = "${MOD_NAME}-${MINECRAFT_VERSION}"

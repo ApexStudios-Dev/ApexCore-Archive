@@ -1,14 +1,7 @@
 {
     "required": true,
     "package": "${APEX_GROUP}.${MOD_ID}.shared.mixin",
-    "mixins": [
-        "MixinBlockStateBase",
-        "MixinFireBlock",
-        "accessors.ArmorMaterialsAccessor",
-        "accessors.BlockAccessor",
-        "accessors.ExplosionAccessor",
-        "invokers.BlockInvoker"
-    ],
+    "mixins": [ ],
     "client": [ ],
     "server": [ ],
     "minVersion": "${MIXIN_VERSION}"
