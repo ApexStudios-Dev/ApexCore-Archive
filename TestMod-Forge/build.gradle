@@ -36,7 +36,6 @@ loom {
 
 	mods {
 		"${MOD_ID}" {
-			sourceSet project(':Common').sourceSets.main
 			sourceSet project(':Forge').sourceSets.main
 		}
 	}

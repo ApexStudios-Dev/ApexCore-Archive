@@ -1,14 +1,14 @@
 package xyz.apex.minecraft.apexcore.fabric;
 
-import net.fabricmc.api.ModInitializer;
-
+import xyz.apex.minecraft.apexcore.fabric.platform.FabricModPlatform;
 import xyz.apex.minecraft.apexcore.shared.ApexCore;
 
-public final class ApexCoreFabric implements ModInitializer
+public final class ApexCoreFabric extends FabricModPlatform implements ApexCore
 {
-    @Override
-    public void onInitialize()
+    public static final FabricModPlatform INSTANCE = new ApexCoreFabric();
+
+    private ApexCoreFabric()
     {
-        ApexCore.bootstrap();
+        super(ID);
     }
 }

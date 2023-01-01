@@ -55,9 +55,10 @@
     "license": "GNU GENERAL PUBLIC LICENSE",
     "environment": "*",
     "entrypoints": {
-        "main": [ "${APEX_GROUP}.${MOD_ID}.fabric.${MOD_NAME}Fabric" ],
-        "client": [ ],
-        "server": [ ]
+        "main": [ "${APEX_GROUP}.${MOD_ID}.fabric.${MOD_NAME}Fabric::INSTANCE" ],
+        "client": [ "${APEX_GROUP}.${MOD_ID}.fabric.${MOD_NAME}Fabric::INSTANCE" ],
+        "server": [ "${APEX_GROUP}.${MOD_ID}.fabric.${MOD_NAME}Fabric::INSTANCE" ],
+        "fabric-datagen": [ "${APEX_GROUP}.${MOD_ID}.fabric.${MOD_NAME}Fabric::INSTANCE" ]
     },
     "mixins": [ "${MOD_ID}.mixins.json", "${MOD_ID}-common.mixins.json" ],
     "depends": {

@@ -1,14 +1,14 @@
 package xyz.apex.minecraft.testmod.fabric;
 
-import net.fabricmc.api.ModInitializer;
-
+import xyz.apex.minecraft.apexcore.fabric.platform.FabricModPlatform;
 import xyz.apex.minecraft.testmod.shared.TestMod;
 
-public final class TestModFabric implements ModInitializer
+public final class TestModFabric extends FabricModPlatform implements TestMod
 {
-    @Override
-    public void onInitialize()
+    public static final FabricModPlatform INSTANCE = new TestModFabric();
+
+    private TestModFabric()
     {
-        TestMod.bootstrap();
+        super(ID);
     }
 }

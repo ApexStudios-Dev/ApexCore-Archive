@@ -54,10 +54,12 @@
     "license": "GNU GENERAL PUBLIC LICENSE",
     "environment": "*",
     "entrypoints": {
-        "main": [ "${APEX_GROUP}.${TEST_MOD_ID}.fabric.${TEST_MOD_NAME}Fabric" ],
-        "client": [ ],
-        "server": [ ]
+        "main": [ "${APEX_GROUP}.${TEST_MOD_ID}.fabric.${TEST_MOD_NAME}Fabric::INSTANCE" ],
+        "client": [ "${APEX_GROUP}.${TEST_MOD_ID}.fabric.${TEST_MOD_NAME}Fabric::INSTANCE" ],
+        "server": [ "${APEX_GROUP}.${TEST_MOD_ID}.fabric.${TEST_MOD_NAME}Fabric::INSTANCE" ],
+        "fabric-datagen": [ "${APEX_GROUP}.${TEST_MOD_ID}.fabric.${TEST_MOD_NAME}Fabric::INSTANCE" ]
     },
+    "mixins": [ "${TEST_MOD_ID}.mixins.json", "${TEST_MOD_ID}-common.mixins.json" ],
     "depends": {
         "minecraft": "~${MINECRAFT_VERSION}",
         "java": ">=${JAVA_VERSION}",
