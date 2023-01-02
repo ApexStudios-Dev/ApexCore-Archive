@@ -45,7 +45,7 @@ public final class BlockBuilder<R extends Block, O extends AbstractRegistrar<O>,
     private int burnOdds = -1;
     private int igniteOdds = -1;
     private Supplier<Supplier<RenderType>> renderTypeSupplier = () -> () -> null;
-    @Nullable private Supplier<VoxelShape> hitbox = () -> null;
+    @Nullable private Supplier<VoxelShape> hitbox;
     private TriFunction<VoxelShape, R, BlockState, VoxelShape> hitboxModifier = (current, block, blockState) -> current;
     private Supplier<Supplier<BlockColor>> blockColorSupplier = () -> () -> null;
     private int burnTime = -1;
@@ -57,10 +57,14 @@ public final class BlockBuilder<R extends Block, O extends AbstractRegistrar<O>,
 
         this.factory = factory;
 
+        simpleItem();
+
         onRegister(block -> {
+            var registryName =  getRegistryName();
+
             if(burnTime != -1) FuelRegistry.register(burnTime, block);
-            if(burnOdds != -1 && igniteOdds != -1) FlammabilityRegistry.register(block, burnOdds, igniteOdds);
-            if(hitbox != null) HitBoxRegistry.register(block, hitbox, hitboxModifier);
+            if(burnOdds != -1 && igniteOdds != -1) FlammabilityRegistry.register(registryName, burnOdds, igniteOdds);
+            if(hitbox != null) HitBoxRegistry.register(registryName, hitbox, hitboxModifier);
 
             EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
                 var renderType = renderTypeSupplier.get().get();

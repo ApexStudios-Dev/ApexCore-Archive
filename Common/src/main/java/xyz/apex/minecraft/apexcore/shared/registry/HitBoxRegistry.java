@@ -2,6 +2,8 @@ package xyz.apex.minecraft.apexcore.shared.registry;
 
 import com.google.common.collect.Maps;
 
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -15,21 +17,22 @@ import java.util.function.Supplier;
 
 public final class HitBoxRegistry
 {
-    private static final Map<Block, Entry<?>> ENTRY_MAP = Maps.newHashMap();
+    private static final Map<ResourceLocation, Entry<?>> ENTRY_MAP = Maps.newHashMap();
 
-    public static void register(Block block, Supplier<VoxelShape> baseShape)
+    public static void register(ResourceLocation blockRegistryName, Supplier<VoxelShape> baseShape)
     {
-        register(block, baseShape, (current, $, blockState) -> current);
+        register(blockRegistryName, baseShape, (current, $, blockState) -> current);
     }
 
-    public static <T extends Block> void register(T block, Supplier<VoxelShape> baseShape, TriFunction<VoxelShape, T, BlockState, VoxelShape> modifier)
+    public static <T extends Block> void register(ResourceLocation blockRegistryName, Supplier<VoxelShape> baseShape, TriFunction<VoxelShape, T, BlockState, VoxelShape> modifier)
     {
-        ENTRY_MAP.put(block, new Entry<>(baseShape, modifier));
+        ENTRY_MAP.put(blockRegistryName, new Entry<>(baseShape, modifier));
     }
 
     public static Optional<Entry<?>> findForBlock(Block block)
     {
-        return Optional.ofNullable(ENTRY_MAP.get(block));
+        var blockRegistryName = BuiltInRegistries.BLOCK.getKey(block);
+        return Optional.ofNullable(ENTRY_MAP.get(blockRegistryName));
     }
 
     public static final class Entry<T extends Block>

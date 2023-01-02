@@ -2,6 +2,8 @@ package xyz.apex.minecraft.apexcore.shared.registry;
 
 import com.google.common.collect.Maps;
 
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 
 import java.util.Map;
@@ -13,16 +15,17 @@ import java.util.OptionalInt;
 //  Use this registry for custom modded blocks only, that do not / can not make use of Forge / Fabrics built-in systems
 public final class FlammabilityRegistry
 {
-    private static final Map<Block, Entry> REGISTRY = Maps.newHashMap();
+    private static final Map<ResourceLocation, Entry> REGISTRY = Maps.newHashMap();
 
-    public static void register(Block block, int burnOdds, int igniteOdds)
+    public static void register(ResourceLocation blockRegistryName, int burnOdds, int igniteOdds)
     {
-        REGISTRY.put(block, new Entry(burnOdds, igniteOdds));
+        REGISTRY.put(blockRegistryName, new Entry(burnOdds, igniteOdds));
     }
 
     public static OptionalInt lookupBurnOdds(Block block)
     {
-        return REGISTRY.containsKey(block) ? OptionalInt.of(REGISTRY.get(block).burnOdds) : OptionalInt.empty();
+        var blockRegistryName = BuiltInRegistries.BLOCK.getKey(block);
+        return REGISTRY.containsKey(blockRegistryName) ? OptionalInt.of(REGISTRY.get(blockRegistryName).burnOdds) : OptionalInt.empty();
     }
 
     public static int getBurnOddsOrDefault(Block block, int defaultBurnOdds)
@@ -37,7 +40,8 @@ public final class FlammabilityRegistry
 
     public static OptionalInt lookupIgniteOdds(Block block)
     {
-        return REGISTRY.containsKey(block) ? OptionalInt.of(REGISTRY.get(block).igniteOdds) : OptionalInt.empty();
+        var blockRegistryName = BuiltInRegistries.BLOCK.getKey(block);
+        return REGISTRY.containsKey(blockRegistryName) ? OptionalInt.of(REGISTRY.get(blockRegistryName).igniteOdds) : OptionalInt.empty();
     }
 
     public static int getIgniteOddsOrDefault(Block block, int defaultIgniteOdds)
