@@ -4,13 +4,20 @@ import dev.architectury.platform.Mod;
 import dev.architectury.platform.Platform;
 import dev.architectury.utils.Env;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Block;
+
+import xyz.apex.minecraft.apexcore.shared.util.EnhancedTier;
 import xyz.apex.minecraft.apexcore.shared.util.Tags;
 
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.function.Supplier;
 
 public interface GamePlatform
 {
@@ -93,4 +100,6 @@ public interface GamePlatform
     {
         return Platform.isDevelopmentEnvironment();
     }
+
+    EnhancedTier createEnhancedTier(String registryName, int uses, float speed, float attackDamageBonus, int level, int enchantmentValue, Supplier<Ingredient> repairIngredient, @Nullable TagKey<Block> toolLevelBlock);
 }
