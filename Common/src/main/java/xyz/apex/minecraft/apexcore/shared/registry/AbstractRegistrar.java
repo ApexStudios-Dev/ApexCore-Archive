@@ -1,6 +1,7 @@
 package xyz.apex.minecraft.apexcore.shared.registry;
 
 import com.google.common.collect.*;
+import dev.architectury.registry.CreativeTabRegistry;
 import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrarManager;
 import org.apache.commons.compress.utils.Lists;
@@ -9,30 +10,35 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
 import xyz.apex.minecraft.apexcore.shared.platform.ModPlatform;
-import xyz.apex.minecraft.apexcore.shared.registry.builder.Builder;
-import xyz.apex.minecraft.apexcore.shared.registry.builder.NoConfigBuilder;
+import xyz.apex.minecraft.apexcore.shared.registry.builder.*;
+import xyz.apex.minecraft.apexcore.shared.registry.entry.MenuEntry;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.shared.util.function.Lazy;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-@SuppressWarnings({ "UnusedReturnValue", "unchecked", "SuspiciousMethodCalls" })
+@SuppressWarnings({ "UnusedReturnValue", "unchecked", "SuspiciousMethodCalls", "UnstableApiUsage" })
 public class AbstractRegistrar<S extends AbstractRegistrar<S>>
 {
     private final Table<ResourceKey<? extends Registry<?>>, String, Registration<?, ?>> registrations = HashBasedTable.create();
@@ -49,6 +55,11 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
         this.modId = modId;
 
         registrarManager = Lazy.of(() -> RegistrarManager.get(modId));
+    }
+
+    public final ModPlatform getMod()
+    {
+        return Objects.requireNonNull(mod);
     }
 
     public final ResourceLocation registryName(String registrationName)
@@ -88,6 +99,18 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
         return mapper.apply(self());
     }
 
+    public final S creativeModeTab(String creativeModeTabName, Supplier<ItemStack> icon)
+    {
+        CreativeTabRegistry.create(registryName(creativeModeTabName), icon);
+        return self();
+    }
+
+    public final S creativeModeTab(String creativeModeTabName, Consumer<CreativeModeTab.Builder> builder)
+    {
+        CreativeTabRegistry.create(registryName(creativeModeTabName), builder);
+        return self();
+    }
+
     public final <T, R extends T> RegistryEntry<R> simple(ResourceKey<? extends Registry<T>> registryType, String registrationName, Supplier<R> entryFactory)
     {
         return simple(self(), registryType, registrationName, entryFactory);
@@ -96,6 +119,61 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     public final <T, R extends T, P> RegistryEntry<R> simple(P parent, ResourceKey<? extends Registry<T>> registryType, String registrationName, Supplier<R> entryFactory)
     {
         return new NoConfigBuilder<>(self(), parent, registryType, registrationName, entryFactory).register();
+    }
+
+    public final <T extends Item, P> ItemBuilder<T, S, P> item(P parent, String itemName, ItemBuilder.Factory<T> factory)
+    {
+        return new ItemBuilder<>(self(), parent, itemName, factory);
+    }
+
+    public final <P> ItemBuilder<Item, S, P> item(P parent, String itemName)
+    {
+        return item(parent, itemName, Item::new);
+    }
+
+    public final <T extends Item> ItemBuilder<T, S, S> item(String itemName, ItemBuilder.Factory<T> factory)
+    {
+        return item(self(), itemName, factory);
+    }
+
+    public final ItemBuilder<Item, S, S> item(String itemName)
+    {
+        return item(self(), itemName, Item::new);
+    }
+
+    public final <T extends Block, P> BlockBuilder<T, S, P> block(P parent, String blockName, BlockBuilder.Factory<T> factory)
+    {
+        return new BlockBuilder<>(self(), parent, blockName, factory);
+    }
+
+    public final <P> BlockBuilder<Block, S, P> block(P parent, String blockName)
+    {
+        return block(parent, blockName, Block::new);
+    }
+
+    public final <T extends Block> BlockBuilder<T, S, S> block(String blockName, BlockBuilder.Factory<T> factory)
+    {
+        return block(self(), blockName, factory);
+    }
+
+    public final BlockBuilder<Block, S, S> block(String blockName)
+    {
+        return block(self(), blockName, Block::new);
+    }
+
+    public final <T extends BlockEntity, P> BlockEntityBuilder<T, S, P> blockEntity(P parent, String blockName, BlockEntityBuilder.Factory<T> factory)
+    {
+        return new BlockEntityBuilder<>(self(), parent, blockName, factory);
+    }
+
+    public final <T extends BlockEntity> BlockEntityBuilder<T, S, S> blockEntity(String blockName, BlockEntityBuilder.Factory<T> factory)
+    {
+        return blockEntity(self(), blockName, factory);
+    }
+
+    public final <T extends AbstractContainerMenu, C extends Screen & MenuAccess<T>> MenuEntry<T> menu(String menuName, MenuBuilder.MenuFactory<T> menuFactory, Supplier<MenuBuilder.ScreenFactory<T, C>> screenFactorySupplier)
+    {
+        return new MenuBuilder<>(self(), self(), menuName, menuFactory, screenFactorySupplier).register();
     }
 
     @ApiStatus.Internal
@@ -282,8 +360,8 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
             var value = creator.get();
             creator = Lazy.of(value);
             registry.register(registryEntry.getRegistryName(), creator);
-            var holder = BuiltInRegistries.REGISTRY.getOrThrow((ResourceKey) registryEntry.getRegistryType()).wrapAsHolder(value);
-            registryEntry.updateReference(value, holder);
+            var vanillaRegistry = BuiltInRegistries.REGISTRY.getOrThrow((ResourceKey) registryEntry.getRegistryType());
+            registryEntry.updateReference(value, vanillaRegistry);
             callbacks.forEach(callback -> callback.accept(value));
             callbacks.clear();
             registered = true;

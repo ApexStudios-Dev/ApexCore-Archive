@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.shared.registry.entry;
 
+import dev.architectury.extensions.injected.InjectedRegistryEntryExtension;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +21,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "PatternVariableHidesField", "rawtypes" })
 public class RegistryEntry<T> implements LazyLike<T>, Comparable<RegistryEntry<?>>
 {
     protected final AbstractRegistrar<?> owner;
@@ -81,6 +82,7 @@ public class RegistryEntry<T> implements LazyLike<T>, Comparable<RegistryEntry<?
 
     public final Holder<? super T> getHolder()
     {
+        if(value instanceof InjectedRegistryEntryExtension<?> holder) return (Holder.Reference<? super T>) holder.arch$holder();
         return Objects.requireNonNull(holder);
     }
 
@@ -102,10 +104,12 @@ public class RegistryEntry<T> implements LazyLike<T>, Comparable<RegistryEntry<?
     }
 
     @ApiStatus.Internal
-    public final void updateReference(T value, Holder<? super T> holder)
+    public final void updateReference(T value, Registry<? super T> registry)
     {
         this.value = value;
-        this.holder = holder;
+
+        if(value instanceof InjectedRegistryEntryExtension<?>) holder = ((InjectedRegistryEntryExtension) value).arch$holder();
+        else holder = (Holder<? super T>) registry.getHolder((ResourceKey) registryKey).orElseGet(() -> registry.wrapAsHolder(value));
     }
 
     public final void ifPresent(Consumer<? super T> action)

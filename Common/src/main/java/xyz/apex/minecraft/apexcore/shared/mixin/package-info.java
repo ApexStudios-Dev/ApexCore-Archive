@@ -1,7 +1,7 @@
 @FieldsAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package xyz.apex.minecraft.testmod.shared.init;
+package xyz.apex.minecraft.apexcore.shared.mixin;
 
 import net.minecraft.FieldsAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;

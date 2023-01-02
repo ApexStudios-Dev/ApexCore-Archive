@@ -74,7 +74,6 @@ public interface Builder<T, R extends T, O extends AbstractRegistrar<O>, P, B ex
 
     default P build()
     {
-        register();
         return getParent();
     }
 
