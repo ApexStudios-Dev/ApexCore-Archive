@@ -4,9 +4,10 @@
     "mixins": [
         "MixinBlockStateBase",
         "MixinFireBlock",
+        "accessors.AccessorArmorMaterials",
         "accessors.AccessorBlock",
         "accessors.AccessorBlockEntityType",
-        "invoker.InvokerBlock"
+        "invokers.InvokerBlock"
     ],
     "client": [ ],
     "server": [ ],
