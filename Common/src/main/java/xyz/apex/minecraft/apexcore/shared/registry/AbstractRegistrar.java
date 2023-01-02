@@ -262,6 +262,7 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
         });
     }
 
+    @SuppressWarnings("rawtypes")
     private static final class Registration<T, R extends T>
     {
         private Supplier<R> creator;
@@ -281,6 +282,8 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
             var value = creator.get();
             creator = Lazy.of(value);
             registry.register(registryEntry.getRegistryName(), creator);
+            var holder = BuiltInRegistries.REGISTRY.getOrThrow((ResourceKey) registryEntry.getRegistryType()).wrapAsHolder(value);
+            registryEntry.updateReference(value, holder);
             callbacks.forEach(callback -> callback.accept(value));
             callbacks.clear();
             registered = true;
