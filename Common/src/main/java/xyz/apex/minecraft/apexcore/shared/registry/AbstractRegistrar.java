@@ -163,14 +163,14 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
         return block(self(), blockName, Block::new);
     }
 
-    public final <T extends BlockEntity, P> BlockEntityBuilder<T, S, P> blockEntity(P parent, String blockName, BlockEntityBuilder.Factory<T> factory)
+    public final <T extends BlockEntity, P> BlockEntityBuilder<T, S, P> blockEntity(P parent, String blockEntityName, BlockEntityBuilder.Factory<T> factory)
     {
-        return new BlockEntityBuilder<>(self(), parent, blockName, factory);
+        return new BlockEntityBuilder<>(self(), parent, blockEntityName, factory);
     }
 
-    public final <T extends BlockEntity> BlockEntityBuilder<T, S, S> blockEntity(String blockName, BlockEntityBuilder.Factory<T> factory)
+    public final <T extends BlockEntity> BlockEntityBuilder<T, S, S> blockEntity(String blockEntityName, BlockEntityBuilder.Factory<T> factory)
     {
-        return blockEntity(self(), blockName, factory);
+        return blockEntity(self(), blockEntityName, factory);
     }
 
     public final <T extends AbstractContainerMenu, C extends Screen & MenuAccess<T>> MenuEntry<T> menu(String menuName, MenuBuilder.MenuFactory<T> menuFactory, Supplier<MenuBuilder.ScreenFactory<T, C>> screenFactorySupplier)
