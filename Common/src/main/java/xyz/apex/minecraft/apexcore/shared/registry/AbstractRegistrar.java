@@ -4,6 +4,7 @@ import com.google.common.collect.*;
 import dev.architectury.registry.CreativeTabRegistry;
 import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrarManager;
+import dev.architectury.registry.registries.RegistrySupplier;
 import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
@@ -17,6 +18,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -176,6 +178,16 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
         return new MenuBuilder<>(self(), self(), menuName, menuFactory, screenFactorySupplier).register();
     }
 
+    public final <T extends Entity, P> EntityBuilder<T, S, P> entity(P parent, String entityName, EntityBuilder.Factory<T> factory)
+    {
+        return new EntityBuilder<>(self(), parent, entityName, factory);
+    }
+
+    public final <T extends Entity> EntityBuilder<T, S, S> entity(String entityName, EntityBuilder.Factory<T> factory)
+    {
+        return entity(self(), entityName, factory);
+    }
+
     @ApiStatus.Internal
     public final <T, R extends T, P, B extends Builder<T, R, S, P, B>> RegistryEntry<R> accept(B builder, Supplier<R> entryFactory, Supplier<RegistryEntry<R>> registryEntryFactory)
     {
@@ -186,6 +198,20 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
         registerCallbacks.removeAll(Pair.of(registryType, registrationName)).forEach(callback -> registration.addCallback((Consumer<R>) callback));
         registrations.put(registryType, registrationName, registration);
         return registration.registryEntry;
+    }
+
+    @ApiStatus.Internal
+    public final <T, R extends T> RegistrySupplier<R> getDelegate(ResourceKey<? extends Registry<T>> registryType, String registrationName)
+    {
+        return Objects.requireNonNull(this.<T, R>getRegistrationOrThrow(registryType, registrationName).delegate);
+    }
+
+    @ApiStatus.Internal
+    public final <T, R extends T> Optional<RegistrySupplier<R>> getOptionalDelegate(ResourceKey<? extends Registry<T>> registryType, String registrationName)
+    {
+        var registration = this.<T, R>getRegistrationUnchecked(registryType, registrationName);
+        if(registration == null) return Optional.empty();
+        return Optional.ofNullable(registration.delegate);
     }
 
     public final <T, R extends T> RegistryEntry<R> get(ResourceKey<? extends Registry<T>> registryType, String registrationName)
@@ -346,6 +372,7 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
         private Supplier<R> creator;
         private final RegistryEntry<R> registryEntry;
         private final List<Consumer<R>> callbacks = Lists.newArrayList();
+        @Nullable private RegistrySupplier<R> delegate;
         private boolean registered = false;
 
         private Registration(RegistryEntry<R> registryEntry, Supplier<R> creator)
@@ -359,7 +386,7 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
             if(registered) return;
             var value = creator.get();
             creator = Lazy.of(value);
-            registry.register(registryEntry.getRegistryName(), creator);
+            delegate = registry.register(registryEntry.getRegistryName(), creator);
             var vanillaRegistry = BuiltInRegistries.REGISTRY.getOrThrow((ResourceKey) registryEntry.getRegistryType());
             registryEntry.updateReference(value, vanillaRegistry);
             callbacks.forEach(callback -> callback.accept(value));
