@@ -29,6 +29,6 @@ public final class TestBlock extends Block
     @Override
     public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos)
     {
-        return TestMod.TEST_MENU.asProvider(Component.literal("Test Menu"));
+        return TestMod.TEST_MENU.asProvider(Component.literal("Test Menu"), data -> data.writeBlockPos(pos).writeResourceKey(level.dimension()));
     }
 }

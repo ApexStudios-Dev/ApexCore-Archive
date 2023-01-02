@@ -43,7 +43,7 @@ public final class MenuBuilder<M extends AbstractContainerMenu, S extends Screen
     @Override
     protected MenuEntry<M> createRegistryEntry()
     {
-        return new MenuEntry<>(owner, registryKey);
+        return new MenuEntry<>(owner, registryKey, menuFactory);
     }
 
     @Override
