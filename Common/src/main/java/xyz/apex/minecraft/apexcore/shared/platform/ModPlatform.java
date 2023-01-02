@@ -2,6 +2,11 @@ package xyz.apex.minecraft.apexcore.shared.platform;
 
 import dev.architectury.platform.Mod;
 import dev.architectury.utils.Env;
+import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.resources.ResourceLocation;
+
+import xyz.apex.minecraft.apexcore.shared.registry.AbstractRegistrar;
 
 public interface ModPlatform extends GamePlatform
 {
@@ -44,4 +49,11 @@ public interface ModPlatform extends GamePlatform
     {
         return GamePlatform.INSTANCE.getModLoaderVersion();
     }
+
+    default ResourceLocation id(String path)
+    {
+        return new ResourceLocation(getModId(), path);
+    }
+
+    @Nullable AbstractRegistrar<?> getRegistrar();
 }

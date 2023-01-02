@@ -6,6 +6,10 @@ import xyz.apex.minecraft.apexcore.forge.platform.ForgeModPlatform;
 import xyz.apex.minecraft.apexcore.shared.ApexCore;
 
 @Mod(ApexCore.ID)
-public final class ApexCoreForge extends ForgeModPlatform
+public final class ApexCoreForge extends ForgeModPlatform implements ApexCore
 {
+    public ApexCoreForge()
+    {
+        super(null);
+    }
 }

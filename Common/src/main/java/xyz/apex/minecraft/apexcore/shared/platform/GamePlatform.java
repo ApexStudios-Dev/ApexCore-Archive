@@ -19,6 +19,7 @@ public interface GamePlatform
     default void initialize()
     {
         getLogger().info("Initializing | ModLoader: {} v{}...", getModLoader().getDisplayName(), getModLoaderVersion());
+        if(this instanceof ModPlatform) return;
         Tags.bootstrap();
     }
 

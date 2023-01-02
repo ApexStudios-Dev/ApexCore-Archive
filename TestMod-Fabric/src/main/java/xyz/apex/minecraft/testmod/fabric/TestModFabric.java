@@ -9,6 +9,6 @@ public final class TestModFabric extends FabricModPlatform implements TestMod
 
     private TestModFabric()
     {
-        super(ID);
+        super(ID, REGISTRAR);
     }
 }

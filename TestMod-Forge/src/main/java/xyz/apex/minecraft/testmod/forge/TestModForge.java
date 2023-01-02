@@ -6,6 +6,10 @@ import xyz.apex.minecraft.apexcore.forge.platform.ForgeModPlatform;
 import xyz.apex.minecraft.testmod.shared.TestMod;
 
 @Mod(TestMod.ID)
-public final class TestModForge extends ForgeModPlatform
+public final class TestModForge extends ForgeModPlatform implements TestMod
 {
+    public TestModForge()
+    {
+        super(REGISTRAR);
+    }
 }

@@ -9,6 +9,6 @@ public final class ApexCoreFabric extends FabricModPlatform implements ApexCore
 
     private ApexCoreFabric()
     {
-        super(ID);
+        super(ID, null);
     }
 }

@@ -2,6 +2,11 @@ package xyz.apex.minecraft.apexcore.shared.platform;
 
 import dev.architectury.platform.Mod;
 import dev.architectury.utils.Env;
+import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.resources.ResourceLocation;
+
+import xyz.apex.minecraft.apexcore.shared.registry.AbstractRegistrar;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -91,5 +96,18 @@ public abstract class AbstractModPlatform implements ModPlatform
     public final String getModLoaderVersion()
     {
         return ModPlatform.super.getModLoaderVersion();
+    }
+
+    @Override
+    public final ResourceLocation id(String path)
+    {
+        return ModPlatform.super.id(path);
+    }
+
+    @Nullable
+    @Override
+    public AbstractRegistrar<?> getRegistrar()
+    {
+        return null;
     }
 }
