@@ -5,6 +5,7 @@ import dev.architectury.registry.CreativeTabRegistry;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import org.apache.commons.compress.utils.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -17,13 +18,17 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
+import xyz.apex.minecraft.apexcore.shared.item.CustomHorseArmorItem;
+import xyz.apex.minecraft.apexcore.shared.multiblock.MultiBlock;
+import xyz.apex.minecraft.apexcore.shared.multiblock.MultiBlockFactory;
+import xyz.apex.minecraft.apexcore.shared.multiblock.MultiBlockType;
+import xyz.apex.minecraft.apexcore.shared.multiblock.SimpleMultiBlock;
 import xyz.apex.minecraft.apexcore.shared.platform.ModPlatform;
 import xyz.apex.minecraft.apexcore.shared.registry.builder.*;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.MenuEntry;
@@ -114,6 +119,7 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     // endregion
 
     // region: Item
+    // region: Generic
     public final <T extends Item, P> ItemBuilder<T, S, P> item(P parent, String itemName, ItemBuilder.Factory<T> factory)
     {
         return new ItemBuilder<>(self(), parent, itemName, factory);
@@ -135,7 +141,289 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     }
     // endregion
 
+    // region: Tiered
+    // region: Sword
+    public final <T extends SwordItem, P> ItemBuilder<T, S, P> swordItem(P parent, String itemName, Tier tier, int attackDamage, float attackSpeed, SwordItemFactory<T> factory)
+    {
+        return item(parent, itemName, factory.toItemFactory(tier, attackDamage, attackSpeed));
+    }
+
+    public final <P> ItemBuilder<SwordItem, S, P> swordItem(P parent, String itemName, Tier tier, int attackDamage, float attackSpeed)
+    {
+        return swordItem(parent, itemName, tier, attackDamage, attackSpeed, SwordItem::new);
+    }
+
+    public final <T extends SwordItem> ItemBuilder<T, S, S> swordItem(String itemName, Tier tier, int attackDamage, float attackSpeed, SwordItemFactory<T> factory)
+    {
+        return swordItem(self(), itemName, tier, attackDamage, attackSpeed, factory);
+    }
+
+    public final ItemBuilder<SwordItem, S, S> swordItem(String itemName, Tier tier, int attackDamage, float attackSpeed)
+    {
+        return swordItem(self(), itemName, tier, attackDamage, attackSpeed, SwordItem::new);
+    }
+    // endregion
+
+    // region: Digger
+    // region: Pickaxe
+    public final <T extends PickaxeItem, P> ItemBuilder<T, S, P> pickaxeItem(P parent, String itemName, Tier tier, int attackDamage, float attackSpeed, PickaxeItemFactory<T> factory)
+    {
+        return item(parent, itemName, factory.toItemFactory(tier, attackDamage, attackSpeed));
+    }
+
+    public final <P> ItemBuilder<PickaxeItem, S, P> pickaxeItem(P parent, String itemName, Tier tier, int attackDamage, float attackSpeed)
+    {
+        return pickaxeItem(parent, itemName, tier, attackDamage, attackSpeed, PickaxeItem::new);
+    }
+
+    public final <T extends PickaxeItem> ItemBuilder<T, S, S> pickaxeItem(String itemName, Tier tier, int attackDamage, float attackSpeed, PickaxeItemFactory<T> factory)
+    {
+        return pickaxeItem(self(), itemName, tier, attackDamage, attackSpeed, factory);
+    }
+
+    public final ItemBuilder<PickaxeItem, S, S> pickaxeItem(String itemName, Tier tier, int attackDamage, float attackSpeed)
+    {
+        return pickaxeItem(self(), itemName, tier, attackDamage, attackSpeed, PickaxeItem::new);
+    }
+    // endregion
+
+    // region: Axe
+    public final <T extends AxeItem, P> ItemBuilder<T, S, P> axeItem(P parent, String itemName, Tier tier, float attackDamage, float attackSpeed, AxeItemFactory<T> factory)
+    {
+        return item(parent, itemName, factory.toItemFactory(tier, attackDamage, attackSpeed));
+    }
+
+    public final <P> ItemBuilder<AxeItem, S, P> axeItem(P parent, String itemName, Tier tier, float attackDamage, float attackSpeed)
+    {
+        return axeItem(parent, itemName, tier, attackDamage, attackSpeed, AxeItem::new);
+    }
+
+    public final <T extends AxeItem> ItemBuilder<T, S, S> axeItem(String itemName, Tier tier, float attackDamage, float attackSpeed, AxeItemFactory<T> factory)
+    {
+        return axeItem(self(), itemName, tier, attackDamage, attackSpeed, factory);
+    }
+
+    public final ItemBuilder<AxeItem, S, S> axeItem(String itemName, Tier tier, float attackDamage, float attackSpeed)
+    {
+        return axeItem(self(), itemName, tier, attackDamage, attackSpeed, AxeItem::new);
+    }
+    // endregion
+
+    // region: Shovel
+    public final <T extends ShovelItem, P> ItemBuilder<T, S, P> shovelItem(P parent, String itemName, Tier tier, int attackDamage, float attackSpeed, ShovelItemFactory<T> factory)
+    {
+        return item(parent, itemName, factory.toItemFactory(tier, attackDamage, attackSpeed));
+    }
+
+    public final <P> ItemBuilder<ShovelItem, S, P> shovelItem(P parent, String itemName, Tier tier, int attackDamage, float attackSpeed)
+    {
+        return shovelItem(parent, itemName, tier, attackDamage, attackSpeed, ShovelItem::new);
+    }
+
+    public final <T extends ShovelItem> ItemBuilder<T, S, S> shovelItem(String itemName, Tier tier, int attackDamage, float attackSpeed, ShovelItemFactory<T> factory)
+    {
+        return shovelItem(self(), itemName, tier, attackDamage, attackSpeed, factory);
+    }
+
+    public final ItemBuilder<ShovelItem, S, S> shovelItem(String itemName, Tier tier, int attackDamage, float attackSpeed)
+    {
+        return shovelItem(self(), itemName, tier, attackDamage, attackSpeed, ShovelItem::new);
+    }
+    // endregion
+
+    // region: Hoe
+    public final <T extends HoeItem, P> ItemBuilder<T, S, P> hoeItem(P parent, String itemName, Tier tier, int attackDamage, float attackSpeed, HoeItemFactory<T> factory)
+    {
+        return item(parent, itemName, factory.toItemFactory(tier, attackDamage, attackSpeed));
+    }
+
+    public final <P> ItemBuilder<HoeItem, S, P> hoeItem(P parent, String itemName, Tier tier, int attackDamage, float attackSpeed)
+    {
+        return hoeItem(parent, itemName, tier, attackDamage, attackSpeed, HoeItem::new);
+    }
+
+    public final <T extends HoeItem> ItemBuilder<T, S, S> hoeItem(String itemName, Tier tier, int attackDamage, float attackSpeed, HoeItemFactory<T> factory)
+    {
+        return hoeItem(self(), itemName, tier, attackDamage, attackSpeed, factory);
+    }
+
+    public final ItemBuilder<HoeItem, S, S> hoeItem(String itemName, Tier tier, int attackDamage, float attackSpeed)
+    {
+        return hoeItem(self(), itemName, tier, attackDamage, attackSpeed, HoeItem::new);
+    }
+    // endregion
+    // endregion
+    // endregion
+
+    // region: Armor
+    private <T extends ArmorItem, P> ItemBuilder<T, S, P> armorItem(P parent, String itemName, ArmorMaterial armorMaterial, EquipmentSlot equipmentSlot, ArmorItemFactory<T> factory)
+    {
+        return item(parent, itemName, factory.toItemFactory(armorMaterial, equipmentSlot));
+    }
+
+    // region: Helmet
+    public final <T extends ArmorItem, P> ItemBuilder<T, S, P> helmetItem(P parent, String itemName, ArmorMaterial armorMaterial, ArmorItemFactory<T> factory)
+    {
+        return armorItem(parent, itemName, armorMaterial, EquipmentSlot.HEAD, factory);
+    }
+
+    public final <P> ItemBuilder<ArmorItem, S, P> helmetItem(P parent, String itemName, ArmorMaterial armorMaterial)
+    {
+        return helmetItem(parent, itemName, armorMaterial, ArmorItem::new);
+    }
+
+    public final <T extends ArmorItem> ItemBuilder<T, S, S> helmetItem(String itemName, ArmorMaterial armorMaterial, ArmorItemFactory<T> factory)
+    {
+        return helmetItem(self(), itemName, armorMaterial, factory);
+    }
+
+    public final ItemBuilder<ArmorItem, S, S> helmetItem(String itemName, ArmorMaterial armorMaterial)
+    {
+        return helmetItem(self(), itemName, armorMaterial, ArmorItem::new);
+    }
+    // endregion
+
+    // region: Chestplate
+    public final <T extends ArmorItem, P> ItemBuilder<T, S, P> chestplateItem(P parent, String itemName, ArmorMaterial armorMaterial, ArmorItemFactory<T> factory)
+    {
+        return armorItem(parent, itemName, armorMaterial, EquipmentSlot.CHEST, factory);
+    }
+
+    public final <P> ItemBuilder<ArmorItem, S, P> chestplateItem(P parent, String itemName, ArmorMaterial armorMaterial)
+    {
+        return chestplateItem(parent, itemName, armorMaterial, ArmorItem::new);
+    }
+
+    public final <T extends ArmorItem> ItemBuilder<T, S, S> chestplateItem(String itemName, ArmorMaterial armorMaterial, ArmorItemFactory<T> factory)
+    {
+        return chestplateItem(self(), itemName, armorMaterial, factory);
+    }
+
+    public final ItemBuilder<ArmorItem, S, S> chestplateItem(String itemName, ArmorMaterial armorMaterial)
+    {
+        return chestplateItem(self(), itemName, armorMaterial, ArmorItem::new);
+    }
+    // endregion
+
+    // region: Leggings
+    public final <T extends ArmorItem, P> ItemBuilder<T, S, P> leggingsItem(P parent, String itemName, ArmorMaterial armorMaterial, ArmorItemFactory<T> factory)
+    {
+        return armorItem(parent, itemName, armorMaterial, EquipmentSlot.LEGS, factory);
+    }
+
+    public final <P> ItemBuilder<ArmorItem, S, P> leggingsItem(P parent, String itemName, ArmorMaterial armorMaterial)
+    {
+        return leggingsItem(parent, itemName, armorMaterial, ArmorItem::new);
+    }
+
+    public final <T extends ArmorItem> ItemBuilder<T, S, S> leggingsItem(String itemName, ArmorMaterial armorMaterial, ArmorItemFactory<T> factory)
+    {
+        return leggingsItem(self(), itemName, armorMaterial, factory);
+    }
+
+    public final ItemBuilder<ArmorItem, S, S> leggingsItem(String itemName, ArmorMaterial armorMaterial)
+    {
+        return leggingsItem(self(), itemName, armorMaterial, ArmorItem::new);
+    }
+    // endregion
+
+    // region: Boots
+    public final <T extends ArmorItem, P> ItemBuilder<T, S, P> bootsItem(P parent, String itemName, ArmorMaterial armorMaterial, ArmorItemFactory<T> factory)
+    {
+        return armorItem(parent, itemName, armorMaterial, EquipmentSlot.FEET, factory);
+    }
+
+    public final <P> ItemBuilder<ArmorItem, S, P> bootsItem(P parent, String itemName, ArmorMaterial armorMaterial)
+    {
+        return bootsItem(parent, itemName, armorMaterial, ArmorItem::new);
+    }
+
+    public final <T extends ArmorItem> ItemBuilder<T, S, S> bootsItem(String itemName, ArmorMaterial armorMaterial, ArmorItemFactory<T> factory)
+    {
+        return bootsItem(self(), itemName, armorMaterial, factory);
+    }
+
+    public final ItemBuilder<ArmorItem, S, S> bootsItem(String itemName, ArmorMaterial armorMaterial)
+    {
+        return bootsItem(self(), itemName, armorMaterial, ArmorItem::new);
+    }
+    // endregion
+    // endregion
+
+    // region: HorseArmor
+    // region: TexturePath
+    public final <T extends CustomHorseArmorItem, P> ItemBuilder<T, S, P> horseArmorItem(P parent, String itemName, int protection, ResourceLocation texturePath, HorseArmorItemFactory<T> factory)
+    {
+        return item(parent, itemName, factory.toItemFactory(protection, texturePath));
+    }
+
+    public final <P> ItemBuilder<CustomHorseArmorItem, S, P> horseArmorItem(P parent, String itemName, int protection, ResourceLocation texturePath)
+    {
+        return horseArmorItem(parent, itemName, protection, texturePath, CustomHorseArmorItem::new);
+    }
+
+    public final <T extends CustomHorseArmorItem> ItemBuilder<T, S, S> horseArmorItem(String itemName, int protection, ResourceLocation texturePath, HorseArmorItemFactory<T> factory)
+    {
+        return horseArmorItem(self(), itemName, protection, texturePath, factory);
+    }
+
+    public final ItemBuilder<CustomHorseArmorItem, S, S> horseArmorItem(String itemName, int protection, ResourceLocation texturePath)
+    {
+        return horseArmorItem(self(), itemName, protection, texturePath, CustomHorseArmorItem::new);
+    }
+    // endregion
+
+    // region: TextureName
+    public final <T extends CustomHorseArmorItem, P> ItemBuilder<T, S, P> horseArmorItem(P parent, String itemName, int protection, String textureName, HorseArmorItemFactory<T> factory)
+    {
+        return horseArmorItem(parent, itemName, protection, CustomHorseArmorItem.constructTexturePath(modId, textureName), factory);
+    }
+
+    public final <P> ItemBuilder<CustomHorseArmorItem, S, P> horseArmorItem(P parent, String itemName, int protection, String textureName)
+    {
+        return horseArmorItem(parent, itemName, protection, textureName, CustomHorseArmorItem::new);
+    }
+
+    public final <T extends CustomHorseArmorItem> ItemBuilder<T, S, S> horseArmorItem(String itemName, int protection, String textureName, HorseArmorItemFactory<T> factory)
+    {
+        return horseArmorItem(self(), itemName, protection, textureName, factory);
+    }
+
+    public final ItemBuilder<CustomHorseArmorItem, S, S> horseArmorItem(String itemName, int protection, String textureName)
+    {
+        return horseArmorItem(self(), itemName, protection, textureName, CustomHorseArmorItem::new);
+    }
+    // endregion
+
+    // region: Generic
+    public final <T extends CustomHorseArmorItem, P> ItemBuilder<T, S, P> horseArmorItem(P parent, String itemName, int protection, HorseArmorItemFactory<T> factory)
+    {
+        var textureName = StringUtils.removeEnd(itemName, "_horse_armor");
+        textureName = StringUtils.isBlank(textureName) ? itemName : textureName;
+
+        return horseArmorItem(parent, itemName, protection, textureName, factory);
+    }
+
+    public final <P> ItemBuilder<CustomHorseArmorItem, S, P> horseArmorItem(P parent, String itemName, int protection)
+    {
+        return horseArmorItem(parent, itemName, protection, CustomHorseArmorItem::new);
+    }
+
+    public final <T extends CustomHorseArmorItem> ItemBuilder<T, S, S> horseArmorItem(String itemName, int protection, HorseArmorItemFactory<T> factory)
+    {
+        return horseArmorItem(self(), itemName, protection, factory);
+    }
+
+    public final ItemBuilder<CustomHorseArmorItem, S, S> horseArmorItem(String itemName, int protection)
+    {
+        return horseArmorItem(self(), itemName, protection, CustomHorseArmorItem::new);
+    }
+    // endregion
+    // endregion
+    // endregion
+
     // region: Block
+    // region: Generic
     public final <T extends Block, P> BlockBuilder<T, S, P> block(P parent, String blockName, BlockBuilder.Factory<T> factory)
     {
         return new BlockBuilder<>(self(), parent, blockName, factory);
@@ -155,6 +443,29 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     {
         return block(self(), blockName, Block::new);
     }
+    // endregion
+
+    // region: MultiBlock
+    public final <T extends Block & MultiBlock, P> BlockBuilder<T, S, P> multiBlock(P parent, String blockName, MultiBlockType multiBlockType, MultiBlockFactory<T> factory)
+    {
+        return block(parent, blockName, factory.toBlockFactory(multiBlockType));
+    }
+
+    public final <P> BlockBuilder<SimpleMultiBlock, S, P> multiBlock(P parent, String blockName, MultiBlockType multiBlockType)
+    {
+        return multiBlock(parent, blockName, multiBlockType, SimpleMultiBlock::new);
+    }
+
+    public final <T extends Block & MultiBlock> BlockBuilder<T, S, S> multiBlock(String blockName, MultiBlockType multiBlockType, MultiBlockFactory<T> factory)
+    {
+        return multiBlock(self(), blockName, multiBlockType, factory);
+    }
+
+    public final BlockBuilder<SimpleMultiBlock, S, S> multiBlock(String blockName, MultiBlockType multiBlockType)
+    {
+        return multiBlock(self(), blockName, multiBlockType, SimpleMultiBlock::new);
+    }
+    // endregion
     // endregion
 
     // region: BlockEntity
@@ -374,4 +685,83 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
             else callbacks.add(consumer);
         }
     }
+
+    // region: Factories
+    @FunctionalInterface
+    interface SwordItemFactory<T extends SwordItem>
+    {
+        T create(Tier tier, int attackDamage, float attackSpeed, Item.Properties properties);
+
+        default ItemBuilder.Factory<T> toItemFactory(Tier tier, int attackDamage, float attackSpeed)
+        {
+            return properties -> create(tier, attackDamage, attackSpeed, properties);
+        }
+    }
+
+    @FunctionalInterface
+    interface PickaxeItemFactory<T extends PickaxeItem>
+    {
+        T create(Tier tier, int attackDamage, float attackSpeed, Item.Properties properties);
+
+        default ItemBuilder.Factory<T> toItemFactory(Tier tier, int attackDamage, float attackSpeed)
+        {
+            return properties -> create(tier, attackDamage, attackSpeed, properties);
+        }
+    }
+
+    @FunctionalInterface
+    interface AxeItemFactory<T extends AxeItem>
+    {
+        T create(Tier tier, float attackDamage, float attackSpeed, Item.Properties properties);
+
+        default ItemBuilder.Factory<T> toItemFactory(Tier tier, float attackDamage, float attackSpeed)
+        {
+            return properties -> create(tier, attackDamage, attackSpeed, properties);
+        }
+    }
+
+    @FunctionalInterface
+    interface ShovelItemFactory<T extends ShovelItem>
+    {
+        T create(Tier tier, float attackDamage, float attackSpeed, Item.Properties properties);
+
+        default ItemBuilder.Factory<T> toItemFactory(Tier tier, float attackDamage, float attackSpeed)
+        {
+            return properties -> create(tier, attackDamage, attackSpeed, properties);
+        }
+    }
+
+    @FunctionalInterface
+    interface HoeItemFactory<T extends HoeItem>
+    {
+        T create(Tier tier, int attackDamage, float attackSpeed, Item.Properties properties);
+
+        default ItemBuilder.Factory<T> toItemFactory(Tier tier, int attackDamage, float attackSpeed)
+        {
+            return properties -> create(tier, attackDamage, attackSpeed, properties);
+        }
+    }
+
+    @FunctionalInterface
+    interface ArmorItemFactory<T extends ArmorItem>
+    {
+        T create(ArmorMaterial armorMaterial, EquipmentSlot equipmentSlot, Item.Properties properties);
+
+        default ItemBuilder.Factory<T> toItemFactory(ArmorMaterial armorMaterial, EquipmentSlot equipmentSlot)
+        {
+            return properties -> create(armorMaterial, equipmentSlot, properties);
+        }
+    }
+
+    @FunctionalInterface
+    interface HorseArmorItemFactory<T extends CustomHorseArmorItem>
+    {
+        T create(int protection, ResourceLocation texturePath, Item.Properties properties);
+
+        default ItemBuilder.Factory<T> toItemFactory(int protection, ResourceLocation texturePath)
+        {
+            return properties -> create(protection, texturePath, properties);
+        }
+    }
+    // endregion
 }
