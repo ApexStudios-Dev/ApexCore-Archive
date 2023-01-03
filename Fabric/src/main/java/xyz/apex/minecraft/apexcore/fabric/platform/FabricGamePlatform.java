@@ -21,6 +21,7 @@ public final class FabricGamePlatform implements GamePlatform
     private boolean initialized = false;
     private final Set<Env> initializedSides = EnumSet.noneOf(Env.class);
     private boolean initializedDataGen = false;
+    private final FabricStorages storages = new FabricStorages();
 
     public FabricGamePlatform()
     {

@@ -21,6 +21,7 @@ public final class ForgeGamePlatform implements GamePlatform
     private boolean initialized = false;
     private final Set<Env> initializedSides = EnumSet.noneOf(Env.class);
     private boolean initializedDataGen = false;
+    private ForgeStorages storages = new ForgeStorages();
 
     public ForgeGamePlatform()
     {
