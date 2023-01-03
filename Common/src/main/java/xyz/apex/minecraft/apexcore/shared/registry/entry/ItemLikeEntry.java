@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.shared.registry.entry;
 
+import dev.architectury.registry.registries.RegistrySupplier;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.Registry;
@@ -15,9 +16,9 @@ import xyz.apex.minecraft.apexcore.shared.registry.AbstractRegistrar;
 @SuppressWarnings("deprecation")
 public class ItemLikeEntry<T extends ItemLike> extends RegistryEntry<T> implements ItemLike
 {
-    public ItemLikeEntry(AbstractRegistrar<?> owner, ResourceKey<? extends Registry<? super T>> registryType, ResourceKey<? super T> registryKey)
+    public ItemLikeEntry(AbstractRegistrar<?> owner, RegistrySupplier<T> delegate, ResourceKey<? extends Registry<? super T>> registryType, ResourceKey<? super T> registryKey)
     {
-        super(owner, registryType, registryKey);
+        super(owner, delegate, registryType, registryKey);
     }
 
     @Override

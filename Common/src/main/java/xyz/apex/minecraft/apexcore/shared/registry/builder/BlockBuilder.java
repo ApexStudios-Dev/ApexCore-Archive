@@ -3,6 +3,7 @@ package xyz.apex.minecraft.apexcore.shared.registry.builder;
 import dev.architectury.registry.client.rendering.ColorHandlerRegistry;
 import dev.architectury.registry.client.rendering.RenderTypeRegistry;
 import dev.architectury.registry.fuel.FuelRegistry;
+import dev.architectury.registry.registries.RegistrySupplier;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import org.jetbrains.annotations.Nullable;
@@ -355,16 +356,16 @@ public final class BlockBuilder<R extends Block, O extends AbstractRegistrar<O>,
     }
 
     @Override
-    protected BlockEntry<R> createRegistryEntry()
+    protected BlockEntry<R> createRegistryEntry(RegistrySupplier<R> delegate)
     {
-        return new BlockEntry<>(owner, registryKey);
+        return new BlockEntry<>(owner, delegate, registryKey);
     }
 
     @Override
     public BlockEntry<R> register()
     {
-        var result = (BlockEntry<R>) super.register();
         if(itemBuilder != null) itemBuilder.register();
+        var result = (BlockEntry<R>) super.register();
         if(blockEntityBuilder != null) blockEntityBuilder.register();
         return result;
     }

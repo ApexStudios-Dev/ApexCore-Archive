@@ -1,5 +1,7 @@
 package xyz.apex.minecraft.apexcore.shared.registry.entry;
 
+import dev.architectury.registry.registries.RegistrySupplier;
+
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -11,9 +13,9 @@ import xyz.apex.minecraft.apexcore.shared.registry.AbstractRegistrar;
 @SuppressWarnings("unchecked")
 public final class ItemEntry<T extends Item> extends ItemLikeEntry<T>
 {
-    public ItemEntry(AbstractRegistrar<?> owner, ResourceKey<? super T> registryKey)
+    public ItemEntry(AbstractRegistrar<?> owner, RegistrySupplier<T> delegate, ResourceKey<? super T> registryKey)
     {
-        super(owner, Registries.ITEM, registryKey);
+        super(owner, delegate, Registries.ITEM, registryKey);
     }
 
     public <B extends Block> BlockEntry<B> asBlockEntry()

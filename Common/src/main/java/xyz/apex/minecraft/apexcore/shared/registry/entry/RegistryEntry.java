@@ -1,10 +1,9 @@
 package xyz.apex.minecraft.apexcore.shared.registry.entry;
 
-import dev.architectury.extensions.injected.InjectedRegistryEntryExtension;
+import dev.architectury.registry.registries.RegistrySupplier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -21,20 +20,20 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-@SuppressWarnings({ "unchecked", "PatternVariableHidesField", "rawtypes" })
+@SuppressWarnings("unchecked")
 public class RegistryEntry<T> implements LazyLike<T>, Comparable<RegistryEntry<?>>
 {
     protected final AbstractRegistrar<?> owner;
     protected final ResourceKey<? extends Registry<? super T>> registryType;
     protected final ResourceKey<? super T> registryKey;
-    @Nullable private T value;
-    @Nullable private Holder<? super T> holder;
+    private final RegistrySupplier<T> delegate;
 
-    public RegistryEntry(AbstractRegistrar<?> owner, ResourceKey<? extends Registry<? super T>> registryType, ResourceKey<? super T> registryKey)
+    public RegistryEntry(AbstractRegistrar<?> owner, RegistrySupplier<T> delegate, ResourceKey<? extends Registry<? super T>> registryType, ResourceKey<? super T> registryKey)
     {
         this.owner = owner;
         this.registryType = registryType;
         this.registryKey = registryKey;
+        this.delegate = delegate;
     }
 
     public final AbstractRegistrar<?> getOwner()
@@ -80,36 +79,21 @@ public class RegistryEntry<T> implements LazyLike<T>, Comparable<RegistryEntry<?
         return getRegistryName().getNamespace();
     }
 
-    public final Holder<? super T> getHolder()
-    {
-        if(value instanceof InjectedRegistryEntryExtension<?> holder) return (Holder.Reference<? super T>) holder.arch$holder();
-        return Objects.requireNonNull(holder);
-    }
-
     @Override
     public final T get()
     {
-        return Objects.requireNonNull(value);
+        return delegate.get();
     }
 
     @Nullable
     public final T getUnchecked()
     {
-        return value;
+        return delegate.getOrNull();
     }
 
     public final boolean isPresent()
     {
-        return value != null;
-    }
-
-    @ApiStatus.Internal
-    public final void updateReference(T value, Registry<? super T> registry)
-    {
-        this.value = value;
-
-        if(value instanceof InjectedRegistryEntryExtension<?>) holder = ((InjectedRegistryEntryExtension) value).arch$holder();
-        else holder = (Holder<? super T>) registry.getHolder((ResourceKey) registryKey).orElseGet(() -> registry.wrapAsHolder(value));
+        return delegate.isPresent();
     }
 
     public final void ifPresent(Consumer<? super T> action)
@@ -222,7 +206,7 @@ public class RegistryEntry<T> implements LazyLike<T>, Comparable<RegistryEntry<?
         if(obj instanceof RegistryEntry<?> entry)
         {
             if(!is(entry)) return false;
-            return value == entry.value;
+            return isPresent() && entry.isPresent() && get() == entry.get();
         }
 
         return false;

@@ -2,12 +2,10 @@ package xyz.apex.minecraft.apexcore.shared.registry;
 
 import com.google.common.collect.*;
 import dev.architectury.registry.CreativeTabRegistry;
-import dev.architectury.registry.registries.Registrar;
-import dev.architectury.registry.registries.RegistrarManager;
+import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,12 +24,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
 import xyz.apex.minecraft.apexcore.shared.platform.ModPlatform;
 import xyz.apex.minecraft.apexcore.shared.registry.builder.*;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.MenuEntry;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.RegistryEntry;
-import xyz.apex.minecraft.apexcore.shared.util.function.Lazy;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -40,23 +36,20 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-@SuppressWarnings({ "UnusedReturnValue", "unchecked", "SuspiciousMethodCalls", "UnstableApiUsage" })
+@SuppressWarnings({ "UnusedReturnValue", "unchecked", "SuspiciousMethodCalls", "UnstableApiUsage", "rawtypes" })
 public class AbstractRegistrar<S extends AbstractRegistrar<S>>
 {
     private final Table<ResourceKey<? extends Registry<?>>, String, Registration<?, ?>> registrations = HashBasedTable.create();
     private final Multimap<Pair<ResourceKey<? extends Registry<?>>, String>, Consumer<?>> registerCallbacks = HashMultimap.create();
     private final Multimap<ResourceKey<? extends Registry<?>>, Runnable> afterRegisterCallbacks = HashMultimap.create();
     private final Set<ResourceKey<? extends Registry<?>>> completedRegistrations = Sets.newHashSet();
-    private final Supplier<RegistrarManager> registrarManager;
+    private final Map<ResourceKey<? extends Registry<?>>, DeferredRegister<?>> deferredRegisters = Maps.newHashMap();
     private final String modId;
     @Nullable private ModPlatform mod;
-    private boolean skipErrors = false;
 
     protected AbstractRegistrar(String modId)
     {
         this.modId = modId;
-
-        registrarManager = Lazy.of(() -> RegistrarManager.get(modId));
     }
 
     public final ModPlatform getMod()
@@ -77,18 +70,6 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     protected final S self()
     {
         return (S) this;
-    }
-
-    public final S skipErrors(boolean skipErrors)
-    {
-        if(skipErrors && !GamePlatform.INSTANCE.isDevelopmentEnvironment()) getLogger().error("Ignoring skipErrors(true) as this is not a development environment!");
-        else this.skipErrors = skipErrors;
-        return self();
-    }
-
-    public final S skipErrors()
-    {
-        return skipErrors(true);
     }
 
     public final S transform(UnaryOperator<S> transformer)
@@ -189,12 +170,12 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     }
 
     @ApiStatus.Internal
-    public final <T, R extends T, P, B extends Builder<T, R, S, P, B>> RegistryEntry<R> accept(B builder, Supplier<R> entryFactory, Supplier<RegistryEntry<R>> registryEntryFactory)
+    public final <T, R extends T, P, B extends Builder<T, R, S, P, B>> RegistryEntry<R> accept(B builder, Supplier<R> entryFactory, Function<RegistrySupplier<R>, RegistryEntry<R>> registryEntryFactory)
     {
         var registrationName = builder.getRegistrationName();
         var registryType = builder.getRegistryType();
-        var registration = new Registration<T, R>(registryEntryFactory.get(), entryFactory);
-        getLogger().debug("Captured registration for entry {} of type {}", registrationName, registryType);
+        var register = getRegister(registryType);
+        var registration = new Registration<>(register, builder.getRegistryName(), registryEntryFactory, entryFactory);
         registerCallbacks.removeAll(Pair.of(registryType, registrationName)).forEach(callback -> registration.addCallback((Consumer<R>) callback));
         registrations.put(registryType, registrationName, registration);
         return registration.registryEntry;
@@ -211,7 +192,7 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     {
         var registration = this.<T, R>getRegistrationUnchecked(registryType, registrationName);
         if(registration == null) return Optional.empty();
-        return Optional.ofNullable(registration.delegate);
+        return Optional.of(registration.delegate);
     }
 
     public final <T, R extends T> RegistryEntry<R> get(ResourceKey<? extends Registry<T>> registryType, String registrationName)
@@ -273,42 +254,8 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     public final <T> void register(ResourceKey<? extends Registry<T>> registryType)
     {
         if(completedRegistrations.contains(registryType)) return;
-
-        var logger = getLogger();
-
-        if(!registerCallbacks.isEmpty())
-        {
-            registerCallbacks.asMap().forEach((pair, callbacks) -> logger.warn("Found {} unused register callback(s) for entry {} [{}]. Was the entry ever registered?", callbacks.size(), pair.getLeft(), pair.getRight().length()));
-            registerCallbacks.clear();
-            if(GamePlatform.INSTANCE.isDevelopmentEnvironment()) throw new IllegalStateException("Found unused register callbacks, see logs");
-        }
-
-        var registrationsForType = registrations.row(registryType);
-
-        if(!registrationsForType.isEmpty())
-        {
-            var registry = (Registrar<T>) registrarManager.get().get((ResourceKey<Registry<T>>) registryType);
-            logger.debug("Registering {} known objects of type {}", registrationsForType.size(), registryType.location());
-
-            for(var entry : registrationsForType.entrySet())
-            {
-                var registryEntry = entry.getValue();
-                var registryName = registryEntry.registryEntry.getRegistryName();
-
-                try
-                {
-                    ((Registration<T, ?>) registryEntry).register(registry);
-                    logger.debug("Registered {} to registry {}", registryName, registryType);
-                }
-                catch(Exception e)
-                {
-                    var err = logger.getMessageFactory().newMessage("Unexpected error while registering entry {} to registry {}", registryName, registryType);
-
-                    if(skipErrors) logger.debug(err);
-                    else throw new RuntimeException(e);
-                }
-            }
-        }
+        registrations.row(registryType).forEach((key, value) -> value.register());
+        getRegister(registryType).register();
     }
 
     @ApiStatus.Internal
@@ -339,9 +286,9 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
         this.mod = mod;
     }
 
-    private Logger getLogger()
+    private <T> DeferredRegister<T> getRegister(ResourceKey<? extends Registry<T>> registryType)
     {
-        return mod == null ? GamePlatform.INSTANCE.getLogger() : mod.getLogger();
+        return (DeferredRegister<T>) deferredRegisters.computeIfAbsent(registryType, type -> DeferredRegister.create(modId, (ResourceKey) type));
     }
 
     // mostly used for fabric, to call the #register & #lateRegister methods
@@ -366,37 +313,32 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
         });
     }
 
-    @SuppressWarnings("rawtypes")
     private static final class Registration<T, R extends T>
     {
-        private Supplier<R> creator;
+        private final RegistrySupplier<R> delegate;
         private final RegistryEntry<R> registryEntry;
         private final List<Consumer<R>> callbacks = Lists.newArrayList();
-        @Nullable private RegistrySupplier<R> delegate;
         private boolean registered = false;
 
-        private Registration(RegistryEntry<R> registryEntry, Supplier<R> creator)
+        private Registration(DeferredRegister<T> register, ResourceLocation registryName, Function<RegistrySupplier<R>, RegistryEntry<R>> registryEntryFactory, Supplier<R> entryFactory)
         {
-            this.registryEntry = registryEntry;
-            this.creator = Lazy.of(creator);
+            delegate = register.register(registryName, entryFactory);
+            registryEntry = registryEntryFactory.apply(delegate);
         }
 
-        private void register(Registrar<T> registry)
+        private void register()
         {
-            if(registered) return;
-            var value = creator.get();
-            creator = Lazy.of(value);
-            delegate = registry.register(registryEntry.getRegistryName(), creator);
-            var vanillaRegistry = BuiltInRegistries.REGISTRY.getOrThrow((ResourceKey) registryEntry.getRegistryType());
-            registryEntry.updateReference(value, vanillaRegistry);
-            callbacks.forEach(callback -> callback.accept(value));
-            callbacks.clear();
-            registered = true;
+            delegate.listen(value -> {
+                if(registered) return;
+                callbacks.forEach(callback -> callback.accept(value));
+                callbacks.clear();
+                registered = true;
+            });
         }
 
         private void addCallback(Consumer<R> consumer)
         {
-            if(registered) consumer.accept(creator.get());
+            if(registered) consumer.accept(registryEntry.get());
             else callbacks.add(consumer);
         }
     }

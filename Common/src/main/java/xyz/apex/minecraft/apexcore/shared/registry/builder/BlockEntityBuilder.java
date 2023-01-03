@@ -2,6 +2,7 @@ package xyz.apex.minecraft.apexcore.shared.registry.builder;
 
 import com.google.common.collect.Sets;
 import dev.architectury.registry.client.rendering.BlockEntityRendererRegistry;
+import dev.architectury.registry.registries.RegistrySupplier;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import org.jetbrains.annotations.Nullable;
@@ -99,9 +100,9 @@ public final class BlockEntityBuilder<R extends BlockEntity, O extends AbstractR
     }
 
     @Override
-    protected BlockEntityEntry<R> createRegistryEntry()
+    protected BlockEntityEntry<R> createRegistryEntry(RegistrySupplier<BlockEntityType<R>> delegate)
     {
-        return new BlockEntityEntry<>(owner, registryKey);
+        return new BlockEntityEntry<>(owner, delegate, registryKey);
     }
 
     @Override

@@ -3,6 +3,7 @@ package xyz.apex.minecraft.apexcore.shared.registry.builder;
 import dev.architectury.core.item.ArchitecturySpawnEggItem;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import dev.architectury.registry.level.entity.EntityAttributeRegistry;
+import dev.architectury.registry.registries.RegistrySupplier;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import org.jetbrains.annotations.Nullable;
@@ -144,9 +145,9 @@ public final class EntityBuilder<R extends Entity, O extends AbstractRegistrar<O
     }
 
     @Override
-    protected EntityEntry<R> createRegistryEntry()
+    protected EntityEntry<R> createRegistryEntry(RegistrySupplier<EntityType<R>> delegate)
     {
-        return new EntityEntry<>(owner, registryKey);
+        return new EntityEntry<>(owner, delegate, registryKey);
     }
 
     @Override

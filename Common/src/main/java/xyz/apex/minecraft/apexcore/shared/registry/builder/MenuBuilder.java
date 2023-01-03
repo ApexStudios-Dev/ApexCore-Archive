@@ -1,6 +1,7 @@
 package xyz.apex.minecraft.apexcore.shared.registry.builder;
 
 import dev.architectury.registry.menu.MenuRegistry;
+import dev.architectury.registry.registries.RegistrySupplier;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 
@@ -41,9 +42,9 @@ public final class MenuBuilder<M extends AbstractContainerMenu, S extends Screen
     }
 
     @Override
-    protected MenuEntry<M> createRegistryEntry()
+    protected MenuEntry<M> createRegistryEntry(RegistrySupplier<MenuType<M>> delegate)
     {
-        return new MenuEntry<>(owner, registryKey, menuFactory);
+        return new MenuEntry<>(owner, delegate, registryKey, menuFactory);
     }
 
     @Override

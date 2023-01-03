@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.shared.registry.entry;
 
+import dev.architectury.registry.registries.RegistrySupplier;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -21,9 +22,9 @@ import java.util.function.Consumer;
 @SuppressWarnings("unchecked")
 public final class EntityEntry<T extends Entity> extends RegistryEntry<EntityType<T>>
 {
-    public EntityEntry(AbstractRegistrar<?> owner, ResourceKey<? super EntityType<T>> registryKey)
+    public EntityEntry(AbstractRegistrar<?> owner, RegistrySupplier<EntityType<T>> delegate, ResourceKey<? super EntityType<T>> registryKey)
     {
-        super(owner, Registries.ENTITY_TYPE, registryKey);
+        super(owner, delegate, Registries.ENTITY_TYPE, registryKey);
     }
 
     public <I extends Item> ItemEntry<I> asItemEntry()

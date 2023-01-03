@@ -1,6 +1,7 @@
 package xyz.apex.minecraft.apexcore.shared.registry.entry;
 
 import dev.architectury.registry.menu.MenuRegistry;
+import dev.architectury.registry.registries.RegistrySupplier;
 import io.netty.buffer.Unpooled;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,9 +25,9 @@ public final class MenuEntry<M extends AbstractContainerMenu> extends RegistryEn
 {
     private final MenuBuilder.MenuFactory<M> menuFactory;
 
-    public MenuEntry(AbstractRegistrar<?> owner, ResourceKey<? super MenuType<M>> registryKey, MenuBuilder.MenuFactory<M> menuFactory)
+    public MenuEntry(AbstractRegistrar<?> owner, RegistrySupplier<MenuType<M>> delegate, ResourceKey<? super MenuType<M>> registryKey, MenuBuilder.MenuFactory<M> menuFactory)
     {
-        super(owner, Registries.MENU, registryKey);
+        super(owner, delegate, Registries.MENU, registryKey);
 
         this.menuFactory = menuFactory;
     }

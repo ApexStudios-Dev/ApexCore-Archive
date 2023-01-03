@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.shared.registry.entry;
 
+import dev.architectury.registry.registries.RegistrySupplier;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -21,9 +22,9 @@ import java.util.Optional;
 @SuppressWarnings("unchecked")
 public final class BlockEntityEntry<T extends BlockEntity> extends RegistryEntry<BlockEntityType<T>>
 {
-    public BlockEntityEntry(AbstractRegistrar<?> owner, ResourceKey<? super BlockEntityType<T>> registryKey)
+    public BlockEntityEntry(AbstractRegistrar<?> owner, RegistrySupplier<BlockEntityType<T>> delegate, ResourceKey<? super BlockEntityType<T>> registryKey)
     {
-        super(owner, Registries.BLOCK_ENTITY_TYPE, registryKey);
+        super(owner, delegate, Registries.BLOCK_ENTITY_TYPE, registryKey);
     }
 
     public <M extends AbstractContainerMenu> MenuEntry<M> asMenuEntry()

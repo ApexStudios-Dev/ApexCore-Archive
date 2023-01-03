@@ -1,6 +1,7 @@
 package xyz.apex.minecraft.apexcore.shared.registry.builder;
 
 import com.google.errorprone.annotations.OverridingMethodsMustInvokeSuper;
+import dev.architectury.registry.registries.RegistrySupplier;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -33,9 +34,9 @@ public abstract class AbstractBuilder<T, R extends T, O extends AbstractRegistra
 
     protected abstract R createEntry();
 
-    protected RegistryEntry<R> createRegistryEntry()
+    protected RegistryEntry<R> createRegistryEntry(RegistrySupplier<R> delegate)
     {
-        return new RegistryEntry<R>(owner, registryType, registryKey);
+        return new RegistryEntry<>(owner, delegate, registryType, registryKey);
     }
 
     @OverridingMethodsMustInvokeSuper

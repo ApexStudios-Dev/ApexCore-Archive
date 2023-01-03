@@ -5,6 +5,7 @@ import dev.architectury.registry.CreativeTabRegistry;
 import dev.architectury.registry.client.rendering.ColorHandlerRegistry;
 import dev.architectury.registry.fuel.FuelRegistry;
 import dev.architectury.registry.item.ItemPropertiesRegistry;
+import dev.architectury.registry.registries.RegistrySupplier;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import org.apache.commons.compress.utils.Lists;
@@ -197,9 +198,9 @@ public final class ItemBuilder<R extends Item, O extends AbstractRegistrar<O>, P
     }
 
     @Override
-    protected ItemEntry<R> createRegistryEntry()
+    protected ItemEntry<R> createRegistryEntry(RegistrySupplier<R> delegate)
     {
-        return new ItemEntry<>(owner, registryKey);
+        return new ItemEntry<>(owner, delegate, registryKey);
     }
 
     @Override
