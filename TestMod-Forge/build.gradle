@@ -32,7 +32,7 @@ architectury {
 
 loom {
 	silentMojangMappingsLicense()
-	accessWidenerPath = project(':Common').loom.accessWidenerPath
+	accessWidenerPath = project(':TestMod-Common').loom.accessWidenerPath
 
 	mods {
 		"${MOD_ID}" {
@@ -41,9 +41,6 @@ loom {
 	}
 
 	forge {
-		convertAccessWideners = true
-		extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
-
 		mixinConfig "${TEST_MOD_ID}.mixins.json"
 		mixinConfig "${TEST_MOD_ID}-common.mixins.json"
 	}
@@ -116,8 +113,6 @@ remapJar {
 }
 
 processResources {
-	duplicatesStrategy DuplicatesStrategy.WARN
-
 	project.properties.each { key, value ->
 		inputs.property "${key}", "${value}"
 	}

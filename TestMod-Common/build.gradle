@@ -76,8 +76,6 @@ dependencies {
 }
 
 processResources {
-	duplicatesStrategy DuplicatesStrategy.WARN
-
 	project.properties.each { key, value ->
 		inputs.property "${key}", "${value}"
 	}

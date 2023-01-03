@@ -32,11 +32,10 @@ architectury {
 
 loom {
 	silentMojangMappingsLicense()
-	accessWidenerPath = project(':Common').loom.accessWidenerPath
+	accessWidenerPath = project(':TestMod-Common').loom.accessWidenerPath
 
 	mods {
 		"${MOD_ID}" {
-			sourceSet project(':Common').sourceSets.main
 			sourceSet project(':Fabric').sourceSets.main
 		}
 	}
@@ -120,8 +119,6 @@ remapJar {
 }
 
 processResources {
-	duplicatesStrategy DuplicatesStrategy.WARN
-
 	project.properties.each { key, value ->
 		inputs.property "${key}", "${value}"
 	}
