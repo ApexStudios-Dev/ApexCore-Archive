@@ -52,24 +52,27 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
         this.modId = modId;
     }
 
+    // region: Getters
     public final ModPlatform getMod()
     {
         return Objects.requireNonNull(mod);
-    }
-
-    public final ResourceLocation registryName(String registrationName)
-    {
-        return new ResourceLocation(modId, registrationName);
     }
 
     public final String getModId()
     {
         return modId;
     }
+    // endregion
 
     protected final S self()
     {
         return (S) this;
+    }
+
+    // region: Utility
+    public final ResourceLocation registryName(String registrationName)
+    {
+        return new ResourceLocation(modId, registrationName);
     }
 
     public final S transform(UnaryOperator<S> transformer)
@@ -81,7 +84,9 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     {
         return mapper.apply(self());
     }
+    // endregion
 
+    // region: CreativeModeTab
     public final S creativeModeTab(String creativeModeTabName, Supplier<ItemStack> icon)
     {
         CreativeTabRegistry.create(registryName(creativeModeTabName), icon);
@@ -93,7 +98,10 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
         CreativeTabRegistry.create(registryName(creativeModeTabName), builder);
         return self();
     }
+    // endregion
 
+    // region: Builders
+    // region: Simple
     public final <T, R extends T> RegistryEntry<R> simple(ResourceKey<? extends Registry<T>> registryType, String registrationName, Supplier<R> entryFactory)
     {
         return simple(self(), registryType, registrationName, entryFactory);
@@ -103,7 +111,9 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     {
         return new NoConfigBuilder<>(self(), parent, registryType, registrationName, entryFactory).register();
     }
+    // endregion
 
+    // region: Item
     public final <T extends Item, P> ItemBuilder<T, S, P> item(P parent, String itemName, ItemBuilder.Factory<T> factory)
     {
         return new ItemBuilder<>(self(), parent, itemName, factory);
@@ -123,7 +133,9 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     {
         return item(self(), itemName, Item::new);
     }
+    // endregion
 
+    // region: Block
     public final <T extends Block, P> BlockBuilder<T, S, P> block(P parent, String blockName, BlockBuilder.Factory<T> factory)
     {
         return new BlockBuilder<>(self(), parent, blockName, factory);
@@ -143,7 +155,9 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     {
         return block(self(), blockName, Block::new);
     }
+    // endregion
 
+    // region: BlockEntity
     public final <T extends BlockEntity, P> BlockEntityBuilder<T, S, P> blockEntity(P parent, String blockEntityName, BlockEntityBuilder.Factory<T> factory)
     {
         return new BlockEntityBuilder<>(self(), parent, blockEntityName, factory);
@@ -153,12 +167,16 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     {
         return blockEntity(self(), blockEntityName, factory);
     }
+    // endregion
 
+    // region: Menu
     public final <T extends AbstractContainerMenu, C extends Screen & MenuAccess<T>> MenuEntry<T> menu(String menuName, MenuBuilder.MenuFactory<T> menuFactory, Supplier<MenuBuilder.ScreenFactory<T, C>> screenFactorySupplier)
     {
         return new MenuBuilder<>(self(), self(), menuName, menuFactory, screenFactorySupplier).register();
     }
+    // endregion
 
+    // region: Entity
     public final <T extends Entity, P> EntityBuilder<T, S, P> entity(P parent, String entityName, EntityBuilder.Factory<T> factory)
     {
         return new EntityBuilder<>(self(), parent, entityName, factory);
@@ -168,19 +186,11 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     {
         return entity(self(), entityName, factory);
     }
+    // endregion
+    // endregion
 
-    @ApiStatus.Internal
-    public final <T, R extends T, P, B extends Builder<T, R, S, P, B>> RegistryEntry<R> accept(B builder, Supplier<R> entryFactory, Function<RegistrySupplier<R>, RegistryEntry<R>> registryEntryFactory)
-    {
-        var registrationName = builder.getRegistrationName();
-        var registryType = builder.getRegistryType();
-        var register = getRegister(registryType);
-        var registration = new Registration<>(register, builder.getRegistryName(), registryEntryFactory, entryFactory);
-        registerCallbacks.removeAll(Pair.of(registryType, registrationName)).forEach(callback -> registration.addCallback((Consumer<R>) callback));
-        registrations.put(registryType, registrationName, registration);
-        return registration.registryEntry;
-    }
-
+    // region: Registration Utilities
+    // region: Delegate
     @ApiStatus.Internal
     public final <T, R extends T> RegistrySupplier<R> getDelegate(ResourceKey<? extends Registry<T>> registryType, String registrationName)
     {
@@ -194,7 +204,9 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
         if(registration == null) return Optional.empty();
         return Optional.of(registration.delegate);
     }
+    // endregion
 
+    // region: Entry
     public final <T, R extends T> RegistryEntry<R> get(ResourceKey<? extends Registry<T>> registryType, String registrationName)
     {
         return this.<T, R>getRegistrationOrThrow(registryType, registrationName).registryEntry;
@@ -215,7 +227,9 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     {
         return registrations.row(registryType).values().stream().map(registration -> (RegistryEntry<T>) registration.registryEntry);
     }
+    // endregion
 
+    // region: Callback
     public final <T, R extends T> S addRegisterCallback(ResourceKey<? extends Registry<T>> registryType, String registrationName, Consumer<R> callback)
     {
         var registration = this.<T, R>getRegistrationUnchecked(registryType, registrationName);
@@ -231,12 +245,14 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
         afterRegisterCallbacks.put(registryType, callback);
         return self();
     }
+    // endregion
 
     public final boolean isRegistered(ResourceKey<? extends Registry<?>> registryType)
     {
         return completedRegistrations.contains(registryType);
     }
 
+    // region: Internal
     @Nullable
     private <T, R extends T> Registration<T, R> getRegistrationUnchecked(ResourceKey<? extends Registry<T>> registryType, String registrationName)
     {
@@ -248,6 +264,21 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
         var registration = this.<T, R>getRegistrationUnchecked(registryType, registrationName);
         if(registration == null) throw new IllegalArgumentException("Unknown registration %s for type %s".formatted(registrationName, registryType));
         return registration;
+    }
+    // endregion
+    // endregion
+
+    // region: Internal
+    @ApiStatus.Internal
+    public final <T, R extends T, P, B extends Builder<T, R, S, P, B>> RegistryEntry<R> accept(B builder, Supplier<R> entryFactory, Function<RegistrySupplier<R>, RegistryEntry<R>> registryEntryFactory)
+    {
+        var registrationName = builder.getRegistrationName();
+        var registryType = builder.getRegistryType();
+        var register = getRegister(registryType);
+        var registration = new Registration<>(register, builder.getRegistryName(), registryEntryFactory, entryFactory);
+        registerCallbacks.removeAll(Pair.of(registryType, registrationName)).forEach(callback -> registration.addCallback((Consumer<R>) callback));
+        registrations.put(registryType, registrationName, registration);
+        return registration.registryEntry;
     }
 
     @ApiStatus.Internal
@@ -290,6 +321,7 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     {
         return (DeferredRegister<T>) deferredRegisters.computeIfAbsent(registryType, type -> DeferredRegister.create(modId, (ResourceKey) type));
     }
+    // endregion
 
     // mostly used for fabric, to call the #register & #lateRegister methods
     // since fabric does not have any register events to listen to
