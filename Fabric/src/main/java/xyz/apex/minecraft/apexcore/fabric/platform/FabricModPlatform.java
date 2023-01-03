@@ -6,8 +6,6 @@ import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import xyz.apex.minecraft.apexcore.shared.platform.AbstractModPlatform;
@@ -16,7 +14,6 @@ import xyz.apex.minecraft.apexcore.shared.registry.Registrar;
 public class FabricModPlatform extends AbstractModPlatform implements ModInitializer, ClientModInitializer, DedicatedServerModInitializer, DataGeneratorEntrypoint
 {
     protected final String modId;
-    protected final Logger logger;
     @Nullable protected final Registrar registrar;
 
     public FabricModPlatform(String modId, @Nullable Registrar registrar)
@@ -24,16 +21,9 @@ public class FabricModPlatform extends AbstractModPlatform implements ModInitial
         super();
 
         this.modId = modId;
-        logger = LogManager.getLogger("ModPlatform/Fabric-%s".formatted(modId));
 
         this.registrar = registrar;
         if(registrar != null) registrar.setMod(this);
-    }
-
-    @Override
-    public final Logger getLogger()
-    {
-        return logger;
     }
 
     @Override

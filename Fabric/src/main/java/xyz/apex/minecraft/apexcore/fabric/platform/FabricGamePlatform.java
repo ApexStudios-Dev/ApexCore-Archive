@@ -2,8 +2,6 @@ package xyz.apex.minecraft.apexcore.fabric.platform;
 
 import dev.architectury.utils.Env;
 import net.fabricmc.loader.impl.FabricLoaderImpl;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.tags.TagKey;
@@ -20,7 +18,6 @@ import java.util.function.Supplier;
 
 public final class FabricGamePlatform implements GamePlatform
 {
-    private final Logger logger = LogManager.getLogger("GamePlatform/Fabric");
     private boolean initialized = false;
     private final Set<Env> initializedSides = EnumSet.noneOf(Env.class);
     private boolean initializedDataGen = false;
@@ -58,12 +55,6 @@ public final class FabricGamePlatform implements GamePlatform
     public ModLoader getModLoader()
     {
         return ModLoader.FABRIC;
-    }
-
-    @Override
-    public Logger getLogger()
-    {
-        return logger;
     }
 
     @Override

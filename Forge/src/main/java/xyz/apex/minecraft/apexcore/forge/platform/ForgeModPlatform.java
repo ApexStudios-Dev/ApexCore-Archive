@@ -3,8 +3,6 @@ package xyz.apex.minecraft.apexcore.forge.platform;
 import dev.architectury.platform.forge.EventBuses;
 import dev.architectury.utils.Env;
 import org.apache.commons.lang3.Validate;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraftforge.data.event.GatherDataEvent;
@@ -23,7 +21,6 @@ public class ForgeModPlatform extends AbstractModPlatform
 {
     protected final IEventBus modBus;
     protected final String modId;
-    protected final Logger logger;
     @Nullable protected final Registrar registrar;
 
     // manually instantiated
@@ -33,7 +30,6 @@ public class ForgeModPlatform extends AbstractModPlatform
 
         this.modId = modId;
         this.registrar = registrar;
-        logger = LogManager.getLogger("ModPlatform/Forge-%s".formatted(modId));
         modBus = setup();
     }
 
@@ -45,7 +41,6 @@ public class ForgeModPlatform extends AbstractModPlatform
 
         modId = getClass().getAnnotation(net.minecraftforge.fml.common.Mod.class).value();
         this.registrar = registrar;
-        logger = LogManager.getLogger("ModPlatform/Forge-%s".formatted(modId));
         modBus = setup();
     }
 
@@ -64,12 +59,6 @@ public class ForgeModPlatform extends AbstractModPlatform
         modBus.addListener(EventPriority.LOWEST, this::onLateRegister);
         initialize();
         return modBus;
-    }
-
-    @Override
-    public final Logger getLogger()
-    {
-        return logger;
     }
 
     @Override
@@ -102,7 +91,6 @@ public class ForgeModPlatform extends AbstractModPlatform
 
         if(forgeRegistry != null) registrar.register(forgeRegistry.getRegistryKey());
         else if(vanillaRegistry != null) registrar.register(vanillaRegistry.key());
-        else logger.fatal("UNKNOWN Registry Type: {}, Please report this to the mod author ASAP!", event.getRegistryKey());
     }
 
     private void onLateRegister(RegisterEvent event)
@@ -114,7 +102,6 @@ public class ForgeModPlatform extends AbstractModPlatform
 
         if(forgeRegistry != null) registrar.lateRegister(forgeRegistry.getRegistryKey());
         else if(vanillaRegistry != null) registrar.lateRegister(vanillaRegistry.key());
-        else logger.fatal("UNKNOWN Registry Type: {}, Please report this to the mod author ASAP!", event.getRegistryKey());
     }
 
     @Nullable
