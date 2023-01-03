@@ -5,7 +5,6 @@ import dev.architectury.utils.Env;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -54,7 +53,6 @@ public class ForgeModPlatform extends AbstractModPlatform
         EventBuses.registerModEventBus(modId, modBus);
         modBus.addListener(EventPriority.HIGHEST, this::onClientSetup);
         modBus.addListener(EventPriority.HIGHEST, this::onDedicatedServerSetup);
-        modBus.addListener(EventPriority.HIGHEST, this::onGatherData);
         modBus.addListener(EventPriority.HIGHEST, this::onRegister);
         modBus.addListener(EventPriority.LOWEST, this::onLateRegister);
         initialize();
@@ -75,11 +73,6 @@ public class ForgeModPlatform extends AbstractModPlatform
     private void onDedicatedServerSetup(FMLDedicatedServerSetupEvent event)
     {
         initializeSided(Env.SERVER);
-    }
-
-    private void onGatherData(GatherDataEvent event)
-    {
-        initializeDataGen();
     }
 
     private void onRegister(RegisterEvent event)

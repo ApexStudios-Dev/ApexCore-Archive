@@ -5,7 +5,7 @@ plugins {
 
 	id 'com.github.johnrengelman.shadow' version '7.1.2'
 	id 'architectury-plugin' version '3.4-SNAPSHOT'
-	id 'dev.architectury.loom' version '0.12.0-SNAPSHOT'
+	id 'dev.architectury.loom' version '1.0-SNAPSHOT'
 	id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1'
 }
 
@@ -16,6 +16,16 @@ evaluationDependsOn(':TestMod-Common')
 group = "${APEX_GROUP}.${TEST_MOD_ID}.fabric"
 version = "${TEST_MOD_VERSION}+${MINECRAFT_VERSION}"
 archivesBaseName = "${TEST_MOD_ID}-fabric"
+
+sourceSets {
+	datagen {
+		compileClasspath += sourceSets.main.output
+		runtimeClasspath += sourceSets.main.output
+
+		compileClasspath += sourceSets.main.compileClasspath
+		runtimeClasspath += sourceSets.main.runtimeClasspath
+	}
+}
 
 configurations {
 	common
@@ -34,11 +44,24 @@ loom {
 	silentMojangMappingsLicense()
 	accessWidenerPath = project(':TestMod-Common').loom.accessWidenerPath
 
+	runs {
+		data {
+			inherit(client)
+			source(sourceSets.datagen)
+			vmArg('-Dfabric-api.datagen')
+			vmArg("-Dfabric-api.datagen.output-dir=${project(':TestMod-Common').file('src/main/generated')}")
+			vmArg("-Dfabric-api.datagen.modid=${TEST_MOD_ID}_datagen")
+			vmArg('-Dfabric-api.datagen.strict-validation=true')
+		}
+	}
+
 	mods {
 		"${MOD_ID}" {
 			sourceSet project(':Fabric').sourceSets.main
 		}
 	}
+
+	createRemapConfigurations(sourceSets.datagen)
 }
 
 repositories {
@@ -82,6 +105,12 @@ dependencies {
 	shadowCommon(project(path: ':TestMod-Common', configuration: 'transformProductionFabric')) { transitive false }
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
+	// Data Gen
+	modDatagenImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
+	modDatagenImplementation "net.fabricmc.fabric-api:fabric-api:${FABRIC_VERSION}+${MINECRAFT_VERSION}"
+	datagenImplementation(project(path: ':Fabric', configuration: 'namedElements')) { transitive false }
+	// datagenImplementation 'com.google.code.findbugs:jsr305:3.0.2'
+
 	// JEI
 	if(rootProject.hasProperty('JEI_VERSION')) {
 		modCompileOnlyApi "mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}"
@@ -97,6 +126,7 @@ dependencies {
 	// Lazy DFU
 	if(rootProject.hasProperty('FABRIC_LAZY_DFU_VERSION')) {
 		modRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
+		modDatagenRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
 	}
 
 	// ModMenu
@@ -128,6 +158,16 @@ processResources {
 	}
 
 	from project(':TestMod-Common').sourceSets.main.resources
+}
+
+processDatagenResources {
+	project.properties.each { key, value ->
+		inputs.property "${key}", "${value}"
+	}
+
+	filesMatching([ '*.mixins.json', 'pack.mcmeta', 'fabric.mod.json' ]) {
+		expand project.properties
+	}
 }
 
 tasks.withType(JavaCompile).configureEach {

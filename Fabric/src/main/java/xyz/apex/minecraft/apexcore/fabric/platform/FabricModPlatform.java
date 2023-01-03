@@ -4,14 +4,12 @@ import dev.architectury.utils.Env;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import org.jetbrains.annotations.Nullable;
 
 import xyz.apex.minecraft.apexcore.shared.platform.AbstractModPlatform;
 import xyz.apex.minecraft.apexcore.shared.registry.Registrar;
 
-public class FabricModPlatform extends AbstractModPlatform implements ModInitializer, ClientModInitializer, DedicatedServerModInitializer, DataGeneratorEntrypoint
+public class FabricModPlatform extends AbstractModPlatform implements ModInitializer, ClientModInitializer, DedicatedServerModInitializer
 {
     protected final String modId;
     @Nullable protected final Registrar registrar;
@@ -51,18 +49,6 @@ public class FabricModPlatform extends AbstractModPlatform implements ModInitial
     {
         initialize();
         if(registrar != null) registrar.register();
-    }
-
-    @Override
-    public final void onInitializeDataGenerator(FabricDataGenerator generator)
-    {
-        initializeDataGen();
-    }
-
-    @Override
-    public final String getEffectiveModId()
-    {
-        return modId;
     }
 
     @Nullable

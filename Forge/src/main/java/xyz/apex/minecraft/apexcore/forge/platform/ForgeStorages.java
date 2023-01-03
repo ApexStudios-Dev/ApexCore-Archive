@@ -23,7 +23,7 @@ public final class ForgeStorages
 {
     ForgeStorages()
     {
-        MinecraftForge.EVENT_BUS.addListener(this::onAttachCapabilities);
+        MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, this::onAttachCapabilities);
     }
 
     private void onAttachCapabilities(AttachCapabilitiesEvent<BlockEntity> event)

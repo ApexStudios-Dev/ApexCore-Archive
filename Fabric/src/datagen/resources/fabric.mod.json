@@ -1,9 +1,9 @@
 {
     "schemaVersion": 1,
-    "id": "${TEST_MOD_ID}",
-    "version": "${TEST_MOD_VERSION}",
-    "name": "${TEST_MOD_NAME}",
-    "description": "${TEST_MOD_DESCRIPTION}",
+    "id": "${MOD_ID}_datagen",
+    "version": "${MOD_VERSION}",
+    "name": "${MOD_NAME}-DataGeneration",
+    "description": "Data Generation",
     "authors": [
         {
             "name": "ApexStudios",
@@ -22,6 +22,7 @@
             }
         }
     ],
+    "icon": "logo.png",
     "contact": {
         "homepage": "https://apexstudios.dev/",
         "issues": "https://discord.apexstudios.dev",
@@ -54,11 +55,9 @@
     "license": "GNU GENERAL PUBLIC LICENSE",
     "environment": "*",
     "entrypoints": {
-        "main": [ "${APEX_GROUP}.${TEST_MOD_ID}.fabric.${TEST_MOD_NAME}Fabric::INSTANCE" ],
-        "client": [ "${APEX_GROUP}.${TEST_MOD_ID}.fabric.${TEST_MOD_NAME}Fabric::INSTANCE" ],
-        "server": [ "${APEX_GROUP}.${TEST_MOD_ID}.fabric.${TEST_MOD_NAME}Fabric::INSTANCE" ]
+        "fabric-datagen": [ "${APEX_GROUP}.${MOD_ID}.fabric.${MOD_NAME}Data" ]
     },
-    "mixins": [ "${TEST_MOD_ID}.mixins.json", "${TEST_MOD_ID}-common.mixins.json" ],
+    "mixins": [ ],
     "depends": {
         "minecraft": "~${MINECRAFT_VERSION}",
         "java": ">=${JAVA_VERSION}",

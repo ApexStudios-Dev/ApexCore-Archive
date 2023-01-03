@@ -1,9 +1,9 @@
 {
     "schemaVersion": 1,
-    "id": "${TEST_MOD_ID}",
+    "id": "${TEST_MOD_ID}_datagen",
     "version": "${TEST_MOD_VERSION}",
-    "name": "${TEST_MOD_NAME}",
-    "description": "${TEST_MOD_DESCRIPTION}",
+    "name": "${TEST_MOD_NAME}-DataGeneration",
+    "description": "Data Generation",
     "authors": [
         {
             "name": "ApexStudios",
@@ -54,22 +54,21 @@
     "license": "GNU GENERAL PUBLIC LICENSE",
     "environment": "*",
     "entrypoints": {
-        "main": [ "${APEX_GROUP}.${TEST_MOD_ID}.fabric.${TEST_MOD_NAME}Fabric::INSTANCE" ],
-        "client": [ "${APEX_GROUP}.${TEST_MOD_ID}.fabric.${TEST_MOD_NAME}Fabric::INSTANCE" ],
-        "server": [ "${APEX_GROUP}.${TEST_MOD_ID}.fabric.${TEST_MOD_NAME}Fabric::INSTANCE" ]
+        "fabric-datagen": [ "${APEX_GROUP}.${TEST_MOD_ID}.fabric.${TEST_MOD_NAME}Data" ]
     },
-    "mixins": [ "${TEST_MOD_ID}.mixins.json", "${TEST_MOD_ID}-common.mixins.json" ],
+    "mixins": [ ],
     "depends": {
         "minecraft": "~${MINECRAFT_VERSION}",
         "java": ">=${JAVA_VERSION}",
         "fabricloader": ">=${FABRIC_LOADER_VERSION}",
         "fabric-api": ">=${FABRIC_VERSION}",
-        "${MOD_ID}": ">=${MOD_VERSION}"
+        "${MOD_ID}": ">=${MOD_VERSION}",
+        "${TEST_MOD_ID}": ">=${TEST_MOD_VERSION}"
     },
     "custom": {
         "modmenu": {
             "modmenu.discord": "https://discord.apexstudios.dev/",
-            "parent": "${MOD_ID}"
+            "parent": "${TEST_MOD_ID}"
         }
     }
 }
