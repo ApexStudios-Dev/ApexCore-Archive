@@ -12,6 +12,12 @@ public final class TestModData implements DataGeneratorEntrypoint
     public void onInitializeDataGenerator(FabricDataGenerator generator)
     {
         TestModFabric.INSTANCE.initializeDataGen();
+
+        var pack = generator.createPack();
+
+        pack.addProvider(BlockLootTableGenerator::new);
+        pack.addProvider(ModelGenerator::new);
+        pack.addProvider(LanguageGenerator::new);
     }
 
     @Override
