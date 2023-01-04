@@ -25,8 +25,8 @@ architectury {
 
 loom {
 	forge {
-		// convertAccessWideners = true
-		// extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
+		convertAccessWideners = true
+		extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
 
 		mixinConfig "${MOD_ID}.mixins.json"
 		mixinConfig "${MOD_ID}-common.mixins.json"

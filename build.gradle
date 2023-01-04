@@ -17,7 +17,7 @@ subprojects {
 
     loom {
         silentMojangMappingsLicense()
-        // accessWidenerPath = project(':Common').file("src/main/resources/${MOD_ID}.accesswidener")
+        accessWidenerPath = project(':Common').file("src/main/resources/${MOD_ID}.accesswidener")
     }
 
     repositories {
