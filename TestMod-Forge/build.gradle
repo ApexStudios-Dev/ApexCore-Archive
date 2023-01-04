@@ -1,7 +1,6 @@
 plugins {
 	id 'java-library'
 	id 'idea'
-	id 'maven-publish'
 
 	id 'com.github.johnrengelman.shadow' version '7.1.2'
 	id 'architectury-plugin' version '3.4-SNAPSHOT'
@@ -139,8 +138,6 @@ java {
 	toolchain {
 		languageVersion.set(JavaLanguageVersion.of("${JAVA_VERSION}"))
 	}
-
-	withSourcesJar()
 }
 
 jar {
@@ -159,42 +156,9 @@ jar {
 	}
 }
 
-sourcesJar {
-	def commonSources = project(':TestMod-Common').sourcesJar
-	dependsOn commonSources
-	from commonSources.archiveFile.map { zipTree(it) }
-}
-
 components.java {
 	withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
 		skip()
-	}
-}
-
-publishing {
-	publications {
-		mavenForge(MavenPublication) {
-			groupId = "${project.group}"
-			artifactId = "${project.archivesBaseName}"
-			version = "${project.version}"
-
-			from components.java
-		}
-	}
-	repositories {
-		maven { url "file:///${rootProject.projectDir}/maven" }
-
-		if(System.getenv('APEX_MODS_MAVEN_USERNAME') != null && System.getenv('APEX_MODS_MAVEN_PASSWORD') != null) {
-			maven {
-				name 'ApexMods-Maven'
-				url 'https://apexmodder.jfrog.io/artifactory/mods-maven/'
-
-				credentials {
-					username System.getenv('APEX_MODS_MAVEN_USERNAME')
-					password System.getenv('APEX_MODS_MAVEN_PASSWORD')
-				}
-			}
-		}
 	}
 }
 

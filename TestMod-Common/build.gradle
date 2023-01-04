@@ -1,7 +1,6 @@
 plugins {
 	id 'java-library'
 	id 'idea'
-	id 'maven-publish'
 
 	id 'architectury-plugin' version '3.4-SNAPSHOT'
 	id 'dev.architectury.loom' version '1.0-SNAPSHOT'
@@ -102,8 +101,6 @@ java {
 	toolchain {
 		languageVersion.set(JavaLanguageVersion.of("${JAVA_VERSION}"))
 	}
-
-	withSourcesJar()
 }
 
 jar {
@@ -117,32 +114,5 @@ jar {
 				'Implementation-Vendor': 'ApexStudios',
 				'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
 		])
-	}
-}
-
-publishing {
-	publications {
-		mavenCommon(MavenPublication) {
-			groupId = "${project.group}"
-			artifactId = "${project.archivesBaseName}"
-			version = "${project.version}"
-
-			from components.java
-		}
-	}
-	repositories {
-		maven { url "file:///${rootProject.projectDir}/maven" }
-
-		if(System.getenv('APEX_MODS_MAVEN_USERNAME') != null && System.getenv('APEX_MODS_MAVEN_PASSWORD') != null) {
-			maven {
-				name 'ApexMods-Maven'
-				url 'https://apexmodder.jfrog.io/artifactory/mods-maven/'
-
-				credentials {
-					username System.getenv('APEX_MODS_MAVEN_USERNAME')
-					password System.getenv('APEX_MODS_MAVEN_PASSWORD')
-				}
-			}
-		}
 	}
 }
