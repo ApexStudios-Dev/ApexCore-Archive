@@ -1,12 +1,7 @@
 plugins {
-	id 'java-library'
-	id 'idea'
 	id 'maven-publish'
 
 	id 'com.github.johnrengelman.shadow' version '7.1.2'
-	id 'architectury-plugin' version '3.4-SNAPSHOT'
-	id 'dev.architectury.loom' version '1.0-SNAPSHOT'
-	id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1'
 }
 
 evaluationDependsOn(':Common')
@@ -29,12 +24,9 @@ architectury {
 }
 
 loom {
-	silentMojangMappingsLicense()
-	accessWidenerPath = project(':Common').loom.accessWidenerPath
-
 	forge {
-		convertAccessWideners = true
-		extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
+		// convertAccessWideners = true
+		// extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
 
 		mixinConfig "${MOD_ID}.mixins.json"
 		mixinConfig "${MOD_ID}-common.mixins.json"
@@ -61,17 +53,6 @@ repositories {
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:${MINECRAFT_VERSION}"
-
-	mappings(loom.layered {
-		officialMojangMappings()
-
-		if(rootProject.hasProperty('PARCHMENT_MAPPINGS')) {
-			def mcVersion = rootProject.hasProperty('PARCHMENT_MINECRAFT_VERSION') ? "${PARCHMENT_MINECRAFT_VERSION}" : "${MINECRAFT_VERSION}"
-			parchment("org.parchmentmc.data:parchment-${mcVersion}:${PARCHMENT_MAPPINGS}@zip")
-		}
-	})
-
 	forge "net.minecraftforge:forge:${MINECRAFT_VERSION}-${FORGE_VERSION}"
 	modApi "dev.architectury:architectury-forge:${ARCHITECTURY_VERSION}"
 
@@ -81,7 +62,6 @@ dependencies {
 
 	// JEI
 	if(rootProject.hasProperty('JEI_VERSION')) {
-		modCompileOnlyApi "mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}"
 		modCompileOnlyApi "mezz.jei:jei-${MINECRAFT_VERSION}-forge-api:${JEI_VERSION}"
 		modRuntimeOnly "mezz.jei:jei-${MINECRAFT_VERSION}-forge:${JEI_VERSION}"
 	}
@@ -93,10 +73,8 @@ dependencies {
 }
 
 shadowJar {
-	exclude 'fabric.mod.json'
-	exclude 'architectury.common.json'
 	configurations = [ project.configurations.shadowCommon ]
-	classifier ''
+	classifier 'dev-shadow'
 }
 
 remapJar {
@@ -117,39 +95,8 @@ processResources {
 	from project(':Common').sourceSets.main.resources
 }
 
-tasks.withType(JavaCompile).configureEach {
-	options.encoding = 'UTF-8'
-	options.release.set(JavaLanguageVersion.of("${JAVA_VERSION}").asInt())
-
-	javaToolchains {
-		compilerFor {
-			languageVersion.set(JavaLanguageVersion.of("${JAVA_VERSION}"))
-		}
-	}
-}
-
-java {
-	toolchain {
-		languageVersion.set(JavaLanguageVersion.of("${JAVA_VERSION}"))
-	}
-
-	withSourcesJar()
-}
-
 jar {
-	classifier 'slim'
-
-	manifest {
-		attributes([
-				'Specification-Title': "${MOD_ID}",
-				'Specification-Vendor': 'ApexStudios',
-				'Specification-Version': '1',
-				'Implementation-Title': "${project.name}",
-				'Implementation-Version': "${project.version}",
-				'Implementation-Vendor': 'ApexStudios',
-				'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-		])
-	}
+	classifier 'dev'
 }
 
 sourcesJar {
@@ -189,8 +136,4 @@ publishing {
 			}
 		}
 	}
-}
-
-idea.module {
-	excludeDirs << file('run')
 }

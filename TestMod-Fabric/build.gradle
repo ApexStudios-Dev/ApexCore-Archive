@@ -1,11 +1,5 @@
 plugins {
-	id 'java-library'
-	id 'idea'
-
 	id 'com.github.johnrengelman.shadow' version '7.1.2'
-	id 'architectury-plugin' version '3.4-SNAPSHOT'
-	id 'dev.architectury.loom' version '1.0-SNAPSHOT'
-	id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1'
 }
 
 evaluationDependsOn(':Common')
@@ -40,9 +34,6 @@ architectury {
 }
 
 loom {
-	silentMojangMappingsLicense()
-	accessWidenerPath = project(':TestMod-Common').loom.accessWidenerPath
-
 	runs {
 		data {
 			inherit(client)
@@ -83,17 +74,6 @@ repositories {
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:${MINECRAFT_VERSION}"
-
-	mappings(loom.layered {
-		officialMojangMappings()
-
-		if(rootProject.hasProperty('PARCHMENT_MAPPINGS')) {
-			def mcVersion = rootProject.hasProperty('PARCHMENT_MINECRAFT_VERSION') ? "${PARCHMENT_MINECRAFT_VERSION}" : "${MINECRAFT_VERSION}"
-			parchment("org.parchmentmc.data:parchment-${mcVersion}:${PARCHMENT_MAPPINGS}@zip")
-		}
-	})
-
 	// Main
 	modImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${FABRIC_VERSION}+${MINECRAFT_VERSION}"
@@ -108,11 +88,10 @@ dependencies {
 	modDatagenImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
 	modDatagenImplementation "net.fabricmc.fabric-api:fabric-api:${FABRIC_VERSION}+${MINECRAFT_VERSION}"
 	datagenImplementation(project(path: ':Fabric', configuration: 'namedElements')) { transitive false }
-	// datagenImplementation 'com.google.code.findbugs:jsr305:3.0.2'
+	datagenImplementation 'com.google.code.findbugs:jsr305:3.0.2'
 
 	// JEI
 	if(rootProject.hasProperty('JEI_VERSION')) {
-		modCompileOnlyApi "mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}"
 		modCompileOnlyApi "mezz.jei:jei-${MINECRAFT_VERSION}-fabric-api:${JEI_VERSION}"
 		modRuntimeOnly "mezz.jei:jei-${MINECRAFT_VERSION}-fabric:${JEI_VERSION}"
 	}
@@ -135,7 +114,6 @@ dependencies {
 }
 
 shadowJar {
-	exclude 'architectury.common.json'
 	configurations = [ project.configurations.shadowCommon ]
 	classifier 'dev-shadow'
 }
@@ -169,45 +147,18 @@ processDatagenResources {
 	}
 }
 
-tasks.withType(JavaCompile).configureEach {
-	options.encoding = 'UTF-8'
-	options.release.set(JavaLanguageVersion.of("${JAVA_VERSION}").asInt())
-
-	javaToolchains {
-		compilerFor {
-			languageVersion.set(JavaLanguageVersion.of("${JAVA_VERSION}"))
-		}
-	}
-}
-
-java {
-	toolchain {
-		languageVersion.set(JavaLanguageVersion.of("${JAVA_VERSION}"))
-	}
-}
-
 jar {
 	classifier 'dev'
+}
 
-	manifest {
-		attributes([
-				'Specification-Title': "${TEST_MOD_ID}",
-				'Specification-Vendor': 'ApexStudios',
-				'Specification-Version': '1',
-				'Implementation-Title': "${project.name}",
-				'Implementation-Version': "${project.version}",
-				'Implementation-Vendor': 'ApexStudios',
-				'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-		])
-	}
+sourcesJar {
+	def commonSources = project(':TestMod-Common').sourcesJar
+	dependsOn commonSources
+	from commonSources.archiveFile.map { zipTree(it) }
 }
 
 components.java {
 	withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
 		skip()
 	}
-}
-
-idea.module {
-	excludeDirs << file('run')
 }

@@ -1,11 +1,3 @@
-plugins {
-	id 'java-library'
-	id 'idea'
-
-	id 'architectury-plugin' version '3.4-SNAPSHOT'
-	id 'dev.architectury.loom' version '1.0-SNAPSHOT'
-}
-
 evaluationDependsOn(':Common')
 
 group = "${APEX_GROUP}.${TEST_MOD_ID}.shared"
@@ -23,9 +15,6 @@ architectury {
 }
 
 loom {
-	silentMojangMappingsLicense()
-	accessWidenerPath = project(':Common').loom.accessWidenerPath
-
 	mods {
 		"${MOD_ID}" {
 			sourceSet project(':Common').sourceSets.main
@@ -53,27 +42,11 @@ repositories {
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:${MINECRAFT_VERSION}"
-
-	mappings(loom.layered {
-		officialMojangMappings()
-
-		if(rootProject.hasProperty('PARCHMENT_MAPPINGS')) {
-			def mcVersion = rootProject.hasProperty('PARCHMENT_MINECRAFT_VERSION') ? "${PARCHMENT_MINECRAFT_VERSION}" : "${MINECRAFT_VERSION}"
-			parchment("org.parchmentmc.data:parchment-${mcVersion}:${PARCHMENT_MAPPINGS}@zip")
-		}
-	})
-
 	compileOnly "org.spongepowered:mixin:${MIXIN_VERSION}"
 	modApi "dev.architectury:architectury:${ARCHITECTURY_VERSION}"
 	implementation(project(path: ':Common', configuration: 'namedElements')) { transitive false }
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 	implementation 'com.google.errorprone:error_prone_annotations:2.11.0'
-
-	// JEI
-	if(rootProject.hasProperty('JEI_VERSION')) {
-		modCompileOnlyApi "mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}"
-	}
 }
 
 processResources {
@@ -83,36 +56,5 @@ processResources {
 
 	filesMatching([ '*.mixins.json', 'pack.mcmeta' ]) {
 		expand project.properties
-	}
-}
-
-tasks.withType(JavaCompile).configureEach {
-	options.encoding = 'UTF-8'
-	options.release.set(JavaLanguageVersion.of("${JAVA_VERSION}").asInt())
-
-	javaToolchains {
-		compilerFor {
-			languageVersion.set(JavaLanguageVersion.of("${JAVA_VERSION}"))
-		}
-	}
-}
-
-java {
-	toolchain {
-		languageVersion.set(JavaLanguageVersion.of("${JAVA_VERSION}"))
-	}
-}
-
-jar {
-	manifest {
-		attributes([
-				'Specification-Title': "${TEST_MOD_ID}",
-				'Specification-Vendor': 'ApexStudios',
-				'Specification-Version': '1',
-				'Implementation-Title': "${project.name}",
-				'Implementation-Version': "${project.version}",
-				'Implementation-Vendor': 'ApexStudios',
-				'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-		])
 	}
 }
