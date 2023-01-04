@@ -96,7 +96,7 @@ shadowJar {
 	exclude 'fabric.mod.json'
 	exclude 'architectury.common.json'
 	configurations = [ project.configurations.shadowCommon ]
-	classifier 'dev-shadow'
+	classifier ''
 }
 
 remapJar {
@@ -137,7 +137,7 @@ java {
 }
 
 jar {
-	classifier 'dev'
+	classifier 'slim'
 
 	manifest {
 		attributes([

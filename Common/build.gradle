@@ -98,6 +98,8 @@ java {
 }
 
 jar {
+	classifier ''
+
 	manifest {
 		attributes([
 				'Specification-Title': "${MOD_ID}",
