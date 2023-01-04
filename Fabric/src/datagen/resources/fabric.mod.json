@@ -63,6 +63,7 @@
         "java": ">=${JAVA_VERSION}",
         "fabricloader": ">=${FABRIC_LOADER_VERSION}",
         "fabric-api": ">=${FABRIC_VERSION}",
+        "${ARCHITECTURY_ID}": ">=${ARCHITECTURY_VERSION}",
         "${MOD_ID}": ">=${MOD_VERSION}"
     },
     "custom": {

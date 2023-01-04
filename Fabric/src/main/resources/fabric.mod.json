@@ -64,7 +64,8 @@
         "minecraft": "~${MINECRAFT_VERSION}",
         "java": ">=${JAVA_VERSION}",
         "fabricloader": ">=${FABRIC_LOADER_VERSION}",
-        "fabric-api": ">=${FABRIC_VERSION}"
+        "fabric-api": ">=${FABRIC_VERSION}",
+        "${ARCHITECTURY_ID}": ">=${ARCHITECTURY_VERSION}"
     },
     "custom": {
         "modmenu": {
