@@ -36,9 +36,7 @@ public final class ForgeStorages
             public <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction side)
             {
                 if(capability != ForgeCapabilities.ITEM_HANDLER) return LazyOptional.empty();
-                var inventory = holder.getInventory(side);
-                if(inventory == null) return LazyOptional.empty();
-                return LazyOptional.of(() -> new InventoryWrapper(inventory)).cast();
+                return LazyOptional.of(() -> new InventoryWrapper(holder.getInventory())).cast();
             }
         });
     }

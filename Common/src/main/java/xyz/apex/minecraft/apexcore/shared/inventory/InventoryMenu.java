@@ -3,7 +3,6 @@ package xyz.apex.minecraft.apexcore.shared.inventory;
 import org.apache.commons.lang3.Validate;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -28,7 +27,7 @@ public class InventoryMenu extends AbstractContainerMenu
         blockEntity = Objects.requireNonNull(player.level.getBlockEntity(pos));
         Validate.isInstanceOf(InventoryHolder.class, blockEntity);
         var inventoryHolder = (InventoryHolder) blockEntity;
-        inventory = Objects.requireNonNull(data.readBoolean() ? inventoryHolder.getInventory(data.readEnum(Direction.class)) : inventoryHolder.getInventory());
+        inventory = inventoryHolder.getInventory();
     }
 
     @Override

@@ -6,9 +6,9 @@ import org.jetbrains.annotations.NotNull;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -175,21 +175,41 @@ public class Inventory implements Iterable<ItemStack>
         return slotIndex < slotCount && slotIndex >= 0;
     }
 
-    public static void dropContents(Level level, BlockPos pos, Inventory inventory)
+    public static void dropContents(Level level, BlockPos pos, InventoryHolder inventoryHolder)
     {
-        dropContents(level, pos.getX(), pos.getY(), pos.getZ(), inventory);
-    }
+        var inventory = inventoryHolder.getInventory();
+        if(inventory == null) return;
 
-    public static void dropContents(Level level, Entity dropAt, Inventory inventory)
-    {
-        dropContents(level, dropAt.getX(), dropAt.getY(), dropAt.getZ(), inventory);
-    }
+        var x = pos.getX();
+        var y = pos.getY();
+        var z = pos.getZ();
 
-    public static void dropContents(Level level, double x, double y, double z, Inventory inventory)
-    {
         for(var stack : inventory)
         {
             Containers.dropItemStack(level, x, y, z, stack);
         }
+    }
+
+    public static int getRedstoneSignalFromInventory(InventoryHolder inventoryHolder)
+    {
+        var inventory = inventoryHolder.getInventory();
+        if(inventory == null) return 0;
+
+        var i = 0;
+        var f = 0F;
+
+        for(var j = 0; j < inventory.getSize(); j++)
+        {
+            var stack = inventory.getItem(j);
+
+            if(!stack.isEmpty())
+            {
+                f += (float) stack.getCount() / (float) Math.min(inventory.getSlotLimit(j), stack.getMaxStackSize());
+                i++;
+            }
+        }
+
+        f /= (float) inventory.getSize();
+        return Mth.floor(f * 14F) + (i > 0 ? 1 : 0);
     }
 }

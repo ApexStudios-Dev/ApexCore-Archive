@@ -33,13 +33,8 @@ public final class FabricStorages
     @Nullable
     private Storage<ItemVariant> getFallbackItemStorage(Level level, BlockPos pos, BlockState blockState, @Nullable BlockEntity blockEntity, Direction side)
     {
-        if(blockEntity instanceof InventoryHolder holder)
-        {
-            var inventory = holder.getInventory(side);
-            if(inventory != null) return new InventoryWrapper(inventory);
-        }
-
-        return null;
+        var inventory = InventoryHolder.lookupInventory(level, pos, blockState);
+        return inventory == null ? null : new InventoryWrapper(inventory);
     }
 
     private static final class InventoryWrapper extends CombinedStorage<ItemVariant, InventoryWrapper.Slot>
