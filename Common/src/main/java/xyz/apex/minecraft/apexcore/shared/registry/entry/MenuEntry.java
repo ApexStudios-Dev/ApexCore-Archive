@@ -61,7 +61,7 @@ public final class MenuEntry<M extends AbstractContainerMenu> extends RegistryEn
             {
                 var buffer = new FriendlyByteBuf(Unpooled.buffer());
                 data.accept(buffer);
-                return menuFactory.create(get(), containerId, inventory, buffer);
+                return menuFactory.create(get(), containerId, player, buffer);
             }
         };
     }

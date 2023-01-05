@@ -25,7 +25,6 @@ import xyz.apex.minecraft.apexcore.shared.registry.entry.BlockEntityEntry;
 import xyz.apex.minecraft.apexcore.shared.util.function.Lazy;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -91,11 +90,12 @@ public final class BlockEntityBuilder<R extends BlockEntity, O extends AbstractR
         return this;
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Override
     protected BlockEntityType<R> createEntry()
     {
         var validBlocks = this.validBlocks.stream().map(Supplier::get).toArray(Block[]::new);
-        var dataType = Objects.requireNonNull(Util.fetchChoiceType(References.BLOCK_ENTITY, getRegistryName().toString()));
+        var dataType = Util.fetchChoiceType(References.BLOCK_ENTITY, getRegistryName().toString());
         return BlockEntityType.Builder.of((pos, blockState) -> factory.create(safeSupplier.get(), pos, blockState), validBlocks).build(dataType);
     }
 

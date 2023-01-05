@@ -1,30 +1,28 @@
 package xyz.apex.minecraft.testmod.shared;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-public final class TestMenuScreen extends AbstractContainerScreen<TestMenu>
+import xyz.apex.minecraft.apexcore.shared.inventory.InventoryMenuScreen;
+
+public final class TestMenuScreen extends InventoryMenuScreen<TestMenu>
 {
+    private static final ResourceLocation BACKGROUND = new ResourceLocation(TestMod.ID, "textures/gui/container/test_menu.png");
+
     public TestMenuScreen(TestMenu menu, Inventory inventory, Component component)
     {
-        super(menu, inventory, component);
+        super(menu, inventory, component, BACKGROUND);
     }
 
     @Override
-    public void render(PoseStack pose, int mouseX, int mouseY, float partialTick)
+    protected void init()
     {
-        renderBackground(pose);
-        super.render(pose, mouseX, mouseY, partialTick);
-        renderTooltip(pose, mouseX, mouseY);
-    }
+        imageWidth = 176;
+        imageHeight = 166;
 
-    @Override
-    protected void renderBg(PoseStack pose, float partialTick, int mouseX, int mouseY)
-    {
-        drawString(pose, font, menu.pos.toShortString(), leftPos + 128, topPos + 128, 0);
-        drawString(pose, font, menu.dimensionType.location().toString(), leftPos + 128, topPos + 128 - 32, 0);
+        super.init();
+
+        inventoryLabelY = imageHeight - 94;
     }
 }

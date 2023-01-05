@@ -11,6 +11,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 
@@ -38,7 +39,7 @@ public final class MenuBuilder<M extends AbstractContainerMenu, S extends Screen
     @Override
     protected MenuType<M> createEntry()
     {
-        return MenuRegistry.ofExtended((containerId, inventory, data) -> menuFactory.create(safeSupplier.get(), containerId, inventory, data));
+        return MenuRegistry.ofExtended((containerId, inventory, data) -> menuFactory.create(safeSupplier.get(), containerId, inventory.player, data));
     }
 
     @Override
@@ -56,7 +57,7 @@ public final class MenuBuilder<M extends AbstractContainerMenu, S extends Screen
     @FunctionalInterface
     public interface MenuFactory<M extends AbstractContainerMenu>
     {
-        M create(MenuType<M> menuType, int containerId, Inventory inventory, FriendlyByteBuf data);
+        M create(MenuType<M> menuType, int containerId, Player player, FriendlyByteBuf data);
     }
 
     @FunctionalInterface

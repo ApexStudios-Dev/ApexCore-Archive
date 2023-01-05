@@ -1,17 +1,54 @@
 package xyz.apex.minecraft.apexcore.shared.inventory;
 
+import com.google.common.collect.Lists;
+import org.jetbrains.annotations.NotNull;
+
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Containers;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
-public class Inventory
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.IntConsumer;
+import java.util.function.ObjIntConsumer;
+import java.util.stream.IntStream;
+
+public class Inventory implements Iterable<ItemStack>
 {
     private NonNullList<ItemStack> slots;
+    private List<IntConsumer> listeners = Lists.newArrayList();
+    private boolean listening = true;
 
     public Inventory(int slotCount)
     {
         slots = NonNullList.withSize(slotCount, ItemStack.EMPTY);
+    }
+
+    public void addListener(IntConsumer listener)
+    {
+        listeners.add(listener);
+    }
+
+    public void removeListener(IntConsumer listener)
+    {
+        listeners.remove(listener);
+    }
+
+    @NotNull
+    @Override
+    public Iterator<ItemStack> iterator()
+    {
+        return slots.iterator();
+    }
+
+    public void forEach(ObjIntConsumer<ItemStack> consumer)
+    {
+        IntStream.range(0, slots.size()).forEach(i -> consumer.accept(slots.get(i), i));
     }
 
     public int getSize()
@@ -28,7 +65,9 @@ public class Inventory
     {
         if(!isValidSlotIndex(slotIndex, slots.size())) return ItemStack.EMPTY;
         if(!isItemValid(slotIndex, stack)) return ItemStack.EMPTY;
-        return slots.set(slotIndex, stack);
+        var old = slots.set(slotIndex, stack);
+        setChanged(slotIndex);
+        return old;
     }
 
     public ItemStack insertItem(int slotIndex, ItemStack stack, boolean simulate)
@@ -53,6 +92,7 @@ public class Inventory
         {
             if(existing.isEmpty()) slots.set(slotIndex, reachedLimit ? stack.copyWithCount(limit) : stack);
             else existing.grow(reachedLimit ? limit : stack.getCount());
+            setChanged(slotIndex);
         }
 
         return reachedLimit ? stack.copyWithCount(stack.getCount() - limit) : ItemStack.EMPTY;
@@ -70,11 +110,17 @@ public class Inventory
         {
             if(simulate) return existing.copy();
             slots.set(slotIndex, ItemStack.EMPTY);
+            setChanged(slotIndex);
             return existing;
         }
         else
         {
-            if(!simulate) slots.set(slotIndex, existing.copyWithCount(existing.getCount() - toExtract));
+            if(!simulate)
+            {
+                slots.set(slotIndex, existing.copyWithCount(existing.getCount() - toExtract));
+                setChanged(slotIndex);
+            }
+
             return existing.copyWithCount(toExtract);
         }
     }
@@ -103,12 +149,47 @@ public class Inventory
 
     public void deserialize(CompoundTag tag)
     {
+        ignoreChanges();
         slots = NonNullList.withSize(tag.getInt("Size"), ItemStack.EMPTY);
         ContainerHelper.loadAllItems(tag, slots);
+        listen();
+    }
+
+    public void ignoreChanges()
+    {
+        listening = false;
+    }
+
+    public void listen()
+    {
+        listening = true;
+    }
+
+    public void setChanged(int slotIndex)
+    {
+        if(listening) listeners.forEach(listener -> listener.accept(slotIndex));
     }
 
     public static boolean isValidSlotIndex(int slotIndex, int slotCount)
     {
         return slotIndex < slotCount && slotIndex >= 0;
+    }
+
+    public static void dropContents(Level level, BlockPos pos, Inventory inventory)
+    {
+        dropContents(level, pos.getX(), pos.getY(), pos.getZ(), inventory);
+    }
+
+    public static void dropContents(Level level, Entity dropAt, Inventory inventory)
+    {
+        dropContents(level, dropAt.getX(), dropAt.getY(), dropAt.getZ(), inventory);
+    }
+
+    public static void dropContents(Level level, double x, double y, double z, Inventory inventory)
+    {
+        for(var stack : inventory)
+        {
+            Containers.dropItemStack(level, x, y, z, stack);
+        }
     }
 }

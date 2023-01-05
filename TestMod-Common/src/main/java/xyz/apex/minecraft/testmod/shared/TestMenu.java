@@ -1,44 +1,18 @@
 package xyz.apex.minecraft.testmod.shared;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 
-public final class TestMenu extends AbstractContainerMenu
+import xyz.apex.minecraft.apexcore.shared.inventory.InventoryMenu;
+
+public final class TestMenu extends InventoryMenu
 {
-    public final BlockPos pos;
-    public final ResourceKey<Level> dimensionType;
-    public final Player player;
-
-    public TestMenu(MenuType<TestMenu> menuType, int containerId, Inventory inventory, FriendlyByteBuf data)
+    public TestMenu(MenuType<? extends TestMenu> menuType, int containerId, Player player, FriendlyByteBuf data)
     {
-        super(menuType, containerId);
+        super(menuType, containerId, player, data);
 
-        player = inventory.player;
-        pos = data.readBlockPos();
-        dimensionType = data.readResourceKey(Registries.DIMENSION);
-    }
-
-    @Override
-    public ItemStack quickMoveStack(Player player, int index)
-    {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public boolean stillValid(Player other)
-    {
-        if(!other.getUUID().equals(player.getUUID())) return false;
-        if(!player.level.dimension().equals(dimensionType)) return false;
-
-        var blockState = player.level.getBlockState(pos);
-        return TestMod.TEST_BLOCK.hasBlockState(blockState);
+        bindInventory(this, inventory, TestBlockEntity.ROWS, TestBlockEntity.COLS, 8, 18);
+        bindPlayerInventory(this, player, 8, 84);
     }
 }

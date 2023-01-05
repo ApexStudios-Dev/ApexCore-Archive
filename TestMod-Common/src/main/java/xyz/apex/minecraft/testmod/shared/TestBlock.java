@@ -1,18 +1,10 @@
 package xyz.apex.minecraft.testmod.shared;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
+import xyz.apex.minecraft.apexcore.shared.inventory.InventoryBlock;
+import xyz.apex.minecraft.apexcore.shared.registry.entry.BlockEntityEntry;
+import xyz.apex.minecraft.apexcore.shared.registry.entry.MenuEntry;
 
-public final class TestBlock extends Block
+public final class TestBlock extends InventoryBlock<TestBlockEntity, TestMenu>
 {
     public TestBlock(Properties properties)
     {
@@ -20,15 +12,14 @@ public final class TestBlock extends Block
     }
 
     @Override
-    public InteractionResult use(BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
+    public BlockEntityEntry<TestBlockEntity> getInventoryBlockEntityType()
     {
-        if(player instanceof ServerPlayer serverPlayer) TestMod.TEST_MENU.open(serverPlayer, Component.literal("Test Menu"), data -> data.writeBlockPos(pos).writeResourceKey(level.dimension()));
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return TestMod.TEST_BLOCK_ENTITY;
     }
 
     @Override
-    public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos)
+    public MenuEntry<TestMenu> getInventoryMenuType()
     {
-        return TestMod.TEST_MENU.asProvider(Component.literal("Test Menu"), data -> data.writeBlockPos(pos).writeResourceKey(level.dimension()));
+        return TestMod.TEST_MENU;
     }
 }
