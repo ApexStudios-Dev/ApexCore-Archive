@@ -70,6 +70,10 @@
     "custom": {
         "modmenu": {
             "modmenu.discord": "https://discord.apexstudios.dev/"
+        },
+        "mc-publish": {
+            "modrinth": "${MOD_ID}",
+            "curseforge": "${MOD_ID}"
         }
     }
 }
