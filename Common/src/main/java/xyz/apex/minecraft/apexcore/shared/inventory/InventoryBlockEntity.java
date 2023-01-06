@@ -92,7 +92,7 @@ public class InventoryBlockEntity extends BlockEntity implements InventoryHolder
         this.customName = customName;
     }
 
-    public static final class Delegate extends InventoryBlockEntity
+    public static class Delegate extends InventoryBlockEntity
     {
         public Delegate(BlockEntityType<? extends InventoryBlockEntity> blockEntityType, BlockPos blockPos, BlockState blockState)
         {
