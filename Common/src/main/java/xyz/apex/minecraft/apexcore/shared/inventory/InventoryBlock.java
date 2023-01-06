@@ -3,7 +3,6 @@ package xyz.apex.minecraft.apexcore.shared.inventory;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -54,7 +53,7 @@ public abstract class InventoryBlock<T extends InventoryBlockEntity, M extends I
         return Optional.ofNullable(getBlockEntity(level, pos, blockState));
     }
 
-    protected InteractionResult openMenu(Level level, BlockPos pos, BlockState blockState, Player player, InteractionHand hand, @Nullable Direction side)
+    public InteractionResult openMenu(Level level, BlockPos pos, BlockState blockState, Player player)
     {
         var blockEntity = getBlockEntity(level, pos, blockState);
         if(blockEntity == null) return InteractionResult.PASS;
@@ -62,7 +61,7 @@ public abstract class InventoryBlock<T extends InventoryBlockEntity, M extends I
         if(player instanceof ServerPlayer serverPlayer)
         {
             var displayName = blockEntity.getDisplayName();
-            getInventoryMenuType().open(serverPlayer, displayName, data -> writeInventoryData(data, level, pos, blockState, side));
+            getInventoryMenuType().open(serverPlayer, displayName, data -> writeInventoryData(data, level, pos, blockState));
         }
 
         return InteractionResult.sidedSuccess(level.isClientSide);
@@ -71,8 +70,7 @@ public abstract class InventoryBlock<T extends InventoryBlockEntity, M extends I
     @Override
     public InteractionResult use(BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
     {
-        var side = hit.getDirection();
-        return openMenu(level, pos, blockState, player, hand, side);
+        return openMenu(level, pos, blockState, player);
     }
 
     @Nullable
@@ -136,17 +134,13 @@ public abstract class InventoryBlock<T extends InventoryBlockEntity, M extends I
     {
         return getOptionalBlockEntity(level, pos, blockState).map(blockEntity -> {
             var displayName = blockEntity.getDisplayName();
-            return getInventoryMenuType().asProvider(displayName, data -> writeInventoryData(data, level, pos, blockState, null));
+            return getInventoryMenuType().asProvider(displayName, data -> writeInventoryData(data, level, pos, blockState));
         }).orElse(null);
     }
 
-    protected void writeInventoryData(FriendlyByteBuf data, Level level, BlockPos pos, BlockState blockState, @Nullable Direction side)
+    protected void writeInventoryData(FriendlyByteBuf data, Level level, BlockPos pos, BlockState blockState)
     {
         data.writeBlockPos(pos);
-
-        var writeSide = side != null;
-        data.writeBoolean(writeSide);
-        if(writeSide) data.writeEnum(side);
     }
 
     public static abstract class AsMultiBlock<T extends InventoryBlockEntity, M extends InventoryMenu> extends InventoryBlock<T, M> implements MultiBlock
@@ -222,6 +216,21 @@ public abstract class InventoryBlock<T extends InventoryBlockEntity, M extends I
         public RenderShape getRenderShape(BlockState blockState)
         {
             return multiBlockType.isOrigin(blockState) ? RenderShape.MODEL : RenderShape.INVISIBLE;
+        }
+
+        @Override
+        public InteractionResult openMenu(Level level, BlockPos pos, BlockState blockState, Player player)
+        {
+            if(!isSameBlockTypeForMultiBlock(blockState)) return InteractionResult.PASS;
+
+            if(!multiBlockType.isOrigin(blockState))
+            {
+                var originPos = multiBlockType.getOriginPos(this, blockState, pos);
+                var originBlockState = level.getBlockState(originPos);
+                return openMenu(level, originPos, originBlockState, player);
+            }
+
+            return super.openMenu(level, pos, blockState, player);
         }
     }
 }
