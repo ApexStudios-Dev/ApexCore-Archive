@@ -7,7 +7,7 @@ import xyz.apex.minecraft.apexcore.shared.registry.AbstractRegistrar;
 
 import java.util.function.Supplier;
 
-public final class NoConfigBuilder<T, R extends T, O extends AbstractRegistrar<O>, P> extends AbstractBuilder<T, R, O, P, NoConfigBuilder<T, R, O, P>>
+public class NoConfigBuilder<T, R extends T, O extends AbstractRegistrar<O>, P> extends AbstractBuilder<T, R, O, P, NoConfigBuilder<T, R, O, P>>
 {
     private final Supplier<R> entryFactory;
 

@@ -21,6 +21,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
@@ -32,6 +34,7 @@ import xyz.apex.minecraft.apexcore.shared.multiblock.SimpleMultiBlock;
 import xyz.apex.minecraft.apexcore.shared.platform.ModPlatform;
 import xyz.apex.minecraft.apexcore.shared.registry.builder.*;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.MenuEntry;
+import xyz.apex.minecraft.apexcore.shared.registry.entry.RecipeEntry;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.RegistryEntry;
 
 import java.util.*;
@@ -496,6 +499,13 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     public final <T extends Entity> EntityBuilder<T, S, S> entity(String entityName, EntityBuilder.Factory<T> factory)
     {
         return entity(self(), entityName, factory);
+    }
+    // endregion
+
+    // region: RecipeSerializer & RecipeType
+    public <R extends Recipe<?>> RecipeEntry<R> recipe(String recipeName, Supplier<RecipeSerializer<R>> factory)
+    {
+        return new RecipeSerializerBuilder<>(self(), self(), recipeName, factory).register();
     }
     // endregion
     // endregion
