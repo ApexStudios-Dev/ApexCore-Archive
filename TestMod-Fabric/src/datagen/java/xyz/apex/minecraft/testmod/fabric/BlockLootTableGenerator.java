@@ -16,5 +16,6 @@ public final class BlockLootTableGenerator extends BlockLootTableProvider
     public void generate()
     {
         dropSelf(TestMod.TEST_BLOCK.get());
+        dropSelf(TestMod.TEST_MULTI_BLOCK.get());
     }
 }

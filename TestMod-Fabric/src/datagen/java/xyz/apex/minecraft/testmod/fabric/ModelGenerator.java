@@ -20,6 +20,7 @@ public final class ModelGenerator extends FabricModelProvider
     public void generateBlockStateModels(BlockModelGenerators generators)
     {
         generators.createTrivialCube(TestMod.TEST_BLOCK.get());
+        generators.createTrivialCube(TestMod.TEST_MULTI_BLOCK.get());
     }
 
     @Override
