@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.shared.registry.builder;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import dev.architectury.registry.CreativeTabRegistry;
 import dev.architectury.registry.client.rendering.ColorHandlerRegistry;
@@ -8,7 +9,6 @@ import dev.architectury.registry.item.ItemPropertiesRegistry;
 import dev.architectury.registry.registries.RegistrySupplier;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
-import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
