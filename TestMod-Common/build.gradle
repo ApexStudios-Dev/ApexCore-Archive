@@ -11,7 +11,7 @@ sourceSets {
 }
 
 architectury {
-	common(['forge', 'fabric'])
+	common(['forge', 'fabric', 'quilt'])
 }
 
 loom {

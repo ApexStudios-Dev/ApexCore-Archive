@@ -10,7 +10,8 @@ import xyz.apex.minecraft.apexcore.shared.util.Tags;
 public enum ModLoader
 {
     FORGE("forge", "MinecraftForge"),
-    FABRIC("fabric", "c", "Fabric");
+    FABRIC("fabric", "c", "Fabric"),
+    QUILT("quilt", "Quilt");
 
     private final String modId;
     private final String tagsNamespace;
