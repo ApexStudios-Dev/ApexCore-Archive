@@ -7,6 +7,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
+import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
 import xyz.apex.minecraft.apexcore.shared.registry.AbstractRegistrar;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.shared.util.function.Lazy;
@@ -134,5 +135,11 @@ public abstract class AbstractBuilder<T, R extends T, O extends AbstractRegistra
     public final B self()
     {
         return Builder.super.self();
+    }
+
+    @Override
+    public final GamePlatform platform()
+    {
+        return Builder.super.platform();
     }
 }

@@ -1,6 +1,7 @@
 package xyz.apex.minecraft.apexcore.fabric.platform;
 
 import dev.architectury.utils.Env;
+import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 import net.fabricmc.loader.impl.FabricLoaderImpl;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,6 +63,12 @@ public final class FabricGamePlatform implements GamePlatform
     public String getModLoaderVersion()
     {
         return FabricLoaderImpl.VERSION;
+    }
+
+    @Override
+    public boolean isRunningDataGeneration()
+    {
+        return FabricDataGenHelper.ENABLED;
     }
 
     @Override

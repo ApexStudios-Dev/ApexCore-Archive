@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.data.loading.DatagenModLoader;
 import net.minecraftforge.versions.forge.ForgeVersion;
 
 import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
@@ -62,6 +63,12 @@ public final class ForgeGamePlatform implements GamePlatform
     public String getModLoaderVersion()
     {
         return ForgeVersion.getVersion();
+    }
+
+    @Override
+    public boolean isRunningDataGeneration()
+    {
+        return DatagenModLoader.isRunningDataGen();
     }
 
     @Override

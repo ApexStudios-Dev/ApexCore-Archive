@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
 
-public interface GamePlatform
+public interface GamePlatform extends PlatformHolder
 {
     GamePlatform INSTANCE = ServiceLoader.load(GamePlatform.class).findFirst().orElseThrow();
 
@@ -89,6 +89,14 @@ public interface GamePlatform
     default boolean isDevelopmentEnvironment()
     {
         return Platform.isDevelopmentEnvironment();
+    }
+
+    boolean isRunningDataGeneration();
+
+    @Override
+    default GamePlatform platform()
+    {
+        return this;
     }
 
     EnhancedTier createEnhancedTier(String registryName, int uses, float speed, float attackDamageBonus, int level, int enchantmentValue, Supplier<Ingredient> repairIngredient, @Nullable TagKey<Block> toolLevelBlock);

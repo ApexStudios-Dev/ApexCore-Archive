@@ -4,6 +4,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
+import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
+import xyz.apex.minecraft.apexcore.shared.platform.PlatformHolder;
 import xyz.apex.minecraft.apexcore.shared.registry.AbstractRegistrar;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.shared.util.function.LazyLike;
@@ -13,7 +15,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unchecked")
-public interface Builder<T, R extends T, O extends AbstractRegistrar<O>, P, B extends Builder<T, R, O, P, B>> extends LazyLike<RegistryEntry<R>>
+public interface Builder<T, R extends T, O extends AbstractRegistrar<O>, P, B extends Builder<T, R, O, P, B>> extends LazyLike<RegistryEntry<R>>, PlatformHolder
 {
     RegistryEntry<R> register();
 
@@ -80,5 +82,11 @@ public interface Builder<T, R extends T, O extends AbstractRegistrar<O>, P, B ex
     default B self()
     {
         return (B) this;
+    }
+
+    @Override
+    default GamePlatform platform()
+    {
+        return getOwner().platform();
     }
 }

@@ -30,7 +30,9 @@ import xyz.apex.minecraft.apexcore.shared.multiblock.MultiBlock;
 import xyz.apex.minecraft.apexcore.shared.multiblock.MultiBlockFactory;
 import xyz.apex.minecraft.apexcore.shared.multiblock.MultiBlockType;
 import xyz.apex.minecraft.apexcore.shared.multiblock.SimpleMultiBlock;
+import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
 import xyz.apex.minecraft.apexcore.shared.platform.ModPlatform;
+import xyz.apex.minecraft.apexcore.shared.platform.PlatformHolder;
 import xyz.apex.minecraft.apexcore.shared.registry.builder.*;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.MenuEntry;
 import xyz.apex.minecraft.apexcore.shared.registry.entry.RecipeEntry;
@@ -44,7 +46,7 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 @SuppressWarnings({ "UnusedReturnValue", "unchecked", "SuspiciousMethodCalls", "UnstableApiUsage", "rawtypes" })
-public class AbstractRegistrar<S extends AbstractRegistrar<S>>
+public class AbstractRegistrar<S extends AbstractRegistrar<S>> implements PlatformHolder
 {
     private final Table<ResourceKey<? extends Registry<?>>, String, Registration<?, ?>> registrations = HashBasedTable.create();
     private final Multimap<Pair<ResourceKey<? extends Registry<?>>, String>, Consumer<?>> registerCallbacks = HashMultimap.create();
@@ -63,6 +65,12 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>>
     public final ModPlatform getMod()
     {
         return Objects.requireNonNull(mod);
+    }
+
+    @Override
+    public final GamePlatform platform()
+    {
+        return mod == null ? GamePlatform.INSTANCE : mod;
     }
 
     public final String getModId()

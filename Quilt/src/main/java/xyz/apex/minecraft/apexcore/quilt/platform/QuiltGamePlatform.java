@@ -3,6 +3,7 @@ package xyz.apex.minecraft.apexcore.quilt.platform;
 import com.google.common.collect.Maps;
 import dev.architectury.platform.Mod;
 import dev.architectury.utils.Env;
+import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 import org.jetbrains.annotations.Nullable;
 import org.quiltmc.loader.api.*;
 import org.quiltmc.loader.impl.QuiltLoaderImpl;
@@ -144,6 +145,12 @@ public final class QuiltGamePlatform implements GamePlatform
     public boolean isDevelopmentEnvironment()
     {
         return QuiltLoader.isDevelopmentEnvironment();
+    }
+
+    @Override
+    public boolean isRunningDataGeneration()
+    {
+        return FabricDataGenHelper.ENABLED;
     }
 
     private record QuiltModImpl(ModContainer modContainer) implements Mod

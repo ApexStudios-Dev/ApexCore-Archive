@@ -68,11 +68,25 @@ public final class BlockBuilder<R extends Block, O extends AbstractRegistrar<O>,
             if(hitbox != null) HitBoxRegistry.register(registryName, hitbox, hitboxModifier);
 
             EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                var renderType = renderTypeSupplier.get().get();
                 var blockColor = blockColorSupplier.get().get();
-
-                if(renderType != null) RenderTypeRegistry.register(renderType, block);
                 if(blockColor != null) ColorHandlerRegistry.registerBlockColors(blockColor, block);
+
+                // must be done during ClientSetup events
+                //
+                // arch invokes the client setup event for fabric loaders immediately their internal mod is invoked
+                // and with fabric not having reliable or sorted mod order loading
+                // there can be times arch runs [invokes the event] and then our mod runs [and registers the event listener]
+                // leading to the event never being fired for us
+                //
+                // this is fine to leave here in normal circumstances, as it falls under client setup
+                // but when run on forge data gen, the client setup event finishes before this gets invoked
+                // and forges client checks in the render type registration fail, which hard crash the game, saying to render during client setup
+                // since this is only during data gen though, we can safely ignore the registration
+                if(!platform().isRunningDataGeneration())
+                {
+                    var renderType = renderTypeSupplier.get().get();
+                    if(renderType != null) RenderTypeRegistry.register(renderType, block);
+                }
             });
         });
     }

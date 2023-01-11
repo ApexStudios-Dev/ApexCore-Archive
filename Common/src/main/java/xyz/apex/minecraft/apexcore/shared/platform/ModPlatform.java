@@ -20,46 +20,58 @@ public interface ModPlatform extends GamePlatform
 
     default Mod asMod()
     {
-        return GamePlatform.INSTANCE.getMod(getModId());
+        return platform().getMod(getModId());
     }
 
     @Override
     default void initialize()
     {
-        GamePlatform.INSTANCE.initialize();
+        platform().initialize();
         GamePlatform.super.initialize();
     }
 
     @Override
     default void initializeSided(Env side)
     {
-        GamePlatform.INSTANCE.initializeSided(side);
+        platform().initializeSided(side);
         GamePlatform.super.initializeSided(side);
     }
 
     @Override
     default void initializeDataGen()
     {
-        GamePlatform.INSTANCE.initializeDataGen();
+        platform().initializeDataGen();
         GamePlatform.super.initializeDataGen();
     }
 
     @Override
     default ModLoader getModLoader()
     {
-        return GamePlatform.INSTANCE.getModLoader();
+        return platform().getModLoader();
     }
 
     @Override
     default String getModLoaderVersion()
     {
-        return GamePlatform.INSTANCE.getModLoaderVersion();
+        return platform().getModLoaderVersion();
+    }
+
+    @Override
+    default boolean isRunningDataGeneration()
+    {
+        return platform().isRunningDataGeneration();
+    }
+
+    @Override
+    default GamePlatform platform()
+    {
+        return GamePlatform.INSTANCE;
     }
 
     @Override
     default EnhancedTier createEnhancedTier(String registryName, int uses, float speed, float attackDamageBonus, int level, int enchantmentValue, Supplier<Ingredient> repairIngredient, @Nullable TagKey<Block> toolLevelBlock)
     {
-        return GamePlatform.INSTANCE.createEnhancedTier("%s:%s".formatted(getModId(), registryName), uses, speed, attackDamageBonus, level, enchantmentValue, repairIngredient, toolLevelBlock);
+        return platform().createEnhancedTier("%s:%s".formatted(getModId(), registryName), uses, speed, attackDamageBonus, level, enchantmentValue, repairIngredient, toolLevelBlock);
     }
 
     default ResourceLocation id(String path)

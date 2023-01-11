@@ -8,6 +8,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
+import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
+import xyz.apex.minecraft.apexcore.shared.platform.PlatformHolder;
 import xyz.apex.minecraft.apexcore.shared.registry.AbstractRegistrar;
 import xyz.apex.minecraft.apexcore.shared.util.function.LazyLike;
 
@@ -21,7 +23,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
-public class RegistryEntry<T> implements LazyLike<T>, Comparable<RegistryEntry<?>>
+public class RegistryEntry<T> implements LazyLike<T>, Comparable<RegistryEntry<?>>, PlatformHolder
 {
     protected final AbstractRegistrar<?> owner;
     protected final ResourceKey<? extends Registry<? super T>> registryType;
@@ -39,6 +41,12 @@ public class RegistryEntry<T> implements LazyLike<T>, Comparable<RegistryEntry<?
     public final AbstractRegistrar<?> getOwner()
     {
         return owner;
+    }
+
+    @Override
+    public final GamePlatform platform()
+    {
+        return owner.platform();
     }
 
     @ApiStatus.Internal

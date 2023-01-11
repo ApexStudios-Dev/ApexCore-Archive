@@ -92,6 +92,18 @@ public abstract class AbstractModPlatform implements ModPlatform
     }
 
     @Override
+    public final boolean isRunningDataGeneration()
+    {
+        return ModPlatform.super.isRunningDataGeneration();
+    }
+
+    @Override
+    public final GamePlatform platform()
+    {
+        return ModPlatform.super.platform();
+    }
+
+    @Override
     public final ModLoader getModLoader()
     {
         return ModPlatform.super.getModLoader();
