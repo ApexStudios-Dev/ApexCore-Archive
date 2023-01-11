@@ -58,3 +58,15 @@ processResources {
 		expand project.properties
 	}
 }
+
+remapJar {
+	enabled = false
+}
+
+jar {
+	enabled = false
+}
+
+sourcesJar {
+	enabled = false
+}
