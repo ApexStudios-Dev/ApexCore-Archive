@@ -65,6 +65,7 @@
         "fabricloader": ">=${FABRIC_LOADER_VERSION}",
         "fabric-api": ">=${FABRIC_VERSION}",
         "${ARCHITECTURY_ID}": ">=${ARCHITECTURY_VERSION}",
+        "${CLOTH_CONFIG_FABRIC_ID}": ">=${CLOTH_CONFIG_VERSION_MOD}",
         "${MOD_ID}": ">=${MOD_VERSION}"
     },
     "custom": {

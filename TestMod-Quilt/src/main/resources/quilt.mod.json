@@ -50,6 +50,10 @@
                 "versions": ">=${ARCHITECTURY_VERSION}"
             },
             {
+                "id": "${CLOTH_CONFIG_FABRIC_ID}",
+                "versions": ">=${CLOTH_CONFIG_VERSION_MOD}"
+            },
+            {
                 "id": "${MOD_ID}",
                 "versions": ">=${MOD_VERSION}"
             }

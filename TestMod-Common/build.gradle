@@ -29,6 +29,7 @@ repositories {
 	maven { url 'https://dvs1.progwml6.com/files/maven/' }
 	maven { url 'https://modmaven.dev/' }
 	maven { url 'https://maven.covers1624.net/' }
+	maven { url 'https://maven.shedaniel.me/' }
 
 	maven {
 		url 'https://www.cursemaven.com'
@@ -47,6 +48,10 @@ dependencies {
 	implementation(project(path: ':Common', configuration: 'namedElements')) { transitive false }
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 	implementation 'com.google.errorprone:error_prone_annotations:2.11.0'
+
+	if(rootProject.hasProperty('CLOTH_CONFIG_VERSION')) {
+		modApi "me.shedaniel.cloth:cloth-config:${CLOTH_CONFIG_VERSION}"
+	}
 }
 
 processResources {

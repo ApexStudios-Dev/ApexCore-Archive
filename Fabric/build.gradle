@@ -55,6 +55,7 @@ repositories {
 	maven { url 'https://dvs1.progwml6.com/files/maven/' }
 	maven { url 'https://modmaven.dev/' }
 	maven { url 'https://maven.covers1624.net/' }
+	maven { url 'https://maven.shedaniel.me/' }
 
 	maven {
 		url 'https://www.cursemaven.com'
@@ -101,6 +102,13 @@ dependencies {
 	// ModMenu
 	if(rootProject.hasProperty('FABRIC_MOD_MENU_VERSION')) {
 		modImplementation "com.terraformersmc:modmenu:${FABRIC_MOD_MENU_VERSION}"
+	}
+
+	// ClothConfig
+	if(rootProject.hasProperty('CLOTH_CONFIG_VERSION')) {
+		modApi("me.shedaniel.cloth:cloth-config-fabric:${CLOTH_CONFIG_VERSION}") {
+			exclude(module: 'fabric-api')
+		}
 	}
 }
 

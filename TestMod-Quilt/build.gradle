@@ -34,6 +34,7 @@ repositories {
 	maven { url 'https://modmaven.dev/' }
 	maven { url 'https://maven.covers1624.net/' }
 	maven { url "https://maven.quiltmc.org/repository/release/" }
+	maven { url 'https://maven.shedaniel.me/' }
 
 	maven {
 		url 'https://www.cursemaven.com'
@@ -81,6 +82,13 @@ dependencies {
 		modImplementation("com.terraformersmc:modmenu:${FABRIC_MOD_MENU_VERSION}") {
 			exclude group: 'net.fabricmc'
 			exclude group: 'net.fabricmc.fabric-api'
+		}
+	}
+
+	// ClothConfig
+	if(rootProject.hasProperty('CLOTH_CONFIG_VERSION')) {
+		modApi("me.shedaniel.cloth:cloth-config-fabric:${CLOTH_CONFIG_VERSION}") {
+			exclude(module: 'fabric-api')
 		}
 	}
 }
