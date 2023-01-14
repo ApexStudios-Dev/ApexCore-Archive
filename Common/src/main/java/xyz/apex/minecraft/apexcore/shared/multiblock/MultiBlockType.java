@@ -154,7 +154,7 @@ public final class MultiBlockType
 
     public boolean passesPlacementTests(MultiBlock multiBlock, LevelReader level, BlockPos pos, BlockState multiBlockState, BlockState worldBlockState)
     {
-        if(multiBlock.isSameBlockTypeForMultiBlock(worldBlockState)) return true;
+        // if(multiBlock.isSameBlockTypeForMultiBlock(worldBlockState)) return true;
 
         if(!worldBlockState.getMaterial().isReplaceable()) return false;
         if(!placementPredicate.test(multiBlock, level, pos, multiBlockState)) return false;
