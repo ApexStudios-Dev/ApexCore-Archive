@@ -1,6 +1,5 @@
 package xyz.apex.minecraft.apexcore.fabric.platform;
 
-import dev.architectury.utils.Env;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.api.ModInitializer;
@@ -34,14 +33,12 @@ public class FabricModPlatform extends AbstractModPlatform implements ModInitial
     public final void onInitializeClient()
     {
         if(registrar != null) registrar.lateRegister();
-        initializeSided(Env.CLIENT);
     }
 
     @Override
     public final void onInitializeServer()
     {
         if(registrar != null) registrar.lateRegister();
-        initializeSided(Env.SERVER);
     }
 
     @Override

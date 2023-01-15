@@ -1,15 +1,12 @@
 package xyz.apex.minecraft.apexcore.forge.platform;
 
 import dev.architectury.platform.forge.EventBuses;
-import dev.architectury.utils.Env;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegisterEvent;
 
@@ -51,8 +48,6 @@ public class ForgeModPlatform extends AbstractModPlatform
         Validate.isTrue(ModLoadingContext.get().getActiveNamespace().equals(modId));
         var modBus = FMLJavaModLoadingContext.get().getModEventBus();
         EventBuses.registerModEventBus(modId, modBus);
-        modBus.addListener(EventPriority.HIGHEST, this::onClientSetup);
-        modBus.addListener(EventPriority.HIGHEST, this::onDedicatedServerSetup);
         modBus.addListener(EventPriority.HIGHEST, this::onRegister);
         modBus.addListener(EventPriority.LOWEST, this::onLateRegister);
         initialize();
@@ -63,16 +58,6 @@ public class ForgeModPlatform extends AbstractModPlatform
     public final String getModId()
     {
         return modId;
-    }
-
-    private void onClientSetup(FMLClientSetupEvent event)
-    {
-        initializeSided(Env.CLIENT);
-    }
-
-    private void onDedicatedServerSetup(FMLDedicatedServerSetupEvent event)
-    {
-        initializeSided(Env.SERVER);
     }
 
     private void onRegister(RegisterEvent event)

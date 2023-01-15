@@ -1,7 +1,6 @@
 package xyz.apex.minecraft.apexcore.shared.platform;
 
 import dev.architectury.platform.Mod;
-import dev.architectury.utils.Env;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.resources.ResourceLocation;
@@ -28,20 +27,6 @@ public interface ModPlatform extends GamePlatform
     {
         platform().initialize();
         GamePlatform.super.initialize();
-    }
-
-    @Override
-    default void initializeSided(Env side)
-    {
-        platform().initializeSided(side);
-        GamePlatform.super.initializeSided(side);
-    }
-
-    @Override
-    default void initializeDataGen()
-    {
-        platform().initializeDataGen();
-        GamePlatform.super.initializeDataGen();
     }
 
     @Override

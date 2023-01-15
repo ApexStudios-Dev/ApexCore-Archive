@@ -1,6 +1,5 @@
 package xyz.apex.minecraft.apexcore.quilt.platform;
 
-import dev.architectury.utils.Env;
 import org.jetbrains.annotations.Nullable;
 import org.quiltmc.loader.api.ModContainer;
 import org.quiltmc.qsl.base.api.entrypoint.ModInitializer;
@@ -35,14 +34,12 @@ public class QuiltModPlatform extends AbstractModPlatform implements ModInitiali
     public final void onInitializeClient(ModContainer mod)
     {
         if(registrar != null) registrar.lateRegister();
-        initializeSided(Env.CLIENT);
     }
 
     @Override
     public final void onInitializeServer(ModContainer mod)
     {
         if(registrar != null) registrar.lateRegister();
-        initializeSided(Env.SERVER);
     }
 
     @Override

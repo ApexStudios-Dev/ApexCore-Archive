@@ -24,8 +24,6 @@ import java.util.stream.Collectors;
 public final class QuiltGamePlatform implements GamePlatform
 {
     private boolean initialized = false;
-    private final Set<Env> initializedSides = EnumSet.noneOf(Env.class);
-    private boolean initializedDataGen = false;
     private final QuiltStorages storages = new QuiltStorages();
     private final Map<String, Mod> mods = Maps.newConcurrentMap();
 
@@ -40,22 +38,6 @@ public final class QuiltGamePlatform implements GamePlatform
         if(initialized) return;
         GamePlatform.super.initialize();
         initialized = true;
-    }
-
-    @Override
-    public void initializeSided(Env side)
-    {
-        if(initializedSides.contains(side)) return;
-        GamePlatform.super.initializeSided(side);
-        initializedSides.add(side);
-    }
-
-    @Override
-    public void initializeDataGen()
-    {
-        if(initializedDataGen) return;
-        GamePlatform.super.initializeDataGen();
-        initializedDataGen = true;
     }
 
     @Override

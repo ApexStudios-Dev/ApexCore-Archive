@@ -1,6 +1,5 @@
 package xyz.apex.minecraft.apexcore.fabric.platform;
 
-import dev.architectury.utils.Env;
 import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 import net.fabricmc.loader.impl.FabricLoaderImpl;
 import org.jetbrains.annotations.Nullable;
@@ -13,15 +12,11 @@ import xyz.apex.minecraft.apexcore.shared.platform.GamePlatform;
 import xyz.apex.minecraft.apexcore.shared.platform.ModLoader;
 import xyz.apex.minecraft.apexcore.shared.util.EnhancedTier;
 
-import java.util.EnumSet;
-import java.util.Set;
 import java.util.function.Supplier;
 
 public final class FabricGamePlatform implements GamePlatform
 {
     private boolean initialized = false;
-    private final Set<Env> initializedSides = EnumSet.noneOf(Env.class);
-    private boolean initializedDataGen = false;
     private final FabricStorages storages = new FabricStorages();
 
     public FabricGamePlatform()
@@ -35,22 +30,6 @@ public final class FabricGamePlatform implements GamePlatform
         if(initialized) return;
         GamePlatform.super.initialize();
         initialized = true;
-    }
-
-    @Override
-    public void initializeSided(Env side)
-    {
-        if(initializedSides.contains(side)) return;
-        GamePlatform.super.initializeSided(side);
-        initializedSides.add(side);
-    }
-
-    @Override
-    public void initializeDataGen()
-    {
-        if(initializedDataGen) return;
-        GamePlatform.super.initializeDataGen();
-        initializedDataGen = true;
     }
 
     @Override

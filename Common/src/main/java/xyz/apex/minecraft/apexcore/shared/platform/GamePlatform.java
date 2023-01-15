@@ -28,10 +28,6 @@ public interface GamePlatform extends PlatformHolder
         Tags.bootstrap();
     }
 
-    default void initializeSided(Env side) {}
-
-    default void initializeDataGen() {}
-
     ModLoader getModLoader();
 
     default String getMinecraftVersion()
