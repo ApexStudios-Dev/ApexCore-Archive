@@ -39,11 +39,11 @@ issueTrackerURL="https://discord.apexstudios.dev/"
 	side="BOTH"
 	[dependencies.apexcore.custom.mc-publish]
 		ignore=true
-#[[dependencies.apexcore]]
-#	modId="jei"
-#	mandatory=false
-#	versionRange="[11.2.0.246,)"
-#	ordering="AFTER"
-#	side="BOTH"
-#	[dependencies.apexcore.custom.mc-publish]
-#		curseforge="jei"
+[[dependencies.apexcore]]
+	modId="jei"
+	mandatory=false
+	versionRange="[12.0.0.0,)"
+	ordering="AFTER"
+	side="BOTH"
+	[dependencies.apexcore.custom.mc-publish]
+		curseforge="jei"
