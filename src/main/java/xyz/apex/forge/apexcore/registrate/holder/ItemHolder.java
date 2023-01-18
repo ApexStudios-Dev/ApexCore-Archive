@@ -51,15 +51,12 @@ public interface ItemHolder<OWNER extends CoreRegistrate<OWNER> & ItemHolder<OWN
 
 	default <ITEM extends Item, PARENT> ItemBuilder<OWNER, ITEM, PARENT> item(PARENT parent, String name, ItemFactory<ITEM> itemFactory)
 	{
-		// TODO: See creativeModeTab todo in CoreRegistrate
 		// obtain instance so that future calls to creativeModeTab won't affect this builder
-		/*var supplier = self().currentCreativeModeTab();
-		var creativeModeTab = supplier == null ? null : supplier.get();*/
+		var creativeModeTab = self().currentCreativeModeTab();
 
 		return self().entry(name, callback -> new ItemBuilder<>(self(), parent, name, callback, itemFactory)
 				.transform(ItemBuilder::applyDefaults)
-				// TODO: See creativeModeTab todo in CoreRegistrate
-				// .transform(builder -> builder.tab(creativeModeTab))
+				.transform(builder -> creativeModeTab == null ? builder : builder.tab(creativeModeTab::get))
 		);
 	}
 }

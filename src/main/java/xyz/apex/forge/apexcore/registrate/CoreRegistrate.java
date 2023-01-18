@@ -7,6 +7,7 @@ import com.tterrag.registrate.builders.BuilderCallback;
 import com.tterrag.registrate.builders.NoConfigBuilder;
 import com.tterrag.registrate.providers.ProviderType;
 import com.tterrag.registrate.providers.RegistrateProvider;
+import com.tterrag.registrate.util.CreativeModeTabModifier;
 import com.tterrag.registrate.util.OneTimeEventReceiver;
 import com.tterrag.registrate.util.entry.RegistryEntry;
 import com.tterrag.registrate.util.nullness.*;
@@ -16,6 +17,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.NewRegistryEvent;
@@ -23,9 +25,12 @@ import net.minecraftforge.registries.RegistryBuilder;
 
 import xyz.apex.forge.apexcore.registrate.entry.ForgeRegistryEntry;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 // Bare bones Registrate object
@@ -37,8 +42,6 @@ public class CoreRegistrate<OWNER extends CoreRegistrate<OWNER>>
 
 	protected final OWNER self = (OWNER) this;
 	public final String modId;
-	// TODO: See later creativeModeTab TODO
-	// @Nullable private Supplier<? extends CreativeModeTab> currentTab = null;
 
 	protected CoreRegistrate(String modId)
 	{
@@ -69,12 +72,11 @@ public class CoreRegistrate<OWNER extends CoreRegistrate<OWNER>>
 		return backend.currentName();
 	}
 
-	// TODO: See later creativeModeTab TODO
-	/*@Nullable
+	@Nullable
 	public final Supplier<? extends CreativeModeTab> currentCreativeModeTab()
 	{
-		return currentTab;
-	}*/
+		return backend.currentCreativeModeTab;
+	}
 
 	public final <TYPE, VALUE extends TYPE> RegistryEntry<VALUE> get(ResourceKey<? extends Registry<TYPE>> registryType)
 	{
@@ -174,18 +176,61 @@ public class CoreRegistrate<OWNER extends CoreRegistrate<OWNER>>
 		return self;
 	}
 
-	// TODO: Bring back if tterrag manages to find away to implement these
-	/*public final OWNER creativeModeTab(NonNullSupplier<? extends CreativeModeTab> creativeModeTab)
+	public final Supplier<CreativeModeTab> buildCreativeModeTab(String registryName, @Nullable List<Object> beforeEntries, @Nullable List<Object> afterEntries, Consumer<CreativeModeTab.Builder> configurator, @Nullable String englishTranslation)
+	{
+		return backend.buildCreativeModeTab(registryName, beforeEntries, afterEntries, configurator, englishTranslation);
+	}
+
+	public final Supplier<CreativeModeTab> buildCreativeModeTab(String registryName, @Nullable List<Object> beforeEntries, @Nullable List<Object> afterEntries, Consumer<CreativeModeTab.Builder> configurator)
+	{
+		return backend.buildCreativeModeTab(registryName, beforeEntries, afterEntries, configurator);
+	}
+
+	public final Supplier<CreativeModeTab> buildCreativeModeTab(String registryName, Consumer<CreativeModeTab.Builder> configurator)
+	{
+		return backend.buildCreativeModeTab(registryName, configurator);
+	}
+
+	public final Supplier<CreativeModeTab> buildCreativeModeTab(String registryName, Consumer<CreativeModeTab.Builder> configurator, @Nullable String englishTranslation)
+	{
+		return backend.buildCreativeModeTab(registryName, configurator, englishTranslation);
+	}
+
+	public final OWNER creativeModeTab(String registryName, @Nullable List<Object> beforeEntries, @Nullable List<Object> afterEntries, Consumer<CreativeModeTab.Builder> configurator)
+	{
+		backend.creativeModeTab(registryName, beforeEntries, afterEntries, configurator);
+		return self;
+	}
+
+	public final OWNER creativeModeTab(String registryName, @Nullable List<Object> beforeEntries, @Nullable List<Object> afterEntries, Consumer<CreativeModeTab.Builder> configurator, @Nullable String englishTranslation)
+	{
+		backend.creativeModeTab(registryName, beforeEntries, afterEntries, configurator, englishTranslation);
+		return self;
+	}
+
+	public final OWNER creativeModeTab(String registryName, Consumer<CreativeModeTab.Builder> configurator)
+	{
+		backend.creativeModeTab(registryName, configurator);
+		return self;
+	}
+
+	public final OWNER creativeModeTab(String registryName, Consumer<CreativeModeTab.Builder> configurator, @Nullable String englishTranslation)
+	{
+		backend.creativeModeTab(registryName, configurator, englishTranslation);
+		return self;
+	}
+
+	public final OWNER creativeModeTab(Supplier<? extends CreativeModeTab> creativeModeTab)
 	{
 		backend.creativeModeTab(creativeModeTab);
 		return self;
 	}
 
-	public final OWNER creativeModeTab(NonNullSupplier<? extends CreativeModeTab> creativeModeTab, String name)
+	public final OWNER modifyCreativeModeTab(Supplier<? extends CreativeModeTab> creativeModeTab, Consumer<CreativeModeTabModifier> modifier)
 	{
-		backend.creativeModeTab(creativeModeTab, name);
+		backend.modifyCreativeModeTab(creativeModeTab, modifier);
 		return self;
-	}*/
+	}
 
 	public final OWNER transform(NonNullUnaryOperator<OWNER> func)
 	{
@@ -274,6 +319,8 @@ public class CoreRegistrate<OWNER extends CoreRegistrate<OWNER>>
 
 	public final class Backend extends com.tterrag.registrate.AbstractRegistrate<Backend>
 	{
+		@Nullable private Supplier<? extends CreativeModeTab> currentCreativeModeTab;
+
 		private Backend()
 		{
 			super(CoreRegistrate.this.modId);
@@ -291,12 +338,11 @@ public class CoreRegistrate<OWNER extends CoreRegistrate<OWNER>>
 			return super.currentName();
 		}
 
-		// TODO: See other creativeModeTab todo
-		/*@Override
-		public Backend creativeModeTab(NonNullSupplier<? extends CreativeModeTab> tab)
+		@Override
+		public Backend creativeModeTab(Supplier<? extends CreativeModeTab> creativeModeTab)
 		{
-			CoreRegistrate.this.currentTab = Suppliers.memoize(tab::get);
-			return super.creativeModeTab(tab);
-		}*/
+			currentCreativeModeTab = creativeModeTab;
+			return super.creativeModeTab(creativeModeTab);
+		}
 	}
 }

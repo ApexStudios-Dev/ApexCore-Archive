@@ -1,10 +1,12 @@
 package xyz.apex.forge.apexcore.registrate.builder;
 
+import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.tterrag.registrate.builders.BuilderCallback;
 import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateItemModelProvider;
 import com.tterrag.registrate.providers.RegistrateRecipeProvider;
+import com.tterrag.registrate.util.CreativeModeTabModifier;
 import com.tterrag.registrate.util.OneTimeEventReceiver;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
@@ -15,6 +17,8 @@ import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraftforge.api.distmarker.Dist;
@@ -30,6 +34,8 @@ import xyz.apex.forge.apexcore.registrate.entry.ItemEntry;
 import xyz.apex.forge.apexcore.registrate.holder.ItemHolder;
 import xyz.apex.forge.commonality.Mods;
 
+import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static com.tterrag.registrate.providers.ProviderType.*;
@@ -45,6 +51,7 @@ public final class ItemBuilder<
 	private NonNullSupplier<Item.Properties> initialProperties = Item.Properties::new;
 	private NonNullFunction<Item.Properties, Item.Properties> propertiesModifier = NonNullUnaryOperator.identity();
 	private NonNullSupplier<Supplier<ItemColor>> colorHandler = () -> () -> null;
+	private Map<NonNullSupplier<? extends CreativeModeTab>, Consumer<CreativeModeTabModifier>> creativeModeTabs = Maps.newHashMap();
 
 	public ItemBuilder(OWNER owner, PARENT parent, String name, BuilderCallback callback, ItemFactory<ITEM> itemFactory)
 	{
@@ -52,12 +59,15 @@ public final class ItemBuilder<
 
 		this.itemFactory = itemFactory;
 
-		DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> onRegister(item -> OneTimeEventReceiver.addModListener(RegisterColorHandlersEvent.Item.class, event -> {
-			var colorHandler = this.colorHandler.get().get();
+		onRegister(item -> {
+			DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> OneTimeEventReceiver.addModListener(RegisterColorHandlersEvent.Item.class, event -> {
+				var colorHandler = this.colorHandler.get().get();
+				if(colorHandler != null) event.register(colorHandler, item);
+			}));
 
-			if(colorHandler != null)
-				event.register(colorHandler, item);
-		})));
+			creativeModeTabs.forEach(owner::modifyCreativeModeTab);
+			creativeModeTabs.clear(); // this registration should only fire once, to doubly ensure this, clear the map
+		});
 	}
 
 	public ItemBuilder<OWNER, ITEM, PARENT> properties(NonNullUnaryOperator<Item.Properties> propertiesModifier)
@@ -69,6 +79,23 @@ public final class ItemBuilder<
 	public ItemBuilder<OWNER, ITEM, PARENT> initialProperties(NonNullSupplier<Item.Properties> initialProperties)
 	{
 		this.initialProperties = initialProperties;
+		return this;
+	}
+
+	public ItemBuilder<OWNER, ITEM, PARENT> tab(NonNullSupplier<? extends CreativeModeTab> tab, Consumer<CreativeModeTabModifier> modifier)
+	{
+		creativeModeTabs.put(tab, modifier);
+		return this;
+	}
+
+	public ItemBuilder<OWNER, ITEM, PARENT> tab(NonNullSupplier<? extends CreativeModeTab> tab)
+	{
+		return tab(tab, modifier -> modifier.accept(asSupplier()));
+	}
+
+	public ItemBuilder<OWNER, ITEM, PARENT> removeTab(NonNullSupplier<? extends CreativeModeTab> tab)
+	{
+		creativeModeTabs.remove(tab);
 		return this;
 	}
 
@@ -146,12 +173,6 @@ public final class ItemBuilder<
 		return properties(properties -> properties.craftRemainder(craftingRemainingItem.get()));
 	}
 
-	// TODO: See creativeModeTab todo in CoreRegistrate
-	/*public ItemBuilder<OWNER, ITEM, PARENT> tab(@Nullable CreativeModeTab creativeModeTab)
-	{
-		return properties(properties -> creativeModeTab == null ? properties : properties.tab(creativeModeTab));
-	}*/
-
 	public ItemBuilder<OWNER, ITEM, PARENT> rarity(Rarity rarity)
 	{
 		return properties(properties -> properties.rarity(rarity));
@@ -211,8 +232,7 @@ public final class ItemBuilder<
 	{
 		return builder
 				.transform(ItemBuilder::applyDefaults)
-				// TODO: See other creativeModeTab todo
-				// .tab(CreativeModeTab.TAB_MISC)
+				.tab(() -> CreativeModeTabs.SPAWN_EGGS)
 				.model((ctx, provider) -> provider.withExistingParent(ctx.getName(), new ResourceLocation(Mods.MINECRAFT, "item/template_spawn_egg")))
 		;
 	}
