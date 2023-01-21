@@ -14,9 +14,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 
-import xyz.apex.minecraft.apexcore.shared.mixin.accessors.AccessorBlock;
-import xyz.apex.minecraft.apexcore.shared.mixin.invokers.InvokerBlock;
-
 public class SimpleMultiBlock extends Block implements MultiBlock
 {
     protected final MultiBlockType multiBlockType;
@@ -70,7 +67,7 @@ public class SimpleMultiBlock extends Block implements MultiBlock
 
     @SuppressWarnings("ConstantValue")
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
     {
         // null on first call, as it's set in constructor and this method is called from super
         // none-null on second call, as that's fired in our constructor and replaces the vanilla state definition
@@ -87,10 +84,9 @@ public class SimpleMultiBlock extends Block implements MultiBlock
     public static <T extends Block> void replaceBlockStateContainer(T block)
     {
         var builder = new StateDefinition.Builder<Block, BlockState>(block);
-        ((InvokerBlock) block).ApexCore$createBlockStateDefinition(builder);
-        var stateDefinition = builder.create(Block::defaultBlockState, BlockState::new);
-        ((AccessorBlock) block).ApexCore$setStateDefinition(stateDefinition);
-        ((InvokerBlock) block).ApexCore$registerDefaultState(stateDefinition.any());
+        block.createBlockStateDefinition(builder);
+        block.stateDefinition = builder.create(Block::defaultBlockState, BlockState::new);
+        block.registerDefaultState(block.stateDefinition.any());
     }
 
     public static class WithHorizontalFacing extends HorizontalDirectionalBlock implements MultiBlock
@@ -149,7 +145,7 @@ public class SimpleMultiBlock extends Block implements MultiBlock
 
         @SuppressWarnings("ConstantValue")
         @Override
-        protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
+        public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
         {
             builder.add(FACING);
             // null on first call, as it's set in constructor and this method is called from super

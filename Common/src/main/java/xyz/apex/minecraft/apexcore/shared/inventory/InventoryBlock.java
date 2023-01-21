@@ -205,7 +205,7 @@ public abstract class InventoryBlock<T extends InventoryBlockEntity, M extends I
 
         @SuppressWarnings("ConstantValue")
         @Override
-        protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
+        public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
         {
             // null on first call, as it's set in constructor and this method is called from super
             // none-null on second call, as that's fired in our constructor and replaces the vanilla state definition

@@ -10,7 +10,6 @@ public final class ApexCoreData implements DataGeneratorEntrypoint
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator generator)
     {
-        ApexCoreFabric.INSTANCE.initializeDataGen();
     }
 
     @Override

@@ -3,14 +3,9 @@
     "package": "${APEX_GROUP}.${MOD_ID}.shared.mixin",
     "mixins": [
         "MixinBlockStateBase",
-        "MixinFireBlock",
-        "accessors.AccessorArmorMaterials",
-        "accessors.AccessorBlock",
-        "accessors.AccessorBlockEntityType",
-        "invokers.InvokerBlock"
+        "MixinFireBlock"
     ],
     "client": [ ],
     "server": [ ],
-    "minVersion": "${MIXIN_VERSION}",
-    "refmap": "${MOD_ID}-shared-Common-refmap.json"
+    "minVersion": "${MIXIN_VERSION}"
 }

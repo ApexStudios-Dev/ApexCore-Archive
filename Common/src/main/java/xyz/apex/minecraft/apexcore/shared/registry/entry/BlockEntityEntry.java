@@ -14,7 +14,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-import xyz.apex.minecraft.apexcore.shared.mixin.accessors.AccessorBlockEntityType;
 import xyz.apex.minecraft.apexcore.shared.registry.AbstractRegistrar;
 
 import java.util.Optional;
@@ -71,6 +70,6 @@ public final class BlockEntityEntry<T extends BlockEntity> extends RegistryEntry
 
     public boolean isValid(Block block)
     {
-        return ((AccessorBlockEntityType) get()).getValidBlocks().contains(block);
+        return get().validBlocks.contains(block);
     }
 }

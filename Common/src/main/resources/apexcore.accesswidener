@@ -1,1 +1,12 @@
 accessWidener   v2  named
+
+accessible field net/minecraft/world/item/ArmorMaterials HEALTH_PER_SLOT [I
+
+accessible method net/minecraft/world/level/block/Block createBlockStateDefinition (Lnet/minecraft/world/level/block/state/StateDefinition$Builder;)V
+accessible method net/minecraft/world/level/block/Block registerDefaultState (Lnet/minecraft/world/level/block/state/BlockState;)V
+accessible field net/minecraft/world/level/block/Block stateDefinition Lnet/minecraft/world/level/block/state/StateDefinition;
+mutable field net/minecraft/world/level/block/Block stateDefinition Lnet/minecraft/world/level/block/state/StateDefinition;
+
+accessible field net/minecraft/world/level/block/entity/BlockEntityType validBlocks Ljava/util/Set;
+
+accessible method net/minecraft/world/level/block/state/BlockBehaviour$BlockStateBase asState ()Lnet/minecraft/world/level/block/state/BlockState;

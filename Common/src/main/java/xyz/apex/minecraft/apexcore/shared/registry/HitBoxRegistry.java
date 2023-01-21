@@ -1,6 +1,7 @@
 package xyz.apex.minecraft.apexcore.shared.registry;
 
 import com.google.common.collect.Maps;
+import org.apache.logging.log4j.LogManager;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -50,6 +51,7 @@ public final class HitBoxRegistry
         @SuppressWarnings("unchecked")
         public VoxelShape getShape(BlockState blockState)
         {
+            LogManager.getLogger().info("get shape");
             return optimizedShapes.computeIfAbsent(blockState, $ -> modifier.apply(baseShape.get(), (T) blockState.getBlock(), $).optimize());
         }
     }

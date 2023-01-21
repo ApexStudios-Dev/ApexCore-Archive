@@ -7,7 +7,6 @@ import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 
-import xyz.apex.minecraft.apexcore.shared.mixin.accessors.AccessorArmorMaterials;
 import xyz.apex.minecraft.apexcore.shared.util.EnhancedArmorMaterial;
 import xyz.apex.minecraft.apexcore.shared.util.function.Lazy;
 
@@ -41,7 +40,7 @@ public final class ArmorMaterialBuilder
 
     public ArmorMaterialBuilder durabilityFromModifier(int durabilityModifier)
     {
-        return durabilityForSlot(slot -> AccessorArmorMaterials.getHealthPerSlot()[slot.getIndex()] * durabilityModifier);
+        return durabilityForSlot(slot -> ArmorMaterials.HEALTH_PER_SLOT[slot.getIndex()] * durabilityModifier);
     }
 
     public ArmorMaterialBuilder defenseForSlot(ToIntFunction<EquipmentSlot> defenseForSlot)
