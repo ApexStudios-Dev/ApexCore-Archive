@@ -79,3 +79,9 @@ subprojects {
         excludeDirs << file('run')
     }
 }
+
+apply plugin: 'org.jetbrains.gradle.plugin.idea-ext'
+
+idea.module {
+    excludeDirs << file('gradle')
+}

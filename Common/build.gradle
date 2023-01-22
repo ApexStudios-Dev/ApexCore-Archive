@@ -6,12 +6,6 @@ group = "${APEX_GROUP}.${MOD_ID}.shared"
 version = "${MOD_VERSION}+${MINECRAFT_VERSION}"
 archivesBaseName = "${MOD_ID}-shared"
 
-sourceSets {
-	main {
-		resources.srcDirs += 'src/main/generated'
-	}
-}
-
 architectury {
 	common(['forge', 'fabric', 'quilt'])
 }

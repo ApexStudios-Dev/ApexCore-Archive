@@ -26,7 +26,8 @@
         "entrypoints": {
             "init": [ "${APEX_GROUP}.${MOD_ID}.quilt.${MOD_NAME}Quilt::INSTANCE" ],
             "client_init": [ "${APEX_GROUP}.${MOD_ID}.quilt.${MOD_NAME}Quilt::INSTANCE" ],
-            "server_init": [ "${APEX_GROUP}.${MOD_ID}.quilt.${MOD_NAME}Quilt::INSTANCE" ]
+            "server_init": [ "${APEX_GROUP}.${MOD_ID}.quilt.${MOD_NAME}Quilt::INSTANCE" ],
+            "fabric-datagen": [ "${APEX_GROUP}.${MOD_ID}.quilt.${MOD_NAME}Quilt::INSTANCE" ]
         },
         "depends": [
             {

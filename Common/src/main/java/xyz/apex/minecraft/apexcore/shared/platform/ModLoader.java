@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 
-import xyz.apex.minecraft.apexcore.shared.util.Tags;
+import xyz.apex.minecraft.apexcore.shared.util.ApexTags;
 
 public enum ModLoader
 {
@@ -51,7 +51,7 @@ public enum ModLoader
 
     public <T> TagKey<T> tag(ResourceKey<? extends Registry<T>> registryType, String tagName)
     {
-        return Tags.tag(registryType, tagsNamespace, tagName);
+        return ApexTags.tag(registryType, tagsNamespace, tagName);
     }
 
     public boolean is(ModLoader other)

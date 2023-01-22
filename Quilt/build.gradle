@@ -10,6 +10,8 @@ group = "${APEX_GROUP}.${MOD_ID}.quilt"
 version = "${MOD_VERSION}+${MINECRAFT_VERSION}"
 archivesBaseName = "${MOD_ID}-quilt"
 
+sourceSets.main.resources.srcDirs += 'src/main/generated'
+
 configurations {
 	common
 	shadowCommon
@@ -21,6 +23,18 @@ configurations {
 architectury {
 	platformSetupLoomIde()
 	loader('quilt')
+}
+
+loom {
+	runs {
+		data {
+			inherit(client)
+			vmArg('-Dfabric-api.datagen')
+			vmArg("-Dfabric-api.datagen.output-dir=${file('src/main/generated')}")
+			vmArg("-Dfabric-api.datagen.modid=${MOD_ID}")
+			vmArg('-Dfabric-api.datagen.strict-validation=true')
+		}
+	}
 }
 
 repositories {

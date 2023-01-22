@@ -1,7 +1,7 @@
 package xyz.apex.minecraft.apexcore.shared;
 
 import xyz.apex.minecraft.apexcore.shared.platform.ModPlatform;
-import xyz.apex.minecraft.apexcore.shared.util.Tags;
+import xyz.apex.minecraft.apexcore.shared.util.ApexTags;
 
 public interface ApexCore extends ModPlatform
 {
@@ -10,6 +10,6 @@ public interface ApexCore extends ModPlatform
     @Override
     default void initialize()
     {
-        Tags.bootstrap();
+        ApexTags.bootstrap();
     }
 }
