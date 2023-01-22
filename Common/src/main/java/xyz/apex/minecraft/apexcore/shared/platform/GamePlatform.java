@@ -10,7 +10,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 
 import xyz.apex.minecraft.apexcore.shared.util.EnhancedTier;
-import xyz.apex.minecraft.apexcore.shared.util.Tags;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -21,12 +20,6 @@ import java.util.function.Supplier;
 public interface GamePlatform extends PlatformHolder
 {
     GamePlatform INSTANCE = ServiceLoader.load(GamePlatform.class).findFirst().orElseThrow();
-
-    default void initialize()
-    {
-        if(this instanceof ModPlatform) return;
-        Tags.bootstrap();
-    }
 
     ModLoader getModLoader();
 

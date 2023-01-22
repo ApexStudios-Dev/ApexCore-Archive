@@ -23,22 +23,8 @@ import java.util.stream.Collectors;
 
 public final class QuiltGamePlatform implements GamePlatform
 {
-    private boolean initialized = false;
     private final QuiltStorages storages = new QuiltStorages();
     private final Map<String, Mod> mods = Maps.newConcurrentMap();
-
-    public QuiltGamePlatform()
-    {
-        initialize();
-    }
-
-    @Override
-    public void initialize()
-    {
-        if(initialized) return;
-        GamePlatform.super.initialize();
-        initialized = true;
-    }
 
     @Override
     public ModLoader getModLoader()

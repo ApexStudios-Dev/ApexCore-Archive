@@ -16,21 +16,7 @@ import java.util.function.Supplier;
 
 public final class FabricGamePlatform implements GamePlatform
 {
-    private boolean initialized = false;
     private final FabricStorages storages = new FabricStorages();
-
-    public FabricGamePlatform()
-    {
-        initialize();
-    }
-
-    @Override
-    public void initialize()
-    {
-        if(initialized) return;
-        GamePlatform.super.initialize();
-        initialized = true;
-    }
 
     @Override
     public ModLoader getModLoader()

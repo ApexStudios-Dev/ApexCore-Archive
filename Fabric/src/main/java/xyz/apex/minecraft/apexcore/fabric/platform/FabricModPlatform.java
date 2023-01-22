@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.shared.platform.AbstractModPlatform;
 import xyz.apex.minecraft.apexcore.shared.registry.Registrar;
 
-public class FabricModPlatform extends AbstractModPlatform implements ModInitializer, ClientModInitializer, DedicatedServerModInitializer
+public abstract class FabricModPlatform extends AbstractModPlatform implements ModInitializer, ClientModInitializer, DedicatedServerModInitializer
 {
     protected final String modId;
     @Nullable protected final Registrar registrar;

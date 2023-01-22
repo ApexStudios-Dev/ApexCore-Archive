@@ -22,12 +22,7 @@ public interface ModPlatform extends GamePlatform
         return platform().getMod(getModId());
     }
 
-    @Override
-    default void initialize()
-    {
-        platform().initialize();
-        GamePlatform.super.initialize();
-    }
+    void initialize();
 
     @Override
     default ModLoader getModLoader()

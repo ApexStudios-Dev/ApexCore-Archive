@@ -16,21 +16,7 @@ import java.util.function.Supplier;
 
 public final class ForgeGamePlatform implements GamePlatform
 {
-    private boolean initialized = false;
     private ForgeStorages storages = new ForgeStorages();
-
-    public ForgeGamePlatform()
-    {
-        initialize();
-    }
-
-    @Override
-    public void initialize()
-    {
-        if(initialized) return;
-        GamePlatform.super.initialize();
-        initialized = true;
-    }
 
     @Override
     public ModLoader getModLoader()

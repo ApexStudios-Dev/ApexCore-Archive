@@ -13,7 +13,7 @@ import net.minecraftforge.registries.RegisterEvent;
 import xyz.apex.minecraft.apexcore.shared.platform.AbstractModPlatform;
 import xyz.apex.minecraft.apexcore.shared.registry.Registrar;
 
-public class ForgeModPlatform extends AbstractModPlatform
+public abstract class ForgeModPlatform extends AbstractModPlatform
 {
     protected final IEventBus modBus;
     protected final String modId;

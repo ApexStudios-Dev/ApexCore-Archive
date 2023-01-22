@@ -9,7 +9,7 @@ import org.quiltmc.qsl.base.api.entrypoint.server.DedicatedServerModInitializer;
 import xyz.apex.minecraft.apexcore.shared.platform.AbstractModPlatform;
 import xyz.apex.minecraft.apexcore.shared.registry.Registrar;
 
-public class QuiltModPlatform extends AbstractModPlatform implements ModInitializer, ClientModInitializer, DedicatedServerModInitializer
+public abstract class QuiltModPlatform extends AbstractModPlatform implements ModInitializer, ClientModInitializer, DedicatedServerModInitializer
 {
     protected final String modId;
     @Nullable protected final Registrar registrar;
