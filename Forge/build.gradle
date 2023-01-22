@@ -111,8 +111,6 @@ processResources {
 	filesMatching([ '*.mixins.json', 'pack.mcmeta', 'META-INF/mods.toml' ]) {
 		expand project.properties
 	}
-
-	from project(':Common').sourceSets.main.resources
 }
 
 jar {
