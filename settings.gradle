@@ -29,9 +29,4 @@ include 'Forge'
 include 'Fabric'
 include 'Quilt'
 
-include 'TestMod-Common'
-include 'TestMod-Forge'
-include 'TestMod-Fabric'
-include 'TestMod-Quilt'
-
 rootProject.name = "${MOD_NAME}-${MINECRAFT_VERSION}"
