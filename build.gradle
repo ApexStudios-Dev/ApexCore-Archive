@@ -1,27 +1,58 @@
 plugins {
-    id 'architectury-plugin' version '3.4-SNAPSHOT'
-    id 'dev.architectury.loom' version '1.0-SNAPSHOT' apply false
+    id 'architectury-plugin' version '3.4-SNAPSHOT' apply false
+    id 'dev.architectury.loom' version '0.12.0-SNAPSHOT' apply false
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1' apply false
-}
-
-architectury {
-    minecraft = "${MINECRAFT_VERSION}"
+    id 'com.github.johnrengelman.shadow' version '7.1.2' apply false
 }
 
 subprojects {
     apply plugin: 'java-library'
     apply plugin: 'idea'
+    apply plugin: 'maven-publish'
     apply plugin: 'architectury-plugin'
     apply plugin: 'dev.architectury.loom'
     apply plugin: 'org.jetbrains.gradle.plugin.idea-ext'
 
+    project.ext {
+        accessWidenerFile = rootProject.file("common/src/main/resources/${MOD_ID}.accesswidener")
+    }
+
+    group = "${MOD_GROUP}.${project.name}"
+    version = "${MOD_VERSION}+${MINECRAFT_VERSION}"
+    archivesBaseName = "${MOD_ID}-${project.name}"
+
+    sourceSets.test {
+        java.srcDirs = [ ]
+        resources.srcDirs = [ ]
+    }
+
+    architectury {
+        minecraft = "${MINECRAFT_VERSION}"
+    }
+
     loom {
         silentMojangMappingsLicense()
-        accessWidenerPath = project(':Common').file("src/main/resources/${MOD_ID}.accesswidener")
+
+        if(accessWidenerFile.exists()) {
+            accessWidenerPath = accessWidenerFile
+        }
     }
 
     repositories {
+        mavenLocal()
         maven { url 'https://maven.parchmentmc.org' }
+        maven { url 'https://maven.apexstudios.dev' }
+        maven { url 'https://maven.terraformersmc.com/releases/' }
+
+        maven {
+            url 'https://www.cursemaven.com'
+            content { includeGroup 'curse.maven' }
+        }
+
+        maven {
+            url 'https://api.modrinth.com/maven'
+            content { includeGroup 'maven.modrinth' }
+        }
     }
 
     dependencies {
@@ -36,9 +67,17 @@ subprojects {
             }
         })
 
-        // JEI
-        if(rootProject.hasProperty('JEI_VERSION')) {
-            modCompileOnlyApi "mezz.jei:jei-${MINECRAFT_VERSION}-common-api:${JEI_VERSION}"
+        compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+        compileOnly 'com.google.errorprone:error_prone_annotations:2.11.0'
+    }
+
+    processResources {
+        project.properties.each {
+            inputs.property "${it.key}", "${it.value}"
+        }
+
+        filesMatching([ '*.mixins.json', 'pack.mcmeta', 'META-INF/mods.toml', 'fabric.mod.json', 'architectury.common.json' ]) {
+            expand project.properties
         }
     }
 
@@ -75,13 +114,42 @@ subprojects {
         }
     }
 
-    idea.module {
-        excludeDirs << file('run')
+    publishing {
+        publications {
+            mavenCommon(MavenPublication) {
+                groupId = "${project.group}"
+                artifactId = "${project.archivesBaseName}"
+                version = "${project.version}"
+
+                loom.disableDeprecatedPomGeneration(it)
+
+                artifact remapJar
+                artifact sourcesJar
+            }
+        }
+
+        repositories {
+            if(System.getenv('APEX_MODS_MAVEN_USERNAME') != null && System.getenv('APEX_MODS_MAVEN_PASSWORD') != null) {
+                maven {
+                    name 'ApexStudios-Maven'
+                    url 'https://maven.apexstudios.dev'
+
+                    credentials {
+                        username System.getenv('APEX_MODS_MAVEN_USERNAME')
+                        password System.getenv('APEX_MODS_MAVEN_PASSWORD')
+                    }
+                }
+            }
+        }
     }
 }
 
 apply plugin: 'org.jetbrains.gradle.plugin.idea-ext'
 
 idea.module {
-    excludeDirs << file('gradle')
+    excludeDirs += [
+            file('.idea'),
+            file('.gradle'),
+            file('gradle')
+    ]
 }

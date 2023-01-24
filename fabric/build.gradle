@@ -1,0 +1,22 @@
+apply from: '../loader.gradle'
+
+loom {
+	runs {
+		data {
+			inherit(client)
+			vmArg('-Dfabric-api.datagen')
+			vmArg("-Dfabric-api.datagen.output-dir=${file('src/main/generated')}")
+			vmArg("-Dfabric-api.datagen.modid=${MOD_ID}")
+			vmArg('-Dfabric-api.datagen.strict-validation=true')
+		}
+	}
+}
+
+dependencies {
+	modRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
+
+	modRuntimeOnly("com.terraformersmc:modmenu:${FABRIC_MOD_MENU_VERSION}") {
+		exclude group: 'net.fabricmc'
+		exclude group: 'net.fabricmc.fabric-api'
+	}
+}

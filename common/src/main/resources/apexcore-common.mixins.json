@@ -1,0 +1,11 @@
+{
+    "required": true,
+    "package": "${MOD_GROUP}.common.mixin",
+    "mixins": [
+        "MixinBlockStateBase",
+        "MixinFireBlock"
+    ],
+    "client": [ ],
+    "server": [ ],
+    "minVersion": "${MIXIN_VERSION}"
+}
