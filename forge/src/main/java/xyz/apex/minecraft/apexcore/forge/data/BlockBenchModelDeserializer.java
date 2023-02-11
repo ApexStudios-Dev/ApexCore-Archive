@@ -22,7 +22,8 @@ import java.nio.file.Path;
 
 public class BlockBenchModelDeserializer
 {
-    private static boolean VALIDATE_REF_MODELS_EXIST = true;
+    public static boolean VALIDATE_REF_MODELS_EXIST = true;
+    public static boolean PARSE_TEXTURES = true;
 
     private static final Gson GSON = new GsonBuilder()
             // .registerTypeAdapter(BlockModel.class, new ExtendedBlockModelDeserializer())
@@ -134,7 +135,7 @@ public class BlockBenchModelDeserializer
             itemTransforms.moddedTransforms.forEach((key, value) -> transform(transformsBuilder, value, key));
         }
 
-        if(root.has("textures"))
+        if(PARSE_TEXTURES && root.has("textures"))
         {
             var texturesJson = GsonHelper.getAsJsonObject(root, "textures");
             texturesJson.keySet().forEach(key -> builder.texture(key, GsonHelper.getAsString(texturesJson, key)));

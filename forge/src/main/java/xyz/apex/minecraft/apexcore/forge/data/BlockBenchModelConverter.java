@@ -3,7 +3,6 @@ package xyz.apex.minecraft.apexcore.forge.data;
 import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
@@ -38,30 +37,37 @@ public abstract class BlockBenchModelConverter implements DataProvider
     private final Map<ResourceLocation, ItemModelBuilder> itemModelBuilders = Maps.newHashMap();
     private final Map<ResourceLocation, Path> itemModelInputPaths = Maps.newHashMap();
 
-    protected BlockBenchModelConverter(GatherDataEvent event, PackOutput packOutput, String modId)
-    {
-        this(event, packOutput, null, null, modId);
-    }
-
-    protected BlockBenchModelConverter(GatherDataEvent event, PackOutput packOutput, @Nullable BlockModelProvider blockModels, @Nullable ItemModelProvider itemModels, String modId)
+    protected BlockBenchModelConverter(PackOutput packOutput, String modId, ExistingFileHelper existingFileHelper, Collection<Path> inputFolders)
     {
         this.packOutput = packOutput;
-        existingFileHelper = event.getExistingFileHelper();
-        inputFolders = getDataGeneratorConfig(event).getInputs();
-
+        this.existingFileHelper = existingFileHelper;
+        this.inputFolders = inputFolders;
         this.modId = modId;
-        this.blockModels = blockModels == null ? dummyBlockModels(packOutput, existingFileHelper, modId) : blockModels;
-        this.itemModels = itemModels == null ? dummyItemModels(packOutput, existingFileHelper, modId) : itemModels;
+
+        blockModels = new BlockModelProvider(packOutput, modId, existingFileHelper) {
+            @Override protected void registerModels() {}
+
+            @Override
+            public CompletableFuture<?> run(CachedOutput output)
+            {
+                return CompletableFuture.allOf();
+            }
+        };
+
+        itemModels = new ItemModelProvider(packOutput, modId, existingFileHelper) {
+            @Override protected void registerModels() {}
+
+            @Override
+            public CompletableFuture<?> run(CachedOutput output)
+            {
+                return CompletableFuture.allOf();
+            }
+        };
     }
 
-    protected BlockBenchModelConverter(GatherDataEvent event, PackOutput packOutput, @Nullable BlockModelProvider blockModels, String modId)
+    protected BlockBenchModelConverter(GatherDataEvent event, String modId)
     {
-        this(event, packOutput, blockModels, null, modId);
-    }
-
-    protected BlockBenchModelConverter(GatherDataEvent event, PackOutput packOutput, @Nullable ItemModelProvider itemModels, String modId)
-    {
-        this(event, packOutput, null, itemModels, modId);
+        this(event.getGenerator().getPackOutput(), modId, event.getExistingFileHelper(), getDataGeneratorConfig(event).getInputs());
     }
 
     protected abstract void convertModels();
@@ -162,27 +168,7 @@ public abstract class BlockBenchModelConverter implements DataProvider
         throw new RuntimeException(new FileNotFoundException("Could not determine input model path from model name '%s'".formatted(modelPath)));
     }
 
-    public static BlockModelProvider dummyBlockModels(PackOutput packOutput, ExistingFileHelper existingFileHelper, String modId)
-    {
-        return new BlockModelProvider(packOutput, modId, existingFileHelper) {
-            @Override
-            protected void registerModels()
-            {
-            }
-        };
-    }
-
-    public static ItemModelProvider dummyItemModels(PackOutput packOutput, ExistingFileHelper existingFileHelper, String modId)
-    {
-        return new ItemModelProvider(packOutput, modId, existingFileHelper) {
-            @Override
-            protected void registerModels()
-            {
-            }
-        };
-    }
-
-    private static GatherDataEvent.DataGeneratorConfig getDataGeneratorConfig(GatherDataEvent event)
+    public static GatherDataEvent.DataGeneratorConfig getDataGeneratorConfig(GatherDataEvent event)
     {
         try
         {
