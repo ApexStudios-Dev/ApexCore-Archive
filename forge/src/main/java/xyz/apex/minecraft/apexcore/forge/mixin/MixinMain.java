@@ -7,6 +7,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.data.Main;
 
+import xyz.apex.minecraft.apexcore.common.platform.GamePlatform;
+
 @Mixin(Main.class)
 public abstract class MixinMain
 {
@@ -18,6 +20,8 @@ public abstract class MixinMain
     )
     private static void main(String[] args, CallbackInfo ci)
     {
+        if(!GamePlatform.INSTANCE.isDevelopmentEnvironment()) return;
+        if(!GamePlatform.INSTANCE.isRunningDataGeneration()) return;
         System.exit(0);
     }
 }
