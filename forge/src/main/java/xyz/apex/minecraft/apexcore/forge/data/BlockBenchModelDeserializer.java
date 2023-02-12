@@ -1,14 +1,13 @@
 package xyz.apex.minecraft.apexcore.forge.data;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.util.Mth;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ModelBuilder;
@@ -24,6 +23,8 @@ public class BlockBenchModelDeserializer
 {
     public static boolean VALIDATE_REF_MODELS_EXIST = true;
     public static boolean PARSE_TEXTURES = true;
+
+    private static final String EMISSIVITY_ELEMENT_TAG = "forge-emissivity";
 
     private static final Gson GSON = new GsonBuilder()
             // .registerTypeAdapter(BlockModel.class, new ExtendedBlockModelDeserializer())
@@ -105,6 +106,8 @@ public class BlockBenchModelDeserializer
 
                 if(element.rotation != null) elementRotation(elementBuilder, element.rotation);
 
+                var emissivity = parseEmissivityFromName(jsonElement);
+
                 element.faces.forEach((face, elementFace) -> elementBuilder
                         .face(face)
                         .cullface(elementFace.cullForDirection)
@@ -112,7 +115,7 @@ public class BlockBenchModelDeserializer
                         .texture(elementFace.texture)
                         .uvs(elementFace.uv.uvs[0], elementFace.uv.uvs[1], elementFace.uv.uvs[2], elementFace.uv.uvs[3])
                         .rotation(getRotation(elementFace.uv.rotation))
-                        .emissivity(elementFace.emissivity)
+                        .emissivity(emissivity != -1 ? emissivity : elementFace.emissivity)
                         .end()
                 );
             }
@@ -219,5 +222,42 @@ public class BlockBenchModelDeserializer
         }
 
         return new ModelFile.UncheckedModelFile(modelPath);
+    }
+
+    private static int parseEmissivityFromName(JsonElement element)
+    {
+        if(!element.isJsonObject()) return -1;
+        var obj = element.getAsJsonObject();
+        if(!obj.has("name")) return -1;
+        var name = GsonHelper.getAsString(obj, "name");
+        var index = StringUtils.indexOfIgnoreCase(name, EMISSIVITY_ELEMENT_TAG);
+        if(index == -1) return -1;
+        // anything above here ^^^ is invalid for obtaining emissivity value, return invalid value
+
+        // check for custom value after the 'forge-emissivity' tag
+        var eqIndex = index + EMISSIVITY_ELEMENT_TAG.length();
+
+        // custom value specified
+        if(name.charAt(eqIndex) == '=')
+        {
+            // extract out all numbers after the '='
+            var num = new StringBuilder();
+
+            for(var i = eqIndex + 1; i < name.length(); i++) // keep going to end of string
+            {
+                var c = name.charAt(i);
+                if(!Character.isDigit(c)) break; // stop once we hit anything that is not a digit
+                num.append(c);
+            }
+
+            try
+            {
+                // try parse the string into a integer
+                return Mth.clamp(Integer.parseInt(num.toString()), 0, 15);
+            }
+            catch(NumberFormatException ignored) {}
+        }
+
+        return 15; // 'forge-emissivity' was defined but no '=<num>' was found, use full bright
     }
 }
