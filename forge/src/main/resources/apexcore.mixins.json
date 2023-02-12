@@ -2,7 +2,7 @@
     "required": true,
     "package": "${MOD_GROUP}.forge.mixin",
     "mixins": [ ],
-    "client": [ ],
+    "client": [ "MixinMain" ],
     "server": [ ],
     "minVersion": "${MIXIN_VERSION}"
 }
