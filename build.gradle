@@ -316,9 +316,13 @@ if(System.getenv('CURSEFORGE_TOKEN') != null) {
 			mainArtifact(tasks.jarJar) {
 				changelog = file('CHANGELOG.md')
 				changelogType = 'markdown'
+				optionalDependency 'jei'
 			}
 
-			addArtifact jar
+			addArtifact(jar) {
+				optionalDependency 'jei'
+			}
+
 			addArtifact sourcesJar
 		}
 
@@ -342,7 +346,7 @@ if(System.getenv('MODRINTH_TOKEN') != null) {
 		loaders = [ 'forge' ]
 		debugMode = true
 		dependencies {
-
+			optional.project 'jei'
 		}
 	}
 }
