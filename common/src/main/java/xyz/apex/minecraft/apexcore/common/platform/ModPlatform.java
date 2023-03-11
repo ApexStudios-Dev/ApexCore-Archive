@@ -5,6 +5,8 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 
@@ -52,6 +54,12 @@ public interface ModPlatform extends GamePlatform
     default EnhancedTier createEnhancedTier(String registryName, int uses, float speed, float attackDamageBonus, int level, int enchantmentValue, Supplier<Ingredient> repairIngredient, @Nullable TagKey<Block> toolLevelBlock)
     {
         return platform().createEnhancedTier("%s:%s".formatted(getModId(), registryName), uses, speed, attackDamageBonus, level, enchantmentValue, repairIngredient, toolLevelBlock);
+    }
+
+    @Override
+    default DyeColor getDyeColor(ItemStack stack)
+    {
+        return platform().getDyeColor(stack);
     }
 
     default ResourceLocation id(String path)

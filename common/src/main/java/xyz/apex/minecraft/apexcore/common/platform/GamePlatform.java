@@ -6,6 +6,8 @@ import dev.architectury.utils.Env;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 
@@ -89,4 +91,7 @@ public interface GamePlatform extends PlatformHolder
     }
 
     EnhancedTier createEnhancedTier(String registryName, int uses, float speed, float attackDamageBonus, int level, int enchantmentValue, Supplier<Ingredient> repairIngredient, @Nullable TagKey<Block> toolLevelBlock);
+
+    @Nullable
+    DyeColor getDyeColor(ItemStack stack);
 }

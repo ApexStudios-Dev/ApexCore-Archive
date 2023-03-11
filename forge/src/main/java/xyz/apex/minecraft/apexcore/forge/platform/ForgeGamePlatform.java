@@ -3,6 +3,8 @@ package xyz.apex.minecraft.apexcore.forge.platform;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.data.loading.DatagenModLoader;
@@ -40,5 +42,12 @@ public final class ForgeGamePlatform implements GamePlatform
     public EnhancedTier createEnhancedTier(String registryName, int uses, float speed, float attackDamageBonus, int level, int enchantmentValue, Supplier<Ingredient> repairIngredient, @Nullable TagKey<Block> toolLevelBlock)
     {
         return new ForgeEnhancedTier(registryName, uses, speed, attackDamageBonus, level, enchantmentValue, repairIngredient, toolLevelBlock);
+    }
+
+    @Nullable
+    @Override
+    public DyeColor getDyeColor(ItemStack stack)
+    {
+        return DyeColor.getColor(stack);
     }
 }

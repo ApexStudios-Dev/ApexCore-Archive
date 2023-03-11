@@ -6,6 +6,8 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 
@@ -125,6 +127,12 @@ public abstract class AbstractModPlatform implements ModPlatform
     public final EnhancedTier createEnhancedTier(String registryName, int uses, float speed, float attackDamageBonus, int level, int enchantmentValue, Supplier<Ingredient> repairIngredient, @Nullable TagKey<Block> toolLevelBlock)
     {
         return ModPlatform.super.createEnhancedTier(registryName, uses, speed, attackDamageBonus, level, enchantmentValue, repairIngredient, toolLevelBlock);
+    }
+
+    @Override
+    public final DyeColor getDyeColor(ItemStack stack)
+    {
+        return ModPlatform.super.getDyeColor(stack);
     }
 
     @Nullable
