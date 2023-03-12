@@ -25,11 +25,10 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
+import xyz.apex.minecraft.apexcore.common.component.ComponentBlock;
+import xyz.apex.minecraft.apexcore.common.component.ComponentBlockFactory;
+import xyz.apex.minecraft.apexcore.common.component.SimpleComponentBlock;
 import xyz.apex.minecraft.apexcore.common.item.CustomHorseArmorItem;
-import xyz.apex.minecraft.apexcore.common.multiblock.MultiBlock;
-import xyz.apex.minecraft.apexcore.common.multiblock.MultiBlockFactory;
-import xyz.apex.minecraft.apexcore.common.multiblock.MultiBlockType;
-import xyz.apex.minecraft.apexcore.common.multiblock.SimpleMultiBlock;
 import xyz.apex.minecraft.apexcore.common.platform.GamePlatform;
 import xyz.apex.minecraft.apexcore.common.platform.ModPlatform;
 import xyz.apex.minecraft.apexcore.common.platform.PlatformHolder;
@@ -455,25 +454,25 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>> implements Platfo
     }
     // endregion
 
-    // region: MultiBlock
-    public final <T extends Block & MultiBlock, P> BlockBuilder<T, S, P> multiBlock(P parent, String blockName, MultiBlockType multiBlockType, MultiBlockFactory<T> factory)
+    // region: ComponentBlock
+    public final <T extends Block & ComponentBlock, P> BlockBuilder<T, S, P> componentBlock(P parent, String blockName, Consumer<T> registerComponents, ComponentBlockFactory<T> factory)
     {
-        return block(parent, blockName, factory.toBlockFactory(multiBlockType));
+        return block(parent, blockName, properties -> factory.create(registerComponents, properties));
     }
 
-    public final <P> BlockBuilder<SimpleMultiBlock, S, P> multiBlock(P parent, String blockName, MultiBlockType multiBlockType)
+    public final <P> BlockBuilder<SimpleComponentBlock, S, P> componentBlock(P parent, String blockName, Consumer<SimpleComponentBlock> registerComponents)
     {
-        return multiBlock(parent, blockName, multiBlockType, SimpleMultiBlock::new);
+        return componentBlock(parent, blockName, registerComponents, SimpleComponentBlock::new);
     }
 
-    public final <T extends Block & MultiBlock> BlockBuilder<T, S, S> multiBlock(String blockName, MultiBlockType multiBlockType, MultiBlockFactory<T> factory)
+    public final <T extends Block & ComponentBlock> BlockBuilder<T, S, S> componentBlock(String blockName, Consumer<T> registerComponents, ComponentBlockFactory<T> factory)
     {
-        return multiBlock(self(), blockName, multiBlockType, factory);
+        return componentBlock(self(), blockName, registerComponents, factory);
     }
 
-    public final BlockBuilder<SimpleMultiBlock, S, S> multiBlock(String blockName, MultiBlockType multiBlockType)
+    public final BlockBuilder<SimpleComponentBlock, S, S> componentBlock(String blockName, Consumer<SimpleComponentBlock> registerComponents)
     {
-        return multiBlock(self(), blockName, multiBlockType, SimpleMultiBlock::new);
+        return componentBlock(self(), blockName, registerComponents, SimpleComponentBlock::new);
     }
     // endregion
     // endregion

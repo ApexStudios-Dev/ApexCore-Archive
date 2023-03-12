@@ -4,9 +4,8 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.state.BlockState;
 
-import xyz.apex.minecraft.apexcore.common.multiblock.MultiBlock;
+import xyz.apex.minecraft.apexcore.common.component.components.BlockEntityComponent;
 
 public interface InventoryHolder
 {
@@ -18,25 +17,15 @@ public interface InventoryHolder
     // we need to delegate those blocks off to the origin point
     // since no block entity will exist at those locations to instance check against
     @Nullable
-    static Inventory lookupInventory(@Nullable BlockGetter level, BlockPos pos, BlockState blockState)
+    static Inventory lookupInventory(@Nullable BlockGetter level, BlockPos pos)
     {
         if(level == null) return null;
-
-        if(blockState.getBlock() instanceof MultiBlock multiBlock)
-        {
-            if(!multiBlock.isSameBlockTypeForMultiBlock(blockState)) return null;
-
-            var multiBlockType = multiBlock.getMultiBlockType();
-
-            if(!multiBlockType.isOrigin(blockState))
-            {
-                var originPos = multiBlockType.getOriginPos(multiBlock, blockState, pos);
-                var originBlockState = level.getBlockState(originPos);
-                return lookupInventory(level, originPos, originBlockState);
-            }
-        }
-
-        var blockEntity = level.getBlockEntity(pos);
-        return blockEntity instanceof InventoryHolder holder ? holder.getInventory() : null;
+        return BlockEntityComponent
+                .lookupBlockEntity(level, pos)
+                .filter(InventoryHolder.class::isInstance)
+                .map(InventoryHolder.class::cast)
+                .map(InventoryHolder::getInventory)
+                .orElse(null)
+        ;
     }
 }

@@ -1,33 +1,20 @@
 package xyz.apex.minecraft.apexcore.common.inventory;
 
-import org.apache.commons.lang3.Validate;
-
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
-
-import java.util.Objects;
 
 public class InventoryMenu extends AbstractContainerMenu
 {
-    protected final BlockPos pos;
-    protected final BlockEntity blockEntity;
     protected final Inventory inventory;
 
-    protected InventoryMenu(MenuType<? extends InventoryMenu> menuType, int containerId, Player player, FriendlyByteBuf data)
+    protected InventoryMenu(MenuType<? extends InventoryMenu> menuType, int containerId, Player player, Inventory inventory)
     {
         super(menuType, containerId);
 
-        pos = data.readBlockPos();
-        blockEntity = Objects.requireNonNull(player.level.getBlockEntity(pos));
-        Validate.isInstanceOf(InventoryHolder.class, blockEntity);
-        var inventoryHolder = (InventoryHolder) blockEntity;
-        inventory = inventoryHolder.getInventory();
+        this.inventory = inventory;
     }
 
     @Override
@@ -85,7 +72,6 @@ public class InventoryMenu extends AbstractContainerMenu
     public void broadcastChanges()
     {
         super.broadcastChanges();
-        blockEntity.setChanged();
     }
 
     public static void bindInventory(InventoryMenu menu, Inventory inventory, int rows, int cols, int x, int y)
