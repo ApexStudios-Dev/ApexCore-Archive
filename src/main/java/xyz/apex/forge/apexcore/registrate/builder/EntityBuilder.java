@@ -7,8 +7,6 @@ import com.tterrag.registrate.util.OneTimeEventReceiver;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.tags.TagKey;
@@ -25,7 +23,7 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.network.PlayMessages;
 import net.minecraftforge.registries.ForgeRegistries;
-
+import org.jetbrains.annotations.Nullable;
 import xyz.apex.forge.apexcore.lib.util.RegistryHelper;
 import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
 import xyz.apex.forge.apexcore.registrate.builder.factory.EntityFactory;

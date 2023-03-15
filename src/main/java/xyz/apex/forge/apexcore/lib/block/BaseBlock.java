@@ -1,9 +1,6 @@
 package xyz.apex.forge.apexcore.lib.block;
 
 import io.netty.buffer.Unpooled;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
@@ -40,7 +37,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.network.NetworkHooks;
-
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.Nullable;
 import xyz.apex.forge.apexcore.lib.util.ContainerHelper;
 import xyz.apex.forge.apexcore.lib.util.NameableMutable;
 import xyz.apex.forge.commonality.tags.FluidTags;

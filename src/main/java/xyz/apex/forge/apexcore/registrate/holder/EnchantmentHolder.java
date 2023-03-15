@@ -1,7 +1,6 @@
 package xyz.apex.forge.apexcore.registrate.holder;
 
 import net.minecraft.world.item.enchantment.Enchantment;
-
 import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
 import xyz.apex.forge.apexcore.registrate.builder.EnchantmentBuilder;
 import xyz.apex.forge.apexcore.registrate.builder.factory.EnchantmentFactory;

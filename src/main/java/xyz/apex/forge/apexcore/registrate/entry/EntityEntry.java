@@ -1,13 +1,11 @@
 package xyz.apex.forge.apexcore.registrate.entry;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.RegistryObject;
-
+import org.jetbrains.annotations.Nullable;
 import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
 
 public final class EntityEntry<ENTITY extends Entity> extends RegistryEntry<EntityType<ENTITY>>

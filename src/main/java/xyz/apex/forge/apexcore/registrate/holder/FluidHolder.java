@@ -3,11 +3,9 @@ package xyz.apex.forge.apexcore.registrate.holder;
 import com.tterrag.registrate.builders.FluidBuilder;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
-
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
-
 import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
 
 @SuppressWarnings("unchecked")

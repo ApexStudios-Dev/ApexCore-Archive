@@ -3,7 +3,6 @@ package xyz.apex.forge.apexcore.registrate;
 import com.tterrag.registrate.builders.FluidBuilder;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
-
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.resources.ResourceLocation;
@@ -13,10 +12,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
-
 import xyz.apex.forge.apexcore.registrate.builder.*;
 import xyz.apex.forge.apexcore.registrate.builder.factory.*;
 import xyz.apex.forge.apexcore.registrate.entry.MenuEntry;

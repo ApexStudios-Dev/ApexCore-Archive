@@ -1,7 +1,6 @@
 package xyz.apex.forge.apexcore.registrate;
 
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
-
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 

@@ -1,7 +1,6 @@
 package xyz.apex.forge.apexcore.lib.event.client;
 
 import net.minecraftforge.eventbus.api.Event;
-
 import xyz.apex.forge.apexcore.core.client.BlockVisualizer;
 import xyz.apex.forge.commonality.SideOnly;
 

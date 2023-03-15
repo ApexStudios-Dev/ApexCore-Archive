@@ -1,12 +1,10 @@
 package xyz.apex.forge.apexcore.registrate.entry;
 
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
-
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.registries.IForgeRegistry;
-
 import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
 
 import java.util.function.Supplier;

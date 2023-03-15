@@ -1,7 +1,5 @@
 package xyz.apex.forge.apexcore.lib.container;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
@@ -17,7 +15,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
-
+import org.jetbrains.annotations.Nullable;
 import xyz.apex.forge.apexcore.lib.util.function.QuadFunction;
 
 public class BaseMenu extends AbstractContainerMenu

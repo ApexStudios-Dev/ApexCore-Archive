@@ -1,7 +1,5 @@
 package xyz.apex.forge.apexcore.core.entity;
 
-import org.jetbrains.annotations.ApiStatus;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -14,7 +12,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.PlayMessages;
-
+import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.forge.apexcore.core.init.ACEntities;
 import xyz.apex.forge.apexcore.lib.block.ISeatBlock;
 

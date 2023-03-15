@@ -1,12 +1,10 @@
 package xyz.apex.forge.apexcore.registrate.builder;
 
 import com.tterrag.registrate.builders.BuilderCallback;
-
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraftforge.registries.ForgeRegistries;
-
 import xyz.apex.forge.apexcore.core.init.ACRegistry;
 import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
 import xyz.apex.forge.apexcore.registrate.builder.factory.EnchantmentFactory;

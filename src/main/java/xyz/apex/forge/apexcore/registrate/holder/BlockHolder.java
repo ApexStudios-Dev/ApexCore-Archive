@@ -1,7 +1,6 @@
 package xyz.apex.forge.apexcore.registrate.holder;
 
 import net.minecraft.world.level.block.Block;
-
 import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
 import xyz.apex.forge.apexcore.registrate.builder.BlockBuilder;
 import xyz.apex.forge.apexcore.registrate.builder.factory.BlockFactory;

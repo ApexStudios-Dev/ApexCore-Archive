@@ -1,11 +1,9 @@
 package xyz.apex.forge.apexcore.registrate.holder;
 
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
-
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-
 import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
 import xyz.apex.forge.apexcore.registrate.builder.MenuBuilder;
 import xyz.apex.forge.apexcore.registrate.builder.factory.ForgeMenuFactory;

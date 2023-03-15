@@ -1,10 +1,8 @@
 package xyz.apex.forge.apexcore.core.init;
 
 import com.tterrag.registrate.util.entry.EntityEntry;
-
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.block.Blocks;
-
 import xyz.apex.forge.apexcore.core.entity.SeatEntity;
 import xyz.apex.forge.apexcore.lib.client.renderer.DummyEntityRenderer;
 

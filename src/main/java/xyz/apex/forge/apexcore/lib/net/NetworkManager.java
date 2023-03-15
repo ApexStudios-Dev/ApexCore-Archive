@@ -2,8 +2,6 @@ package xyz.apex.forge.apexcore.lib.net;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import org.apache.commons.lang3.Validate;
-
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.resources.ResourceLocation;
@@ -13,7 +11,7 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
-
+import org.apache.commons.lang3.Validate;
 import xyz.apex.forge.apexcore.core.ApexCore;
 
 import java.lang.reflect.InvocationTargetException;

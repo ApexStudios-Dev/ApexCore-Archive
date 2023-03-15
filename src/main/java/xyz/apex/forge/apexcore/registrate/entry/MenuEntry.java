@@ -1,7 +1,5 @@
 package xyz.apex.forge.apexcore.registrate.entry;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,7 +10,7 @@ import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.registries.RegistryObject;
-
+import org.jetbrains.annotations.Nullable;
 import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
 
 import java.util.function.Consumer;

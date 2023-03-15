@@ -11,8 +11,6 @@ import com.tterrag.registrate.util.CreativeModeTabModifier;
 import com.tterrag.registrate.util.OneTimeEventReceiver;
 import com.tterrag.registrate.util.entry.RegistryEntry;
 import com.tterrag.registrate.util.nullness.*;
-import org.jetbrains.annotations.ApiStatus;
-
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
@@ -22,7 +20,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.NewRegistryEvent;
 import net.minecraftforge.registries.RegistryBuilder;
-
+import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.forge.apexcore.registrate.entry.ForgeRegistryEntry;
 
 import javax.annotation.Nullable;

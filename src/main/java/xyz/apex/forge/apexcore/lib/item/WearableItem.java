@@ -1,7 +1,6 @@
 package xyz.apex.forge.apexcore.lib.item;
 
 import com.google.common.collect.ImmutableSet;
-
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;

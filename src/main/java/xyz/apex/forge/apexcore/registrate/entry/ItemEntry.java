@@ -1,10 +1,8 @@
 package xyz.apex.forge.apexcore.registrate.entry;
 
 import com.tterrag.registrate.util.entry.RegistryEntry;
-
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.RegistryObject;
-
 import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
 
 public final class ItemEntry<ITEM extends Item> extends ItemLikeEntry<ITEM>

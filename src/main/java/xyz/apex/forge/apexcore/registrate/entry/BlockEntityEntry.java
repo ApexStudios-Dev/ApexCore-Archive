@@ -1,14 +1,12 @@
 package xyz.apex.forge.apexcore.registrate.entry;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.RegistryObject;
-
+import org.jetbrains.annotations.Nullable;
 import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
 
 import java.util.Optional;

@@ -11,15 +11,13 @@ import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
-import org.jetbrains.annotations.ApiStatus;
-
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraftforge.registries.RegistryObject;
-
+import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
 
 import java.util.Arrays;

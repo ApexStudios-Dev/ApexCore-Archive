@@ -1,7 +1,6 @@
 package xyz.apex.forge.apexcore.registrate.holder;
 
 import net.minecraft.world.entity.Entity;
-
 import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
 import xyz.apex.forge.apexcore.registrate.builder.EntityBuilder;
 import xyz.apex.forge.apexcore.registrate.builder.factory.EntityFactory;

@@ -2,15 +2,13 @@ package xyz.apex.forge.apexcore.lib.block;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.commons.lang3.mutable.MutableObject;
-
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-
+import org.apache.commons.lang3.mutable.MutableObject;
 import xyz.apex.forge.apexcore.lib.util.VectorHelper;
 
 import java.util.Arrays;

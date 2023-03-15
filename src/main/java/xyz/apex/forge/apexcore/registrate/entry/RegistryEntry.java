@@ -1,7 +1,6 @@
 package xyz.apex.forge.apexcore.registrate.entry;
 
 import net.minecraftforge.registries.RegistryObject;
-
 import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
 
 public class RegistryEntry<T> extends com.tterrag.registrate.util.entry.RegistryEntry<T>

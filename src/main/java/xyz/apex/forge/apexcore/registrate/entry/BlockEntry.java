@@ -1,14 +1,12 @@
 package xyz.apex.forge.apexcore.registrate.entry;
 
 import com.tterrag.registrate.util.entry.RegistryEntry;
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-
+import org.jetbrains.annotations.Nullable;
 import xyz.apex.forge.apexcore.lib.util.RegistryHelper;
 import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
 

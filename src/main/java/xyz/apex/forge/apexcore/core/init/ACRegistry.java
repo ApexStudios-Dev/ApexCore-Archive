@@ -1,12 +1,10 @@
 package xyz.apex.forge.apexcore.core.init;
 
 import com.tterrag.registrate.AbstractRegistrate;
-
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-
 import xyz.apex.forge.commonality.Mods;
 import xyz.apex.forge.commonality.tags.BlockTags;
 
