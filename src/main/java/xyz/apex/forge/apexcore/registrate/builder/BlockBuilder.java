@@ -13,12 +13,12 @@ import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
-
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.flag.FeatureFlag;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -35,7 +35,6 @@ import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
-
 import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
 import xyz.apex.forge.apexcore.registrate.builder.factory.BlockEntityFactory;
 import xyz.apex.forge.apexcore.registrate.builder.factory.BlockFactory;
@@ -349,9 +348,14 @@ public final class BlockBuilder<
 		return properties(properties -> properties.offsetType(offsetType));
 	}
 
-	public BlockBuilder<OWNER, BLOCK, PARENT> offsetType(Function<BlockState, BlockBehaviour.OffsetType> offsetFunction)
+	public BlockBuilder<OWNER, BLOCK, PARENT> noParticlesOnBreak()
 	{
-		return properties(properties -> properties.offsetType(offsetFunction));
+		return properties(BlockBehaviour.Properties::noParticlesOnBreak);
+	}
+
+	public BlockBuilder<OWNER, BLOCK, PARENT> requiredFeatures(FeatureFlag... flags)
+	{
+		return properties(properties -> properties.requiredFeatures(flags));
 	}
 
 	@SafeVarargs

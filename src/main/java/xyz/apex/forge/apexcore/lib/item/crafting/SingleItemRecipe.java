@@ -1,8 +1,8 @@
 package xyz.apex.forge.apexcore.lib.item.crafting;
 
 import com.google.gson.JsonObject;
-
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -67,7 +67,7 @@ public class SingleItemRecipe implements Recipe<Container>
 	}
 
 	@Override
-	public final ItemStack getResultItem()
+	public final ItemStack getResultItem(RegistryAccess registryAccess)
 	{
 		return recipeResult;
 	}
@@ -88,7 +88,7 @@ public class SingleItemRecipe implements Recipe<Container>
 	}
 
 	@Override
-	public ItemStack assemble(Container inventory)
+	public ItemStack assemble(Container inventory, RegistryAccess registryAccess)
 	{
 		return recipeResult.copy();
 	}

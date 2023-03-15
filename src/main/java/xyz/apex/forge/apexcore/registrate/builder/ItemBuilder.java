@@ -12,10 +12,10 @@ import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
-
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.flag.FeatureFlag;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -27,7 +27,6 @@ import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.ForgeRegistries;
-
 import xyz.apex.forge.apexcore.registrate.CoreRegistrate;
 import xyz.apex.forge.apexcore.registrate.builder.factory.ItemFactory;
 import xyz.apex.forge.apexcore.registrate.entry.ItemEntry;
@@ -186,6 +185,11 @@ public final class ItemBuilder<
 	public ItemBuilder<OWNER, ITEM, PARENT> setNoRepair()
 	{
 		return properties(Item.Properties::setNoRepair);
+	}
+
+	public ItemBuilder<OWNER, ITEM, PARENT> requiredFeatures(FeatureFlag... flags)
+	{
+		return properties(properties -> properties.requiredFeatures(flags));
 	}
 
 	@Override
