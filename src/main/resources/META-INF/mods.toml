@@ -18,7 +18,7 @@ issueTrackerURL="https://discord.apexstudios.dev/"
 [[dependencies.apexcore]]
 	modId="forge"
 	mandatory=true
-	versionRange="[45.0.0,44.0.0)"
+	versionRange="[45.0.0,46.0.0)"
 	ordering="AFTER"
 	side="BOTH"
 	[dependencies.apexcore.custom.mc-publish]
