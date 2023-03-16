@@ -39,13 +39,6 @@ public class InventorySlot extends Slot
     }
 
     @Override
-    public void initialize(ItemStack stack)
-    {
-        inventory.setItem(index, stack);
-        setChanged();
-    }
-
-    @Override
     public void setChanged()
     {
         inventory.setChanged(index);

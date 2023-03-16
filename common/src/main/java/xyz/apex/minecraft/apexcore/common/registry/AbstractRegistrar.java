@@ -17,7 +17,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.Recipe;
@@ -265,15 +264,15 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>> implements Platfo
     // endregion
 
     // region: Armor
-    private <T extends ArmorItem, P> ItemBuilder<T, S, P> armorItem(P parent, String itemName, ArmorMaterial armorMaterial, EquipmentSlot equipmentSlot, ArmorItemFactory<T> factory)
+    private <T extends ArmorItem, P> ItemBuilder<T, S, P> armorItem(P parent, String itemName, ArmorMaterial armorMaterial, ArmorItem.Type armorType, ArmorItemFactory<T> factory)
     {
-        return item(parent, itemName, factory.toItemFactory(armorMaterial, equipmentSlot));
+        return item(parent, itemName, factory.toItemFactory(armorMaterial, armorType));
     }
 
     // region: Helmet
     public final <T extends ArmorItem, P> ItemBuilder<T, S, P> helmetItem(P parent, String itemName, ArmorMaterial armorMaterial, ArmorItemFactory<T> factory)
     {
-        return armorItem(parent, itemName, armorMaterial, EquipmentSlot.HEAD, factory);
+        return armorItem(parent, itemName, armorMaterial, ArmorItem.Type.HELMET, factory);
     }
 
     public final <P> ItemBuilder<ArmorItem, S, P> helmetItem(P parent, String itemName, ArmorMaterial armorMaterial)
@@ -295,7 +294,7 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>> implements Platfo
     // region: Chestplate
     public final <T extends ArmorItem, P> ItemBuilder<T, S, P> chestplateItem(P parent, String itemName, ArmorMaterial armorMaterial, ArmorItemFactory<T> factory)
     {
-        return armorItem(parent, itemName, armorMaterial, EquipmentSlot.CHEST, factory);
+        return armorItem(parent, itemName, armorMaterial, ArmorItem.Type.CHESTPLATE, factory);
     }
 
     public final <P> ItemBuilder<ArmorItem, S, P> chestplateItem(P parent, String itemName, ArmorMaterial armorMaterial)
@@ -317,7 +316,7 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>> implements Platfo
     // region: Leggings
     public final <T extends ArmorItem, P> ItemBuilder<T, S, P> leggingsItem(P parent, String itemName, ArmorMaterial armorMaterial, ArmorItemFactory<T> factory)
     {
-        return armorItem(parent, itemName, armorMaterial, EquipmentSlot.LEGS, factory);
+        return armorItem(parent, itemName, armorMaterial, ArmorItem.Type.LEGGINGS, factory);
     }
 
     public final <P> ItemBuilder<ArmorItem, S, P> leggingsItem(P parent, String itemName, ArmorMaterial armorMaterial)
@@ -339,7 +338,7 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>> implements Platfo
     // region: Boots
     public final <T extends ArmorItem, P> ItemBuilder<T, S, P> bootsItem(P parent, String itemName, ArmorMaterial armorMaterial, ArmorItemFactory<T> factory)
     {
-        return armorItem(parent, itemName, armorMaterial, EquipmentSlot.FEET, factory);
+        return armorItem(parent, itemName, armorMaterial, ArmorItem.Type.BOOTS, factory);
     }
 
     public final <P> ItemBuilder<ArmorItem, S, P> bootsItem(P parent, String itemName, ArmorMaterial armorMaterial)
@@ -761,11 +760,11 @@ public class AbstractRegistrar<S extends AbstractRegistrar<S>> implements Platfo
     @FunctionalInterface
     interface ArmorItemFactory<T extends ArmorItem>
     {
-        T create(ArmorMaterial armorMaterial, EquipmentSlot equipmentSlot, Item.Properties properties);
+        T create(ArmorMaterial armorMaterial, ArmorItem.Type armorType, Item.Properties properties);
 
-        default ItemBuilder.Factory<T> toItemFactory(ArmorMaterial armorMaterial, EquipmentSlot equipmentSlot)
+        default ItemBuilder.Factory<T> toItemFactory(ArmorMaterial armorMaterial, ArmorItem.Type armorType)
         {
-            return properties -> create(armorMaterial, equipmentSlot, properties);
+            return properties -> create(armorMaterial, armorType, properties);
         }
     }
 

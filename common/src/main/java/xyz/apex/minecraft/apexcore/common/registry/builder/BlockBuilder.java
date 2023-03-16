@@ -348,11 +348,6 @@ public final class BlockBuilder<R extends Block, O extends AbstractRegistrar<O>,
         return properties(properties -> properties.offsetType(offsetType));
     }
 
-    public BlockBuilder<R, O, P> offsetType(Function<BlockState, BlockBehaviour.OffsetType> offsetTypeFunction)
-    {
-        return properties(properties -> properties.offsetType(offsetTypeFunction));
-    }
-
     public BlockBuilder<R, O, P> noParticlesOnBreak()
     {
         return properties(BlockBehaviour.Properties::noParticlesOnBreak);

@@ -13,10 +13,10 @@ loom {
 }
 
 dependencies {
-	modRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
+//	modRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
 
-	modRuntimeOnly("com.terraformersmc:modmenu:${FABRIC_MOD_MENU_VERSION}") {
-		exclude group: 'net.fabricmc'
-		exclude group: 'net.fabricmc.fabric-api'
-	}
+//	modRuntimeOnly("com.terraformersmc:modmenu:${FABRIC_MOD_MENU_VERSION}") {
+//		exclude group: 'net.fabricmc'
+//		exclude group: 'net.fabricmc.fabric-api'
+//	}
 }

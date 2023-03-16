@@ -9,7 +9,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
@@ -102,7 +101,7 @@ public final class BedComponent extends SimpleComponent
             }
 
             var center = bedPos.getCenter();
-            level.explode(null, DamageSource.badRespawnPointExplosion(center), null, center, 5F, true, Level.ExplosionInteraction.BLOCK);
+            level.explode(null, level.damageSources().badRespawnPointExplosion(center), null, center, 5F, true, Level.ExplosionInteraction.BLOCK);
         }
         else if(blockState.getValue(OCCUPIED))
         {

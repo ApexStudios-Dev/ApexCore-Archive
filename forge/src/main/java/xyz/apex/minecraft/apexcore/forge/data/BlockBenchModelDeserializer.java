@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ModelBuilder;
@@ -115,7 +116,7 @@ public class BlockBenchModelDeserializer
                         .texture(elementFace.texture)
                         .uvs(elementFace.uv.uvs[0], elementFace.uv.uvs[1], elementFace.uv.uvs[2], elementFace.uv.uvs[3])
                         .rotation(getRotation(elementFace.uv.rotation))
-                        .emissivity(emissivity != -1 ? emissivity : elementFace.emissivity)
+                        .emissivity(emissivity != -1 ? emissivity : 0, emissivity != -1 ? emissivity : 0)
                         .end()
                 );
             }
@@ -126,14 +127,14 @@ public class BlockBenchModelDeserializer
             var itemTransforms = GSON.getAdapter(ItemTransforms.class).fromJsonTree(GsonHelper.getAsJsonObject(root, "display"));
             var transformsBuilder = builder.transforms();
 
-            transform(transformsBuilder, itemTransforms.thirdPersonLeftHand, ItemTransforms.TransformType.THIRD_PERSON_LEFT_HAND);
-            transform(transformsBuilder, itemTransforms.thirdPersonRightHand, ItemTransforms.TransformType.THIRD_PERSON_RIGHT_HAND);
-            transform(transformsBuilder, itemTransforms.firstPersonLeftHand, ItemTransforms.TransformType.FIRST_PERSON_LEFT_HAND);
-            transform(transformsBuilder, itemTransforms.firstPersonRightHand, ItemTransforms.TransformType.FIRST_PERSON_RIGHT_HAND);
-            transform(transformsBuilder, itemTransforms.head, ItemTransforms.TransformType.HEAD);
-            transform(transformsBuilder, itemTransforms.gui, ItemTransforms.TransformType.GUI);
-            transform(transformsBuilder, itemTransforms.ground, ItemTransforms.TransformType.GROUND);
-            transform(transformsBuilder, itemTransforms.fixed, ItemTransforms.TransformType.FIXED);
+            transform(transformsBuilder, itemTransforms.thirdPersonLeftHand, ItemDisplayContext.THIRD_PERSON_LEFT_HAND);
+            transform(transformsBuilder, itemTransforms.thirdPersonRightHand, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND);
+            transform(transformsBuilder, itemTransforms.firstPersonLeftHand, ItemDisplayContext.FIRST_PERSON_LEFT_HAND);
+            transform(transformsBuilder, itemTransforms.firstPersonRightHand, ItemDisplayContext.FIRST_PERSON_RIGHT_HAND);
+            transform(transformsBuilder, itemTransforms.head, ItemDisplayContext.HEAD);
+            transform(transformsBuilder, itemTransforms.gui, ItemDisplayContext.GUI);
+            transform(transformsBuilder, itemTransforms.ground, ItemDisplayContext.GROUND);
+            transform(transformsBuilder, itemTransforms.fixed, ItemDisplayContext.FIXED);
 
             itemTransforms.moddedTransforms.forEach((key, value) -> transform(transformsBuilder, value, key));
         }
@@ -184,7 +185,7 @@ public class BlockBenchModelDeserializer
         ;
     }
 
-    private static <T extends ModelBuilder<T>> void transform(ModelBuilder<T>.TransformsBuilder builder, ItemTransform transform, ItemTransforms.TransformType transformType)
+    private static <T extends ModelBuilder<T>> void transform(ModelBuilder<T>.TransformsBuilder builder, ItemTransform transform, ItemDisplayContext displayContext)
     {
         // translation is multiplied by 0.0625 during deserialization
         // we divide by same value here to get back the raw values
@@ -192,7 +193,7 @@ public class BlockBenchModelDeserializer
         var tY = transform.translation.y() / .0625F;
         var tZ = transform.translation.z() / .0625F;
 
-        builder.transform(transformType)
+        builder.transform(displayContext)
                .translation(tX, tY, tZ)
                .scale(transform.scale.x(), transform.scale.y(), transform.scale.z())
                .leftRotation(transform.rotation.x(), transform.rotation.y(), transform.rotation.z())

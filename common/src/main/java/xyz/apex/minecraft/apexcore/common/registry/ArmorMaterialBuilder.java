@@ -2,7 +2,7 @@ package xyz.apex.minecraft.apexcore.common.registry;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
@@ -18,8 +18,8 @@ public final class ArmorMaterialBuilder
     private final String modId;
     private final String registryName;
 
-    private ToIntFunction<EquipmentSlot> durabilityForSlot = ArmorMaterials.LEATHER::getDurabilityForSlot;
-    private ToIntFunction<EquipmentSlot> defenseForSlot = ArmorMaterials.LEATHER::getDefenseForSlot;
+    private ToIntFunction<ArmorItem.Type> durabilityForType = ArmorMaterials.LEATHER::getDurabilityForType;
+    private ToIntFunction<ArmorItem.Type> defenseForType = ArmorMaterials.LEATHER::getDefenseForType;
     private int enchantmentValue = ArmorMaterials.LEATHER.getEnchantmentValue();
     private Supplier<SoundEvent> equipSound = ArmorMaterials.LEATHER::getEquipSound;
     private Supplier<Ingredient> repairIngredient = ArmorMaterials.LEATHER::getRepairIngredient;
@@ -32,31 +32,31 @@ public final class ArmorMaterialBuilder
         this.registryName = registryName;
     }
 
-    public ArmorMaterialBuilder durabilityForSlot(ToIntFunction<EquipmentSlot> durabilityForSlot)
+    public ArmorMaterialBuilder durabilityForSlot(ToIntFunction<ArmorItem.Type> durabilityForSlot)
     {
-        this.durabilityForSlot = durabilityForSlot;
+        this.durabilityForType = durabilityForSlot;
         return this;
     }
 
     public ArmorMaterialBuilder durabilityFromModifier(int durabilityModifier)
     {
-        return durabilityForSlot(slot -> ArmorMaterials.HEALTH_PER_SLOT[slot.getIndex()] * durabilityModifier);
+        return durabilityForSlot(slot -> ArmorMaterials.HEALTH_FUNCTION_FOR_TYPE.get(slot) * durabilityModifier);
     }
 
-    public ArmorMaterialBuilder defenseForSlot(ToIntFunction<EquipmentSlot> defenseForSlot)
+    public ArmorMaterialBuilder defenseForSlot(ToIntFunction<ArmorItem.Type> defenseForSlot)
     {
-        this.defenseForSlot = defenseForSlot;
+        this.defenseForType = defenseForSlot;
         return this;
     }
 
-    public ArmorMaterialBuilder defenseFromSlotProtections(int feet, int legs, int chest, int head)
+    public ArmorMaterialBuilder defenseFromSlotProtections(int boots, int leggings, int chestplate, int helmet)
     {
         return defenseForSlot(slot -> switch(slot) {
-            case FEET -> feet;
-            case LEGS -> legs;
-            case CHEST -> chest;
-            case HEAD -> head;
-            default -> throw new IllegalArgumentException("Unknown EquipmentSlot for ArmorMaterial#getDefenseForSlot: %s".formatted(slot.getName()));
+            case BOOTS -> boots;
+            case LEGGINGS -> leggings;
+            case CHESTPLATE -> chestplate;
+            case HELMET -> helmet;
+            default -> throw new IllegalArgumentException("Unknown ArmorItem.Type for ArmorMaterial#getDefenseForType: %s".formatted(slot.getName()));
         });
     }
 
@@ -107,8 +107,8 @@ public final class ArmorMaterialBuilder
 
     public static final class ArmorMaterial implements EnhancedArmorMaterial
     {
-        private final ToIntFunction<EquipmentSlot> durabilityForSlot;
-        private final ToIntFunction<EquipmentSlot> defenseForSlot;
+        private final ToIntFunction<ArmorItem.Type> durabilityForType;
+        private final ToIntFunction<ArmorItem.Type> defenseForType;
         private final int enchantmentValue;
         private final Supplier<SoundEvent> equipSound;
         private final Supplier<Ingredient> repairIngredient;
@@ -118,8 +118,8 @@ public final class ArmorMaterialBuilder
 
         private ArmorMaterial(ArmorMaterialBuilder builder)
         {
-            durabilityForSlot = builder.durabilityForSlot;
-            defenseForSlot = builder.defenseForSlot;
+            durabilityForType = builder.durabilityForType;
+            defenseForType = builder.defenseForType;
             enchantmentValue = builder.enchantmentValue;
             equipSound = Lazy.of(builder.equipSound);
             repairIngredient = Lazy.of(builder.repairIngredient);
@@ -136,15 +136,15 @@ public final class ArmorMaterialBuilder
         }
 
         @Override
-        public int getDurabilityForSlot(EquipmentSlot slot)
+        public int getDurabilityForType(ArmorItem.Type slot)
         {
-            return durabilityForSlot.applyAsInt(slot);
+            return durabilityForType.applyAsInt(slot);
         }
 
         @Override
-        public int getDefenseForSlot(EquipmentSlot slot)
+        public int getDefenseForType(ArmorItem.Type slot)
         {
-            return defenseForSlot.applyAsInt(slot);
+            return defenseForType.applyAsInt(slot);
         }
 
         @Override
