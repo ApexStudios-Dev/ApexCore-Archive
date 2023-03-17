@@ -1,11 +1,117 @@
-apply from: '../loader.gradle'
+plugins {
+    id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'org.spongepowered.mixin' version '0.7.+'
+}
 
-loom {
-	runs {
-		data {
-			data()
-			programArgs("--existing", project(':common').file('src/main/resources').absolutePath)
-			programArgs("--existing", file('src/main/resources').absolutePath)
-		}
-	}
+jarJar.enable()
+
+minecraft {
+    if(rootProject.hasProperty('PARCHMENT_MAPPINGS')) {
+        if(rootProject.hasProperty('PARCHMENT_MINECRAFT_VERSION')) {
+            mappings channel: 'parchment', version: "${PARCHMENT_MINECRAFT_VERSION}-${PARCHMENT_MAPPINGS}-${MINECRAFT_VERSION}"
+        } else {
+            mappings channel: 'parchment', version: "${PARCHMENT_MAPPINGS}-${MINECRAFT_VERSION}"
+        }
+    } else {
+        mappings channel: 'official', version: "${MINECRAFT_VERSION}"
+    }
+
+    if(accessTransformerFile.exists()) {
+        accessTransformer = accessTransformerFile
+    }
+
+    runs {
+        client {
+            workingDirectory file('run/client')
+            property 'forge.logging.markers', ''
+            property 'forge.logging.console.level', 'debug'
+            ideaModule "${rootProject.name}.${project.name}.main"
+            args '--width', 1920, '--height', 1080
+
+            mods {
+                "${MOD_ID}" {
+                    source sourceSets.main
+                    source project(':common').sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory file('run/server')
+            property 'forge.logging.markers', ''
+            property 'forge.logging.console.level', 'debug'
+            ideaModule "${rootProject.name}.${project.name}.main"
+            args 'nogui'
+
+            mods {
+                "${MOD_ID}" {
+                    source sourceSets.main
+                    source project(':common').sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory file('run/client')
+            property 'forge.logging.markers', ''
+            property 'forge.logging.console.level', 'debug'
+            ideaModule "${rootProject.name}.${project.name}.main"
+            args '--mod', MOD_ID, '--client', '--server', '--validate', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            forceExit false
+
+            mods {
+                "${MOD_ID}" {
+                    source sourceSets.main
+                    source project(':common').sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+mixin {
+    if(file("src/main/resources/${MOD_ID}.mixins.json").exists()) {
+        add sourceSets.main, "${MOD_ID}.refmap.json"
+        config "${MOD_ID}.mixins.json"
+    }
+
+    if(project(':common').file("src/main/resources/${MOD_ID}-common.mixins.json").exists()) {
+        add project(':common').sourceSets.main, "${MOD_ID}-common.refmap.json"
+        config "${MOD_ID}-common.mixins.json"
+    }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${MINECRAFT_VERSION}-${FORGE_VERSION}"
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+    implementation project(':common')
+}
+
+tasks.jarJar.configure {
+    classifier ''
+}
+
+jar {
+    classifier 'slim'
+}
+
+artifacts {
+    archives tasks.jarJar
+}
+
+reobf {
+    jarJar { }
+}
+
+jar.finalizedBy('reobfJar')
+tasks.jarJar.finalizedBy('reobfJarJar')
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact tasks.jarJar
+        }
+    }
 }
