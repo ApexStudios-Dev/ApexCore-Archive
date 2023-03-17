@@ -55,7 +55,8 @@
     "license": "${MOD_LICENSE}",
     "environment": "*",
     "entrypoints": {
-        "main": [ "${MOD_GROUP}.fabric.${MOD_NAME}Fabric" ]
+        "main": [ "${MOD_GROUP}.fabric.${MOD_NAME}Fabric" ],
+        "preLaunch": [ "${MOD_GROUP}.fabric.platform.ModLoaderFabric::onPreLaunch" ]
     },
     "mixins": [ ],
     "depends": {
