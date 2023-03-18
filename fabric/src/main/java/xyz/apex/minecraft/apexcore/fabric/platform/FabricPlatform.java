@@ -3,11 +3,14 @@ package xyz.apex.minecraft.apexcore.fabric.platform;
 import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
+import xyz.apex.minecraft.apexcore.common.platform.Internals;
 import xyz.apex.minecraft.apexcore.common.platform.Platform;
 import xyz.apex.minecraft.apexcore.common.platform.Side;
 
 public final class FabricPlatform implements Platform
 {
+    private final FabricInternals internals = new FabricInternals();
+
     @Override
     public String getMinecraftVersion()
     {
@@ -39,5 +42,11 @@ public final class FabricPlatform implements Platform
             case CLIENT -> Side.CLIENT;
             case SERVER -> Side.SERVER;
         };
+    }
+
+    @Override
+    public Internals internals()
+    {
+        return internals;
     }
 }

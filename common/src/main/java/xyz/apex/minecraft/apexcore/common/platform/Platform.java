@@ -19,4 +19,6 @@ public interface Platform
     boolean isDataGenActive();
 
     Side getPhysicalSide();
+
+    Internals internals();
 }

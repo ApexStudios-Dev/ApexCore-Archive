@@ -3,11 +3,14 @@ package xyz.apex.minecraft.apexcore.forge.platform;
 import net.minecraft.SharedConstants;
 import net.minecraftforge.data.loading.DatagenModLoader;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import xyz.apex.minecraft.apexcore.common.platform.Internals;
 import xyz.apex.minecraft.apexcore.common.platform.Platform;
 import xyz.apex.minecraft.apexcore.common.platform.Side;
 
 public final class ForgePlatform implements Platform
 {
+    private final ForgeInternals internals = new ForgeInternals();
+
     @Override
     public String getMinecraftVersion()
     {
@@ -39,5 +42,11 @@ public final class ForgePlatform implements Platform
             case CLIENT -> Side.CLIENT;
             case DEDICATED_SERVER -> Side.SERVER;
         };
+    }
+
+    @Override
+    public Internals internals()
+    {
+        return internals;
     }
 }
