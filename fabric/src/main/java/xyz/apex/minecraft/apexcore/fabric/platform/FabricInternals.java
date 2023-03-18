@@ -18,7 +18,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.RepositorySource;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -32,7 +31,6 @@ import xyz.apex.minecraft.apexcore.common.registry.entry.MenuEntry;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 final class FabricInternals implements Internals
 {
@@ -54,32 +52,32 @@ final class FabricInternals implements Internals
     }
 
     @Override
-    public void openMenu(ServerPlayer player, MenuProvider constructor, Consumer<FriendlyByteBuf> extraData)
+    public void openMenu(ServerPlayer player, MenuEntry.ExtendedMenuProvider menuProvider)
     {
         player.openMenu(new ExtendedScreenHandlerFactory() {
             @Override
-            public void writeScreenOpeningData(ServerPlayer player, FriendlyByteBuf buffer)
+            public void writeScreenOpeningData(ServerPlayer player, FriendlyByteBuf extraData)
             {
-                extraData.accept(buffer);
+                menuProvider.writeExtraData(extraData);
             }
 
             @Override
             public Component getDisplayName()
             {
-                return constructor.getDisplayName();
+                return menuProvider.getDisplayName();
             }
 
             @Nullable
             @Override
             public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player)
             {
-                return constructor.createMenu(containerId, playerInventory, player);
+                return menuProvider.createMenu(containerId, playerInventory, player);
             }
         });
     }
 
     @Override
-    public <T extends AbstractContainerMenu> MenuType<T> menuType(MenuEntry.ClientMenuConstructor<T> clientMenuConstructor)
+    public <T extends AbstractContainerMenu> MenuType<T> menuType(MenuEntry.MenuFactory<T> clientMenuConstructor)
     {
         return new ExtendedScreenHandlerType<>((containerId, playerInventory, extraData) -> clientMenuConstructor.create(containerId, playerInventory, playerInventory.player, extraData));
     }

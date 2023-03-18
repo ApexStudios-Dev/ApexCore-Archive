@@ -4,12 +4,10 @@ import com.google.common.collect.Maps;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Registry;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.RepositorySource;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.Block;
@@ -20,7 +18,6 @@ import xyz.apex.minecraft.apexcore.common.registry.DeferredRegister;
 import xyz.apex.minecraft.apexcore.common.registry.entry.MenuEntry;
 
 import java.util.Map;
-import java.util.function.Consumer;
 
 final class ForgeInternals implements Internals
 {
@@ -33,13 +30,13 @@ final class ForgeInternals implements Internals
     }
 
     @Override
-    public void openMenu(ServerPlayer player, MenuProvider constructor, Consumer<FriendlyByteBuf> extraData)
+    public void openMenu(ServerPlayer player, MenuEntry.ExtendedMenuProvider menuProvider)
     {
-        NetworkHooks.openScreen(player, constructor, extraData);
+        NetworkHooks.openScreen(player, menuProvider, menuProvider::writeExtraData);
     }
 
     @Override
-    public <T extends AbstractContainerMenu> MenuType<T> menuType(MenuEntry.ClientMenuConstructor<T> clientMenuConstructor)
+    public <T extends AbstractContainerMenu> MenuType<T> menuType(MenuEntry.MenuFactory<T> clientMenuConstructor)
     {
         return IForgeMenuType.create((containerId, playerInventory, extraData) -> clientMenuConstructor.create(containerId, playerInventory, playerInventory.player, extraData));
     }
