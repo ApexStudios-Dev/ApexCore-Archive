@@ -1,6 +1,7 @@
 package xyz.apex.minecraft.apexcore.common.component;
 
 import com.google.common.collect.Maps;
+import com.google.errorprone.annotations.OverridingMethodsMustInvokeSuper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -154,8 +155,9 @@ public class SimpleComponentBlock extends Block implements ComponentBlock
     // endregion
 
     // region: Overrides
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final InteractionResult use(BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
+    public InteractionResult use(BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
     {
         for(var component : components)
         {
@@ -167,8 +169,9 @@ public class SimpleComponentBlock extends Block implements ComponentBlock
     }
 
     @Nullable
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final BlockState getStateForPlacement(BlockPlaceContext ctx)
+    public BlockState getStateForPlacement(BlockPlaceContext ctx)
     {
         var blockState = defaultBlockState();
 
@@ -181,8 +184,9 @@ public class SimpleComponentBlock extends Block implements ComponentBlock
         return blockState;
     }
 
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final boolean canSurvive(BlockState blockState, LevelReader level, BlockPos pos)
+    public boolean canSurvive(BlockState blockState, LevelReader level, BlockPos pos)
     {
         for(var component : components)
         {
@@ -192,22 +196,25 @@ public class SimpleComponentBlock extends Block implements ComponentBlock
         return true;
     }
 
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final void onPlace(BlockState blockState, Level level, BlockPos pos, BlockState oldBlockState, boolean isMoving)
+    public void onPlace(BlockState blockState, Level level, BlockPos pos, BlockState oldBlockState, boolean isMoving)
     {
         components.forEach(component -> component.onPlace(blockState, level, pos, oldBlockState, isMoving));
         super.onPlace(blockState, level, pos, oldBlockState, isMoving);
     }
 
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final void onRemove(BlockState blockState, Level level, BlockPos pos, BlockState newBlockState, boolean isMoving)
+    public void onRemove(BlockState blockState, Level level, BlockPos pos, BlockState newBlockState, boolean isMoving)
     {
         components.forEach(component -> component.onRemove(blockState, level, pos, newBlockState, isMoving));
         super.onRemove(blockState, level, pos, newBlockState, isMoving);
     }
 
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
     {
         // this method gets run twice
         // once by super constructor, to build vanilla state definition
@@ -218,8 +225,9 @@ public class SimpleComponentBlock extends Block implements ComponentBlock
         super.createBlockStateDefinition(builder);
     }
 
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final RenderShape getRenderShape(BlockState blockState)
+    public RenderShape getRenderShape(BlockState blockState)
     {
         for(var component : components)
         {
@@ -230,15 +238,17 @@ public class SimpleComponentBlock extends Block implements ComponentBlock
         return RenderShape.MODEL;
     }
 
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final void setPlacedBy(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack)
+    public void setPlacedBy(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack)
     {
         components.forEach(component -> component.setPlacedBy(level, pos, blockState, placer, stack));
         super.setPlacedBy(level, pos, blockState, placer, stack);
     }
 
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final boolean hasAnalogOutputSignal(BlockState blockState)
+    public boolean hasAnalogOutputSignal(BlockState blockState)
     {
         for(var component : components)
         {
@@ -248,8 +258,9 @@ public class SimpleComponentBlock extends Block implements ComponentBlock
         return false;
     }
 
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos)
+    public int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos)
     {
         var result = 0;
 
@@ -261,8 +272,9 @@ public class SimpleComponentBlock extends Block implements ComponentBlock
         return result;
     }
 
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final BlockState rotate(BlockState blockState, Rotation rotation)
+    public BlockState rotate(BlockState blockState, Rotation rotation)
     {
         var modified = blockState;
 
@@ -275,8 +287,9 @@ public class SimpleComponentBlock extends Block implements ComponentBlock
         return modified;
     }
 
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final BlockState mirror(BlockState blockState, Mirror mirror)
+    public BlockState mirror(BlockState blockState, Mirror mirror)
     {
         var modified = blockState;
 
@@ -289,8 +302,9 @@ public class SimpleComponentBlock extends Block implements ComponentBlock
         return modified;
     }
 
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final BlockState updateShape(BlockState blockState, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos)
+    public BlockState updateShape(BlockState blockState, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos)
     {
         var modified = blockState;
 
@@ -303,22 +317,25 @@ public class SimpleComponentBlock extends Block implements ComponentBlock
         return modified;
     }
 
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final void neighborChanged(BlockState blockState, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving)
+    public void neighborChanged(BlockState blockState, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving)
     {
         components.forEach(component -> component.neighborChanged(blockState, level, pos, block, fromPos, isMoving));
         super.neighborChanged(blockState, level, pos, block, fromPos, isMoving);
     }
 
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final void playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player)
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player)
     {
         components.forEach(component -> component.playerWillDestroy(level, pos, blockState, player));
         super.playerWillDestroy(level, pos, blockState, player);
     }
 
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final boolean isPathfindable(BlockState blockState, BlockGetter level, BlockPos pos, PathComputationType type)
+    public boolean isPathfindable(BlockState blockState, BlockGetter level, BlockPos pos, PathComputationType type)
     {
         for(var component : components)
         {
@@ -328,8 +345,9 @@ public class SimpleComponentBlock extends Block implements ComponentBlock
         return true;
     }
 
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final PushReaction getPistonPushReaction(BlockState blockState)
+    public PushReaction getPistonPushReaction(BlockState blockState)
     {
         for(var component : components)
         {
@@ -340,8 +358,9 @@ public class SimpleComponentBlock extends Block implements ComponentBlock
         return super.getPistonPushReaction(blockState);
     }
 
+    @OverridingMethodsMustInvokeSuper
     @Override
-    public final long getSeed(BlockState blockState, BlockPos pos)
+    public long getSeed(BlockState blockState, BlockPos pos)
     {
         var seed = -1L;
 
