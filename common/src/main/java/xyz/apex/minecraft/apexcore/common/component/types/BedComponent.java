@@ -79,11 +79,7 @@ public final class BedComponent extends SimpleComponent
 
         if(!BedBlock.canSetSpawn(level))
         {
-            level.removeBlock(bedPos, false);
-            level.removeBlock(pos, false);
-
-            // TODO
-            /*var multiBlock = getComponent(ComponentTypes.MULTI_BLOCK);
+            var multiBlock = getComponent(ComponentTypes.MULTI_BLOCK);
 
             if(multiBlock == null)
             {
@@ -100,7 +96,7 @@ public final class BedComponent extends SimpleComponent
                     var worldSpace = multiBlockType.getWorldSpaceFromLocalSpace(bedBlockState, originPos, localSpace);
                     level.removeBlock(worldSpace, false);
                 }
-            }*/
+            }
 
             var center = bedPos.getCenter();
             level.explode(null, level.damageSources().badRespawnPointExplosion(center), null, center, 5F, true, Level.ExplosionInteraction.BLOCK);
@@ -138,8 +134,7 @@ public final class BedComponent extends SimpleComponent
     @Override
     public void playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player)
     {
-        // TODO
-        // if(hasComponent(ComponentTypes.MULTI_BLOCK)) return;
+        if(hasComponent(ComponentTypes.MULTI_BLOCK)) return;
 
         var part = blockState.getValue(PART);
 

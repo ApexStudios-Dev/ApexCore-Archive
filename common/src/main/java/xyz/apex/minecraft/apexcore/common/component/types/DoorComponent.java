@@ -137,8 +137,7 @@ public final class DoorComponent extends SimpleComponent
     @Override
     public void playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player)
     {
-        // TODO
-        // if(hasComponent(ComponentTypes.MULTI_BLOCK)) return;
+        if(hasComponent(ComponentTypes.MULTI_BLOCK)) return;
         if(!level.isClientSide && player.isCreative()) DoublePlantBlock.preventCreativeDropFromBottomPart(level, pos, blockState, player);
     }
 
@@ -154,8 +153,7 @@ public final class DoorComponent extends SimpleComponent
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack)
     {
-        // TODO
-        // if(hasComponent(ComponentTypes.MULTI_BLOCK)) return;
+        if(hasComponent(ComponentTypes.MULTI_BLOCK)) return;
         level.setBlock(pos.above(), blockState.setValue(HALF, DoubleBlockHalf.UPPER), Block.UPDATE_ALL);
     }
 
