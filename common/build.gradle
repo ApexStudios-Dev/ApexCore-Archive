@@ -6,6 +6,8 @@ loom {
     if(accessWidenerFile.exists()) {
         accessWidenerPath = accessWidenerFile
     }
+
+    enableTransitiveAccessWideners = true
 }
 
 dependencies {

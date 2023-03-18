@@ -70,6 +70,21 @@ public class RegistryEntry<T> implements Supplier<T>
         return registryName.getNamespace();
     }
 
+    public final void registerCallback(Consumer<T> registerCallback)
+    {
+        RegistryManager.get(getOwnerId()).getRegistry(registryType).registerCallback(this, registerCallback);
+    }
+
+    public final void registerCallback(ResourceLocation registryName, Consumer<T> registerCallback)
+    {
+        RegistryManager.get(getOwnerId()).getRegistry(registryType).registerCallback(registryName, registerCallback);
+    }
+
+    public final void registerCallback(Runnable registerCallback)
+    {
+        RegistryManager.get(getOwnerId()).getRegistry(registryType).registerCallback(registerCallback);
+    }
+
     @Override
     public final T get()
     {

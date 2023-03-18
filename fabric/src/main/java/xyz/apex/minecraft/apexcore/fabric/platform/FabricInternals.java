@@ -3,16 +3,29 @@ package xyz.apex.minecraft.apexcore.fabric.platform;
 import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.platform.Internals;
 import xyz.apex.minecraft.apexcore.common.platform.SideExecutor;
 import xyz.apex.minecraft.apexcore.common.registry.DeferredRegister;
+import xyz.apex.minecraft.apexcore.common.registry.entry.MenuEntry;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 final class FabricInternals implements Internals
 {
@@ -31,6 +44,37 @@ final class FabricInternals implements Internals
     public <T> DeferredRegister<T> deferredRegister(String ownerId, ResourceKey<? extends Registry<T>> registryType)
     {
         return modInternals.computeIfAbsent(ownerId, FabricModInternals::new).deferredRegister(registryType);
+    }
+
+    @Override
+    public void openMenu(ServerPlayer player, MenuProvider constructor, Consumer<FriendlyByteBuf> extraData)
+    {
+        player.openMenu(new ExtendedScreenHandlerFactory() {
+            @Override
+            public void writeScreenOpeningData(ServerPlayer player, FriendlyByteBuf buffer)
+            {
+                extraData.accept(buffer);
+            }
+
+            @Override
+            public Component getDisplayName()
+            {
+                return constructor.getDisplayName();
+            }
+
+            @Nullable
+            @Override
+            public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player)
+            {
+                return constructor.createMenu(containerId, playerInventory, player);
+            }
+        });
+    }
+
+    @Override
+    public <T extends AbstractContainerMenu> MenuType<T> menuType(MenuEntry.ClientMenuConstructor<T> clientMenuConstructor)
+    {
+        return new ExtendedScreenHandlerType<>((containerId, playerInventory, extraData) -> clientMenuConstructor.create(containerId, playerInventory, playerInventory.player, extraData));
     }
 
     private void register()
