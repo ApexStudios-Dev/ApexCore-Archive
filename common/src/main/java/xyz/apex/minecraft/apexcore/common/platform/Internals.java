@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.common.platform;
 
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
@@ -9,6 +10,7 @@ import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.level.block.Block;
 import xyz.apex.minecraft.apexcore.common.registry.DeferredRegister;
 import xyz.apex.minecraft.apexcore.common.registry.entry.MenuEntry;
 
@@ -23,4 +25,7 @@ public interface Internals
     <T extends AbstractContainerMenu> MenuType<T> menuType(MenuEntry.ClientMenuConstructor<T> clientMenuConstructor);
 
     void registerPackRepository(PackRepository repository, RepositorySource source);
+
+    @SideOnly(Side.CLIENT)
+    void registerRenderType(Block block, RenderType renderType);
 }

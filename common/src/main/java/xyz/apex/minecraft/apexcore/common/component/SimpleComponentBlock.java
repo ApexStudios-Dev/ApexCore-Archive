@@ -24,7 +24,7 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
-import xyz.apex.minecraft.apexcore.common.util.BlockUtils;
+import xyz.apex.minecraft.apexcore.common.hooks.BlockHooks;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -73,7 +73,7 @@ public class SimpleComponentBlock extends Block implements ComponentBlock
 
     public void registerDefaultBlockStateForComponents()
     {
-        var defaultBlockState = BlockUtils.replaceBlockStateDefinition(this);
+        var defaultBlockState = BlockHooks.replaceBlockStateDefinition(this);
 
         for(var component : components)
         {

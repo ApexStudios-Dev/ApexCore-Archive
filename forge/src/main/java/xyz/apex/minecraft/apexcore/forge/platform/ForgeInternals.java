@@ -1,6 +1,8 @@
 package xyz.apex.minecraft.apexcore.forge.platform;
 
 import com.google.common.collect.Maps;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
@@ -10,6 +12,7 @@ import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.network.NetworkHooks;
 import xyz.apex.minecraft.apexcore.common.platform.Internals;
@@ -45,6 +48,12 @@ final class ForgeInternals implements Internals
     public void registerPackRepository(PackRepository repository, RepositorySource source)
     {
         repository.addPackFinder(source);
+    }
+
+    @Override
+    public void registerRenderType(Block block, RenderType renderType)
+    {
+        ItemBlockRenderTypes.setRenderLayer(block, renderType);
     }
 
     private static final class ModInternals

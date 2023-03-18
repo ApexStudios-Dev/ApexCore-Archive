@@ -1,4 +1,4 @@
-package xyz.apex.minecraft.apexcore.common.util;
+package xyz.apex.minecraft.apexcore.common.hooks;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import xyz.apex.minecraft.apexcore.common.mixin.AccessorBlock;
 import xyz.apex.minecraft.apexcore.common.mixin.InvokerBlock;
 
-public interface BlockUtils
+public interface BlockHooks
 {
     static BlockState replaceBlockStateDefinition(Block block)
     {

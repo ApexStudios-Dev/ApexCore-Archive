@@ -1,10 +1,10 @@
-package xyz.apex.minecraft.apexcore.common.util;
+package xyz.apex.minecraft.apexcore.common.hooks;
 
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.RepositorySource;
 import xyz.apex.minecraft.apexcore.common.platform.Platform;
 
-public interface PackRepositoryUtils
+public interface PackRepositoryHooks
 {
     static void registerPackRepository(PackRepository repository, RepositorySource source)
     {

@@ -1,6 +1,7 @@
 package xyz.apex.minecraft.apexcore.common.registry.builder;
 
 import it.unimi.dsi.fastutil.Pair;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -15,6 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.hooks.RenderTypeHooks;
 import xyz.apex.minecraft.apexcore.common.registry.FlammabilityRegistry;
 import xyz.apex.minecraft.apexcore.common.registry.entry.BlockEntry;
 
@@ -30,6 +32,7 @@ public final class BlockBuilder<T extends Block> extends Builder<Block, T, Block
     private final BlockFactory<T> blockFactory;
     @Nullable private ItemBuilder<?> itemBuilder = null;
     @Nullable private Pair<Integer, Integer> flammabilityOdds = null;
+    @Nullable private Supplier<Supplier<RenderType>> renderType = null;
 
     private BlockBuilder(String ownerId, String registrationName, BlockFactory<T> blockFactory)
     {
@@ -39,6 +42,7 @@ public final class BlockBuilder<T extends Block> extends Builder<Block, T, Block
 
         onRegister(block -> {
             if(flammabilityOdds != null) FlammabilityRegistry.register(block, flammabilityOdds.first(), flammabilityOdds.second());
+            if(renderType != null) RenderTypeHooks.registerRenderType(block, renderType);
         });
     }
 
@@ -46,6 +50,12 @@ public final class BlockBuilder<T extends Block> extends Builder<Block, T, Block
     public BlockBuilder<T> flammability(int igniteOdds, int burnOdds)
     {
         flammabilityOdds = Pair.of(igniteOdds, burnOdds);
+        return this;
+    }
+
+    public BlockBuilder<T> renderType(Supplier<Supplier<RenderType>> renderType)
+    {
+        this.renderType = renderType;
         return this;
     }
     // endregion

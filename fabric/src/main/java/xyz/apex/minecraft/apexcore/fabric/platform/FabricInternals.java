@@ -3,10 +3,12 @@ package xyz.apex.minecraft.apexcore.fabric.platform;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -21,6 +23,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.platform.Internals;
 import xyz.apex.minecraft.apexcore.common.platform.SideExecutor;
@@ -86,6 +89,12 @@ final class FabricInternals implements Internals
     {
         if(repository.sources instanceof ImmutableSet) repository.sources = Sets.newHashSet(repository.sources);
         repository.sources.add(source);
+    }
+
+    @Override
+    public void registerRenderType(Block block, RenderType renderType)
+    {
+        BlockRenderLayerMap.INSTANCE.putBlocks(renderType, block);
     }
 
     private void register()
