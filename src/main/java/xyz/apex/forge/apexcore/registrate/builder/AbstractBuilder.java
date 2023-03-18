@@ -63,7 +63,7 @@ public abstract class AbstractBuilder<
 	public final BUILDER tag(ProviderType<? extends RegistrateTagsProvider<TYPE>> providerType, TagKey<TYPE>... tags)
 	{
 		if(!tagsByType.containsKey(providerType))
-			setData(providerType, (ctx, provider) -> tagsByType.get(providerType).stream().map(tag -> (TagKey<TYPE>) tag).map(provider::tag).forEach(tag -> tag.add(TagEntry.element(new ResourceLocation(owner.modId, name)))));
+			setData(providerType, (ctx, provider) -> tagsByType.get(providerType).stream().map(tag -> (TagKey<TYPE>) tag).map(provider::addTag).forEach(tag -> tag.add(TagEntry.element(new ResourceLocation(owner.modId, name)))));
 
 		tagsByType.putAll(providerType, Arrays.asList(tags));
 		return self;

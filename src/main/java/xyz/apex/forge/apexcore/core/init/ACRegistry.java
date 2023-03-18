@@ -36,7 +36,7 @@ public final class ACRegistry extends AbstractRegistrate<ACRegistry>
 			provider.add(ACItemGroupCategories.LOGS.getCategoryNameKey(), "Logs");
 		});*/
 
-		addDataGenerator(BLOCK_TAGS, provider -> provider.tag(TAG_VISUALIZER));
+		addDataGenerator(BLOCK_TAGS, provider -> provider.addTag(TAG_VISUALIZER));
 	}
 
 	public static void bootstrap()
