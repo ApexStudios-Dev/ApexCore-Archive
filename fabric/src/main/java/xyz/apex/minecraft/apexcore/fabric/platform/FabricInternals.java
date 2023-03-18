@@ -1,6 +1,8 @@
 package xyz.apex.minecraft.apexcore.fabric.platform;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
@@ -12,6 +14,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -75,6 +79,13 @@ final class FabricInternals implements Internals
     public <T extends AbstractContainerMenu> MenuType<T> menuType(MenuEntry.ClientMenuConstructor<T> clientMenuConstructor)
     {
         return new ExtendedScreenHandlerType<>((containerId, playerInventory, extraData) -> clientMenuConstructor.create(containerId, playerInventory, playerInventory.player, extraData));
+    }
+
+    @Override
+    public void registerPackRepository(PackRepository repository, RepositorySource source)
+    {
+        if(repository.sources instanceof ImmutableSet) repository.sources = Sets.newHashSet(repository.sources);
+        repository.sources.add(source);
     }
 
     private void register()

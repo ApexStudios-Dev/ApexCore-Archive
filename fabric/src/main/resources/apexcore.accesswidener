@@ -12,3 +12,7 @@ transitive-accessible method net/minecraft/world/level/block/BedBlock getNeighbo
 
 # custom block flammability
 transitive-accessible method net/minecraft/world/level/block/FireBlock setFlammable (Lnet/minecraft/world/level/block/Block;II)V
+
+# [FABRIC ONLY] register custom packs
+accessible field net/minecraft/server/packs/repository/PackRepository sources Ljava/util/Set;
+mutable field net/minecraft/server/packs/repository/PackRepository sources Ljava/util/Set;

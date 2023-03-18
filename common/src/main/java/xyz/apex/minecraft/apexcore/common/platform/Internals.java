@@ -4,6 +4,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -19,4 +21,6 @@ public interface Internals
     void openMenu(ServerPlayer player, MenuProvider constructor, Consumer<FriendlyByteBuf> extraData);
 
     <T extends AbstractContainerMenu> MenuType<T> menuType(MenuEntry.ClientMenuConstructor<T> clientMenuConstructor);
+
+    void registerPackRepository(PackRepository repository, RepositorySource source);
 }
