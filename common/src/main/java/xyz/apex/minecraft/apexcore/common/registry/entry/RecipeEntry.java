@@ -10,6 +10,8 @@ import net.minecraft.world.item.crafting.RecipeType;
 import xyz.apex.minecraft.apexcore.common.registry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.common.registry.RegistryManager;
 
+import java.util.function.Supplier;
+
 public final class RecipeEntry<T extends Recipe<?>> extends RegistryEntry<RecipeSerializer<T>> implements RecipeSerializer<T>, RecipeType<T>
 {
     private final RegistryEntry<RecipeType<T>> recipeType;
@@ -42,5 +44,10 @@ public final class RecipeEntry<T extends Recipe<?>> extends RegistryEntry<Recipe
     public void toNetwork(FriendlyByteBuf buffer, T recipe)
     {
         get().toNetwork(buffer, recipe);
+    }
+
+    public static <T extends Recipe<?>> RecipeEntry<T> register(String ownerId, String registrationName, Supplier<RecipeSerializer<T>> recipeSerializerFactory)
+    {
+        return RegistryManager.get(ownerId).getRegistry(Registries.RECIPE_SERIALIZER).register(registrationName, RecipeEntry::new, recipeSerializerFactory);
     }
 }

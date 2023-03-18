@@ -113,4 +113,9 @@ public final class EntityBuilder<T extends Entity> extends Builder<EntityType<?>
     {
         return propertiesModifier.apply(EntityType.Builder.of(entityFactory, mobCategory)).build(registryName.toString());
     }
+
+    public static <T extends Entity> EntityBuilder<T> builder(String ownerId, String registrationName, MobCategory mobCategory, EntityType.EntityFactory<T> entityFactory)
+    {
+        return new EntityBuilder<>(ownerId, registrationName, mobCategory, entityFactory);
+    }
 }
