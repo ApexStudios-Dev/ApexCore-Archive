@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 
 public final class BlockEntityBuilder<T extends BlockEntity> extends Builder<BlockEntityType<?>, BlockEntityType<T>, BlockEntityEntry<T>, BlockEntityBuilder<T>>
 {
-    private final List<Supplier<Block>> validBlocks = Lists.newArrayList();
+    private final List<Supplier<? extends Block>> validBlocks = Lists.newArrayList();
     private final BlockEntityType.BlockEntitySupplier<T> blockEntityFactory;
 
     private BlockEntityBuilder(String ownerId, String registrationName, BlockEntityType.BlockEntitySupplier<T> blockEntityFactory)
@@ -28,26 +28,26 @@ public final class BlockEntityBuilder<T extends BlockEntity> extends Builder<Blo
         this.blockEntityFactory = blockEntityFactory;
     }
 
-    public BlockEntityBuilder<T> validBlock(Supplier<Block> validBlock)
+    public BlockEntityBuilder<T> validBlock(Supplier<? extends Block> validBlock)
     {
         validBlocks.add(validBlock);
         return this;
     }
 
     @SafeVarargs
-    public final BlockEntityBuilder<T> validBlocks(Supplier<Block>... validBlocks)
+    public final BlockEntityBuilder<T> validBlocks(Supplier<? extends Block>... validBlocks)
     {
         Collections.addAll(this.validBlocks, validBlocks);
         return this;
     }
 
-    public BlockEntityBuilder<T> validBlocks(Collection<Supplier<Block>> validBlocks)
+    public BlockEntityBuilder<T> validBlocks(Collection<Supplier<? extends Block>> validBlocks)
     {
         this.validBlocks.addAll(validBlocks);
         return this;
     }
 
-    public BlockEntityBuilder<T> validBlocks(Iterable<Supplier<Block>> validBlocks)
+    public BlockEntityBuilder<T> validBlocks(Iterable<Supplier<? extends Block>> validBlocks)
     {
         Iterables.addAll(this.validBlocks, validBlocks);
         return this;
