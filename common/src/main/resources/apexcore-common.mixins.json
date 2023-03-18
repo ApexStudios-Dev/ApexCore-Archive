@@ -1,0 +1,11 @@
+{
+    "required": true,
+    "package": "${MOD_GROUP}.common.mixin",
+    "mixins": [
+        "AccessorBlock",
+        "InvokerBlock"
+    ],
+    "client": [ ],
+    "server": [ ],
+    "minVersion": "${MIXIN_VERSION}"
+}

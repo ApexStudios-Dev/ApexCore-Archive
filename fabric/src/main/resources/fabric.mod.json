@@ -56,9 +56,12 @@
     "environment": "*",
     "entrypoints": {
         "main": [ "${MOD_GROUP}.fabric.${MOD_NAME}Fabric" ],
-        "preLaunch": [ "${MOD_GROUP}.fabric.platform.ModLoaderFabric::onPreLaunch" ]
+        "preLaunch": [ "${MOD_GROUP}.fabric.platform.FabricModLoader::onPreLaunch" ]
     },
-    "mixins": [ ],
+    "mixins": [
+        "${MOD_ID}-common.mixins.json"
+    ],
+    "accessWidener": "${MOD_ID}.accesswidener",
     "depends": {
         "minecraft": "~${MINECRAFT_VERSION}",
         "java": ">=${JAVA_VERSION}",

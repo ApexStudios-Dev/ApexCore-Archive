@@ -84,9 +84,17 @@ mixin {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${MINECRAFT_VERSION}-${FORGE_VERSION}"
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    annotationProcessor "org.spongepowered:mixin:${MIXIN_VERSION}:processor"
 
     implementation project(':common')
+}
+
+processResources {
+    from project(':common').sourceSets.main.resources
+}
+
+compileJava {
+    source project(':common').sourceSets.main.allSource
 }
 
 tasks.jarJar.configure {
@@ -112,6 +120,16 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             artifact tasks.jarJar
+
+            pom.withXml {
+                def depsNode = asNode().appendNode('dependencies')
+                def depNode = depsNode.appendNode('dependency')
+                def prj = project(':common')
+                depNode.appendNode('groupId', prj.group)
+                depNode.appendNode('artifactId', prj.archivesBaseName)
+                depNode.appendNode('version', prj.version)
+                depNode.appendNode('scope', 'compile')
+            }
         }
     }
 }

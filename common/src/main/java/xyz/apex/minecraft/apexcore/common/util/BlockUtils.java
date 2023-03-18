@@ -3,16 +3,19 @@ package xyz.apex.minecraft.apexcore.common.util;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import xyz.apex.minecraft.apexcore.common.mixin.AccessorBlock;
+import xyz.apex.minecraft.apexcore.common.mixin.InvokerBlock;
 
 public interface BlockUtils
 {
     static BlockState replaceBlockStateDefinition(Block block)
     {
         var builder = new StateDefinition.Builder<Block, BlockState>(block);
-        block.createBlockStateDefinition(builder);
-        block.stateDefinition = builder.create(Block::defaultBlockState, BlockState::new);
-        var defaultBlockState = block.stateDefinition.any();
-        block.registerDefaultState(defaultBlockState);
+        ((InvokerBlock) block).ApexCore$createBlockStateDefinition(builder);
+        var stateDefinition = builder.create(Block::defaultBlockState, BlockState::new);
+        ((AccessorBlock) block).ApexCore$setStateDefinition(stateDefinition);
+        var defaultBlockState = stateDefinition.any();
+        ((InvokerBlock) block).ApexCore$registerDefaultState(defaultBlockState);
         return defaultBlockState;
     }
 }

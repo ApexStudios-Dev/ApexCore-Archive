@@ -10,6 +10,10 @@ loom {
     enableTransitiveAccessWideners = true
 }
 
+repositories {
+    maven { url 'https://repo.spongepowered.org/maven/' }
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${MINECRAFT_VERSION}"
 
@@ -21,12 +25,23 @@ dependencies {
             parchment("org.parchmentmc.data:parchment-${mcVersion}:${PARCHMENT_MAPPINGS}@zip")
         }
     })
+
+    compileOnly "org.spongepowered:mixin:${MIXIN_VERSION}"
+}
+
+remapJar.enabled = false
+remapSourcesJar.enabled = false
+
+jar {
+    classifier ''
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
             loom.disableDeprecatedPomGeneration(it)
+
+            artifact jar
         }
     }
 }

@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.common.registry.builder;
 
+import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -14,6 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.registry.FlammabilityRegistry;
 import xyz.apex.minecraft.apexcore.common.registry.entry.BlockEntry;
 
 import java.util.function.Function;
@@ -27,13 +29,26 @@ public final class BlockBuilder<T extends Block> extends Builder<Block, T, Block
     private Function<BlockBehaviour.Properties, BlockBehaviour.Properties> propertiesModifier = Function.identity();
     private final BlockFactory<T> blockFactory;
     @Nullable private ItemBuilder<?> itemBuilder = null;
+    @Nullable private Pair<Integer, Integer> flammabilityOdds = null;
 
     private BlockBuilder(String ownerId, String registrationName, BlockFactory<T> blockFactory)
     {
         super(Registries.BLOCK, ownerId, registrationName);
 
         this.blockFactory = blockFactory;
+
+        onRegister(block -> {
+            if(flammabilityOdds != null) FlammabilityRegistry.register(block, flammabilityOdds.first(), flammabilityOdds.second());
+        });
     }
+
+    // region: Custom
+    public BlockBuilder<T> flammability(int igniteOdds, int burnOdds)
+    {
+        flammabilityOdds = Pair.of(igniteOdds, burnOdds);
+        return this;
+    }
+    // endregion
 
     // region: Initial Properties
     public BlockBuilder<T> initialProperties(Material material)

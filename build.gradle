@@ -12,7 +12,7 @@ subprojects {
         accessTransformerFile = rootProject.file('forge/src/main/resources/META-INF/accesstransformer.cfg')
     }
 
-    group = "${MOD_GROUP}.${project.name}"
+    group = "${MOD_GROUP}"
     version = "${MOD_VERSION}+${MINECRAFT_VERSION}"
     archivesBaseName = "${MOD_ID}-${project.name}"
 
@@ -98,7 +98,6 @@ subprojects {
                 artifactId = "${project.archivesBaseName}"
                 version = "${project.version}"
 
-                artifact jar
                 artifact sourcesJar
             }
         }
