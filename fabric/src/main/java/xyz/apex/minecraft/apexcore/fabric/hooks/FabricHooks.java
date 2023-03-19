@@ -12,6 +12,7 @@ public final class FabricHooks extends FabricPlatformHolder implements Hooks
     private final FabricPackRepositoryHooks packRepository;
     private final FabricRegistryHooks registry;
     private final FabricRendererHooks renderer;
+    private final FabricCreativeModeTabHooks creativeModeTab;
 
     public FabricHooks(FabricPlatform platform)
     {
@@ -20,6 +21,7 @@ public final class FabricHooks extends FabricPlatformHolder implements Hooks
         packRepository = new FabricPackRepositoryHooks(platform);
         registry = new FabricRegistryHooks(platform);
         renderer = new FabricRendererHooks(platform);
+        creativeModeTab = new FabricCreativeModeTabHooks(platform);
     }
 
     @Override
@@ -38,5 +40,11 @@ public final class FabricHooks extends FabricPlatformHolder implements Hooks
     public RendererHooks renderer()
     {
         return renderer;
+    }
+
+    @Override
+    public FabricCreativeModeTabHooks creativeModeTab()
+    {
+        return creativeModeTab;
     }
 }

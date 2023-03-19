@@ -12,6 +12,7 @@ public final class ForgeHooks extends ForgePlatformHolder implements Hooks
     private final ForgePackRepositoryHooks packRepository;
     private final ForgeRegistryHooks registry;
     private final ForgeRendererHooks renderer;
+    private final ForgeCreativeModeTabHooks creativeModeTab;
 
     public ForgeHooks(ForgePlatform platform)
     {
@@ -20,6 +21,7 @@ public final class ForgeHooks extends ForgePlatformHolder implements Hooks
         packRepository = new ForgePackRepositoryHooks(platform);
         registry = new ForgeRegistryHooks(platform);
         renderer = new ForgeRendererHooks(platform);
+        creativeModeTab = new ForgeCreativeModeTabHooks(platform);
     }
 
     @Override
@@ -38,5 +40,11 @@ public final class ForgeHooks extends ForgePlatformHolder implements Hooks
     public RendererHooks renderer()
     {
         return renderer;
+    }
+
+    @Override
+    public ForgeCreativeModeTabHooks creativeModeTab()
+    {
+        return creativeModeTab;
     }
 }
