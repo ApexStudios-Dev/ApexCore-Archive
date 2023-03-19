@@ -1,12 +1,15 @@
 package xyz.apex.minecraft.apexcore.common.registry.builder;
 
 import com.google.common.collect.Streams;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.hooks.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.registry.entry.EntityEntry;
 
 import java.util.Collection;
@@ -20,6 +23,7 @@ public final class EntityBuilder<T extends Entity> extends Builder<EntityType<?>
     private Function<EntityType.Builder<T>, EntityType.Builder<T>> propertiesModifier = Function.identity();
     private final EntityType.EntityFactory<T> entityFactory;
     private final MobCategory mobCategory;
+    @Nullable private Supplier<EntityRendererProvider<T>> entityRendererProvider = null;
 
     private EntityBuilder(String ownerId, String registrationName, MobCategory mobCategory, EntityType.EntityFactory<T> entityFactory)
     {
@@ -27,7 +31,19 @@ public final class EntityBuilder<T extends Entity> extends Builder<EntityType<?>
 
         this.mobCategory = mobCategory;
         this.entityFactory = entityFactory;
+
+        onRegister(entityType -> {
+            if(entityRendererProvider != null) RendererHooks.getInstance().registerEntityRenderer(entityType, entityRendererProvider);
+        });
     }
+
+    // region: Custom
+    public EntityBuilder<T> renderer(Supplier<EntityRendererProvider<T>> entityRendererProvider)
+    {
+        this.entityRendererProvider = entityRendererProvider;
+        return this;
+    }
+    // endregion
 
     // region: Properties
     public EntityBuilder<T> properties(UnaryOperator<EntityType.Builder<T>> propertiesModifier)
