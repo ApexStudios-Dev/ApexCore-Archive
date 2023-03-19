@@ -6,8 +6,6 @@ loom {
     if(accessWidenerFile.exists()) {
         accessWidenerPath = accessWidenerFile
     }
-
-    enableTransitiveAccessWideners = true
 }
 
 repositories {
@@ -29,12 +27,19 @@ dependencies {
     compileOnly "org.spongepowered:mixin:${MIXIN_VERSION}"
 }
 
+remapJar.enabled = false
+remapSourcesJar.enabled = false
+
+jar {
+    classifier ''
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
             loom.disableDeprecatedPomGeneration(it)
 
-            artifact remapJar
+            artifact jar
         }
     }
 }
