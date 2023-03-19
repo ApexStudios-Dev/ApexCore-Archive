@@ -29,10 +29,6 @@ dependencies {
     compileOnly "org.spongepowered:mixin:${MIXIN_VERSION}"
 }
 
-jar {
-    classifier ''
-}
-
 publishing {
     publications {
         mavenJava(MavenPublication) {
