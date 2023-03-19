@@ -5,7 +5,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import xyz.apex.minecraft.apexcore.common.platform.Platform;
+import xyz.apex.minecraft.apexcore.common.hooks.RegistryHooks;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,7 @@ public final class RegistryManager
     @SuppressWarnings("unchecked")
     public <T> DeferredRegister<T> getRegistry(ResourceKey<? extends Registry<T>> registryType)
     {
-        return (DeferredRegister<T>) registries.computeIfAbsent(registryType, $ -> Platform.INSTANCE.internals().deferredRegister(ownerId, registryType));
+        return (DeferredRegister<T>) registries.computeIfAbsent(registryType, $ -> RegistryHooks.getInstance().deferredRegister(ownerId, registryType));
     }
 
     public void register()

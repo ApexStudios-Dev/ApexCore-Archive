@@ -1,10 +1,11 @@
 package xyz.apex.minecraft.apexcore.common.platform;
 
-import java.util.ServiceLoader;
+import xyz.apex.minecraft.apexcore.common.hooks.Hooks;
+import xyz.apex.minecraft.apexcore.common.util.ServiceUtil;
 
 public interface Platform
 {
-    Platform INSTANCE = ServiceLoader.load(Platform.class).findFirst().orElseThrow();
+    Platform INSTANCE = ServiceUtil.lookup(Platform.class);
 
     String FORGE = "forge";
     String FABRIC = "fabricloader";
@@ -20,5 +21,7 @@ public interface Platform
 
     Side getPhysicalSide();
 
-    Internals internals();
+    Hooks hooks();
+
+    ModLoader modLoader();
 }

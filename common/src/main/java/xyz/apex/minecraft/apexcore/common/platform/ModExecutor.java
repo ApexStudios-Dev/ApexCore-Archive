@@ -17,11 +17,11 @@ public interface ModExecutor
 
     static void runIfLoadedOrElse(String modId, Supplier<Consumer<Mod>> toRun, Supplier<Runnable> emptyRunnable)
     {
-        ModLoader.INSTANCE.getMod(modId).ifPresentOrElse(mod -> toRun.get().accept(mod), () -> emptyRunnable.get().run());
+        ModLoader.getInstance().getMod(modId).ifPresentOrElse(mod -> toRun.get().accept(mod), () -> emptyRunnable.get().run());
     }
 
     static <T> Optional<T> callIfLoaded(String modId, Supplier<Function<Mod, T>> toCall)
     {
-        return ModLoader.INSTANCE.getMod(modId).map(mod -> toCall.get().apply(mod));
+        return ModLoader.getInstance().getMod(modId).map(mod -> toCall.get().apply(mod));
     }
 }

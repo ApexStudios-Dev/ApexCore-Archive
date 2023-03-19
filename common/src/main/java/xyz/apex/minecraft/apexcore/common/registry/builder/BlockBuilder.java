@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import org.jetbrains.annotations.Nullable;
-import xyz.apex.minecraft.apexcore.common.hooks.RenderTypeHooks;
+import xyz.apex.minecraft.apexcore.common.hooks.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.registry.FlammabilityRegistry;
 import xyz.apex.minecraft.apexcore.common.registry.entry.BlockEntry;
 
@@ -44,7 +44,7 @@ public final class BlockBuilder<T extends Block> extends Builder<Block, T, Block
 
         onRegister(block -> {
             if(flammabilityOdds != null) FlammabilityRegistry.register(block, flammabilityOdds.first(), flammabilityOdds.second());
-            if(renderType != null) RenderTypeHooks.registerRenderType(block, renderType);
+            if(renderType != null) RendererHooks.getInstance().registerRenderType(block, renderType);
         });
     }
 

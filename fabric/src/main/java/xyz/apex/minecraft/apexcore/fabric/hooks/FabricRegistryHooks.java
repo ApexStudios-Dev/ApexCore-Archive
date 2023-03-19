@@ -1,41 +1,40 @@
-package xyz.apex.minecraft.apexcore.fabric.platform;
+package xyz.apex.minecraft.apexcore.fabric.hooks;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
-import xyz.apex.minecraft.apexcore.common.platform.Internals;
+import xyz.apex.minecraft.apexcore.common.hooks.RegistryHooks;
 import xyz.apex.minecraft.apexcore.common.registry.DeferredRegister;
 import xyz.apex.minecraft.apexcore.common.registry.entry.MenuEntry;
+import xyz.apex.minecraft.apexcore.fabric.platform.FabricDeferredRegister;
+import xyz.apex.minecraft.apexcore.fabric.platform.FabricPlatform;
+import xyz.apex.minecraft.apexcore.fabric.platform.FabricPlatformHolder;
 
 import java.util.Map;
 
-final class FabricInternals implements Internals
+public final class FabricRegistryHooks extends FabricPlatformHolder implements RegistryHooks
 {
-    private final Map<String, FabricModInternals> modInternals = Maps.newHashMap();
+    private final Map<String, Mod> mods = Maps.newHashMap();
 
-    FabricInternals() {}
+    FabricRegistryHooks(FabricPlatform platform)
+    {
+        super(platform);
+    }
 
     @Override
     public <T> DeferredRegister<T> deferredRegister(String ownerId, ResourceKey<? extends Registry<T>> registryType)
     {
-        return modInternals.computeIfAbsent(ownerId, FabricModInternals::new).deferredRegister(registryType);
+        return mods.computeIfAbsent(ownerId, Mod::new).deferredRegister(registryType);
     }
 
     @Override
@@ -69,25 +68,12 @@ final class FabricInternals implements Internals
         return new ExtendedScreenHandlerType<>((containerId, playerInventory, extraData) -> clientMenuConstructor.create(containerId, playerInventory, playerInventory.player, extraData));
     }
 
-    @Override
-    public void registerPackRepository(PackRepository repository, RepositorySource source)
-    {
-        if(repository.sources instanceof ImmutableSet) repository.sources = Sets.newHashSet(repository.sources);
-        repository.sources.add(source);
-    }
-
-    @Override
-    public void registerRenderType(Block block, RenderType renderType)
-    {
-        BlockRenderLayerMap.INSTANCE.putBlocks(renderType, block);
-    }
-
-    private static final class FabricModInternals
+    private static final class Mod
     {
         private final String ownerId;
         private final Map<ResourceKey<? extends Registry<?>>, FabricDeferredRegister<?>> registries = Maps.newHashMap();
 
-        private FabricModInternals(String ownerId)
+        private Mod(String ownerId)
         {
             this.ownerId = ownerId;
         }

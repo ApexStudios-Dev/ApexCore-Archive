@@ -9,12 +9,17 @@ import xyz.apex.minecraft.apexcore.common.platform.ModLoader;
 import java.util.*;
 import java.util.stream.Stream;
 
-public final class ForgeModLoader implements ModLoader
+public final class ForgeModLoader extends ForgePlatformHolder implements ModLoader
 {
     private final Map<String, Mod> mods = Maps.newHashMap();
     private final Set<String> modIdView = Collections.unmodifiableSet(mods.keySet());
     private final Collection<Mod> modView = Collections.unmodifiableCollection(mods.values());
     private boolean init = false;
+
+    ForgeModLoader(ForgePlatform platform)
+    {
+        super(platform);
+    }
 
     @Override
     public String version()
@@ -72,7 +77,7 @@ public final class ForgeModLoader implements ModLoader
     private void lookupMods()
     {
         if(init) return;
-        ModList.get().forEachModContainer((modId, mod) -> mods.putIfAbsent(modId, new ForgeMod(modId, mod)));
+        ModList.get().forEachModContainer((modId, mod) -> mods.putIfAbsent(modId, new ForgeMod(platform, mod)));
         init = true;
     }
 }

@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public interface Mod
+public interface Mod extends PlatformHolder
 {
     String id();
 
@@ -25,4 +25,6 @@ public interface Mod
     List<Path> filePaths();
 
     Optional<Path> findResource(String... path);
+
+    ModLoader modLoader();
 }

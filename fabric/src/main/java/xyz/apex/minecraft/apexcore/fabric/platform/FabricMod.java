@@ -11,8 +11,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-record FabricMod(ModContainer modContainer) implements Mod
+final class FabricMod extends FabricPlatformHolder implements Mod
 {
+    private final ModContainer modContainer;
+
+    FabricMod(FabricPlatform platform, ModContainer modContainer)
+    {
+        super(platform);
+
+        this.modContainer = modContainer;
+    }
+
     @Override
     public String id()
     {
@@ -53,5 +62,11 @@ record FabricMod(ModContainer modContainer) implements Mod
     public Optional<Path> findResource(String... path)
     {
         return modContainer.findPath(String.join(File.separator, path));
+    }
+
+    @Override
+    public FabricModLoader modLoader()
+    {
+        return platform.modLoader();
     }
 }

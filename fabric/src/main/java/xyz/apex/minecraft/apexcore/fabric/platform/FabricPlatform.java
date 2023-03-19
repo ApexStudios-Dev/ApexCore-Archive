@@ -3,13 +3,20 @@ package xyz.apex.minecraft.apexcore.fabric.platform;
 import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
-import xyz.apex.minecraft.apexcore.common.platform.Internals;
 import xyz.apex.minecraft.apexcore.common.platform.Platform;
 import xyz.apex.minecraft.apexcore.common.platform.Side;
+import xyz.apex.minecraft.apexcore.fabric.hooks.FabricHooks;
 
 public final class FabricPlatform implements Platform
 {
-    private final FabricInternals internals = new FabricInternals();
+    private final FabricHooks hooks;
+    private final FabricModLoader modLoader;
+
+    public FabricPlatform()
+    {
+        hooks = new FabricHooks(this);
+        modLoader = new FabricModLoader(this);
+    }
 
     @Override
     public String getMinecraftVersion()
@@ -45,8 +52,14 @@ public final class FabricPlatform implements Platform
     }
 
     @Override
-    public Internals internals()
+    public FabricHooks hooks()
     {
-        return internals;
+        return hooks;
+    }
+
+    @Override
+    public FabricModLoader modLoader()
+    {
+        return modLoader;
     }
 }

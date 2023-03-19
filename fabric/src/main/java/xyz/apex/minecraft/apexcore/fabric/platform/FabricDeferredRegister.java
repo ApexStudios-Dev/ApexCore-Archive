@@ -9,11 +9,11 @@ import xyz.apex.minecraft.apexcore.common.registry.RegistryEntry;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-class FabricDeferredRegister<T> extends DeferredRegister<T>
+public final class FabricDeferredRegister<T> extends DeferredRegister<T>
 {
     private boolean registered = false;
 
-    FabricDeferredRegister(String ownerId, ResourceKey<? extends Registry<T>> registryType)
+    public FabricDeferredRegister(String ownerId, ResourceKey<? extends Registry<T>> registryType)
     {
         super(ownerId, registryType);
     }

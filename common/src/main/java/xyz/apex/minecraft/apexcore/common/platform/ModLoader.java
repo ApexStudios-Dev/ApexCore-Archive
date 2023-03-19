@@ -2,14 +2,11 @@ package xyz.apex.minecraft.apexcore.common.platform;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public interface ModLoader
+public interface ModLoader extends PlatformHolder
 {
-    ModLoader INSTANCE = ServiceLoader.load(ModLoader.class).findFirst().orElseThrow();
-
     String version();
 
     String id();
@@ -25,4 +22,9 @@ public interface ModLoader
     Set<String> getModIdSet();
 
     Optional<Mod> getMod(String modId);
+
+    static ModLoader getInstance()
+    {
+        return Platform.INSTANCE.modLoader();
+    }
 }

@@ -9,12 +9,17 @@ import xyz.apex.minecraft.apexcore.common.platform.ModLoader;
 import java.util.*;
 import java.util.stream.Stream;
 
-public final class FabricModLoader implements ModLoader
+public final class FabricModLoader extends FabricPlatformHolder implements ModLoader
 {
     private final Map<String, Mod> mods = Maps.newHashMap();
     private final Set<String> modIdView = Collections.unmodifiableSet(mods.keySet());
     private final Collection<Mod> modView = Collections.unmodifiableCollection(mods.values());
     private boolean init = false;
+
+    FabricModLoader(FabricPlatform platform)
+    {
+        super(platform);
+    }
 
     @Override
     public String version()
@@ -72,7 +77,7 @@ public final class FabricModLoader implements ModLoader
     private void lookupMods()
     {
         if(init) return;
-        FabricLoader.getInstance().getAllMods().forEach(mod -> mods.putIfAbsent(mod.getMetadata().getId(), new FabricMod(mod)));
+        FabricLoader.getInstance().getAllMods().forEach(mod -> mods.putIfAbsent(mod.getMetadata().getId(), new FabricMod(platform, mod)));
         init = true;
     }
 }

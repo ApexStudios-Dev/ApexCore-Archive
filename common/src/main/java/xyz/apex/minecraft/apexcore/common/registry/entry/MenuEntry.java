@@ -14,7 +14,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import xyz.apex.minecraft.apexcore.common.platform.Platform;
+import xyz.apex.minecraft.apexcore.common.hooks.RegistryHooks;
 import xyz.apex.minecraft.apexcore.common.platform.Side;
 import xyz.apex.minecraft.apexcore.common.platform.SideExecutor;
 import xyz.apex.minecraft.apexcore.common.registry.RegistryEntry;
@@ -32,7 +32,7 @@ public final class MenuEntry<T extends AbstractContainerMenu> extends RegistryEn
 
     public InteractionResult open(Player player, Component displayName, Consumer<FriendlyByteBuf> extraDataWriter)
     {
-        if(player instanceof ServerPlayer serverPlayer) Platform.INSTANCE.internals().openMenu(serverPlayer, asMenuProvider(displayName, extraDataWriter));
+        if(player instanceof ServerPlayer serverPlayer) RegistryHooks.getInstance().openMenu(serverPlayer, asMenuProvider(displayName, extraDataWriter));
         return InteractionResult.sidedSuccess(player.level.isClientSide);
     }
 
@@ -64,7 +64,7 @@ public final class MenuEntry<T extends AbstractContainerMenu> extends RegistryEn
         return RegistryManager.get(ownerId).getRegistry(Registries.MENU).register(
                 registrationName,
                 MenuEntry::new,
-                () -> Platform.INSTANCE.internals().menuType(menuFactory)
+                () -> RegistryHooks.getInstance().menuType(menuFactory)
         );
     }
 

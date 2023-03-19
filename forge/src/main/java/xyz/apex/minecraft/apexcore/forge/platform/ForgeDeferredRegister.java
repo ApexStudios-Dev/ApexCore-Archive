@@ -24,12 +24,12 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-class ForgeDeferredRegister<T> extends DeferredRegister<T>
+public final class ForgeDeferredRegister<T> extends DeferredRegister<T>
 {
     private boolean registered = false;
     @Nullable private RegisterEvent.RegisterHelper<T> registerHelper;
 
-    ForgeDeferredRegister(String ownerId, ResourceKey<? extends Registry<T>> registryType)
+    public ForgeDeferredRegister(String ownerId, ResourceKey<? extends Registry<T>> registryType)
     {
         super(ownerId, registryType);
 
