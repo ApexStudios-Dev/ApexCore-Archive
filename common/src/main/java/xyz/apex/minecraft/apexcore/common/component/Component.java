@@ -1,6 +1,5 @@
 package xyz.apex.minecraft.apexcore.common.component;
 
-import com.google.errorprone.annotations.DoNotCall;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -70,100 +69,82 @@ public interface Component
     // endregion
 
     // region: Block
-    @DoNotCall
     default InteractionResult use(BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
     {
         return InteractionResult.PASS;
     }
 
-    @DoNotCall
     default BlockState registerDefaultBlockState(BlockState blockState)
     {
         return blockState;
     }
 
     @Nullable
-    @DoNotCall
     default BlockState getStateForPlacement(BlockPlaceContext ctx, BlockState blockState)
     {
         return blockState;
     }
 
-    @DoNotCall
     default boolean canSurvive(BlockState blockState, LevelReader level, BlockPos pos)
     {
         return true;
     }
 
-    @DoNotCall
     default void onPlace(BlockState blockState, Level level, BlockPos pos, BlockState oldBlockState, boolean isMoving) {}
 
-    @DoNotCall
     default void onRemove(BlockState blockState, Level level, BlockPos pos, BlockState newBlockState, boolean isMoving) {}
 
-    @DoNotCall
     default void createBlockStateDefinition(Consumer<Property<?>> consumer) { }
 
     @Nullable
-    @DoNotCall
     default RenderShape getRenderShape(BlockState blockState)
     {
         return null;
     }
 
-    @DoNotCall
     default void setPlacedBy(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack) { }
 
-    @DoNotCall
     default boolean hasAnalogOutputSignal(BlockState blockState)
     {
         return false;
     }
 
-    @DoNotCall
     default int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos)
     {
         return 0;
     }
 
-    @DoNotCall
     default BlockState rotate(BlockState blockState, Rotation rotation)
     {
         return blockState;
     }
 
-    @DoNotCall
+
     default BlockState mirror(BlockState blockState, Mirror mirror)
     {
         return blockState;
     }
 
-    @DoNotCall
     default BlockState updateShape(BlockState blockState, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos)
     {
         return blockState;
     }
 
-    @DoNotCall
     default void neighborChanged(BlockState blockState, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) { }
 
-    @DoNotCall
     default void playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player) { }
 
-    @DoNotCall
     default boolean isPathFindable(BlockState blockState, BlockGetter level, BlockPos pos, PathComputationType pathComputationType)
     {
         return true;
     }
 
     @Nullable
-    @DoNotCall
     default PushReaction getPistonPushReaction(BlockState blockState)
     {
         return null;
     }
 
-    @DoNotCall
     default long getSeed(BlockState blockState, BlockPos pos)
     {
         return -1L;

@@ -1,6 +1,5 @@
 package xyz.apex.minecraft.apexcore.common.multiblock;
 
-import com.google.errorprone.annotations.DoNotCall;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -39,7 +38,6 @@ public class MultiBlockType
     }
 
     @Nullable
-    @DoNotCall
     public BlockState getStateForPlacement(BlockState placementBlockState, BlockPlaceContext ctx)
     {
         var level = ctx.getLevel();
@@ -61,7 +59,6 @@ public class MultiBlockType
         return result;
     }
 
-    @DoNotCall
     public boolean canSurvive(LevelReader level, BlockPos pos, BlockState blockState)
     {
         if(!isValidBlock(blockState)) return false;
@@ -80,7 +77,6 @@ public class MultiBlockType
         return level.getBlockState(origin).canSurvive(level, origin);
     }
 
-    @DoNotCall
     public void onPlace(BlockState blockState, Level level, BlockPos origin, BlockState oldBlockState)
     {
         if(!isValidBlock(oldBlockState) && isOrigin(blockState))
@@ -100,7 +96,6 @@ public class MultiBlockType
         }
     }
 
-    @DoNotCall
     public void onRemove(BlockState blockState, Level level, BlockPos pos, BlockState newBlockState)
     {
         if(!isValidBlock(blockState) || !isValidBlock(newBlockState))
@@ -119,13 +114,11 @@ public class MultiBlockType
         }
     }
 
-    @DoNotCall
     public void registerBlockProperty(Consumer<Property<?>> consumer)
     {
         consumer.accept(pattern.getBlockProperty());
     }
 
-    @DoNotCall
     public BlockState registerDefaultBlockState(BlockState defaultBlockState)
     {
         return setIndex(defaultBlockState, MultiBlockPattern.ORIGIN_INDEX);
