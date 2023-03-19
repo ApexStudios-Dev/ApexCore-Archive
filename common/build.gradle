@@ -29,9 +29,6 @@ dependencies {
     compileOnly "org.spongepowered:mixin:${MIXIN_VERSION}"
 }
 
-remapJar.enabled = false
-remapSourcesJar.enabled = false
-
 jar {
     classifier ''
 }
@@ -41,7 +38,7 @@ publishing {
         mavenJava(MavenPublication) {
             loom.disableDeprecatedPomGeneration(it)
 
-            artifact jar
+            artifact remapJar
         }
     }
 }

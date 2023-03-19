@@ -89,14 +89,6 @@ dependencies {
     implementation project(':common')
 }
 
-processResources {
-    from project(':common').sourceSets.main.resources
-}
-
-compileJava {
-    source project(':common').sourceSets.main.allSource
-}
-
 tasks.jarJar.configure {
     classifier ''
 }
@@ -120,16 +112,6 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             artifact tasks.jarJar
-
-            pom.withXml {
-                def depsNode = asNode().appendNode('dependencies')
-                def depNode = depsNode.appendNode('dependency')
-                def prj = project(':common')
-                depNode.appendNode('groupId', prj.group)
-                depNode.appendNode('artifactId', prj.archivesBaseName)
-                depNode.appendNode('version', prj.version)
-                depNode.appendNode('scope', 'compile')
-            }
         }
     }
 }
