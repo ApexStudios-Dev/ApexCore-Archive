@@ -75,9 +75,4 @@ public final class FabricModLoader implements ModLoader
         FabricLoader.getInstance().getAllMods().forEach(mod -> mods.putIfAbsent(mod.getMetadata().getId(), new FabricMod(mod)));
         init = true;
     }
-
-    public static void onPreLaunch()
-    {
-        ((FabricModLoader) ModLoader.INSTANCE).lookupMods();
-    }
 }

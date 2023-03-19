@@ -44,6 +44,9 @@ class ForgeDeferredRegister<T> extends DeferredRegister<T>
     }
 
     @Override
+    public void register() {}
+
+    @Override
     protected <R extends T> void registryEntry(RegistryEntry<R> registryEntry, Supplier<R> registryEntryFactory)
     {
         Validate.notNull(registerHelper);

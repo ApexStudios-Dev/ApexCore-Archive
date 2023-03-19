@@ -126,6 +126,7 @@ public abstract class DeferredRegister<T>
         registerCallbacks.clear();
     }
 
+    public abstract void register();
     protected abstract boolean isRegistered();
     protected abstract <R extends T> void registryEntry(RegistryEntry<R> registryEntry, Supplier<R> registryEntryFactory);
     protected abstract Runnable buildRegisterCallback(ResourceLocation registryName, Consumer<T> registerCallback);

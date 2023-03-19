@@ -18,7 +18,8 @@ class FabricDeferredRegister<T> extends DeferredRegister<T>
         super(ownerId, registryType);
     }
 
-    void register()
+    @Override
+    public void register()
     {
         if(registered) return;
         registerEntries();

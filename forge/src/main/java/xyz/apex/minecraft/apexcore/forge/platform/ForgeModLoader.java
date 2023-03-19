@@ -75,9 +75,4 @@ public final class ForgeModLoader implements ModLoader
         ModList.get().forEachModContainer((modId, mod) -> mods.putIfAbsent(modId, new ForgeMod(modId, mod)));
         init = true;
     }
-
-    public static void onPreLaunch()
-    {
-        ((ForgeModLoader) ModLoader.INSTANCE).lookupMods();
-    }
 }
