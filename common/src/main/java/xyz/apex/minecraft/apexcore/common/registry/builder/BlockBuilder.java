@@ -40,6 +40,8 @@ public final class BlockBuilder<T extends Block> extends Builder<Block, T, Block
 
         this.blockFactory = blockFactory;
 
+        item();
+
         onRegister(block -> {
             if(flammabilityOdds != null) FlammabilityRegistry.register(block, flammabilityOdds.first(), flammabilityOdds.second());
             if(renderType != null) RenderTypeHooks.registerRenderType(block, renderType);
