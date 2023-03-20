@@ -1,8 +1,6 @@
 package xyz.apex.minecraft.apexcore.common.registry.entry;
 
-import com.google.gson.JsonObject;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -12,7 +10,7 @@ import xyz.apex.minecraft.apexcore.common.registry.RegistryManager;
 
 import java.util.function.Supplier;
 
-public final class RecipeEntry<T extends Recipe<?>> extends RegistryEntry<RecipeSerializer<T>> implements RecipeSerializer<T>, RecipeType<T>
+public final class RecipeEntry<T extends Recipe<?>> extends RegistryEntry<RecipeSerializer<T>> implements RecipeType<T>
 {
     private final RegistryEntry<RecipeType<T>> recipeType;
 
@@ -26,24 +24,6 @@ public final class RecipeEntry<T extends Recipe<?>> extends RegistryEntry<Recipe
     public RegistryEntry<RecipeType<T>> asRecipeType()
     {
         return recipeType;
-    }
-
-    @Override
-    public T fromJson(ResourceLocation recipeId, JsonObject serializedRecipe)
-    {
-        return get().fromJson(recipeId, serializedRecipe);
-    }
-
-    @Override
-    public T fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer)
-    {
-        return get().fromNetwork(recipeId, buffer);
-    }
-
-    @Override
-    public void toNetwork(FriendlyByteBuf buffer, T recipe)
-    {
-        get().toNetwork(buffer, recipe);
     }
 
     public static <T extends Recipe<?>> RecipeEntry<T> register(String ownerId, String registrationName, Supplier<RecipeSerializer<T>> recipeSerializerFactory)
