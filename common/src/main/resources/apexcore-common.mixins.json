@@ -3,7 +3,9 @@
     "package": "${MOD_GROUP}.common.mixin",
     "mixins": [
         "AccessorBlock",
-        "InvokerBlock"
+        "AccessorPoiTypes",
+        "InvokerBlock",
+        "MixinPoiType"
     ],
     "client": [ ],
     "server": [ ],
