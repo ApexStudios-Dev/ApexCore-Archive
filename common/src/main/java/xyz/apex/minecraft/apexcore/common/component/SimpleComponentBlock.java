@@ -28,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.hooks.BlockHooks;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public class SimpleComponentBlock extends Block implements ComponentBlock
 {
@@ -39,21 +38,15 @@ public class SimpleComponentBlock extends Block implements ComponentBlock
 
     public SimpleComponentBlock(Properties properties)
     {
-        this(block -> {}, properties);
-    }
-
-    public SimpleComponentBlock(Consumer<SimpleComponentBlock> registerComponents, Properties properties)
-    {
         super(properties);
 
-        doConstructor(registerComponents);
+        doConstructor();
     }
 
     // region: Component
-    private void doConstructor(Consumer<SimpleComponentBlock> registerComponents)
+    private void doConstructor()
     {
         registerComponents();
-        registerComponents.accept(this);
         registered = true;
         validateComponents();
         registerDefaultBlockStateForComponents();
