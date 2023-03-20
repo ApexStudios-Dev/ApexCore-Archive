@@ -8,5 +8,6 @@ public final class ApexCoreFabric implements ApexCore, ModInitializer
     @Override
     public void onInitialize()
     {
+        bootstrap();
     }
 }

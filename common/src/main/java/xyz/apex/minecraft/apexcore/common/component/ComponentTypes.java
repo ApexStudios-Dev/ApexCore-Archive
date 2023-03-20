@@ -12,4 +12,6 @@ public interface ComponentTypes
     ComponentType<DoorComponent> DOOR = DoorComponent.COMPONENT_TYPE;
 
     ComponentType<MultiBlockComponent> MULTI_BLOCK = MultiBlockComponent.COMPONENT_TYPE;
+
+    static void bootstrap() {}
 }

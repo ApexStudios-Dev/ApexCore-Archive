@@ -24,4 +24,6 @@ public interface Platform
     Hooks hooks();
 
     ModLoader modLoader();
+
+    static void bootstrap() {}
 }
