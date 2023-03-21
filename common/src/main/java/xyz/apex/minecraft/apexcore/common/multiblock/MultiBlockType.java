@@ -10,17 +10,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.Nullable;
-import xyz.apex.minecraft.apexcore.common.component.ComponentBlock;
+import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentHolder;
 
 import java.util.List;
 import java.util.function.Consumer;
 
 public class MultiBlockType
 {
-    private final ComponentBlock owner;
+    private final BlockComponentHolder owner;
     private final MultiBlockPattern pattern;
 
-    MultiBlockType(ComponentBlock owner, MultiBlockPattern pattern)
+    MultiBlockType(BlockComponentHolder owner, MultiBlockPattern pattern)
     {
         this.owner = owner;
         this.pattern = pattern;

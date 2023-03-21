@@ -1,4 +1,4 @@
-package xyz.apex.minecraft.apexcore.common.component.types;
+package xyz.apex.minecraft.apexcore.common.component.block.types;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,31 +20,26 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.*;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.ApexCore;
-import xyz.apex.minecraft.apexcore.common.component.ComponentBlock;
-import xyz.apex.minecraft.apexcore.common.component.ComponentType;
-import xyz.apex.minecraft.apexcore.common.component.ComponentTypes;
-import xyz.apex.minecraft.apexcore.common.component.SimpleComponent;
+import xyz.apex.minecraft.apexcore.common.component.block.BaseBlockComponent;
+import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentHolder;
+import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentType;
+import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentTypes;
 
 import java.util.function.Consumer;
 
-public final class BedComponent extends SimpleComponent
+public final class BedBlockComponent extends BaseBlockComponent
 {
-    public static final ComponentType<BedComponent> COMPONENT_TYPE = ComponentType
-            .builder(new ResourceLocation(ApexCore.ID, "bed"), BedComponent.class)
-                .requires(ComponentTypes.HORIZONTAL_FACING)
-            .register();
+    public static final BlockComponentType<BedBlockComponent> COMPONENT_TYPE = BlockComponentType.register(new ResourceLocation(ApexCore.ID, "bed"), BedBlockComponent::new, BlockComponentTypes.HORIZONTAL_FACING);
 
     public static final EnumProperty<BedPart> PART = BedBlock.PART;
     public static final BooleanProperty OCCUPIED = BedBlock.OCCUPIED;
-    public static final DirectionProperty FACING = HorizontalFacingComponent.FACING;
+    public static final DirectionProperty FACING = HorizontalFacingBlockComponent.FACING;
 
-    @ApiStatus.Internal // public cause reflection
-    public BedComponent(ComponentBlock block)
+    private BedBlockComponent(BlockComponentHolder holder)
     {
-        super(block);
+        super(holder);
     }
 
     @Override
@@ -68,7 +63,7 @@ public final class BedComponent extends SimpleComponent
         var bedPos = pos;
         var bedBlockState = blockState;
         var facing = blockState.getValue(FACING);
-        var bed = block.toBlock();
+        var bed = toBlock();
 
         if(blockState.getValue(PART) != BedPart.HEAD)
         {
@@ -79,7 +74,7 @@ public final class BedComponent extends SimpleComponent
 
         if(!BedBlock.canSetSpawn(level))
         {
-            var multiBlock = getComponent(ComponentTypes.MULTI_BLOCK);
+            var multiBlock = getComponent(BlockComponentTypes.MULTI_BLOCK);
 
             if(multiBlock == null)
             {
@@ -124,7 +119,7 @@ public final class BedComponent extends SimpleComponent
 
         if(direction == BedBlock.getNeighbourDirection(part, blockState.getValue(FACING)))
         {
-            if(neighborState.is(block.toBlock()) && neighborState.getValue(PART) != part) return blockState.setValue(OCCUPIED, neighborState.getValue(OCCUPIED));
+            if(neighborState.is(toBlock()) && neighborState.getValue(PART) != part) return blockState.setValue(OCCUPIED, neighborState.getValue(OCCUPIED));
             return Blocks.AIR.defaultBlockState();
         }
 
@@ -134,7 +129,7 @@ public final class BedComponent extends SimpleComponent
     @Override
     public void playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player)
     {
-        if(hasComponent(ComponentTypes.MULTI_BLOCK)) return;
+        if(hasComponent(BlockComponentTypes.MULTI_BLOCK)) return;
 
         var part = blockState.getValue(PART);
 
@@ -143,7 +138,7 @@ public final class BedComponent extends SimpleComponent
             var bedPos = pos.relative(BedBlock.getNeighbourDirection(part, blockState.getValue(FACING)));
             var bedBlockState = level.getBlockState(bedPos);
 
-            if(bedBlockState.is(block.toBlock()) && bedBlockState.getValue(PART) == BedPart.HEAD)
+            if(bedBlockState.is(toBlock()) && bedBlockState.getValue(PART) == BedPart.HEAD)
             {
                 level.setBlock(bedPos, Blocks.AIR.defaultBlockState(), 35);
                 level.levelEvent(player, LevelEvent.PARTICLES_DESTROY_BLOCK, bedPos, Block.getId(bedBlockState));
@@ -155,7 +150,7 @@ public final class BedComponent extends SimpleComponent
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx, BlockState blockState)
     {
-        var facing = getRequiredComponent(ComponentTypes.HORIZONTAL_FACING).getFacingDirection(ctx);
+        var facing = getRequiredComponent(BlockComponentTypes.HORIZONTAL_FACING).getFacingDirection(ctx);
         var pos = ctx.getClickedPos();
         var bedPos = pos.relative(facing);
         var level = ctx.getLevel();

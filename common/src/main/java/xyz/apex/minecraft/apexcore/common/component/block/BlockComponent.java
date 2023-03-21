@@ -1,8 +1,7 @@
-package xyz.apex.minecraft.apexcore.common.component;
+package xyz.apex.minecraft.apexcore.common.component.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -24,46 +23,30 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
-public interface Component
+public sealed interface BlockComponent permits BaseBlockComponent
 {
     // region: Component
     @Nullable
-    default <T extends Component> T getComponent(ComponentType<T> componentType)
-    {
-        return getBlock().getComponent(componentType);
-    }
+    <T extends BlockComponent> T getComponent(BlockComponentType<T> componentType);
 
-    default <T extends Component> Optional<T> getOptionalComponent(ComponentType<T> componentType)
-    {
-        return getBlock().getOptionalComponent(componentType);
-    }
+    <T extends BlockComponent> Optional<T> getOptionalComponent(BlockComponentType<T> componentType);
 
-    default <T extends Component> T getRequiredComponent(ComponentType<T> componentType)
-    {
-        return getBlock().getRequiredComponent(componentType);
-    }
+    <T extends BlockComponent> T getRequiredComponent(BlockComponentType<T> componentType);
 
-    default Set<ResourceLocation> getComponentTypes()
-    {
-        return getBlock().getComponentTypes();
-    }
+    Set<BlockComponentType<?>> getComponentTypes();
 
-    default Collection<Component> getComponents()
-    {
-        return getBlock().getComponents();
-    }
+    Stream<BlockComponent> components();
 
-    default <T extends Component> boolean hasComponent(ComponentType<T> componentType)
-    {
-        return getBlock().hasComponent(componentType);
-    }
+    <T extends BlockComponent> boolean hasComponent(BlockComponentType<T> componentType);
 
-    ComponentBlock getBlock();
+    BlockComponentHolder getComponentHolder();
+
+    Block toBlock();
 
     default void validate() {}
     // endregion
@@ -96,23 +79,12 @@ public interface Component
 
     default void createBlockStateDefinition(Consumer<Property<?>> consumer) { }
 
-    @Nullable
     default RenderShape getRenderShape(BlockState blockState)
     {
-        return null;
+        return RenderShape.MODEL;
     }
 
     default void setPlacedBy(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack) { }
-
-    default boolean hasAnalogOutputSignal(BlockState blockState)
-    {
-        return false;
-    }
-
-    default int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos)
-    {
-        return 0;
-    }
 
     default BlockState rotate(BlockState blockState, Rotation rotation)
     {

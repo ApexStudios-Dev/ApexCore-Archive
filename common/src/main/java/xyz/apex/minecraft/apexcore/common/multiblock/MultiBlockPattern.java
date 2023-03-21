@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import xyz.apex.minecraft.apexcore.common.component.ComponentBlock;
+import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentHolder;
 import xyz.apex.minecraft.apexcore.common.util.function.QuadFunction;
 import xyz.apex.minecraft.apexcore.common.util.function.QuadPredicate;
 import xyz.apex.minecraft.apexcore.common.util.function.TriFunction;
@@ -88,7 +88,7 @@ public final class MultiBlockPattern
         return placeSoundPerBlock;
     }
 
-    public MultiBlockType finalizeFor(ComponentBlock owner)
+    public MultiBlockType finalizeFor(BlockComponentHolder owner)
     {
         return new MultiBlockType(owner, this);
     }

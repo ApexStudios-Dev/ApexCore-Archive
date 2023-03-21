@@ -1,4 +1,4 @@
-package xyz.apex.minecraft.apexcore.common.component.types;
+package xyz.apex.minecraft.apexcore.common.component.block.types;
 
 import com.google.common.base.Suppliers;
 import net.minecraft.core.BlockPos;
@@ -30,25 +30,21 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.ApexCore;
-import xyz.apex.minecraft.apexcore.common.component.ComponentBlock;
-import xyz.apex.minecraft.apexcore.common.component.ComponentType;
-import xyz.apex.minecraft.apexcore.common.component.ComponentTypes;
-import xyz.apex.minecraft.apexcore.common.component.SimpleComponent;
+import xyz.apex.minecraft.apexcore.common.component.block.BaseBlockComponent;
+import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentHolder;
+import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentType;
+import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentTypes;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public final class DoorComponent extends SimpleComponent
+public final class DoorBlockComponent extends BaseBlockComponent
 {
-    public static final ComponentType<DoorComponent> COMPONENT_TYPE = ComponentType
-            .builder(new ResourceLocation(ApexCore.ID, "door"), DoorComponent.class)
-                .requires(ComponentTypes.HORIZONTAL_FACING)
-            .register();
+    public static final BlockComponentType<DoorBlockComponent> COMPONENT_TYPE = BlockComponentType.register(new ResourceLocation(ApexCore.ID, "door"), DoorBlockComponent::new, BlockComponentTypes.HORIZONTAL_FACING);
 
-    public static final DirectionProperty FACING = HorizontalFacingComponent.FACING;
+    public static final DirectionProperty FACING = HorizontalFacingBlockComponent.FACING;
     public static final BooleanProperty OPEN = DoorBlock.OPEN;
     public static final EnumProperty<DoorHingeSide> HINGE = DoorBlock.HINGE;
     public static final BooleanProperty POWERED = DoorBlock.POWERED;
@@ -57,24 +53,23 @@ public final class DoorComponent extends SimpleComponent
     private Supplier<SoundEvent> openSound = Suppliers.memoize(() -> SoundEvents.WOODEN_DOOR_OPEN);
     private Supplier<SoundEvent> closeSound = Suppliers.memoize(() -> SoundEvents.WOODEN_DOOR_CLOSE);
 
-    @ApiStatus.Internal // public cause reflection
-    public DoorComponent(ComponentBlock block)
+    private DoorBlockComponent(BlockComponentHolder holder)
     {
-        super(block);
+        super(holder);
     }
 
-    public DoorComponent setSounds(Supplier<SoundEvent> openSound, Supplier<SoundEvent> closeSound)
+    public DoorBlockComponent setSounds(Supplier<SoundEvent> openSound, Supplier<SoundEvent> closeSound)
     {
         return setOpenSound(openSound).setCloseSound(closeSound);
     }
 
-    public DoorComponent setOpenSound(Supplier<SoundEvent> openSound)
+    public DoorBlockComponent setOpenSound(Supplier<SoundEvent> openSound)
     {
         this.openSound = Suppliers.memoize(openSound::get);
         return this;
     }
 
-    public DoorComponent setCloseSound(Supplier<SoundEvent> closeSound)
+    public DoorBlockComponent setCloseSound(Supplier<SoundEvent> closeSound)
     {
         this.closeSound = Suppliers.memoize(closeSound::get);
         return this;
@@ -102,7 +97,7 @@ public final class DoorComponent extends SimpleComponent
         var pos = ctx.getClickedPos();
         var level = ctx.getLevel();
 
-        if(pos.getY() < level.getMaxBuildHeight() - 1 && level.getBlockState(pos.above()).canBeReplaced(ctx)) return getPlacementState(block, ctx, blockState);
+        if(pos.getY() < level.getMaxBuildHeight() - 1 && level.getBlockState(pos.above()).canBeReplaced(ctx)) return getPlacementState(holder, ctx, blockState);
         return null;
     }
 
@@ -126,7 +121,7 @@ public final class DoorComponent extends SimpleComponent
 
         if(direction.getAxis() == Direction.Axis.Y && doubleBlockHalf == DoubleBlockHalf.LOWER == (direction == Direction.UP))
         {
-            if(neighborState.is(block.toBlock()) && neighborState.getValue(HALF) != doubleBlockHalf) return blockState.setValue(OPEN, neighborState.getValue(OPEN)).setValue(HINGE, neighborState.getValue(HINGE)).setValue(POWERED, neighborState.getValue(POWERED));
+            if(neighborState.is(toBlock()) && neighborState.getValue(HALF) != doubleBlockHalf) return blockState.setValue(OPEN, neighborState.getValue(OPEN)).setValue(HINGE, neighborState.getValue(HINGE)).setValue(POWERED, neighborState.getValue(POWERED));
             return Blocks.AIR.defaultBlockState();
         }
 
@@ -137,7 +132,7 @@ public final class DoorComponent extends SimpleComponent
     @Override
     public void playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player)
     {
-        if(hasComponent(ComponentTypes.MULTI_BLOCK)) return;
+        if(hasComponent(BlockComponentTypes.MULTI_BLOCK)) return;
         if(!level.isClientSide && player.isCreative()) DoublePlantBlock.preventCreativeDropFromBottomPart(level, pos, blockState, player);
     }
 
@@ -153,7 +148,7 @@ public final class DoorComponent extends SimpleComponent
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack)
     {
-        if(hasComponent(ComponentTypes.MULTI_BLOCK)) return;
+        if(hasComponent(BlockComponentTypes.MULTI_BLOCK)) return;
         level.setBlock(pos.above(), blockState.setValue(HALF, DoubleBlockHalf.UPPER), Block.UPDATE_ALL);
     }
 
@@ -179,7 +174,7 @@ public final class DoorComponent extends SimpleComponent
     {
         var belowPos = pos.below();
         var bewlowBlockState = level.getBlockState(belowPos);
-        return blockState.getValue(HALF) == DoubleBlockHalf.LOWER ? bewlowBlockState.isFaceSturdy(level, belowPos, Direction.UP) : bewlowBlockState.is(block.toBlock());
+        return blockState.getValue(HALF) == DoubleBlockHalf.LOWER ? bewlowBlockState.isFaceSturdy(level, belowPos, Direction.UP) : bewlowBlockState.is(toBlock());
     }
 
     @Override
@@ -196,7 +191,7 @@ public final class DoorComponent extends SimpleComponent
 
     private void setOpen(@Nullable Entity entity, Level level, BlockState blockState, BlockPos pos, boolean open)
     {
-        if(blockState.is(block.toBlock()) && blockState.getValue(OPEN) != open)
+        if(blockState.is(toBlock()) && blockState.getValue(OPEN) != open)
         {
             level.setBlock(pos, blockState.setValue(OPEN, open), 10);
             playSound(entity, level, pos, open);
@@ -209,7 +204,7 @@ public final class DoorComponent extends SimpleComponent
         level.playSound(source, pos, isOpening ? openSound.get() : closeSound.get(), SoundSource.BLOCKS, 1F, level.random.nextFloat() * .1F + .9F);
     }
 
-    public static BlockState getPlacementState(ComponentBlock door, BlockPlaceContext ctx, BlockState blockState)
+    public static BlockState getPlacementState(BlockComponentHolder door, BlockPlaceContext ctx, BlockState blockState)
     {
         var level = ctx.getLevel();
         var pos = ctx.getClickedPos();
@@ -217,7 +212,7 @@ public final class DoorComponent extends SimpleComponent
         return blockState.setValue(HINGE, getHinge(door, ctx)).setValue(POWERED, open).setValue(OPEN, open).setValue(HALF, DoubleBlockHalf.LOWER);
     }
 
-    public static DoorHingeSide getHinge(ComponentBlock door, BlockPlaceContext ctx)
+    public static DoorHingeSide getHinge(BlockComponentHolder door, BlockPlaceContext ctx)
     {
         var level = ctx.getLevel();
         var pos = ctx.getClickedPos();

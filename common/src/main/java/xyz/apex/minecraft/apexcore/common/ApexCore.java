@@ -4,7 +4,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import xyz.apex.minecraft.apexcore.common.component.ComponentTypes;
+import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentTypes;
 import xyz.apex.minecraft.apexcore.common.platform.Platform;
 import xyz.apex.minecraft.apexcore.common.util.TagHelper;
 
@@ -17,7 +17,7 @@ public interface ApexCore
     {
         Platform.bootstrap();
         BlockTags.bootstrap();
-        ComponentTypes.bootstrap();
+        BlockComponentTypes.bootstrap();
     }
 
     interface BlockTags
