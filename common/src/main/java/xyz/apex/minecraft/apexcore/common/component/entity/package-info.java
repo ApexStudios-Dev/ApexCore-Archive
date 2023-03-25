@@ -1,7 +1,7 @@
 @FieldsAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package xyz.apex.minecraft.apexcore.common.component;
+package xyz.apex.minecraft.apexcore.common.component.entity;
 
 import net.minecraft.FieldsAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;

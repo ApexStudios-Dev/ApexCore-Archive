@@ -11,11 +11,13 @@ public final class ForgePlatform implements Platform
 {
     private final ForgeHooks hooks;
     private final ForgeModLoader modLoader;
+    private final ForgeCapabilityHooks capabilityHooks;
 
     public ForgePlatform()
     {
         hooks = new ForgeHooks(this);
         modLoader = new ForgeModLoader(this);
+        capabilityHooks = new ForgeCapabilityHooks(this);
     }
 
     @Override

@@ -5,6 +5,7 @@
         "AccessorBlock",
         "AccessorPoiTypes",
         "InvokerBlock",
+        "MixinLevelChunk",
         "MixinPoiType"
     ],
     "client": [ ],

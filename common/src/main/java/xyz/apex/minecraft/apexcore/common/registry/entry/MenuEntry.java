@@ -13,6 +13,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.inventory.MenuType;
 import xyz.apex.minecraft.apexcore.common.hooks.RegistryHooks;
 import xyz.apex.minecraft.apexcore.common.platform.Side;
@@ -30,13 +31,13 @@ public final class MenuEntry<T extends AbstractContainerMenu> extends RegistryEn
         super(Registries.MENU, registryName);
     }
 
-    public InteractionResult open(Player player, Component displayName, Consumer<FriendlyByteBuf> extraDataWriter)
+    public InteractionResult open(Player player, Component displayName, MenuConstructor menuConstructor, Consumer<FriendlyByteBuf> extraDataWriter)
     {
-        if(player instanceof ServerPlayer serverPlayer) RegistryHooks.getInstance().openMenu(serverPlayer, asMenuProvider(displayName, extraDataWriter));
+        if(player instanceof ServerPlayer serverPlayer) RegistryHooks.getInstance().openMenu(serverPlayer, asMenuProvider(displayName, menuConstructor, extraDataWriter));
         return InteractionResult.sidedSuccess(player.level.isClientSide);
     }
 
-    public ExtendedMenuProvider asMenuProvider(Component displayName, Consumer<FriendlyByteBuf> extraDataWriter)
+    public ExtendedMenuProvider asMenuProvider(Component displayName, MenuConstructor menuConstructor, Consumer<FriendlyByteBuf> extraDataWriter)
     {
         return new ExtendedMenuProvider() {
             @Override
@@ -54,7 +55,7 @@ public final class MenuEntry<T extends AbstractContainerMenu> extends RegistryEn
             @Override
             public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player)
             {
-                return get().create(containerId, playerInventory);
+                return menuConstructor.createMenu(containerId, playerInventory, player);
             }
         };
     }
