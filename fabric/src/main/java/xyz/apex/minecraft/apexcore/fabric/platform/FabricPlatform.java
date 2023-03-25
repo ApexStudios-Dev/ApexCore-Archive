@@ -11,11 +11,15 @@ public final class FabricPlatform implements Platform
 {
     private final FabricHooks hooks;
     private final FabricModLoader modLoader;
+    private final FabricEvents events;
 
     public FabricPlatform()
     {
         hooks = new FabricHooks(this);
         modLoader = new FabricModLoader(this);
+
+        // the following just needs to exist
+        events = new FabricEvents(this);
     }
 
     @Override

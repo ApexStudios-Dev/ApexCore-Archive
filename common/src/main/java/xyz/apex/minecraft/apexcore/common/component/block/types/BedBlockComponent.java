@@ -26,6 +26,7 @@ import xyz.apex.minecraft.apexcore.common.component.block.BaseBlockComponent;
 import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentHolder;
 import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentType;
 import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentTypes;
+import xyz.apex.minecraft.apexcore.common.multiblock.MultiBlockComponent;
 
 import java.util.function.Consumer;
 
@@ -166,5 +167,20 @@ public final class BedBlockComponent extends BaseBlockComponent
         var villager = villagers.get(0);
         villager.stopSleeping();
         return true;
+    }
+
+    // not a general use `isBed` this checks if the block state
+    // uses our component system and has our bed component
+    public static boolean isComponableBed(BlockState blockState)
+    {
+        return blockState.getBlock() instanceof BlockComponentHolder holder && holder.hasComponent(COMPONENT_TYPE);
+    }
+
+    public static boolean setOccupied(Level level, BlockPos pos, BlockState blockState, boolean occupied)
+    {
+        if(!isComponableBed(blockState)) return false;
+        if(MultiBlockComponent.setBlockStateForAll(level, pos, blockState, OCCUPIED, occupied)) return true;
+        if(!blockState.hasProperty(OCCUPIED) || blockState.getValue(OCCUPIED) == occupied) return false;
+        return level.setBlock(pos, blockState.setValue(OCCUPIED, occupied), Block.UPDATE_ALL);
     }
 }

@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -95,5 +96,38 @@ public final class MultiBlockComponent extends BaseBlockComponent
     public void validate()
     {
         Validate.notNull(multiBlockType, "Block: '%s' did not set a MultiBlockType!!".formatted(toBlock().getClass().getName()));
+    }
+
+    public static <P extends Comparable<P>> boolean setBlockStateForAll(Level level, BlockPos pos, BlockState blockState, Property<P> property, P value)
+    {
+        // only for actual multi blocks
+        if(!(blockState.getBlock() instanceof BlockComponentHolder holder) || !holder.hasComponent(COMPONENT_TYPE)) return false;
+
+        var component = holder.getRequiredComponent(COMPONENT_TYPE);
+        Objects.requireNonNull(component.multiBlockType); // if someone fails to set the multiblock type, crash the game, this should *ALWAYS* be set
+        // this should be true, but better to double check
+        if(!component.multiBlockType.isValidBlock(blockState)) return false;
+
+        // find origin point of multi block
+        var originPos = component.multiBlockType.getOriginPos(blockState, pos);
+        var flag = false;
+
+        // set block state for all blocks within the multi block
+        for(var localPos : component.multiBlockType.getLocalPositions())
+        {
+            var worldPos = component.multiBlockType.getWorldSpaceFromLocalSpace(blockState, originPos, localPos);
+            var worldBlockState = level.getBlockState(worldPos);
+
+            // if block in world is not valid skip it
+            if(!component.multiBlockType.isValidBlock(worldBlockState)) continue;
+            // if block does not have property skip it
+            if(!worldBlockState.hasProperty(property)) continue;
+            // if block already has this value skip it
+            if(worldBlockState.getValue(property) == value) continue;
+
+            flag = level.setBlock(worldPos, worldBlockState.setValue(property, value), Block.UPDATE_ALL) || flag;
+        }
+
+        return flag;
     }
 }

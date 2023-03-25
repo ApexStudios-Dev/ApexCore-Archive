@@ -8,6 +8,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -27,7 +28,10 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.component.block.types.BedBlockComponent;
 import xyz.apex.minecraft.apexcore.common.hooks.BlockHooks;
+import xyz.apex.minecraft.apexcore.common.platform.Platform;
+import xyz.apex.minecraft.apexcore.common.platform.PlatformOnly;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -355,6 +359,29 @@ public non-sealed class BaseBlockComponentHolder extends Block implements BlockC
                 (current, next) -> next > 0L ? Math.max(current, next) : current,
                 -1L
         );
+    }
+    // endregion
+
+    // region: Forge Overrides
+    @PlatformOnly(Platform.FORGE)
+    @Deprecated
+    public final boolean isBed(BlockState blockState, BlockGetter level, BlockPos pos, @Nullable Entity player)
+    {
+        return BedBlockComponent.isComponableBed(blockState);
+    }
+
+    @PlatformOnly(Platform.FORGE)
+    @Deprecated
+    public final void setBedOccupied(BlockState blockState, Level level, BlockPos pos, LivingEntity sleeper, boolean occupied)
+    {
+        BedBlockComponent.setOccupied(level, pos, blockState, occupied);
+    }
+
+    @PlatformOnly(Platform.FORGE)
+    @Deprecated
+    public final Direction getBedDirection(BlockState blockState, LevelReader level, BlockPos pos)
+    {
+        return blockState.getValue(BedBlockComponent.FACING);
     }
     // endregion
 }
