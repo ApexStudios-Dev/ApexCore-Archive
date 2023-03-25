@@ -79,7 +79,7 @@ public abstract class SimpleContainerMenu extends AbstractContainerMenu
         {
             for(var k = 0; k < cols; k++)
             {
-                addSlot.accept(new Slot(container, k + j * cols, xStart + k * 18, yStart + j * 18));
+                addSlot.accept(new EnhancedSlot(container, k + j * cols, xStart + k * 18, yStart + j * 18));
             }
         }
     }
@@ -90,13 +90,13 @@ public abstract class SimpleContainerMenu extends AbstractContainerMenu
         {
             for(var j = 0; j < 9; j++)
             {
-                addSlot.accept(new Slot(playerInventory, j + i * 9 + 9, xStart + j * 18, yStart + i * 18));
+                addSlot.accept(new EnhancedSlot(playerInventory, j + i * 9 + 9, xStart + j * 18, yStart + i * 18));
             }
         }
 
         for(var i = 0; i < 9; ++i)
         {
-            addSlot.accept(new Slot(playerInventory, i, xStart + i * 18, yStart + 58));
+            addSlot.accept(new EnhancedSlot(playerInventory, i, xStart + i * 18, yStart + 58));
         }
     }
 }

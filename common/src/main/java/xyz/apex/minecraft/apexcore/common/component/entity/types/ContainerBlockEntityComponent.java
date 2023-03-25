@@ -49,8 +49,8 @@ public final class ContainerBlockEntityComponent extends BaseBlockEntityComponen
     private Function<Direction, int[]> slotsForSide = side -> IntStream.range(0, items.size()).toArray();
     private BiPredicate<Integer, ItemStack> canPlaceItem = (slotIndex, stack) -> true;
     private BiPredicate<Integer, ItemStack> canTakeItem = (slotIndex, stack) -> true;
-    private TriPredicate<Integer, ItemStack, Direction> canPlaceItemThroughFace = (slotIndex, stack, side) -> true;
-    private TriPredicate<Integer, ItemStack, Direction> canTakeItemThroughFace = (slotIndex, stack, side) -> true;
+    private TriPredicate<Integer, ItemStack, Direction> canPlaceItemThroughFace = (slotIndex, stack, side) -> canPlaceItem.test(slotIndex, stack);
+    private TriPredicate<Integer, ItemStack, Direction> canTakeItemThroughFace = (slotIndex, stack, side) -> canTakeItem.test(slotIndex, stack);
     private final Counter counter = new Counter();
 
     private ContainerBlockEntityComponent(BlockEntityComponentHolder holder)
@@ -202,6 +202,8 @@ public final class ContainerBlockEntityComponent extends BaseBlockEntityComponen
     public ItemStack removeItem(int slotIndex, int amount)
     {
         getOptionalComponent(BlockEntityComponentTypes.LOOTABLE).ifPresent(lootable -> lootable.unpackLootTable(null));
+        var current = items.get(slotIndex);
+        if(current.isEmpty() || !canTakeItem.test(slotIndex, current.copy())) return ItemStack.EMPTY;
         var removed = ContainerHelper.removeItem(items, slotIndex, amount);
         if(!removed.isEmpty()) markDirty();
         return removed;
@@ -212,7 +214,7 @@ public final class ContainerBlockEntityComponent extends BaseBlockEntityComponen
     {
         getOptionalComponent(BlockEntityComponentTypes.LOOTABLE).ifPresent(lootable -> lootable.unpackLootTable(null));
         var current = items.get(slotIndex);
-        if(current.isEmpty()) return ItemStack.EMPTY;
+        if(current.isEmpty() || !canTakeItem.test(slotIndex, current)) return ItemStack.EMPTY;
         items.set(slotIndex, ItemStack.EMPTY);
         return current;
     }
@@ -221,6 +223,7 @@ public final class ContainerBlockEntityComponent extends BaseBlockEntityComponen
     public void setItem(int slotIndex, ItemStack stack)
     {
         getOptionalComponent(BlockEntityComponentTypes.LOOTABLE).ifPresent(lootable -> lootable.unpackLootTable(null));
+        // if(!canPlaceItem.test(slotIndex, stack)) return; // we cant check here, since this method doesnt return some state saying if insertion of successful or not
         items.set(slotIndex, stack);
         if(!stack.isEmpty() && stack.getCount() > maxStackSize) stack.setCount(maxStackSize);
         markDirty();
