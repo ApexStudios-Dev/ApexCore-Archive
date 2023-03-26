@@ -45,15 +45,15 @@ public non-sealed class BaseBlockComponentHolder extends Block implements BlockC
     private Set<BlockComponentType<?>> componentTypes = Sets.newLinkedHashSet();
     private boolean registered = false;
 
-    protected BaseBlockComponentHolder(Properties properties)
+    public BaseBlockComponentHolder(Consumer<Registrar> registrarConsumer, Properties properties)
     {
         super(properties);
 
-        initializeComponents();
+        initializeComponents(registrarConsumer);
     }
 
     // region: Component
-    private void initializeComponents()
+    private void initializeComponents(Consumer<Registrar> registrarConsumer)
     {
         // register components
         if(registered) return;
@@ -67,6 +67,7 @@ public non-sealed class BaseBlockComponentHolder extends Block implements BlockC
             componentType.getFor(this).onRegistered(this::safeRegisterComponent);
         }
 
+        registrarConsumer.accept(this::safeRegisterComponent);
         registered = true;
         componentTypes = ImmutableSet.copyOf(componentTypes);
 

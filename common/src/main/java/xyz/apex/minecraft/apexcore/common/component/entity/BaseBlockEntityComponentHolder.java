@@ -58,15 +58,15 @@ public non-sealed class BaseBlockEntityComponentHolder extends BlockEntity imple
     private Set<BlockEntityComponentType<?>> componentTypes = Sets.newLinkedHashSet();
     private boolean registered = false;
 
-    protected BaseBlockEntityComponentHolder(BlockEntityType<? extends BaseBlockEntityComponentHolder> blockEntityType, BlockPos pos, BlockState blockState)
+    protected BaseBlockEntityComponentHolder(Consumer<Registrar> registrarConsumer, BlockEntityType<? extends BaseBlockEntityComponentHolder> blockEntityType, BlockPos pos, BlockState blockState)
     {
         super(blockEntityType, pos, blockState);
 
-        initializeComponents();
+        initializeComponents(registrarConsumer);
     }
 
     // region: Component
-    private void initializeComponents()
+    private void initializeComponents(Consumer<Registrar> registrarConsumer)
     {
         // register components
         if(registered) return;
@@ -80,6 +80,7 @@ public non-sealed class BaseBlockEntityComponentHolder extends BlockEntity imple
             componentType.getFor(this).onRegistered(this::safeRegisterComponent);
         }
 
+        registrarConsumer.accept(this::safeRegisterComponent);
         registered = true;
         componentTypes = ImmutableSet.copyOf(componentTypes);
     }

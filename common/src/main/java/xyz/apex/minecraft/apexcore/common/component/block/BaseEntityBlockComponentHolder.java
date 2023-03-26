@@ -33,6 +33,7 @@ import xyz.apex.minecraft.apexcore.common.util.ExtendedBlockEntityTicker;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -43,9 +44,9 @@ public abstract class BaseEntityBlockComponentHolder<T extends BlockEntity & Blo
     private final Function<BlockEntity, Listener> listener = Util.memoize(Listener::create);
     private final BiFunction<T, Boolean, BlockEntityTicker<T>> ticker = Util.memoize(Ticker::create);
 
-    protected BaseEntityBlockComponentHolder(Properties properties)
+    protected BaseEntityBlockComponentHolder(Consumer<Registrar> registrarConsumer, Properties properties)
     {
-        super(properties);
+        super(registrarConsumer, properties);
     }
 
     protected abstract BlockEntityType<T> getBlockEntityType();

@@ -11,12 +11,15 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.component.entity.BlockEntityComponentHolder;
+import xyz.apex.minecraft.apexcore.common.component.entity.BlockEntityComponentHolderFactory;
 import xyz.apex.minecraft.apexcore.common.hooks.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.registry.entry.BlockEntityEntry;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public final class BlockEntityBuilder<T extends BlockEntity> extends Builder<BlockEntityType<?>, BlockEntityType<T>, BlockEntityEntry<T>, BlockEntityBuilder<T>>
@@ -84,5 +87,10 @@ public final class BlockEntityBuilder<T extends BlockEntity> extends Builder<Blo
     public static <T extends BlockEntity> BlockEntityBuilder<T> builder(String ownerId, String registrationName, BlockEntityType.BlockEntitySupplier<T> blockEntityFactory)
     {
         return new BlockEntityBuilder<>(ownerId, registrationName, blockEntityFactory);
+    }
+
+    public static <T extends BlockEntity & BlockEntityComponentHolder> BlockEntityBuilder<T> builderWithComponents(String ownerId, String registrationName, Consumer<BlockEntityComponentHolder.Registrar> componentRegistrar, BlockEntityComponentHolderFactory<T> blockFactory)
+    {
+        return builder(ownerId, registrationName, (pos, blockState) -> blockFactory.create(componentRegistrar, pos, blockState));
     }
 }

@@ -17,16 +17,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentHolder;
+import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentHolderFactory;
 import xyz.apex.minecraft.apexcore.common.hooks.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.platform.Side;
 import xyz.apex.minecraft.apexcore.common.platform.SideExecutor;
 import xyz.apex.minecraft.apexcore.common.registry.FlammabilityRegistry;
 import xyz.apex.minecraft.apexcore.common.registry.entry.BlockEntry;
 
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.function.ToIntFunction;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 
 public final class BlockBuilder<T extends Block> extends Builder<Block, T, BlockEntry<T>, BlockBuilder<T>>
 {
@@ -286,6 +285,11 @@ public final class BlockBuilder<T extends Block> extends Builder<Block, T, Block
     public static <T extends Block> BlockBuilder<T> builder(String ownerId, String registrationName, BlockFactory<T> blockFactory)
     {
         return new BlockBuilder<>(ownerId, registrationName, blockFactory);
+    }
+
+    public static <T extends Block & BlockComponentHolder> BlockBuilder<T> builderWithComponents(String ownerId, String registrationName, Consumer<BlockComponentHolder.Registrar> componentRegistrar, BlockComponentHolderFactory<T> blockFactory)
+    {
+        return builder(ownerId, registrationName, properties -> blockFactory.create(componentRegistrar, properties));
     }
 
     @FunctionalInterface
