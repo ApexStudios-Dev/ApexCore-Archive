@@ -194,6 +194,36 @@ public abstract class BaseEntityBlockComponentHolder<T extends BlockEntity & Blo
         return getBlockEntity(blockEntityType, level.getBlockState(pos), level, pos);
     }
 
+    @Nullable
+    public static BlockEntity getBlockEntityUnsafe(BlockState blockState, BlockGetter level, BlockPos pos)
+    {
+        if(blockState.getBlock() instanceof BlockComponentHolder holder)
+        {
+            var multiBlockComponent = holder.getComponent(BlockComponentTypes.MULTI_BLOCK);
+
+            if(multiBlockComponent != null)
+            {
+                var multiBlockType = multiBlockComponent.getMultiBlockType();
+
+                if(!multiBlockType.isValidBlock(blockState)) return null;
+
+                if(!multiBlockType.isOrigin(blockState))
+                {
+                    var originPos = multiBlockType.getOriginPos(blockState, pos);
+                    var originBlockState = level.getBlockState(originPos);
+                    return getBlockEntityUnsafe(originBlockState, level, originPos);
+                }
+            }
+        }
+
+        return level.getBlockEntity(pos);
+    }
+
+    public static BlockEntity getBlockEntityUnsafe(BlockGetter level, BlockPos pos)
+    {
+        return getBlockEntityUnsafe(level.getBlockState(pos), level, pos);
+    }
+
     private static final class Listener implements GameEventListener
     {
         private final BlockEntityComponent.Listener[] listeners;
