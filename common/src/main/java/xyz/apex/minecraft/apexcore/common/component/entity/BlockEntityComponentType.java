@@ -1,11 +1,9 @@
 package xyz.apex.minecraft.apexcore.common.component.entity;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 
 public sealed interface BlockEntityComponentType<T extends BlockEntityComponent> permits BlockEntityComponentType.Impl
@@ -13,13 +11,6 @@ public sealed interface BlockEntityComponentType<T extends BlockEntityComponent>
     ResourceLocation registryName();
 
     T getFor(BlockEntityComponentHolder holder);
-
-    Set<BlockEntityComponentType<?>> requiredTypes();
-
-    static <T extends BlockEntityComponent> BlockEntityComponentType<T> register(ResourceLocation registryName, Function<BlockEntityComponentHolder, T> componentFactory, BlockEntityComponentType<?>... requiredTypes)
-    {
-        return Impl.register(registryName, componentFactory, requiredTypes);
-    }
 
     static <T extends BlockEntityComponent> BlockEntityComponentType<T> register(ResourceLocation registryName, Function<BlockEntityComponentHolder, T> componentFactory)
     {
@@ -31,14 +22,12 @@ public sealed interface BlockEntityComponentType<T extends BlockEntityComponent>
         private static final Map<ResourceLocation, BlockEntityComponentType<?>> registry = Maps.newHashMap();
 
         private final ResourceLocation registryName;
-        private final Set<BlockEntityComponentType<?>> requiredTypes;
         private final Map<BlockEntityComponentHolder, T> components = Maps.newHashMap();
         private final Function<BlockEntityComponentHolder, T> componentFactory;
 
-        private Impl(ResourceLocation registryName, Function<BlockEntityComponentHolder, T> componentFactory, BlockEntityComponentType<?>... requiredTypes)
+        private Impl(ResourceLocation registryName, Function<BlockEntityComponentHolder, T> componentFactory)
         {
             this.registryName = registryName;
-            this.requiredTypes = ImmutableSet.copyOf(requiredTypes);
             this.componentFactory = componentFactory;
         }
 
@@ -52,12 +41,6 @@ public sealed interface BlockEntityComponentType<T extends BlockEntityComponent>
         public T getFor(BlockEntityComponentHolder holder)
         {
             return components.computeIfAbsent(holder, componentFactory);
-        }
-
-        @Override
-        public Set<BlockEntityComponentType<?>> requiredTypes()
-        {
-            return requiredTypes;
         }
 
         @Override
@@ -77,12 +60,12 @@ public sealed interface BlockEntityComponentType<T extends BlockEntityComponent>
         @Override
         public String toString()
         {
-            return "BlockEntityComponentType[%s]".formatted(requiredTypes);
+            return "BlockEntityComponentType[%s]".formatted(registryName);
         }
 
-        private static <T extends BlockEntityComponent> BlockEntityComponentType<T> register(ResourceLocation registryName, Function<BlockEntityComponentHolder, T> componentFactory, BlockEntityComponentType<?>... requiredTypes)
+        private static <T extends BlockEntityComponent> BlockEntityComponentType<T> register(ResourceLocation registryName, Function<BlockEntityComponentHolder, T> componentFactory)
         {
-            var instance = new Impl<>(registryName, componentFactory, requiredTypes);
+            var instance = new Impl<>(registryName, componentFactory);
             if(registry.put(registryName, instance) != null) throw new IllegalStateException("Attempt to register duplicate BlockComponentType: '%s'".formatted(registryName));
             return instance;
         }

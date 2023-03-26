@@ -19,7 +19,10 @@ import java.util.function.UnaryOperator;
 
 public final class HorizontalFacingBlockComponent extends BaseBlockComponent
 {
-    public static final BlockComponentType<HorizontalFacingBlockComponent> COMPONENT_TYPE = BlockComponentType.register(new ResourceLocation(ApexCore.ID, "horizontal_facing"), HorizontalFacingBlockComponent::new);
+    public static final BlockComponentType<HorizontalFacingBlockComponent> COMPONENT_TYPE = BlockComponentType.register(
+            new ResourceLocation(ApexCore.ID, "horizontal_facing"),
+            HorizontalFacingBlockComponent::new
+    );
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 

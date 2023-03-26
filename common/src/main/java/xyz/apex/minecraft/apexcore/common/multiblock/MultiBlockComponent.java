@@ -21,7 +21,10 @@ import java.util.function.Consumer;
 
 public final class MultiBlockComponent extends BaseBlockComponent
 {
-    public static final BlockComponentType<MultiBlockComponent> COMPONENT_TYPE = BlockComponentType.register(new ResourceLocation(ApexCore.ID, "multiblock"), MultiBlockComponent::new);
+    public static final BlockComponentType<MultiBlockComponent> COMPONENT_TYPE = BlockComponentType.register(
+            new ResourceLocation(ApexCore.ID, "multiblock"),
+            MultiBlockComponent::new
+    );
 
     @Nullable private MultiBlockType multiBlockType;
 
@@ -93,7 +96,7 @@ public final class MultiBlockComponent extends BaseBlockComponent
     }
 
     @Override
-    public void validate()
+    public void onRegistered(BlockComponentHolder.Registrar registrar)
     {
         Validate.notNull(multiBlockType, "Block: '%s' did not set a MultiBlockType!!".formatted(toBlock().getClass().getName()));
     }

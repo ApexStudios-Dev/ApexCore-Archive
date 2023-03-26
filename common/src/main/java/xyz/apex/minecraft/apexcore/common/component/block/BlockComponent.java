@@ -48,7 +48,7 @@ public sealed interface BlockComponent permits BaseBlockComponent
 
     Block toBlock();
 
-    default void validate() {}
+    default void onRegistered(BlockComponentHolder.Registrar registrar) {}
     // endregion
 
     // region: Block

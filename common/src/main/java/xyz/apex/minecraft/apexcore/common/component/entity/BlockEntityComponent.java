@@ -50,7 +50,7 @@ public sealed interface BlockEntityComponent permits BaseBlockEntityComponent
 
     void runForLevel(Consumer<Level> consumer);
 
-    default void validate() {}
+    default void onRegistered(BlockEntityComponentHolder.Registrar registrar) {}
     // endregion
 
     // region: BlockEntity

@@ -32,7 +32,10 @@ import java.util.function.Consumer;
 
 public final class BedBlockComponent extends BaseBlockComponent
 {
-    public static final BlockComponentType<BedBlockComponent> COMPONENT_TYPE = BlockComponentType.register(new ResourceLocation(ApexCore.ID, "bed"), BedBlockComponent::new, BlockComponentTypes.HORIZONTAL_FACING);
+    public static final BlockComponentType<BedBlockComponent> COMPONENT_TYPE = BlockComponentType.register(
+            new ResourceLocation(ApexCore.ID, "bed"),
+            BedBlockComponent::new
+    );
 
     public static final EnumProperty<BedPart> PART = BedBlock.PART;
     public static final BooleanProperty OCCUPIED = BedBlock.OCCUPIED;
@@ -41,6 +44,12 @@ public final class BedBlockComponent extends BaseBlockComponent
     private BedBlockComponent(BlockComponentHolder holder)
     {
         super(holder);
+    }
+
+    @Override
+    public void onRegistered(BlockComponentHolder.Registrar registrar)
+    {
+        registrar.register(BlockComponentTypes.HORIZONTAL_FACING);
     }
 
     @Override

@@ -5,7 +5,6 @@ import com.google.common.collect.Sets;
 import com.google.errorprone.annotations.OverridingMethodsMustInvokeSuper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -39,7 +38,6 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public non-sealed class BaseBlockComponentHolder extends Block implements BlockComponentHolder
@@ -58,29 +56,19 @@ public non-sealed class BaseBlockComponentHolder extends Block implements BlockC
     private void initializeComponents()
     {
         // register components
-        registerComponents(this::registerComponent);
+        if(registered) return;
+        registerComponents(this::unsafeRegisterComponent);
+
+        // register components other components require
+        // iterate over copy of current types
+        // we may modify the set during this loop
+        for(var componentType : Set.copyOf(componentTypes))
+        {
+            componentType.getFor(this).onRegistered(this::safeRegisterComponent);
+        }
+
         registered = true;
         componentTypes = ImmutableSet.copyOf(componentTypes);
-
-        // validate components
-        var missingTypes = Sets.<BlockComponentType<?>>newHashSet();
-
-        for(var componentType : componentTypes)
-        {
-            for(var requiredType : componentType.requiredTypes())
-            {
-                if(hasComponent(requiredType)) continue;
-                missingTypes.add(requiredType);
-            }
-
-            componentType.getFor(this).validate();
-        }
-
-        if(!missingTypes.isEmpty())
-        {
-            var missingNames = missingTypes.stream().map(BlockComponentType::registryName).map(ResourceLocation::toString).map("'%s'"::formatted).collect(Collectors.joining(",", "[", "]"));
-            throw new IllegalStateException("Missing required BlockComponentTypes: %s for Block: '%s'".formatted(missingNames, getClass().getName()));
-        }
 
         // recreate state container
         //
@@ -101,11 +89,18 @@ public non-sealed class BaseBlockComponentHolder extends Block implements BlockC
         registerDefaultState(defaultBlockState);
     }
 
-    private <T extends BlockComponent> T registerComponent(BlockComponentType<T> componentType)
+    private <T extends BlockComponent> T unsafeRegisterComponent(BlockComponentType<T> componentType)
     {
         Validate.isTrue(!registered, "Attempt to register BlockComponentType: '%s' post registration".formatted(componentType.registryName()));
         if(hasComponent(componentType)) throw new IllegalStateException("Attempt to register duplicate BlockComponentType: '%s' for Block: '%s'".formatted(componentType.registryName(), getClass().getName()));
         componentTypes.add(componentType);
+        return componentType.getFor(this);
+    }
+
+    private <T extends BlockComponent> T safeRegisterComponent(BlockComponentType<T> componentType)
+    {
+        Validate.isTrue(!registered, "Attempt to register BlockComponentType: '%s' post registration".formatted(componentType.registryName()));
+        if(!hasComponent(componentType)) componentTypes.add(componentType);
         return componentType.getFor(this);
     }
 

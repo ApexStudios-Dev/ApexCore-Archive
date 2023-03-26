@@ -42,7 +42,10 @@ import java.util.function.Supplier;
 
 public final class DoorBlockComponent extends BaseBlockComponent
 {
-    public static final BlockComponentType<DoorBlockComponent> COMPONENT_TYPE = BlockComponentType.register(new ResourceLocation(ApexCore.ID, "door"), DoorBlockComponent::new, BlockComponentTypes.HORIZONTAL_FACING);
+    public static final BlockComponentType<DoorBlockComponent> COMPONENT_TYPE = BlockComponentType.register(
+            new ResourceLocation(ApexCore.ID, "door"),
+            DoorBlockComponent::new
+    );
 
     public static final DirectionProperty FACING = HorizontalFacingBlockComponent.FACING;
     public static final BooleanProperty OPEN = DoorBlock.OPEN;
@@ -73,6 +76,12 @@ public final class DoorBlockComponent extends BaseBlockComponent
     {
         this.closeSound = Suppliers.memoize(closeSound::get);
         return this;
+    }
+
+    @Override
+    public void onRegistered(BlockComponentHolder.Registrar registrar)
+    {
+        registrar.register(BlockComponentTypes.HORIZONTAL_FACING);
     }
 
     @Override

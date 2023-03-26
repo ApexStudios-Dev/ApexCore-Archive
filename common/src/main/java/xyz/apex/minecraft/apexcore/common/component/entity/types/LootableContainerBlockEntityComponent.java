@@ -25,8 +25,7 @@ public final class LootableContainerBlockEntityComponent extends BaseBlockEntity
 {
     public static final BlockEntityComponentType<LootableContainerBlockEntityComponent> COMPONENT_TYPE = BlockEntityComponentType.register(
             new ResourceLocation(ApexCore.ID, "lootable"),
-            LootableContainerBlockEntityComponent::new,
-            BlockEntityComponentTypes.CONTAINER
+            LootableContainerBlockEntityComponent::new
     );
 
     private static final String LOOT_TABLE_TAG = RandomizableContainerBlockEntity.LOOT_TABLE_TAG;
@@ -38,6 +37,12 @@ public final class LootableContainerBlockEntityComponent extends BaseBlockEntity
     private LootableContainerBlockEntityComponent(BlockEntityComponentHolder holder)
     {
         super(holder);
+    }
+
+    @Override
+    public void onRegistered(BlockEntityComponentHolder.Registrar registrar)
+    {
+        registrar.register(BlockEntityComponentTypes.CONTAINER);
     }
 
     public LootableContainerBlockEntityComponent withLootTable(ResourceLocation lootTable, long lootTableSeed)

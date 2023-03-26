@@ -36,8 +36,7 @@ public final class ContainerBlockEntityComponent extends BaseBlockEntityComponen
 {
     public static final BlockEntityComponentType<ContainerBlockEntityComponent> COMPONENT_TYPE = BlockEntityComponentType.register(
             new ResourceLocation(ApexCore.ID, "container"),
-            ContainerBlockEntityComponent::new,
-            BlockEntityComponentTypes.MENU_PROVIDER
+            ContainerBlockEntityComponent::new
     );
 
     private NonNullList<ItemStack> items = NonNullList.withSize(0, ItemStack.EMPTY);
@@ -56,6 +55,12 @@ public final class ContainerBlockEntityComponent extends BaseBlockEntityComponen
     private ContainerBlockEntityComponent(BlockEntityComponentHolder holder)
     {
         super(holder);
+    }
+
+    @Override
+    public void onRegistered(BlockEntityComponentHolder.Registrar registrar)
+    {
+        registrar.register(BlockEntityComponentTypes.MENU_PROVIDER);
     }
 
     @Override

@@ -13,7 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -38,7 +37,6 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 // ignore the vanilla implemented interfaces here
@@ -72,36 +70,32 @@ public non-sealed class BaseBlockEntityComponentHolder extends BlockEntity imple
     {
         // register components
         if(registered) return;
-        registerComponents(this::registerComponent);
+        registerComponents(this::unsafeRegisterComponent);
+
+        // register components other components require
+        // iterate over copy of current types
+        // we may modify the set during this loop
+        for(var componentType : Set.copyOf(componentTypes))
+        {
+            componentType.getFor(this).onRegistered(this::safeRegisterComponent);
+        }
+
         registered = true;
         componentTypes = ImmutableSet.copyOf(componentTypes);
-
-        // validate components
-        var missingTypes = Sets.<BlockEntityComponentType<?>>newHashSet();
-
-        for(var componentType : componentTypes)
-        {
-            for(var requiredType : componentType.requiredTypes())
-            {
-                if(hasComponent(requiredType)) continue;
-                missingTypes.add(requiredType);
-            }
-
-            componentType.getFor(this).validate();
-        }
-
-        if(!missingTypes.isEmpty())
-        {
-            var missingNames = missingTypes.stream().map(BlockEntityComponentType::registryName).map(ResourceLocation::toString).map("'%s'"::formatted).collect(Collectors.joining(",", "[", "]"));
-            throw new IllegalStateException("Missing required BlockComponentTypes: %s for Block: '%s'".formatted(missingNames, getClass().getName()));
-        }
     }
 
-    private <T extends BlockEntityComponent> T registerComponent(BlockEntityComponentType<T> componentType)
+    private <T extends BlockEntityComponent> T unsafeRegisterComponent(BlockEntityComponentType<T> componentType)
     {
         Validate.isTrue(!registered, "Attempt to register BlockComponentType: '%s' post registration".formatted(componentType.registryName()));
         if(hasComponent(componentType)) throw new IllegalStateException("Attempt to register duplicate BlockComponentType: '%s' for Block: '%s'".formatted(componentType.registryName(), getClass().getName()));
         componentTypes.add(componentType);
+        return componentType.getFor(this);
+    }
+
+    private <T extends BlockEntityComponent> T safeRegisterComponent(BlockEntityComponentType<T> componentType)
+    {
+        Validate.isTrue(!registered, "Attempt to register BlockComponentType: '%s' post registration".formatted(componentType.registryName()));
+        if(!hasComponent(componentType)) componentTypes.add(componentType);
         return componentType.getFor(this);
     }
 

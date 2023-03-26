@@ -1,11 +1,9 @@
 package xyz.apex.minecraft.apexcore.common.component.block;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 
 public sealed interface BlockComponentType<T extends BlockComponent> permits BlockComponentType.Impl
@@ -13,13 +11,6 @@ public sealed interface BlockComponentType<T extends BlockComponent> permits Blo
     ResourceLocation registryName();
 
     T getFor(BlockComponentHolder holder);
-
-    Set<BlockComponentType<?>> requiredTypes();
-
-    static <T extends BlockComponent> BlockComponentType<T> register(ResourceLocation registryName, Function<BlockComponentHolder, T> componentFactory, BlockComponentType<?>... requiredTypes)
-    {
-        return Impl.register(registryName, componentFactory, requiredTypes);
-    }
 
     static <T extends BlockComponent> BlockComponentType<T> register(ResourceLocation registryName, Function<BlockComponentHolder, T> componentFactory)
     {
@@ -31,14 +22,12 @@ public sealed interface BlockComponentType<T extends BlockComponent> permits Blo
         private static final Map<ResourceLocation, BlockComponentType<?>> registry = Maps.newHashMap();
 
         private final ResourceLocation registryName;
-        private final Set<BlockComponentType<?>> requiredTypes;
         private final Map<BlockComponentHolder, T> components = Maps.newHashMap();
         private final Function<BlockComponentHolder, T> componentFactory;
 
-        private Impl(ResourceLocation registryName, Function<BlockComponentHolder, T> componentFactory, BlockComponentType<?>... requiredTypes)
+        private Impl(ResourceLocation registryName, Function<BlockComponentHolder, T> componentFactory)
         {
             this.registryName = registryName;
-            this.requiredTypes = ImmutableSet.copyOf(requiredTypes);
             this.componentFactory = componentFactory;
         }
 
@@ -52,12 +41,6 @@ public sealed interface BlockComponentType<T extends BlockComponent> permits Blo
         public T getFor(BlockComponentHolder holder)
         {
             return components.computeIfAbsent(holder, componentFactory);
-        }
-
-        @Override
-        public Set<BlockComponentType<?>> requiredTypes()
-        {
-            return requiredTypes;
         }
 
         @Override
@@ -77,12 +60,12 @@ public sealed interface BlockComponentType<T extends BlockComponent> permits Blo
         @Override
         public String toString()
         {
-            return "BlockComponentType[%s]".formatted(requiredTypes);
+            return "BlockComponentType[%s]".formatted(registryName);
         }
 
-        private static <T extends BlockComponent> BlockComponentType<T> register(ResourceLocation registryName, Function<BlockComponentHolder, T> componentFactory, BlockComponentType<?>... requiredTypes)
+        private static <T extends BlockComponent> BlockComponentType<T> register(ResourceLocation registryName, Function<BlockComponentHolder, T> componentFactory)
         {
-            var instance = new Impl<>(registryName, componentFactory, requiredTypes);
+            var instance = new Impl<>(registryName, componentFactory);
             if(registry.put(registryName, instance) != null) throw new IllegalStateException("Attempt to register duplicate BlockComponentType: '%s'".formatted(registryName));
             return instance;
         }

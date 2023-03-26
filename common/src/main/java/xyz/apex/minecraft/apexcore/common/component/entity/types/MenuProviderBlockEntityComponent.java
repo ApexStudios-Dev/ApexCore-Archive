@@ -52,7 +52,7 @@ public final class MenuProviderBlockEntityComponent extends BaseBlockEntityCompo
     }
 
     @Override
-    public void validate()
+    public void onRegistered(BlockEntityComponentHolder.Registrar registrar)
     {
         Validate.notNull(menuType, "BlockEntity: '%s' is missing required MenuType!! (use the setter on the component)".formatted(holder.getClass().getName()));
         Validate.notNull(menuConstructor, "BlockEntity: '%s' is missing required ServerMenuConstructor!! (use the setter on the component)".formatted(holder.getClass().getName()));

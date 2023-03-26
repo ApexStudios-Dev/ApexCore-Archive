@@ -17,8 +17,7 @@ public final class LockableContainerBlockEntityComponent extends BaseBlockEntity
 {
     public static final BlockEntityComponentType<LockableContainerBlockEntityComponent> COMPONENT_TYPE = BlockEntityComponentType.register(
             new ResourceLocation(ApexCore.ID, "locking"),
-            LockableContainerBlockEntityComponent::new,
-            BlockEntityComponentTypes.CONTAINER
+            LockableContainerBlockEntityComponent::new
     );
 
     @Nullable private String lockCode = null;
@@ -32,6 +31,12 @@ public final class LockableContainerBlockEntityComponent extends BaseBlockEntity
     {
         this.lockCode = lockCode;
         return this;
+    }
+
+    @Override
+    public void onRegistered(BlockEntityComponentHolder.Registrar registrar)
+    {
+        registrar.register(BlockEntityComponentTypes.CONTAINER);
     }
 
     @Nullable
