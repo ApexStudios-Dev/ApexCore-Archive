@@ -1,9 +1,6 @@
 package xyz.apex.minecraft.apexcore.forge.hooks;
 
 import xyz.apex.minecraft.apexcore.common.hooks.Hooks;
-import xyz.apex.minecraft.apexcore.common.hooks.PackRepositoryHooks;
-import xyz.apex.minecraft.apexcore.common.hooks.RegistryHooks;
-import xyz.apex.minecraft.apexcore.common.hooks.RendererHooks;
 import xyz.apex.minecraft.apexcore.forge.platform.ForgePlatform;
 import xyz.apex.minecraft.apexcore.forge.platform.ForgePlatformHolder;
 
@@ -13,6 +10,7 @@ public final class ForgeHooks extends ForgePlatformHolder implements Hooks
     private final ForgeRegistryHooks registry;
     private final ForgeRendererHooks renderer;
     private final ForgeCreativeModeTabHooks creativeModeTab;
+    private final ForgeItemHooks item;
 
     public ForgeHooks(ForgePlatform platform)
     {
@@ -22,22 +20,23 @@ public final class ForgeHooks extends ForgePlatformHolder implements Hooks
         registry = new ForgeRegistryHooks(platform);
         renderer = new ForgeRendererHooks(platform);
         creativeModeTab = new ForgeCreativeModeTabHooks(platform);
+        item = new ForgeItemHooks(platform);
     }
 
     @Override
-    public PackRepositoryHooks packRepository()
+    public ForgePackRepositoryHooks packRepository()
     {
         return packRepository;
     }
 
     @Override
-    public RegistryHooks registry()
+    public ForgeRegistryHooks registry()
     {
         return registry;
     }
 
     @Override
-    public RendererHooks renderer()
+    public ForgeRendererHooks renderer()
     {
         return renderer;
     }
@@ -46,5 +45,11 @@ public final class ForgeHooks extends ForgePlatformHolder implements Hooks
     public ForgeCreativeModeTabHooks creativeModeTab()
     {
         return creativeModeTab;
+    }
+
+    @Override
+    public ForgeItemHooks item()
+    {
+        return item;
     }
 }

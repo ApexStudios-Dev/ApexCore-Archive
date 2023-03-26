@@ -1,6 +1,7 @@
 package xyz.apex.minecraft.apexcore.common.registry.builder;
 
 import it.unimi.dsi.fastutil.Pair;
+import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -17,6 +18,8 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.hooks.RendererHooks;
+import xyz.apex.minecraft.apexcore.common.platform.Side;
+import xyz.apex.minecraft.apexcore.common.platform.SideExecutor;
 import xyz.apex.minecraft.apexcore.common.registry.FlammabilityRegistry;
 import xyz.apex.minecraft.apexcore.common.registry.entry.BlockEntry;
 
@@ -33,6 +36,7 @@ public final class BlockBuilder<T extends Block> extends Builder<Block, T, Block
     @Nullable private ItemBuilder<?> itemBuilder = null;
     @Nullable private Pair<Integer, Integer> flammabilityOdds = null;
     @Nullable private Supplier<Supplier<RenderType>> renderType = null;
+    @Nullable private Supplier<BlockColor> blockColor = null;
 
     private BlockBuilder(String ownerId, String registrationName, BlockFactory<T> blockFactory)
     {
@@ -45,6 +49,10 @@ public final class BlockBuilder<T extends Block> extends Builder<Block, T, Block
         onRegister(block -> {
             if(flammabilityOdds != null) FlammabilityRegistry.register(block, flammabilityOdds.first(), flammabilityOdds.second());
             if(renderType != null) RendererHooks.getInstance().registerRenderType(block, renderType);
+
+            SideExecutor.runWhenOn(Side.CLIENT, () -> () -> {
+                if(blockColor != null) RendererHooks.getInstance().registerBlockColor(blockColor, () -> block);
+            });
         });
     }
 
@@ -58,6 +66,12 @@ public final class BlockBuilder<T extends Block> extends Builder<Block, T, Block
     public BlockBuilder<T> renderType(Supplier<Supplier<RenderType>> renderType)
     {
         this.renderType = renderType;
+        return this;
+    }
+
+    public BlockBuilder<T> blockColor(Supplier<BlockColor> blockColor)
+    {
+        this.blockColor = blockColor;
         return this;
     }
     // endregion

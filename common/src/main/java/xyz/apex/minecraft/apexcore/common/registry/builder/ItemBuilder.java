@@ -1,10 +1,15 @@
 package xyz.apex.minecraft.apexcore.common.registry.builder;
 
+import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
+import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.hooks.RendererHooks;
+import xyz.apex.minecraft.apexcore.common.platform.Side;
+import xyz.apex.minecraft.apexcore.common.platform.SideExecutor;
 import xyz.apex.minecraft.apexcore.common.registry.entry.ItemEntry;
 
 import java.util.function.Function;
@@ -15,13 +20,26 @@ public final class ItemBuilder<T extends Item> extends Builder<Item, T, ItemEntr
 {
     private Function<Item.Properties, Item.Properties> propertiesModifier = Function.identity();
     private final ItemFactory<T> itemFactory;
+    @Nullable private Supplier<ItemColor> itemColor = null;
 
     public ItemBuilder(String ownerId, String registrationName, ItemFactory<T> itemFactory)
     {
         super(Registries.ITEM, ownerId, registrationName);
 
         this.itemFactory = itemFactory;
+
+        onRegister(item -> SideExecutor.runWhenOn(Side.CLIENT, () -> () -> {
+            if(itemColor != null) RendererHooks.getInstance().registerItemColor(itemColor, () -> item);
+        }));
     }
+
+    // region: Custom
+    public ItemBuilder<T> itemColor(Supplier<ItemColor> itemColor)
+    {
+        this.itemColor = itemColor;
+        return this;
+    }
+    // endregion
 
     // region: Properties
     public ItemBuilder<T> properties(UnaryOperator<Item.Properties> propertiesModifier)

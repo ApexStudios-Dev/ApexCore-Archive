@@ -13,6 +13,8 @@ public interface Hooks extends PlatformHolder
 
     CreativeModeTabHooks creativeModeTab();
 
+    ItemHooks item();
+
     static Hooks getInstance()
     {
         return Platform.INSTANCE.hooks();
