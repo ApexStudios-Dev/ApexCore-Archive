@@ -2,15 +2,12 @@ package xyz.apex.forge.apexcore.core.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.PlayMessages;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.forge.apexcore.core.init.ACEntities;
@@ -79,12 +76,6 @@ public final class SeatEntity extends Entity
 	@Override
 	protected void addAdditionalSaveData(CompoundTag tagCompound)
 	{
-	}
-
-	@Override
-	public Packet<ClientGamePacketListener> getAddEntityPacket()
-	{
-		return (Packet<ClientGamePacketListener>) NetworkHooks.getEntitySpawningPacket(this);
 	}
 
 	public static boolean create(Level level, BlockPos pos, ISeatBlock seatBlock, Player player)
