@@ -2,6 +2,7 @@ package xyz.apex.minecraft.apexcore.forge.hooks;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.common.CreativeModeTabRegistry;
@@ -30,7 +31,8 @@ public final class ForgeCreativeModeTabHooks extends ForgePlatformHolder impleme
     @Override
     public void register(ResourceLocation registryName, UnaryOperator<CreativeModeTab.Builder> consumer)
     {
-        compute(mod -> mod.registerListeners.add(event -> event.registerCreativeModeTab(registryName, consumer::apply)));
+        // match auto generated name from fabric
+        compute(mod -> mod.registerListeners.add(event -> event.registerCreativeModeTab(registryName, builder -> consumer.apply(builder.title(Component.translatable("itemGroup.%s.%s".formatted(registryName.getNamespace(), registryName.getPath())))))));
     }
 
     @Override
