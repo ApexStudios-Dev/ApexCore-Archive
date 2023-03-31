@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public final class BlockEntityBuilder<T extends BlockEntity> extends Builder<BlockEntityType<?>, BlockEntityType<T>, BlockEntityEntry<T>, BlockEntityBuilder<T>>
@@ -27,6 +28,7 @@ public final class BlockEntityBuilder<T extends BlockEntity> extends Builder<Blo
     private final List<Supplier<? extends Block>> validBlocks = Lists.newArrayList();
     private final BlockEntityType.BlockEntitySupplier<T> blockEntityFactory;
     @Nullable private Supplier<BlockEntityRendererProvider<T>> blockEntityRendererProvider = null;
+    private Predicate<Block> blockValidator = block -> true;
 
     private BlockEntityBuilder(String ownerId, String registrationName, BlockEntityType.BlockEntitySupplier<T> blockEntityFactory)
     {
@@ -42,6 +44,12 @@ public final class BlockEntityBuilder<T extends BlockEntity> extends Builder<Blo
     public BlockEntityBuilder<T> renderer(Supplier<BlockEntityRendererProvider<T>> blockEntityRendererProvider)
     {
         this.blockEntityRendererProvider = blockEntityRendererProvider;
+        return this;
+    }
+
+    public BlockEntityBuilder<T> blockValidator(Predicate<Block> blockValidator)
+    {
+        this.blockValidator = blockValidator;
         return this;
     }
 
@@ -80,7 +88,7 @@ public final class BlockEntityBuilder<T extends BlockEntity> extends Builder<Blo
     @Override
     protected BlockEntityType<T> create()
     {
-        var resolvedValidBlocks = validBlocks.stream().map(Supplier::get).distinct().toArray(Block[]::new);
+        var resolvedValidBlocks = validBlocks.stream().map(Supplier::get).filter(blockValidator).distinct().toArray(Block[]::new);
         return BlockEntityType.Builder.of(blockEntityFactory, resolvedValidBlocks).build(Util.fetchChoiceType(References.BLOCK_ENTITY, registryName.toString()));
     }
 

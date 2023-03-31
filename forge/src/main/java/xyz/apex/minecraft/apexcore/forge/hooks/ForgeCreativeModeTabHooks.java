@@ -20,7 +20,7 @@ import java.util.function.UnaryOperator;
 
 public final class ForgeCreativeModeTabHooks extends ForgePlatformHolder implements CreativeModeTabHooks
 {
-    private final Map<String, Mod> mods = Maps.newHashMap();
+    private final Map<String, Mod> mods = Maps.newConcurrentMap();
 
     ForgeCreativeModeTabHooks(ForgePlatform platform)
     {

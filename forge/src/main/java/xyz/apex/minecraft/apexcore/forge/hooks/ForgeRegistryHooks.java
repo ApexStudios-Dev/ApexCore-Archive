@@ -19,7 +19,7 @@ import java.util.Map;
 
 public final class ForgeRegistryHooks extends ForgePlatformHolder implements RegistryHooks
 {
-    private final Map<String, Mod> mods = Maps.newHashMap();
+    private final Map<String, Mod> mods = Maps.newConcurrentMap();
 
     ForgeRegistryHooks(ForgePlatform platform)
     {

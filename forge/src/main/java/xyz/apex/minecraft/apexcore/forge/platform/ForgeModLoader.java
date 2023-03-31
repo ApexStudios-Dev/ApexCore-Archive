@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 public final class ForgeModLoader extends ForgePlatformHolder implements ModLoader
 {
-    private final Map<String, Mod> mods = Maps.newHashMap();
+    private final Map<String, Mod> mods = Maps.newConcurrentMap();
     private final Set<String> modIdView = Collections.unmodifiableSet(mods.keySet());
     private final Collection<Mod> modView = Collections.unmodifiableCollection(mods.values());
     private boolean init = false;

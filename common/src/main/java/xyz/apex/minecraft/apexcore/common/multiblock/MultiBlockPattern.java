@@ -55,7 +55,7 @@ public final class MultiBlockPattern
         }
 
         localPositions = positions.build();
-        blockProperty = getBlockStateProperty(localPositions.size());
+        blockProperty = getBlockStateProperty(localPositions.size() - 1);
     }
 
     public int getWidth()

@@ -64,6 +64,8 @@ public abstract class BaseEntityBlockComponentHolder<T extends BlockEntity & Blo
     @Override
     public InteractionResult use(BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
     {
+        if(super.use(blockState, level, pos, player, hand, hit).consumesAction()) return InteractionResult.sidedSuccess(level.isClientSide);
+
         var blockEntity = getBlockEntity(blockState, level, pos).orElse(null);
 
         if(blockEntity != null)
@@ -72,7 +74,7 @@ public abstract class BaseEntityBlockComponentHolder<T extends BlockEntity & Blo
             if(result.consumesAction()) return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
-        return super.use(blockState, level, pos, player, hand, hit);
+        return InteractionResult.PASS;
     }
 
     @Nullable

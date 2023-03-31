@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 
 public final class ForgeRendererHooks extends ForgePlatformHolder implements RendererHooks
 {
-    private final Map<String, Mod> mods = Maps.newHashMap();
+    private final Map<String, Mod> mods = Maps.newConcurrentMap();
 
     ForgeRendererHooks(ForgePlatform platform)
     {
