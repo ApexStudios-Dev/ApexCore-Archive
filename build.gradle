@@ -32,6 +32,11 @@ subprojects {
         maven { url 'https://maven.terraformersmc.com/releases/' }
 
         maven {
+            url 'https://jitpack.io'
+            content { includeGroup 'com.github.Chocohead' }
+        }
+
+        maven {
             url 'https://www.cursemaven.com'
             content { includeGroup 'curse.maven' }
         }
@@ -101,8 +106,6 @@ subprojects {
                 groupId = "${project.group}"
                 artifactId = "${project.archivesBaseName}"
                 version = "${project.version}"
-
-                artifact sourcesJar
             }
         }
 

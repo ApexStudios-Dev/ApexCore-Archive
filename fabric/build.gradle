@@ -46,6 +46,9 @@ dependencies {
 
     compileOnly project(':common')
     implementation project(path: ':common', configuration: 'namedElements')
+
+    modImplementation "com.github.Chocohead:Fabric-ASM:v${FABRIC_ASM_VERSION}"
+    include "com.github.Chocohead:Fabric-ASM:v${FABRIC_ASM_VERSION}"
 }
 
 processResources {
@@ -66,6 +69,18 @@ publishing {
             loom.disableDeprecatedPomGeneration(it)
 
             artifact remapJar
+            artifact sourcesJar
+
+            pom.withXml {
+                def depsNode = asNode().appendNode('dependencies')
+
+                // Fabric-ASM
+                def depNode = depsNode.appendNode('dependency')
+                depNode.appendNode('groupId', 'com.github.Chocohead')
+                depNode.appendNode('artifactId', 'Fabric-ASM')
+                depNode.appendNode('version', "v${FABRIC_ASM_VERSION}")
+                depNode.appendNode('scope', 'compile')
+            }
         }
     }
 }

@@ -42,6 +42,7 @@ publishing {
             loom.disableDeprecatedPomGeneration(it)
 
             artifact jar
+            artifact sourcesJar
         }
     }
 }

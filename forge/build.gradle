@@ -124,6 +124,8 @@ tasks.jarJar.finalizedBy('reobfJarJar')
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            artifact jar
+            artifact sourcesJar
             artifact tasks.jarJar
         }
     }
