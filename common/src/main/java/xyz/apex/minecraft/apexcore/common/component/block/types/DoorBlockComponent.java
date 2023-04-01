@@ -36,6 +36,7 @@ import xyz.apex.minecraft.apexcore.common.component.block.BaseBlockComponent;
 import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentHolder;
 import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentType;
 import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentTypes;
+import xyz.apex.minecraft.apexcore.common.multiblock.MultiBlockComponent;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -113,10 +114,35 @@ public final class DoorBlockComponent extends BaseBlockComponent
     @Override
     public InteractionResult use(BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
     {
-        if(blockState.getMaterial() != Material.METAL)
+        var multiBlockComponent = getComponent(BlockComponentTypes.MULTI_BLOCK);
+        var doorPos = pos;
+        var doorBlockState = blockState;
+
+        if(multiBlockComponent == null)
         {
-            var isOpen = blockState.getValue(OPEN);
-            setOpen(player, level, blockState, pos, !isOpen);
+            if(blockState.getValue(HALF) != DoubleBlockHalf.LOWER)
+            {
+                doorPos = pos.below();
+                doorBlockState = level.getBlockState(doorPos);
+                if(!doorBlockState.is(toBlock())) return InteractionResult.PASS;
+            }
+        }
+        else
+        {
+            var multiBlockType = multiBlockComponent.getMultiBlockType();
+
+            if(!multiBlockType.isOrigin(blockState))
+            {
+                doorPos = multiBlockType.getOriginPos(blockState, pos);
+                doorBlockState = level.getBlockState(doorPos);
+                if(!multiBlockType.isValidBlock(blockState)) return InteractionResult.PASS;
+            }
+        }
+
+        if(doorBlockState.getMaterial() != Material.METAL)
+        {
+            var isOpen = doorBlockState.getValue(OPEN);
+            setOpen(player, level, doorBlockState, doorPos, !isOpen);
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
@@ -202,7 +228,8 @@ public final class DoorBlockComponent extends BaseBlockComponent
     {
         if(blockState.is(toBlock()) && blockState.getValue(OPEN) != open)
         {
-            level.setBlock(pos, blockState.setValue(OPEN, open), 10);
+            if(blockState.getBlock() instanceof BlockComponentHolder holder && holder.hasComponent(BlockComponentTypes.MULTI_BLOCK)) MultiBlockComponent.setBlockStateForAll(level, pos, blockState, OPEN, open);
+            else level.setBlock(pos, blockState.setValue(OPEN, open), 10);
             playSound(entity, level, pos, open);
             level.gameEvent(entity, open ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, pos);
         }
