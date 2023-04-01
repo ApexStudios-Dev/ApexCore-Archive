@@ -1,23 +1,48 @@
-architectury {
-	def platforms = rootProject
-			.subprojects
-			.findAll { it.hasProperty('loom.platform') }
-			.collect { it.property('loom.platform') as String }
-			.toSet()
+plugins {
+    id 'fabric-loom' version '1.1-SNAPSHOT'
+}
 
-	println "Platforms: ${platforms.toListString()}"
-	common(platforms)
+loom {
+    if(accessWidenerFile.exists()) {
+        accessWidenerPath = accessWidenerFile
+    }
+
+    mixin.defaultRefmapName = "${MOD_ID}.refmap.json"
+}
+
+repositories {
+    maven { url 'https://repo.spongepowered.org/maven/' }
 }
 
 dependencies {
-	compileOnly "org.spongepowered:mixin:${MIXIN_VERSION}"
-	modApi "dev.architectury:architectury:${ARCHITECTURY_DEV_VERSION}"
+    minecraft "com.mojang:minecraft:${MINECRAFT_VERSION}"
+
+    mappings(loom.layered {
+        officialMojangMappings()
+
+        if(rootProject.hasProperty('PARCHMENT_MAPPINGS')) {
+            def mcVersion = rootProject.hasProperty('PARCHMENT_MINECRAFT_VERSION') ? "${PARCHMENT_MINECRAFT_VERSION}" : "${MINECRAFT_VERSION}"
+            parchment("org.parchmentmc.data:parchment-${mcVersion}:${PARCHMENT_MAPPINGS}@zip")
+        }
+    })
+
+    compileOnly "org.spongepowered:mixin:${MIXIN_VERSION}"
 }
 
-idea.module {
-	excludeDirs += [
-			file('.gradle'),
-			file('build'),
-			file('run')
-	]
+remapJar.enabled = false
+remapSourcesJar.enabled = false
+
+jar {
+    classifier ''
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            loom.disableDeprecatedPomGeneration(it)
+
+            artifact jar
+            artifact sourcesJar
+        }
+    }
 }

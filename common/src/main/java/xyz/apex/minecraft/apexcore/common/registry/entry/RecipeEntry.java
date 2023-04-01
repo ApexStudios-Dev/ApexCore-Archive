@@ -1,59 +1,33 @@
 package xyz.apex.minecraft.apexcore.common.registry.entry;
 
-import com.google.gson.JsonObject;
-import dev.architectury.registry.registries.RegistrySupplier;
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import xyz.apex.minecraft.apexcore.common.registry.RegistryEntry;
+import xyz.apex.minecraft.apexcore.common.registry.RegistryManager;
 
-import xyz.apex.minecraft.apexcore.common.registry.AbstractRegistrar;
+import java.util.function.Supplier;
 
-public final class RecipeEntry<R extends Recipe<?>> extends RegistryEntry<RecipeSerializer<R>>
+public final class RecipeEntry<T extends Recipe<?>> extends RegistryEntry<RecipeSerializer<T>> implements RecipeType<T>
 {
-    private final RegistryEntry<RecipeType<R>> recipeType;
+    private final RegistryEntry<RecipeType<T>> recipeType;
 
-    public RecipeEntry(AbstractRegistrar<?> owner, RegistrySupplier<RecipeSerializer<R>> delegate, ResourceKey<? super RecipeSerializer<R>> registryKey)
+    private RecipeEntry(ResourceLocation registryName)
     {
-        super(owner, delegate, Registries.RECIPE_SERIALIZER, registryKey);
+        super(Registries.RECIPE_SERIALIZER, registryName);
 
-        recipeType = owner.simple(Registries.RECIPE_TYPE, getRegistrationName(), RecipeTypeImpl::new);
+        recipeType = RegistryManager.get(registryName.getNamespace()).getRegistry(Registries.RECIPE_TYPE).register(registryName.getPath(), () -> this);
     }
 
-    public RecipeType<R> asRecipeType()
+    public RegistryEntry<RecipeType<T>> asRecipeType()
     {
-        return recipeType.get();
+        return recipeType;
     }
 
-    public boolean is(@Nullable RecipeType<?> other)
+    public static <T extends Recipe<?>> RecipeEntry<T> register(String ownerId, String registrationName, Supplier<RecipeSerializer<T>> recipeSerializerFactory)
     {
-        return recipeType.isPresent() && recipeType.get() == other;
+        return RegistryManager.get(ownerId).getRegistry(Registries.RECIPE_SERIALIZER).register(registrationName, RecipeEntry::new, recipeSerializerFactory);
     }
-
-    public boolean is(@Nullable RecipeSerializer<?> other)
-    {
-        return isPresent() && get() == other;
-    }
-
-    public R fromJson(ResourceLocation recipeId, JsonObject json)
-    {
-        return get().fromJson(recipeId, json);
-    }
-
-    public R fromNetwork(ResourceLocation recipeId, FriendlyByteBuf data)
-    {
-        return get().fromNetwork(recipeId, data);
-    }
-
-    public void toNetwork(FriendlyByteBuf data, R recipe)
-    {
-        get().toNetwork(data, recipe);
-    }
-
-    private record RecipeTypeImpl<R extends Recipe<?>>() implements RecipeType<R> {}
 }

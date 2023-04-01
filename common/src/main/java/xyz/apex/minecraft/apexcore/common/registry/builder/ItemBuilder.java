@@ -1,217 +1,108 @@
 package xyz.apex.minecraft.apexcore.common.registry.builder;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import dev.architectury.registry.CreativeTabRegistry;
-import dev.architectury.registry.client.rendering.ColorHandlerRegistry;
-import dev.architectury.registry.fuel.FuelRegistry;
-import dev.architectury.registry.item.ItemPropertiesRegistry;
-import dev.architectury.registry.registries.RegistrySupplier;
-import dev.architectury.utils.Env;
-import dev.architectury.utils.EnvExecutor;
-import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.client.color.item.ItemColor;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.MenuAccess;
-import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.flag.FeatureFlag;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.level.ItemLike;
-
-import xyz.apex.minecraft.apexcore.common.registry.AbstractRegistrar;
+import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.hooks.RendererHooks;
+import xyz.apex.minecraft.apexcore.common.platform.Side;
+import xyz.apex.minecraft.apexcore.common.platform.SideExecutor;
 import xyz.apex.minecraft.apexcore.common.registry.entry.ItemEntry;
-import xyz.apex.minecraft.apexcore.common.util.Properties;
-import xyz.apex.minecraft.apexcore.common.util.function.Lazy;
 
-import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-@SuppressWarnings({ "UnstableApiUsage", "unchecked" })
-public final class ItemBuilder<R extends Item, O extends AbstractRegistrar<O>, P> extends AbstractBuilder<Item, R, O, P, ItemBuilder<R, O, P>>
+public final class ItemBuilder<T extends Item> extends Builder<Item, T, ItemEntry<T>, ItemBuilder<T>>
 {
-    private final Factory<R> factory;
-    private Supplier<Item.Properties> initialProperties = Properties.ITEM_GENERIC;
     private Function<Item.Properties, Item.Properties> propertiesModifier = Function.identity();
-    private int burnTime = -1;
-    private Supplier<Supplier<ItemColor>> itemColorSupplier = () -> () -> null;
-    private final Map<ResourceLocation, Supplier<Supplier<ClampedItemPropertyFunction>>> itemPropertiesMap = Maps.newHashMap();
-    private final List<Pair<CreativeModeTab, Function<R, ItemStack>>> additionalCreativeModeTabs = Lists.newArrayList();
-    @Nullable private MenuBuilder<?, ?, O, ItemBuilder<R, O, P>> menuBuilder = null;
+    private final ItemFactory<T> itemFactory;
+    @Nullable private Supplier<ItemColor> itemColor = null;
 
-    public ItemBuilder(O owner, P parent, String registrationName, Factory<R> factory)
+    public ItemBuilder(String ownerId, String registrationName, ItemFactory<T> itemFactory)
     {
-        super(owner, parent, Registries.ITEM, registrationName);
+        super(Registries.ITEM, ownerId, registrationName);
 
-        this.factory = factory;
+        this.itemFactory = itemFactory;
 
-        onRegister(item -> {
-            if(burnTime != -1) FuelRegistry.register(burnTime, item);
-
-            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                var itemColor = itemColorSupplier.get().get();
-                if(itemColor != null) ColorHandlerRegistry.registerItemColors(itemColor, item);
-
-                itemPropertiesMap.forEach((propertyName, propertyFunctionSupplier) -> {
-                    var propertyFunction = propertyFunctionSupplier.get().get();
-                    if(propertyFunction != null) ItemPropertiesRegistry.register(item, propertyName, propertyFunction);
-                });
-            });
-
-            if(!additionalCreativeModeTabs.isEmpty())
-            {
-                // batch everything down into modify call per tab
-                var map = Maps.<CreativeModeTab, List<Supplier<ItemStack>>>newHashMap();
-
-                for(var entry : additionalCreativeModeTabs)
-                {
-                    var stack = entry.getRight().apply(item);
-                    if(stack.isEmpty()) continue;
-                    map.computeIfAbsent(entry.getLeft(), $ -> Lists.newArrayList()).add(Lazy.of(stack));
-                }
-
-                map.forEach((creativeModeTab, stacks) -> CreativeTabRegistry.appendStack(creativeModeTab, stacks.toArray(Supplier[]::new)));
-            }
-        });
+        onRegister(item -> SideExecutor.runWhenOn(Side.CLIENT, () -> () -> {
+            if(itemColor != null) RendererHooks.getInstance().registerItemColor(itemColor, () -> item);
+        }));
     }
 
-    public <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>> ItemBuilder<R, O, P> menu(MenuBuilder.MenuFactory<M> menuFactory, Supplier<MenuBuilder.ScreenFactory<M, S>> screenFactorySupplier)
+    // region: Custom
+    public ItemBuilder<T> itemColor(Supplier<ItemColor> itemColor)
     {
-        menuBuilder = new MenuBuilder<>(owner, this, getRegistrationName(), menuFactory, screenFactorySupplier);
+        this.itemColor = itemColor;
         return this;
     }
+    // endregion
 
-    public ItemBuilder<R, O, P> noMenu()
-    {
-        menuBuilder = null;
-        return this;
-    }
-
-    // Only to be used with vanilla tabs
-    public ItemBuilder<R, O, P> creativeModeTab(CreativeModeTab creativeModeTab, Function<R, ItemStack> stackFunction)
-    {
-        additionalCreativeModeTabs.add(Pair.of(creativeModeTab, stackFunction));
-        return this;
-    }
-
-    public ItemBuilder<R, O, P> creativeModeTab(CreativeModeTab creativeModeTab)
-    {
-        return creativeModeTab(creativeModeTab, Item::getDefaultInstance);
-    }
-
-    public ItemBuilder<R, O, P> itemProperty(ResourceLocation propertyName, Supplier<Supplier<ClampedItemPropertyFunction>> propertyFunction)
-    {
-        itemPropertiesMap.put(propertyName, propertyFunction);
-        return this;
-    }
-
-    public ItemBuilder<R, O, P> itemColor(Supplier<Supplier<ItemColor>> itemColorSupplier)
-    {
-        this.itemColorSupplier = itemColorSupplier;
-        return this;
-    }
-
-    public ItemBuilder<R, O, P> burnTime(int burnTime)
-    {
-        this.burnTime = burnTime;
-        return this;
-    }
-
-    public ItemBuilder<R, O, P> initialProperties(Supplier<Item.Properties> initialProperties)
-    {
-        this.initialProperties = initialProperties;
-        return this;
-    }
-
-    public ItemBuilder<R, O, P> initialProperties(Item.Properties properties)
-    {
-        return initialProperties(() -> properties);
-    }
-
-    public ItemBuilder<R, O, P> properties(UnaryOperator<Item.Properties> propertiesModifier)
+    // region: Properties
+    public ItemBuilder<T> properties(UnaryOperator<Item.Properties> propertiesModifier)
     {
         this.propertiesModifier = this.propertiesModifier.andThen(propertiesModifier);
         return this;
     }
 
-    public ItemBuilder<R, O, P> food(FoodProperties foodProperties)
+    public ItemBuilder<T> food(FoodProperties foodProperties)
     {
         return properties(properties -> properties.food(foodProperties));
     }
 
-    public ItemBuilder<R, O, P> stacksTo(int maxStackSize)
+    public ItemBuilder<T> stacksTo(int maxStackSize)
     {
         return properties(properties -> properties.stacksTo(maxStackSize));
     }
 
-    public ItemBuilder<R, O, P> defaultDurability(int durability)
+    public ItemBuilder<T> defaultDurability(int maxDamage)
     {
-        return properties(properties -> properties.defaultDurability(durability));
+        return properties(properties -> properties.defaultDurability(maxDamage));
     }
 
-    public ItemBuilder<R, O, P> durability(int durability)
+    public ItemBuilder<T> durability(int maxDamage)
     {
-        return properties(properties -> properties.durability(durability));
+        return properties(properties -> properties.durability(maxDamage));
     }
 
-    @Deprecated
-    public ItemBuilder<R, O, P> craftRemainder(Item craftingRemainingItem)
+    public ItemBuilder<T> craftRemainder(Supplier<Item> craftRemainingItem)
     {
-        return properties(properties -> properties.craftRemainder(craftingRemainingItem));
+        return properties(properties -> properties.craftRemainder(craftRemainingItem.get()));
     }
 
-    public ItemBuilder<R, O, P> craftRemainder(Supplier<? extends ItemLike> craftingRemainingItem)
-    {
-        return properties(properties -> properties.craftRemainder(craftingRemainingItem.get().asItem()));
-    }
-
-    public ItemBuilder<R, O, P> rarity(Rarity rarity)
+    public ItemBuilder<T> rarity(Rarity rarity)
     {
         return properties(properties -> properties.rarity(rarity));
     }
 
-    public ItemBuilder<R, O, P> fireResistant()
+    public ItemBuilder<T> fireResistant()
     {
         return properties(Item.Properties::fireResistant);
     }
+    // endregion
 
-    public ItemBuilder<R, O, P> requiredFeatures(FeatureFlag... flags)
+    @Override
+    protected ItemEntry<T> createRegistryEntry(ResourceLocation registryName)
     {
-        return properties(properties -> properties.requiredFeatures(flags));
+        return new ItemEntry<>(registryName);
     }
 
     @Override
-    protected R createEntry()
+    protected T create()
     {
-        return factory.create(propertiesModifier.apply(initialProperties.get()));
+        return itemFactory.create(propertiesModifier.apply(new Item.Properties()));
     }
 
-    @Override
-    protected ItemEntry<R> createRegistryEntry(RegistrySupplier<R> delegate)
+    public static <T extends Item> ItemBuilder<T> builder(String ownerId, String registrationName, ItemFactory<T> itemFactory)
     {
-        return new ItemEntry<>(owner, delegate, registryKey);
-    }
-
-    @Override
-    public ItemEntry<R> register()
-    {
-        if(menuBuilder != null) menuBuilder.register();
-        return (ItemEntry<R>) super.register();
+        return new ItemBuilder<>(ownerId, registrationName, itemFactory);
     }
 
     @FunctionalInterface
-    public interface Factory<T extends Item>
+    public interface ItemFactory<T extends Item>
     {
         T create(Item.Properties properties);
     }

@@ -1,92 +1,100 @@
 package xyz.apex.minecraft.apexcore.common.registry.builder;
 
+import com.google.common.base.Suppliers;
+import com.google.common.collect.Lists;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import xyz.apex.minecraft.apexcore.common.registry.DeferredRegister;
+import xyz.apex.minecraft.apexcore.common.registry.RegistryEntry;
+import xyz.apex.minecraft.apexcore.common.registry.RegistryManager;
 
-import xyz.apex.minecraft.apexcore.common.platform.GamePlatform;
-import xyz.apex.minecraft.apexcore.common.platform.PlatformHolder;
-import xyz.apex.minecraft.apexcore.common.registry.AbstractRegistrar;
-import xyz.apex.minecraft.apexcore.common.registry.entry.RegistryEntry;
-import xyz.apex.minecraft.apexcore.common.util.function.LazyLike;
-
+import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unchecked")
-public interface Builder<T, R extends T, O extends AbstractRegistrar<O>, P, B extends Builder<T, R, O, P, B>> extends LazyLike<RegistryEntry<R>>, PlatformHolder
+public abstract class Builder<T, R extends T, E extends RegistryEntry<R>, S extends Builder<T, R, E, S>>
 {
-    RegistryEntry<R> register();
+    protected final ResourceKey<? extends Registry<T>> registryType;
+    protected final ResourceLocation registryName;
 
-    O getOwner();
+    private final S self = (S) this;
+    private final List<Consumer<R>> registerCallbacks = Lists.newLinkedList();
 
-    P getParent();
+    protected final Supplier<R> safeEntrySupplier = Suppliers.memoize(this::create);
 
-    default String getModId()
+    protected Builder(ResourceKey<? extends Registry<T>> registryType, String ownerId, String registrationName)
     {
-        return getOwner().getModId();
+        this.registryType = registryType;
+
+        registryName = new ResourceLocation(ownerId, registrationName);
     }
 
-    default String getRegistrationName()
+    public final ResourceKey<? extends Registry<T>> getRegistryType()
     {
-        return getRegistryName().getPath();
+        return registryType;
     }
 
-    default ResourceLocation getRegistryName()
+    public final ResourceLocation getRegistryName()
     {
-        return getRegistryKey().location();
+        return registryName;
     }
 
-    ResourceKey<? extends Registry<T>> getRegistryType();
-
-    ResourceKey<T> getRegistryKey();
-
-    @Override
-    default RegistryEntry<R> get()
+    public final String getOwnerId()
     {
-        return getOwner().get(getRegistryType(), getRegistrationName());
+        return registryName.getNamespace();
     }
 
-    default R getEntry()
+    public final String getRegistrationName()
     {
-        return get().get();
+        return registryName.getPath();
     }
 
-    Supplier<R> asSupplier();
-
-    default B onRegister(Consumer<R> callback)
+    public final RegistryManager getRegistryManager()
     {
-        getOwner().addRegisterCallback(getRegistryType(), getRegistrationName(), callback);
-        return self();
+        return RegistryManager.get(getOwnerId());
     }
 
-    default <OR> B onRegisterAfter(ResourceKey<? extends Registry<OR>> dependencyType, Consumer<R> callback)
+    public final DeferredRegister<T> getRegistry()
     {
-        return onRegister(value -> {
-            if(getOwner().isRegistered(dependencyType)) callback.accept(value);
-            else getOwner().addRegisterCallback(dependencyType, () -> callback.accept(value));
-        });
+        return getRegistryManager().getRegistry(registryType);
     }
 
-    default <T1, R1 extends T1, O1 extends AbstractRegistrar<O1>, P1, B1 extends Builder<T1, R1, O1, P1, B1>> B1 transform(Function<B, B1> transformer)
+    public final Supplier<R> asSupplier()
     {
-        return transformer.apply(self());
+        return safeEntrySupplier;
     }
 
-    default P build()
+    public final S onRegister(Consumer<R> registerCallback)
     {
-        return getParent();
+        registerCallbacks.add(registerCallback);
+        return self;
     }
 
-    default B self()
+    public final S onRegister(Runnable registerCallback)
     {
-        return (B) this;
+        getRegistry().registerCallback(registerCallback);
+        return self;
     }
 
-    @Override
-    default GamePlatform platform()
+    public final E register()
     {
-        return getOwner().platform();
+        onPreRegistered();
+        var registry = getRegistry();
+        var registryEntry = registry.register(getRegistrationName(), this::createRegistryEntry, safeEntrySupplier);
+
+        registerCallbacks.forEach(registerCallback -> registry.registerCallback(registryEntry, registerCallback));
+        registerCallbacks.clear();
+        onPostRegistered(registryEntry);
+        return registryEntry;
     }
+
+    protected void onPreRegistered() { }
+
+    protected void onPostRegistered(E registryEntry) { }
+
+    protected abstract E createRegistryEntry(ResourceLocation registryName);
+
+    protected abstract R create();
 }

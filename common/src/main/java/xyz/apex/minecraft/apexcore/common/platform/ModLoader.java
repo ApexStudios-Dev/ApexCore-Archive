@@ -1,71 +1,30 @@
 package xyz.apex.minecraft.apexcore.common.platform;
 
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
 
-import xyz.apex.minecraft.apexcore.common.util.ApexTags;
-
-public enum ModLoader
+public interface ModLoader extends PlatformHolder
 {
-    FORGE("forge", "MinecraftForge"),
-    FABRIC("fabric", "c", "Fabric"),
-    QUILT("quilt", "Quilt");
+    String version();
 
-    private final String modId;
-    private final String tagsNamespace;
-    private final String displayName;
+    String id();
 
-    ModLoader(String modId, String tagsNamespace, String displayName)
+    String displayName();
+
+    boolean isModLoaded(String modId);
+
+    Collection<Mod> getMods();
+
+    Stream<Mod> mods();
+
+    Set<String> getModIdSet();
+
+    Optional<Mod> getMod(String modId);
+
+    static ModLoader getInstance()
     {
-        this.modId = modId;
-        this.tagsNamespace = tagsNamespace;
-        this.displayName = displayName;
-    }
-
-    ModLoader(String modId, String displayName)
-    {
-        this(modId, modId, displayName);
-    }
-
-    public String getModId()
-    {
-        return modId;
-    }
-
-    public String getTagsNamespace()
-    {
-        return tagsNamespace;
-    }
-
-    public String getDisplayName()
-    {
-        return displayName;
-    }
-
-    public ResourceLocation id(String path)
-    {
-        return new ResourceLocation(modId, path);
-    }
-
-    public <T> TagKey<T> tag(ResourceKey<? extends Registry<T>> registryType, String tagName)
-    {
-        return ApexTags.tag(registryType, tagsNamespace, tagName);
-    }
-
-    public boolean is(ModLoader other)
-    {
-        return this == other;
-    }
-
-    public boolean isForge()
-    {
-        return is(FORGE);
-    }
-
-    public boolean isFabric()
-    {
-        return is(FABRIC);
+        return Platform.INSTANCE.modLoader();
     }
 }

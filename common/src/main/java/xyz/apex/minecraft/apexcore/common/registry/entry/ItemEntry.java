@@ -1,30 +1,14 @@
 package xyz.apex.minecraft.apexcore.common.registry.entry;
 
-import dev.architectury.registry.registries.RegistrySupplier;
-
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
+import xyz.apex.minecraft.apexcore.common.registry.RegistryEntry;
 
-import xyz.apex.minecraft.apexcore.common.registry.AbstractRegistrar;
-
-@SuppressWarnings("unchecked")
-public final class ItemEntry<T extends Item> extends ItemLikeEntry<T>
+public final class ItemEntry<T extends Item> extends RegistryEntry<T> implements ItemLikeEntry<T>, FeatureElementEntry<T>
 {
-    public ItemEntry(AbstractRegistrar<?> owner, RegistrySupplier<T> delegate, ResourceKey<? super T> registryKey)
+    public ItemEntry(ResourceLocation registryName)
     {
-        super(owner, delegate, Registries.ITEM, registryKey);
-    }
-
-    public <B extends Block> BlockEntry<B> asBlockEntry()
-    {
-        return getSibling(Registries.BLOCK, BlockEntry.class);
-    }
-
-    public <M extends AbstractContainerMenu> MenuEntry<M> asMenuEntry()
-    {
-        return getSibling(Registries.MENU, MenuEntry.class);
+        super(Registries.ITEM, registryName);
     }
 }

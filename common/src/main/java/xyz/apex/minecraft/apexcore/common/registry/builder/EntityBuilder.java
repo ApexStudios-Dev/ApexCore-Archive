@@ -1,166 +1,137 @@
 package xyz.apex.minecraft.apexcore.common.registry.builder;
 
-import dev.architectury.core.item.ArchitecturySpawnEggItem;
-import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
-import dev.architectury.registry.level.entity.EntityAttributeRegistry;
-import dev.architectury.registry.registries.RegistrySupplier;
-import dev.architectury.utils.Env;
-import dev.architectury.utils.EnvExecutor;
-import org.jetbrains.annotations.Nullable;
-
+import com.google.common.collect.Streams;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.flag.FeatureFlag;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-
-import xyz.apex.minecraft.apexcore.common.registry.AbstractRegistrar;
+import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.hooks.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.registry.entry.EntityEntry;
 
+import java.util.Collection;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
-@SuppressWarnings("unchecked")
-public final class EntityBuilder<R extends Entity, O extends AbstractRegistrar<O>, P> extends AbstractBuilder<EntityType<?>, EntityType<R>, O, P, EntityBuilder<R, O, P>>
+public final class EntityBuilder<T extends Entity> extends Builder<EntityType<?>, EntityType<T>, EntityEntry<T>, EntityBuilder<T>>
 {
-    private final Factory<R> factory;
-    private Function<EntityType.Builder<R>, EntityType.Builder<R>> propertiesModifier = Function.identity();
-    private MobCategory category = MobCategory.MISC;
-    private Supplier<Supplier<EntityRendererProvider<R>>> rendererSupplier = () -> () -> null;
-    @Nullable private Supplier<AttributeSupplier.Builder> attributesSupplier;
-    @Nullable private ItemBuilder<ArchitecturySpawnEggItem, O, EntityBuilder<R, O, P>> spawnEggBuilder;
+    private Function<EntityType.Builder<T>, EntityType.Builder<T>> propertiesModifier = Function.identity();
+    private final EntityType.EntityFactory<T> entityFactory;
+    private final MobCategory mobCategory;
+    @Nullable private Supplier<EntityRendererProvider<T>> entityRendererProvider = null;
 
-    public EntityBuilder(O owner, P parent, String registrationName, Factory<R> factory)
+    private EntityBuilder(String ownerId, String registrationName, MobCategory mobCategory, EntityType.EntityFactory<T> entityFactory)
     {
-        super(owner, parent, Registries.ENTITY_TYPE, registrationName);
+        super(Registries.ENTITY_TYPE, ownerId, registrationName);
 
-        this.factory = factory;
+        this.mobCategory = mobCategory;
+        this.entityFactory = entityFactory;
 
         onRegister(entityType -> {
-            if(attributesSupplier != null) EntityAttributeRegistry.register(() -> (EntityType<? extends LivingEntity>) entityType, attributesSupplier);
-
-            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-                var renderer = rendererSupplier.get().get();
-                if(renderer != null) EntityRendererRegistry.register(() -> entityType, renderer);
-            });
+            if(entityRendererProvider != null) RendererHooks.getInstance().registerEntityRenderer(entityType, entityRendererProvider);
         });
     }
 
-    public ItemBuilder<ArchitecturySpawnEggItem, O, EntityBuilder<R, O, P>> spawnEgg(int primaryColor, int secondaryColor)
+    // region: Custom
+    public EntityBuilder<T> renderer(Supplier<EntityRendererProvider<T>> entityRendererProvider)
     {
-        this.spawnEggBuilder = new ItemBuilder<>(owner, this, getRegistrationName(), properties -> new ArchitecturySpawnEggItem(owner.getDelegate(Registries.ENTITY_TYPE, getRegistrationName()), primaryColor, secondaryColor, properties));
-        return spawnEggBuilder;
-    }
-
-    public EntityBuilder<R, O, P> simpleSpawnEgg(int primaryColor, int secondaryColor)
-    {
-        return spawnEgg(primaryColor, secondaryColor).build();
-    }
-
-    public EntityBuilder<R, O, P> noSpawnEgg()
-    {
-        spawnEggBuilder = null;
+        this.entityRendererProvider = entityRendererProvider;
         return this;
     }
+    // endregion
 
-    public EntityBuilder<R, O, P> category(MobCategory category)
-    {
-        this.category = category;
-        return this;
-    }
-
-    public EntityBuilder<R, O, P> renderer(Supplier<Supplier<EntityRendererProvider<R>>> rendererSupplier)
-    {
-        this.rendererSupplier = rendererSupplier;
-        return this;
-    }
-
-    public EntityBuilder<R, O, P> attributes(Supplier<AttributeSupplier.Builder> attributesSupplier)
-    {
-        this.attributesSupplier = attributesSupplier;
-        return this;
-    }
-
-    public EntityBuilder<R, O, P> properties(UnaryOperator<EntityType.Builder<R>> propertiesModifier)
+    // region: Properties
+    public EntityBuilder<T> properties(UnaryOperator<EntityType.Builder<T>> propertiesModifier)
     {
         this.propertiesModifier = this.propertiesModifier.andThen(propertiesModifier);
         return this;
     }
 
-    public EntityBuilder<R, O, P> sized(float width, float height)
+    public EntityBuilder<T> sized(float width, float height)
     {
         return properties(properties -> properties.sized(width, height));
     }
 
-    public EntityBuilder<R, O, P> noSummon()
+    public EntityBuilder<T> noSummon()
     {
         return properties(EntityType.Builder::noSummon);
     }
 
-    public EntityBuilder<R, O, P> noSave()
+    public EntityBuilder<T> noSave()
     {
         return properties(EntityType.Builder::noSave);
     }
 
-    public EntityBuilder<R, O, P> fireImmune()
+    public EntityBuilder<T> fireImmune()
     {
         return properties(EntityType.Builder::fireImmune);
     }
 
-    public EntityBuilder<R, O, P> immuneTo(Block... blocks)
+    public EntityBuilder<T> immuneTo(Supplier<Block> block)
     {
-        return properties(properties -> properties.immuneTo(blocks));
+        return properties(properties -> properties.immuneTo(block.get()));
     }
 
-    public EntityBuilder<R, O, P> canSpawnFarFromPlayer()
+    @SafeVarargs
+    public final EntityBuilder<T> immuneTo(Supplier<Block>... blocks)
+    {
+        return properties(properties -> {
+            var resolved = Stream.of(blocks).map(Supplier::get).distinct().toArray(Block[]::new);
+            return properties.immuneTo(resolved);
+        });
+    }
+
+    public EntityBuilder<T> validBlocks(Collection<Supplier<Block>> blocks)
+    {
+        return properties(properties -> {
+            var resolved = blocks.stream().map(Supplier::get).distinct().toArray(Block[]::new);
+            return properties.immuneTo(resolved);
+        });
+    }
+
+    public EntityBuilder<T> validBlocks(Iterable<Supplier<Block>> blocks)
+    {
+        return properties(properties -> {
+            var resolved = Streams.stream(blocks).map(Supplier::get).distinct().toArray(Block[]::new);
+            return properties.immuneTo(resolved);
+        });
+    }
+
+    public EntityBuilder<T> canSpawnFarFromPlayer()
     {
         return properties(EntityType.Builder::canSpawnFarFromPlayer);
     }
 
-    public EntityBuilder<R, O, P> clientTrackingRange(int clientTrackingRange)
+    public EntityBuilder<T> clientTrackingRange(int clientTrackingRange)
     {
         return properties(properties -> properties.clientTrackingRange(clientTrackingRange));
     }
 
-    public EntityBuilder<R, O, P> updateInterval(int updateInterval)
+    public EntityBuilder<T> updateInterval(int updateInterval)
     {
         return properties(properties -> properties.updateInterval(updateInterval));
     }
+    // endregion
 
-    public EntityBuilder<R, O, P> requiredFeatures(FeatureFlag... flags)
+    @Override
+    protected EntityEntry<T> createRegistryEntry(ResourceLocation registryName)
     {
-        return properties(properties -> properties.requiredFeatures(flags));
+        return new EntityEntry<>(registryName);
     }
 
     @Override
-    protected EntityType<R> createEntry()
+    protected EntityType<T> create()
     {
-        return propertiesModifier.apply(EntityType.Builder.of(factory::create, category)).build(getRegistryName().toString());
+        return propertiesModifier.apply(EntityType.Builder.of(entityFactory, mobCategory)).build(registryName.toString());
     }
 
-    @Override
-    protected EntityEntry<R> createRegistryEntry(RegistrySupplier<EntityType<R>> delegate)
+    public static <T extends Entity> EntityBuilder<T> builder(String ownerId, String registrationName, MobCategory mobCategory, EntityType.EntityFactory<T> entityFactory)
     {
-        return new EntityEntry<>(owner, delegate, registryKey);
-    }
-
-    @Override
-    public EntityEntry<R> register()
-    {
-        var result = (EntityEntry<R>) super.register();
-        if(spawnEggBuilder != null) spawnEggBuilder.register();
-        return result;
-    }
-
-    @FunctionalInterface
-    public interface Factory<T extends Entity>
-    {
-        T create(EntityType<T> entityType, Level level);
+        return new EntityBuilder<>(ownerId, registrationName, mobCategory, entityFactory);
     }
 }

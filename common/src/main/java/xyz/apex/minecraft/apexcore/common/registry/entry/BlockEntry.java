@@ -1,59 +1,31 @@
 package xyz.apex.minecraft.apexcore.common.registry.entry;
 
-import dev.architectury.registry.registries.RegistrySupplier;
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.Item;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
+import xyz.apex.minecraft.apexcore.common.registry.RegistryEntry;
 
-import xyz.apex.minecraft.apexcore.common.registry.AbstractRegistrar;
-
-@SuppressWarnings({ "unchecked", "deprecation" })
-public final class BlockEntry<T extends Block> extends ItemLikeEntry<T>
+public final class BlockEntry<T extends Block> extends RegistryEntry<T> implements ItemLikeEntry<T>, FeatureElementEntry<T>
 {
-    public BlockEntry(AbstractRegistrar<?> owner, RegistrySupplier<T> delegate, ResourceKey<? super T> registryKey)
+    public BlockEntry(ResourceLocation registryName)
     {
-        super(owner, delegate, Registries.BLOCK, registryKey);
-    }
-
-    public <I extends Item> ItemEntry<I> asItemEntry()
-    {
-        return getSibling(Registries.ITEM, ItemEntry.class);
-    }
-
-    public <B extends BlockEntity> BlockEntityEntry<B> asBlockEntityEntry()
-    {
-        return getSibling(Registries.BLOCK_ENTITY_TYPE, BlockEntityEntry.class);
-    }
-
-    public <M extends AbstractContainerMenu> MenuEntry<M> asMenuEntry()
-    {
-        return getSibling(Registries.MENU, MenuEntry.class);
-    }
-
-    public boolean is(@Nullable Block other)
-    {
-        return isPresent() && get() == other;
-    }
-
-    public boolean hasBlockTag(TagKey<Block> tag)
-    {
-        return get().builtInRegistryHolder().is(tag);
-    }
-
-    public boolean hasBlockState(BlockState blockState)
-    {
-        return is(blockState.getBlock());
+        super(Registries.BLOCK, registryName);
     }
 
     public BlockState defaultBlockState()
     {
         return get().defaultBlockState();
+    }
+
+    public boolean hasBlockState(BlockState blockState)
+    {
+        return blockState.is(get());
+    }
+
+    public <P extends Comparable<P>> BlockState withProperty(Property<P> property, P value)
+    {
+        return defaultBlockState().trySetValue(property, value);
     }
 }

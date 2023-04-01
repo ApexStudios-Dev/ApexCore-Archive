@@ -1,22 +1,86 @@
-apply from: '../loader.gradle'
+plugins {
+    id 'fabric-loom' version '1.1-SNAPSHOT'
+}
 
 loom {
-	runs {
-		data {
-			inherit(client)
-			vmArg('-Dfabric-api.datagen')
-			vmArg("-Dfabric-api.datagen.output-dir=${file('src/main/generated')}")
-			vmArg("-Dfabric-api.datagen.modid=${MOD_ID}")
-			vmArg('-Dfabric-api.datagen.strict-validation=true')
-		}
-	}
+    if(accessWidenerFile.exists()) {
+        accessWidenerPath = accessWidenerFile
+    }
+
+    mixin.defaultRefmapName = "${MOD_ID}.refmap.json"
+
+    runs {
+        client {
+            client()
+            ideConfigGenerated true
+        }
+
+        server {
+            server()
+            ideConfigGenerated true
+        }
+
+        data {
+            inherit server
+            vmArg '-Dfabric-api.datagen'
+            vmArg "-Dfabric-api.datagen.output-dir=${file('src/main/generated')}"
+            vmArg "-Dfabric-api.datagen.modid=${MOD_ID}"
+        }
+    }
 }
 
 dependencies {
-//	modRuntimeOnly "maven.modrinth:lazydfu:${FABRIC_LAZY_DFU_VERSION}"
+    minecraft "com.mojang:minecraft:${MINECRAFT_VERSION}"
 
-//	modRuntimeOnly("com.terraformersmc:modmenu:${FABRIC_MOD_MENU_VERSION}") {
-//		exclude group: 'net.fabricmc'
-//		exclude group: 'net.fabricmc.fabric-api'
-//	}
+    mappings(loom.layered {
+        officialMojangMappings()
+
+        if(rootProject.hasProperty('PARCHMENT_MAPPINGS')) {
+            def mcVersion = rootProject.hasProperty('PARCHMENT_MINECRAFT_VERSION') ? "${PARCHMENT_MINECRAFT_VERSION}" : "${MINECRAFT_VERSION}"
+            parchment("org.parchmentmc.data:parchment-${mcVersion}:${PARCHMENT_MAPPINGS}@zip")
+        }
+    })
+
+    modImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
+    modApi "net.fabricmc.fabric-api:fabric-api:${FABRIC_API_VERSION}+${MINECRAFT_VERSION}"
+
+    compileOnly project(':common')
+    implementation project(path: ':common', configuration: 'namedElements')
+
+    modImplementation "com.github.Chocohead:Fabric-ASM:v${FABRIC_ASM_VERSION}"
+    include "com.github.Chocohead:Fabric-ASM:v${FABRIC_ASM_VERSION}"
+}
+
+processResources {
+    from project(':common').sourceSets.main.resources
+}
+
+compileJava {
+    source project(':common').sourceSets.main.allSource
+}
+
+sourcesJar {
+    from project(':common').sourceSets.main.allJava
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            loom.disableDeprecatedPomGeneration(it)
+
+            artifact remapJar
+            artifact sourcesJar
+
+            pom.withXml {
+                def depsNode = asNode().appendNode('dependencies')
+
+                // Fabric-ASM
+                def depNode = depsNode.appendNode('dependency')
+                depNode.appendNode('groupId', 'com.github.Chocohead')
+                depNode.appendNode('artifactId', 'Fabric-ASM')
+                depNode.appendNode('version', "v${FABRIC_ASM_VERSION}")
+                depNode.appendNode('scope', 'compile')
+            }
+        }
+    }
 }

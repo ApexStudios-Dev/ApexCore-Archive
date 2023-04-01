@@ -7,13 +7,13 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
-public final class VoxelShapeHelper
+public interface VoxelShapeHelper
 {
-    public static AABB rotate(AABB box, Direction side)
+    static AABB rotate(AABB box, Direction side)
     {
         return switch(side) {
             case DOWN -> box;
@@ -25,7 +25,7 @@ public final class VoxelShapeHelper
         };
     }
 
-    public static AABB rotate(AABB box, Rotation rotation)
+    static AABB rotate(AABB box, Rotation rotation)
     {
         return switch(rotation) {
             case NONE -> box;
@@ -35,7 +35,7 @@ public final class VoxelShapeHelper
         };
     }
 
-    public static AABB rotateHorizontal(AABB box, Direction side)
+    static AABB rotateHorizontal(AABB box, Direction side)
     {
         return switch(side) {
             case NORTH -> rotate(box, Rotation.NONE);
@@ -46,22 +46,22 @@ public final class VoxelShapeHelper
         };
     }
 
-    public static VoxelShape rotate(VoxelShape shape, Direction side)
+    static VoxelShape rotate(VoxelShape shape, Direction side)
     {
         return rotate(shape, box -> rotate(box, side));
     }
 
-    public static VoxelShape rotate(VoxelShape shape, Rotation rotation)
+    static VoxelShape rotate(VoxelShape shape, Rotation rotation)
     {
         return rotate(shape, box -> rotate(box, rotation));
     }
 
-    public static VoxelShape rotateHorizontal(VoxelShape shape, Direction side)
+    static VoxelShape rotateHorizontal(VoxelShape shape, Direction side)
     {
         return rotate(shape, box -> rotateHorizontal(box, side));
     }
 
-    public static VoxelShape rotate(VoxelShape shape, UnaryOperator<AABB> rotateFunction)
+    static VoxelShape rotate(VoxelShape shape, UnaryOperator<AABB> rotateFunction)
     {
         var sourceBoxes = shape.toAabbs();
         var rotatedPieces = sourceBoxes
@@ -75,33 +75,33 @@ public final class VoxelShapeHelper
         return combine(rotatedPieces);
     }
 
-    public static VoxelShape combine(VoxelShape... shapes)
+    static VoxelShape combine(VoxelShape... shapes)
     {
         return batchCombine(Shapes.empty(), BooleanOp.OR, true, shapes);
     }
 
-    public static VoxelShape combine(Collection<VoxelShape> shapes)
+    static VoxelShape combine(Collection<VoxelShape> shapes)
     {
         return batchCombine(Shapes.empty(), BooleanOp.OR, true, shapes);
     }
 
-    public static VoxelShape exclude(VoxelShape... shapes)
+    static VoxelShape exclude(VoxelShape... shapes)
     {
         return batchCombine(Shapes.block(), BooleanOp.ONLY_FIRST, true, shapes);
     }
 
-    public static VoxelShape exclude(Collection<VoxelShape> shapes)
+    static VoxelShape exclude(Collection<VoxelShape> shapes)
     {
         return batchCombine(Shapes.block(), BooleanOp.ONLY_FIRST, true, shapes);
     }
 
-    public static VoxelShape batchCombine(VoxelShape initial, BooleanOp function, boolean simplify, VoxelShape... shapes)
+    static VoxelShape batchCombine(VoxelShape initial, BooleanOp function, boolean simplify, VoxelShape... shapes)
     {
-        var combinedShape = Arrays.stream(shapes).reduce(initial, (a, b) -> Shapes.joinUnoptimized(a, b, function));
+        var combinedShape = Stream.of(shapes).reduce(initial, (a, b) -> Shapes.joinUnoptimized(a, b, function));
         return simplify ? combinedShape.optimize() : combinedShape;
     }
 
-    public static VoxelShape batchCombine(VoxelShape initial, BooleanOp function, boolean simplify, Collection<VoxelShape> shapes)
+    static VoxelShape batchCombine(VoxelShape initial, BooleanOp function, boolean simplify, Collection<VoxelShape> shapes)
     {
         var combinedShape = shapes.stream().reduce(initial, (a, b) -> Shapes.joinUnoptimized(a, b, function));
         return simplify ? combinedShape.optimize() : combinedShape;

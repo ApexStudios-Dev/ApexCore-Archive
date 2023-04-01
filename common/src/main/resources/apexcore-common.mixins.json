@@ -2,10 +2,14 @@
     "required": true,
     "package": "${MOD_GROUP}.common.mixin",
     "mixins": [
-        "MixinBlockStateBase",
-        "MixinFireBlock"
+        "AccessorBlock",
+        "AccessorPoiTypes",
+        "InvokerBlock",
+        "MixinLevelChunk",
+        "MixinPoiType"
     ],
     "client": [ ],
     "server": [ ],
-    "minVersion": "${MIXIN_VERSION}"
+    "minVersion": "${MIXIN_VERSION}",
+    "refmap": "${MOD_ID}.refmap.json"
 }

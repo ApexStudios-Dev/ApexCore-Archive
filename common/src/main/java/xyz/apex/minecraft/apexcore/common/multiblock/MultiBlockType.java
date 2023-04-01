@@ -1,7 +1,5 @@
 package xyz.apex.minecraft.apexcore.common.multiblock;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -11,18 +9,18 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
-
-import xyz.apex.minecraft.apexcore.common.component.ComponentBlock;
+import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.component.block.BlockComponentHolder;
 
 import java.util.List;
 import java.util.function.Consumer;
 
-public class MultiBlockType
+public final class MultiBlockType
 {
-    private final ComponentBlock owner;
+    private final BlockComponentHolder owner;
     private final MultiBlockPattern pattern;
 
-    MultiBlockType(ComponentBlock owner, MultiBlockPattern pattern)
+    MultiBlockType(BlockComponentHolder owner, MultiBlockPattern pattern)
     {
         this.owner = owner;
         this.pattern = pattern;
@@ -156,6 +154,12 @@ public class MultiBlockType
     public List<BlockPos> getLocalPositions()
     {
         return pattern.getLocalPositions();
+    }
+
+    public BlockPos getLocalPosition(BlockState blockState)
+    {
+        var index = getIndex(blockState);
+        return pattern.rotateLocalSpace.apply(this, blockState, getLocalPositions().get(index));
     }
 
     public int getIndex(BlockState blockState)

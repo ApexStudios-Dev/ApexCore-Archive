@@ -1,120 +1,104 @@
 package xyz.apex.minecraft.apexcore.common.registry.builder;
 
-import com.google.common.collect.Sets;
-import dev.architectury.registry.client.rendering.BlockEntityRendererRegistry;
-import dev.architectury.registry.registries.RegistrySupplier;
-import dev.architectury.utils.Env;
-import dev.architectury.utils.EnvExecutor;
-import org.jetbrains.annotations.Nullable;
-
+import com.google.common.collect.Iterables;
 import net.minecraft.Util;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.datafix.fixes.References;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
-
-import xyz.apex.minecraft.apexcore.common.registry.AbstractRegistrar;
+import org.apache.commons.compress.utils.Lists;
+import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.component.entity.BlockEntityComponentHolder;
+import xyz.apex.minecraft.apexcore.common.component.entity.BlockEntityComponentHolderFactory;
+import xyz.apex.minecraft.apexcore.common.hooks.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.registry.entry.BlockEntityEntry;
-import xyz.apex.minecraft.apexcore.common.util.function.Lazy;
 
-import java.util.Arrays;
-import java.util.Set;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public final class BlockEntityBuilder<R extends BlockEntity, O extends AbstractRegistrar<O>, P> extends AbstractBuilder<BlockEntityType<?>, BlockEntityType<R>, O, P, BlockEntityBuilder<R, O, P>>
+public final class BlockEntityBuilder<T extends BlockEntity> extends Builder<BlockEntityType<?>, BlockEntityType<T>, BlockEntityEntry<T>, BlockEntityBuilder<T>>
 {
-    private final Factory<R> factory;
-    private final Set<Supplier<? extends Block>> validBlocks = Sets.newHashSet();
-    private Supplier<Supplier<BlockEntityRendererProvider<R>>> rendererSupplier = () -> () -> null;
-    @Nullable private MenuBuilder<?, ?, O, BlockEntityBuilder<R, O, P>> menuBuilder = null;
+    private final List<Supplier<? extends Block>> validBlocks = Lists.newArrayList();
+    private final BlockEntityType.BlockEntitySupplier<T> blockEntityFactory;
+    @Nullable private Supplier<BlockEntityRendererProvider<T>> blockEntityRendererProvider = null;
+    private Predicate<Block> blockValidator = block -> true;
 
-    public BlockEntityBuilder(O owner, P parent, String registrationName, Factory<R> factory)
+    private BlockEntityBuilder(String ownerId, String registrationName, BlockEntityType.BlockEntitySupplier<T> blockEntityFactory)
     {
-        super(owner, parent, Registries.BLOCK_ENTITY_TYPE, registrationName);
+        super(Registries.BLOCK_ENTITY_TYPE, ownerId, registrationName);
 
-        this.factory = factory;
+        this.blockEntityFactory = blockEntityFactory;
 
-        onRegister(blockEntityType -> EnvExecutor.runInEnv(Env.CLIENT, () -> () -> {
-            var renderer = rendererSupplier.get().get();
-            if(renderer != null) BlockEntityRendererRegistry.register(blockEntityType, renderer);
-        }));
+        onRegister(blockEntityType -> {
+           if(blockEntityRendererProvider != null) RendererHooks.getInstance().registerBlockEntityRenderer(blockEntityType, blockEntityRendererProvider);
+        });
     }
 
-    public BlockEntityBuilder<R, O, P> renderer(Supplier<Supplier<BlockEntityRendererProvider<R>>> rendererSupplier)
+    public BlockEntityBuilder<T> renderer(Supplier<BlockEntityRendererProvider<T>> blockEntityRendererProvider)
     {
-        this.rendererSupplier = rendererSupplier;
+        this.blockEntityRendererProvider = blockEntityRendererProvider;
         return this;
     }
 
-    public <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>> BlockEntityBuilder<R, O, P> menu(MenuBuilder.MenuFactory<M> menuFactory, Supplier<MenuBuilder.ScreenFactory<M, S>> screenFactorySupplier)
+    public BlockEntityBuilder<T> blockValidator(Predicate<Block> blockValidator)
     {
-        menuBuilder = new MenuBuilder<>(owner, this, getRegistrationName(), menuFactory, screenFactorySupplier);
+        this.blockValidator = blockValidator;
         return this;
     }
 
-    public BlockEntityBuilder<R, O, P> noMenu()
+    public BlockEntityBuilder<T> validBlock(Supplier<? extends Block> validBlock)
     {
-        menuBuilder = null;
+        validBlocks.add(validBlock);
         return this;
     }
 
-    @Deprecated
-    public BlockEntityBuilder<R, O, P> validBlock(Block block)
+    @SafeVarargs
+    public final BlockEntityBuilder<T> validBlocks(Supplier<? extends Block>... validBlocks)
     {
-        return validBlock(Lazy.of(block));
-    }
-
-    @Deprecated
-    public BlockEntityBuilder<R, O, P> validBlock(Block... blocks)
-    {
-        Arrays.stream(blocks).map(Lazy::of).forEach(this::validBlock);
+        Collections.addAll(this.validBlocks, validBlocks);
         return this;
     }
 
-    public BlockEntityBuilder<R, O, P> validBlock(Supplier<? extends Block> block)
+    public BlockEntityBuilder<T> validBlocks(Collection<Supplier<? extends Block>> validBlocks)
     {
-        validBlocks.add(block);
+        this.validBlocks.addAll(validBlocks);
         return this;
     }
 
-    public BlockEntityBuilder<R, O, P> validBlock(Supplier<? extends Block>... block)
+    public BlockEntityBuilder<T> validBlocks(Iterable<Supplier<? extends Block>> validBlocks)
     {
-        Arrays.stream(block).forEach(this::validBlock);
+        Iterables.addAll(this.validBlocks, validBlocks);
         return this;
+    }
+
+    @Override
+    protected BlockEntityEntry<T> createRegistryEntry(ResourceLocation registryName)
+    {
+        return new BlockEntityEntry<>(registryName);
     }
 
     @SuppressWarnings("DataFlowIssue")
     @Override
-    protected BlockEntityType<R> createEntry()
+    protected BlockEntityType<T> create()
     {
-        var validBlocks = this.validBlocks.stream().map(Supplier::get).toArray(Block[]::new);
-        var dataType = Util.fetchChoiceType(References.BLOCK_ENTITY, getRegistryName().toString());
-        return BlockEntityType.Builder.of((pos, blockState) -> factory.create(safeSupplier.get(), pos, blockState), validBlocks).build(dataType);
+        var resolvedValidBlocks = validBlocks.stream().map(Supplier::get).filter(blockValidator).distinct().toArray(Block[]::new);
+        return BlockEntityType.Builder.of(blockEntityFactory, resolvedValidBlocks).build(Util.fetchChoiceType(References.BLOCK_ENTITY, registryName.toString()));
     }
 
-    @Override
-    protected BlockEntityEntry<R> createRegistryEntry(RegistrySupplier<BlockEntityType<R>> delegate)
+    public static <T extends BlockEntity> BlockEntityBuilder<T> builder(String ownerId, String registrationName, BlockEntityType.BlockEntitySupplier<T> blockEntityFactory)
     {
-        return new BlockEntityEntry<>(owner, delegate, registryKey);
+        return new BlockEntityBuilder<>(ownerId, registrationName, blockEntityFactory);
     }
 
-    @Override
-    public BlockEntityEntry<R> register()
+    public static <T extends BlockEntity & BlockEntityComponentHolder> BlockEntityBuilder<T> builderWithComponents(String ownerId, String registrationName, Consumer<BlockEntityComponentHolder.Registrar> componentRegistrar, BlockEntityComponentHolderFactory<T> blockFactory)
     {
-        if(menuBuilder != null) menuBuilder.register();
-        return (BlockEntityEntry<R>) super.register();
-    }
-
-    @FunctionalInterface
-    public interface Factory<T extends BlockEntity>
-    {
-        T create(BlockEntityType<T> blockEntityType, BlockPos pos, BlockState blockState);
+        return builder(ownerId, registrationName, (pos, blockState) -> blockFactory.create(componentRegistrar, pos, blockState));
     }
 }

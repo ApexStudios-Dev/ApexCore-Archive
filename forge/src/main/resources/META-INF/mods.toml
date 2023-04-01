@@ -4,15 +4,16 @@ license="${MOD_LICENSE}"
 issueTrackerURL="https://discord.apexstudios.dev/"
 
 [[mods]]
-    modId="${MOD_ID}"
-    version="${MOD_VERSION}"
-    displayName="${MOD_NAME}"
-    updateJSONURL="https://api.modrinth.com/updates/apexcore/forge_updates.json"
-    displayURL="https://apexstudios.dev/apexcore"
-    logoFile="banner.png"
-    credits="Apex - Programming"
-    authors="ApexStudios"
-    description="${MOD_DESCRIPTION}"
+	modId="${MOD_ID}"
+	version="${MOD_VERSION}"
+	displayName="${MOD_NAME}"
+	updateJSONURL="https://api.modrinth.com/updates/apexcore/forge_updates.json"
+	displayURL="https://apexstudios.dev/apexcore"
+	logoFile="banner.png"
+	credits="Apex - Programming"
+	authors="ApexStudios"
+	description="${MOD_DESCRIPTION}"
+	displayTest="MATCH_VERSION"
 
 [[dependencies."${MOD_ID}"]]
 	modId="forge"
@@ -24,11 +25,5 @@ issueTrackerURL="https://discord.apexstudios.dev/"
 	modId="minecraft"
 	mandatory=true
 	versionRange="${MINECRAFT_FORGE_VERSION_RANGE}"
-	ordering="AFTER"
-	side="BOTH"
-[[dependencies."${MOD_ID}"]]
-	modId="architectury"
-	mandatory=true
-	versionRange="${ARCHITECTURY_FORGE_VERSION_RANGE}"
 	ordering="AFTER"
 	side="BOTH"

@@ -1,55 +1,51 @@
 package xyz.apex.minecraft.apexcore.common.registry.entry;
 
-import dev.architectury.registry.menu.MenuRegistry;
-import dev.architectury.registry.registries.RegistrySupplier;
-import io.netty.buffer.Unpooled;
-import org.jetbrains.annotations.Nullable;
-
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.inventory.MenuType;
-
-import xyz.apex.minecraft.apexcore.common.registry.AbstractRegistrar;
-import xyz.apex.minecraft.apexcore.common.registry.builder.MenuBuilder;
+import xyz.apex.minecraft.apexcore.common.hooks.RegistryHooks;
+import xyz.apex.minecraft.apexcore.common.platform.Side;
+import xyz.apex.minecraft.apexcore.common.platform.SideExecutor;
+import xyz.apex.minecraft.apexcore.common.registry.RegistryEntry;
+import xyz.apex.minecraft.apexcore.common.registry.RegistryManager;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-public final class MenuEntry<M extends AbstractContainerMenu> extends RegistryEntry<MenuType<M>>
+public final class MenuEntry<T extends AbstractContainerMenu> extends RegistryEntry<MenuType<T>> implements FeatureElementEntry<MenuType<T>>
 {
-    private final MenuBuilder.MenuFactory<M> menuFactory;
-
-    public MenuEntry(AbstractRegistrar<?> owner, RegistrySupplier<MenuType<M>> delegate, ResourceKey<? super MenuType<M>> registryKey, MenuBuilder.MenuFactory<M> menuFactory)
+    private MenuEntry(ResourceLocation registryName)
     {
-        super(owner, delegate, Registries.MENU, registryKey);
-
-        this.menuFactory = menuFactory;
+        super(Registries.MENU, registryName);
     }
 
-    public boolean is(@Nullable MenuType<?> other)
+    public InteractionResult open(Player player, Component displayName, MenuConstructor menuConstructor, Consumer<FriendlyByteBuf> extraDataWriter)
     {
-        return isPresent() && get() == other;
+        if(player instanceof ServerPlayer serverPlayer) RegistryHooks.getInstance().openMenu(serverPlayer, asMenuProvider(displayName, menuConstructor, extraDataWriter));
+        return InteractionResult.sidedSuccess(player.level.isClientSide);
     }
 
-    public void open(ServerPlayer player, Component displayName, Consumer<FriendlyByteBuf> data)
+    public ExtendedMenuProvider asMenuProvider(Component displayName, MenuConstructor menuConstructor, Consumer<FriendlyByteBuf> extraDataWriter)
     {
-        MenuRegistry.openExtendedMenu(player, asProvider(displayName, data), data);
-    }
+        return new ExtendedMenuProvider() {
+            @Override
+            public void writeExtraData(FriendlyByteBuf extraData)
+            {
+                extraDataWriter.accept(extraData);
+            }
 
-    public void open(ServerPlayer player, Component displayName)
-    {
-        open(player, displayName, data -> {});
-    }
-
-    public MenuProvider asProvider(Component displayName, Consumer<FriendlyByteBuf> data)
-    {
-        return new MenuProvider() {
             @Override
             public Component getDisplayName()
             {
@@ -57,12 +53,37 @@ public final class MenuEntry<M extends AbstractContainerMenu> extends RegistryEn
             }
 
             @Override
-            public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player)
+            public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player)
             {
-                var buffer = new FriendlyByteBuf(Unpooled.buffer());
-                data.accept(buffer);
-                return menuFactory.create(get(), containerId, player, buffer);
+                return menuConstructor.createMenu(containerId, playerInventory, player);
             }
         };
+    }
+
+    public static <T extends AbstractContainerMenu> MenuEntry<T> register(String ownerId, String registrationName, MenuFactory<T> menuFactory)
+    {
+        return RegistryManager.get(ownerId).getRegistry(Registries.MENU).register(
+                registrationName,
+                MenuEntry::new,
+                () -> RegistryHooks.getInstance().menuType(menuFactory)
+        );
+    }
+
+    public static <T extends AbstractContainerMenu, S extends Screen & MenuAccess<T>> MenuEntry<T> registerWithScreen(String ownerId, String registrationName, MenuFactory<T> menuFactory, Supplier<MenuScreens.ScreenConstructor<T, S>> screenConstructor)
+    {
+        var registryEntry = register(ownerId, registrationName, menuFactory);
+        SideExecutor.runWhenOn(Side.CLIENT, () -> () -> registryEntry.registerCallback(menuType -> MenuScreens.register(menuType, screenConstructor.get())));
+        return registryEntry;
+    }
+
+    public interface ExtendedMenuProvider extends MenuProvider
+    {
+        void writeExtraData(FriendlyByteBuf extraData);
+    }
+
+    @FunctionalInterface
+    public interface MenuFactory<T extends AbstractContainerMenu>
+    {
+        T create(int containerId, Inventory playerInventory, Player player, FriendlyByteBuf extraData);
     }
 }
