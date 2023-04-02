@@ -207,9 +207,30 @@ public final class DoorBlockComponent extends BaseBlockComponent
     @Override
     public boolean canSurvive(BlockState blockState, LevelReader level, BlockPos pos)
     {
+        var multiBlockComponent = getComponent(BlockComponentTypes.MULTI_BLOCK);
         var belowPos = pos.below();
-        var bewlowBlockState = level.getBlockState(belowPos);
-        return blockState.getValue(HALF) == DoubleBlockHalf.LOWER ? bewlowBlockState.isFaceSturdy(level, belowPos, Direction.UP) : bewlowBlockState.is(toBlock());
+
+        if(multiBlockComponent == null)
+        {
+            if(blockState.getValue(HALF) == DoubleBlockHalf.UPPER)
+            {
+                if(!blockState.is(toBlock())) return false;
+                return level.getBlockState(belowPos).canSurvive(level, belowPos);
+            }
+        }
+        else
+        {
+            var multiBlockType = multiBlockComponent.getMultiBlockType();
+
+            if(!multiBlockType.isOrigin(blockState))
+            {
+                if(!multiBlockType.isValidBlock(blockState)) return false;
+                var originPos = multiBlockType.getOriginPos(blockState, pos);
+                return level.getBlockState(originPos).canSurvive(level, originPos);
+            }
+        }
+
+        return level.getBlockState(belowPos).isFaceSturdy(level, belowPos, Direction.UP);
     }
 
     @Override
