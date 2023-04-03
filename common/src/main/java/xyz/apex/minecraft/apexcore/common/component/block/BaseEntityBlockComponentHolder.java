@@ -197,6 +197,14 @@ public abstract class BaseEntityBlockComponentHolder<T extends BlockEntity & Blo
         return getBlockEntity(blockEntityType, level.getBlockState(pos), level, pos);
     }
 
+    @Override
+    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState blockState)
+    {
+        var cloneStack = super.getCloneItemStack(level, pos, blockState);
+        getBlockEntity(blockState, level, pos).ifPresent(blockEntity -> blockEntity.saveToItem(cloneStack));
+        return cloneStack;
+    }
+
     @Nullable
     public static BlockEntity getBlockEntityUnsafe(BlockState blockState, BlockGetter level, BlockPos pos)
     {
