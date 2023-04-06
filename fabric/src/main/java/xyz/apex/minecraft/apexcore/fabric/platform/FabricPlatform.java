@@ -7,6 +7,8 @@ import xyz.apex.minecraft.apexcore.common.platform.Platform;
 import xyz.apex.minecraft.apexcore.common.platform.Side;
 import xyz.apex.minecraft.apexcore.fabric.hooks.FabricHooks;
 
+import java.nio.file.Path;
+
 public final class FabricPlatform implements Platform
 {
     private final FabricHooks hooks;
@@ -65,5 +67,17 @@ public final class FabricPlatform implements Platform
     public FabricModLoader modLoader()
     {
         return modLoader;
+    }
+
+    @Override
+    public Path getGameDir()
+    {
+        return FabricLoader.getInstance().getGameDir();
+    }
+
+    @Override
+    public Path getConfigDir()
+    {
+        return FabricLoader.getInstance().getConfigDir();
     }
 }

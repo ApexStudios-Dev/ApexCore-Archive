@@ -3,9 +3,12 @@ package xyz.apex.minecraft.apexcore.forge.platform;
 import net.minecraft.SharedConstants;
 import net.minecraftforge.data.loading.DatagenModLoader;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.fml.loading.FMLPaths;
 import xyz.apex.minecraft.apexcore.common.platform.Platform;
 import xyz.apex.minecraft.apexcore.common.platform.Side;
 import xyz.apex.minecraft.apexcore.forge.hooks.ForgeHooks;
+
+import java.nio.file.Path;
 
 public final class ForgePlatform implements Platform
 {
@@ -63,5 +66,17 @@ public final class ForgePlatform implements Platform
     public ForgeModLoader modLoader()
     {
         return modLoader;
+    }
+
+    @Override
+    public Path getGameDir()
+    {
+        return FMLPaths.GAMEDIR.get();
+    }
+
+    @Override
+    public Path getConfigDir()
+    {
+        return FMLPaths.GAMEDIR.get();
     }
 }

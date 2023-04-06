@@ -1,11 +1,13 @@
 package xyz.apex.minecraft.apexcore.common.platform;
 
 import xyz.apex.minecraft.apexcore.common.hooks.Hooks;
-import xyz.apex.minecraft.apexcore.common.util.ServiceUtil;
+import xyz.apex.utils.core.ServiceHelper;
+
+import java.nio.file.Path;
 
 public interface Platform
 {
-    Platform INSTANCE = ServiceUtil.lookup(Platform.class);
+    Platform INSTANCE = ServiceHelper.singleton(Platform.class);
 
     String FORGE = "forge";
     String FABRIC = "fabricloader";
@@ -24,6 +26,10 @@ public interface Platform
     Hooks hooks();
 
     ModLoader modLoader();
+
+    Path getGameDir();
+
+    Path getConfigDir();
 
     static void bootstrap() {}
 }
