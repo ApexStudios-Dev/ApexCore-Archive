@@ -8,9 +8,10 @@ import java.nio.file.Path;
 @ApiStatus.Internal
 public final class MinecraftApexUtils implements ApexUtils
 {
-    public MinecraftApexUtils()
+    public void initMinecraft()
     {
         LOGGER.info("Initialized for Minecraft - {}!", Platform.INSTANCE.getMinecraftVersion());
+        LOGGER.info("Game Directory: {}", INSTANCE.rootPath());
     }
 
     @Override
