@@ -49,6 +49,8 @@ dependencies {
 
     modImplementation "com.github.Chocohead:Fabric-ASM:v${FABRIC_ASM_VERSION}"
     include "com.github.Chocohead:Fabric-ASM:v${FABRIC_ASM_VERSION}"
+
+    include "xyz.apex.utils:apexutils:${APEXUTILS_VERSION}"
 }
 
 processResources {
@@ -79,6 +81,13 @@ publishing {
                 depNode.appendNode('groupId', 'com.github.Chocohead')
                 depNode.appendNode('artifactId', 'Fabric-ASM')
                 depNode.appendNode('version', "v${FABRIC_ASM_VERSION}")
+                depNode.appendNode('scope', 'compile')
+
+                // ApexUtils
+                depNode = depsNode.appendNode('dependency')
+                depNode.appendNode('groupId', 'xyz.apex.utils')
+                depNode.appendNode('artifactId', 'apexutils')
+                depNode.appendNode('version', "${APEXUTILS_VERSION}")
                 depNode.appendNode('scope', 'compile')
             }
         }

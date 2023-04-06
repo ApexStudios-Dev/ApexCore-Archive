@@ -43,6 +43,17 @@ publishing {
 
             artifact jar
             artifact sourcesJar
+
+            pom.withXml {
+                def depsNode = asNode().appendNode('dependencies')
+
+                // ApexUtils
+                def depNode = depsNode.appendNode('dependency')
+                depNode.appendNode('groupId', 'xyz.apex.utils')
+                depNode.appendNode('artifactId', 'apexutils')
+                depNode.appendNode('version', "${APEXUTILS_VERSION}")
+                depNode.appendNode('scope', 'compile')
+            }
         }
     }
 }
