@@ -15,6 +15,8 @@ public interface Hooks extends PlatformHolder
 
     ItemHooks item();
 
+    EntityHooks entity();
+
     static Hooks getInstance()
     {
         return Platform.INSTANCE.hooks();

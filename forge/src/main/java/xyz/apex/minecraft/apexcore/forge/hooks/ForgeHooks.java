@@ -11,6 +11,7 @@ public final class ForgeHooks extends ForgePlatformHolder implements Hooks
     private final ForgeRendererHooks renderer;
     private final ForgeCreativeModeTabHooks creativeModeTab;
     private final ForgeItemHooks item;
+    private final ForgeEntityHooks entity;
 
     public ForgeHooks(ForgePlatform platform)
     {
@@ -21,6 +22,7 @@ public final class ForgeHooks extends ForgePlatformHolder implements Hooks
         renderer = new ForgeRendererHooks(platform);
         creativeModeTab = new ForgeCreativeModeTabHooks(platform);
         item = new ForgeItemHooks(platform);
+        entity = new ForgeEntityHooks(platform);
     }
 
     @Override
@@ -51,5 +53,11 @@ public final class ForgeHooks extends ForgePlatformHolder implements Hooks
     public ForgeItemHooks item()
     {
         return item;
+    }
+
+    @Override
+    public ForgeEntityHooks entity()
+    {
+        return entity;
     }
 }
