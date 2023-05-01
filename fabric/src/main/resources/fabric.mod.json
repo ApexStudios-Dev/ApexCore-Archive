@@ -58,10 +58,7 @@
         "main": [ "${MOD_GROUP}.fabric.${MOD_NAME}Fabric" ],
         "fabric-datagen": [ "${MOD_GROUP}.fabric.data.${MOD_NAME}FabricData" ]
     },
-    "mixins": [
-        "${MOD_ID}-common.mixins.json"
-    ],
-    "accessWidener": "${MOD_ID}.accesswidener",
+    "mixins": [],
     "depends": {
         "minecraft": "~${MINECRAFT_VERSION}",
         "java": ">=${JAVA_VERSION}",

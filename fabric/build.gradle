@@ -21,13 +21,6 @@ loom {
             vmArg '-XX:+AllowEnhancedClassRedefinition'
             ideConfigGenerated true
         }
-
-        data {
-            inherit server
-            vmArg '-Dfabric-api.datagen'
-            vmArg "-Dfabric-api.datagen.output-dir=${file('src/main/generated')}"
-            vmArg "-Dfabric-api.datagen.modid=${MOD_ID}"
-        }
     }
 }
 
