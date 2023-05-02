@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public non-sealed class RegistryEntryImpl<T> implements RegistryEntry<T>
+public class RegistryEntryImpl<T> implements RegistryEntry<T>
 {
     private static final RegistryEntry<?> EMPTY = new RegistryEntryImpl<>();
 
@@ -86,13 +86,13 @@ public non-sealed class RegistryEntryImpl<T> implements RegistryEntry<T>
     }
 
     @Override
-    public String getOwnerId()
+    public final String getOwnerId()
     {
         return registryName.getNamespace();
     }
 
     @Override
-    public void addListener(Runnable listener)
+    public final void addListener(Runnable listener)
     {
         addListener(value -> listener.run());
     }
@@ -122,7 +122,7 @@ public non-sealed class RegistryEntryImpl<T> implements RegistryEntry<T>
 
     @SuppressWarnings("DataFlowIssue")
     @Override
-    public Optional<Holder<T>> getHolderOptional()
+    public final Optional<Holder<T>> getHolderOptional()
     {
         if(isEmpty()) return Optional.empty();
         // none null cause not empty
