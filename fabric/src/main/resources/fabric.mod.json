@@ -55,8 +55,9 @@
     "license": "${MOD_LICENSE}",
     "environment": "*",
     "entrypoints": {
-        "main": [ "${MOD_GROUP}.fabric.${MOD_NAME}Fabric" ],
-        "fabric-datagen": [ "${MOD_GROUP}.fabric.data.${MOD_NAME}FabricData" ]
+        "main": [
+            "xyz.apex.minecraft.apexcore.fabric.core.ApexCoreFabric"
+        ]
     },
     "mixins": [],
     "depends": {
