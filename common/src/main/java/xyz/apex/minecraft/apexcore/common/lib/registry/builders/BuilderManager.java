@@ -1,0 +1,86 @@
+package xyz.apex.minecraft.apexcore.common.lib.registry.builders;
+
+import net.minecraft.world.item.Item;
+import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
+import xyz.apex.minecraft.apexcore.common.lib.registry.factories.ItemFactory;
+
+/**
+ * Builder Manager used to construct various builders.
+ */
+public sealed interface BuilderManager permits BuilderManagerImpl
+{
+    /**
+     * @return Registrar manager this builder manager is bound to.
+     */
+    RegistrarManager getRegistrarManager();
+
+    /**
+     * @return Owning mod id this builder manager is bound to.
+     */
+    String getOwnerId();
+
+    // region: Item
+
+    /**
+     * Returns new builder used to build a new item instance.
+     *
+     * @param parent           Parent element of the builder.
+     * @param registrationName Registration name of the builder.
+     * @param itemFactory      Item factory used to construct finalized item instance.
+     * @param <P>              Type of parent element.
+     * @param <T>              Type of item.
+     * @return New builder used to build a new item instance.
+     */
+    <P, T extends Item> ItemBuilder<P, T> item(P parent, String registrationName, ItemFactory<T> itemFactory);
+
+    /**
+     * Returns new builder used to build a new item instance.
+     *
+     * @param parent           Parent element of the builder.
+     * @param registrationName Registration name of the builder.
+     * @param <P>              Type of parent element.
+     * @return New builder used to build a new item instance.
+     */
+    <P> ItemBuilder<P, Item> item(P parent, String registrationName);
+
+    /**
+     * Returns new builder used to build a new item instance.
+     *
+     * @param registrationName Registration name of the builder.
+     * @param itemFactory
+     * @param <T>              Type of item.
+     * @return New builder used to build a new item instance.
+     */
+    <T extends Item> ItemBuilder<BuilderManager, T> item(String registrationName, ItemFactory<T> itemFactory);
+
+    /**
+     * Returns new builder used to build a new item instance.
+     *
+     * @param registrationName Registration name of the builder.
+     * @return New builder used to build a new item instance.
+     */
+    ItemBuilder<BuilderManager, Item> item(String registrationName);
+    // endregion
+
+    /**
+     * Returns new builder manager bound to the given registrar manager.
+     *
+     * @param registrarManager Registrar manager to bind the builder manager to.
+     * @return New builder manager bound to the given registrar manager.
+     */
+    static BuilderManager create(RegistrarManager registrarManager)
+    {
+        return new BuilderManagerImpl(registrarManager);
+    }
+
+    /**
+     * Returns new builder manager bound to the given mod id.
+     *
+     * @param ownerId Mod id to bind the builder manager to.
+     * @return New builder manager bound to the given mod id.
+     */
+    static BuilderManager create(String ownerId)
+    {
+        return create(RegistrarManager.get(ownerId));
+    }
+}
