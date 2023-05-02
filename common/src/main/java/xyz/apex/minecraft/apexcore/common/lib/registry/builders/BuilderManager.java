@@ -1,7 +1,9 @@
 package xyz.apex.minecraft.apexcore.common.lib.registry.builders;
 
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
+import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.ItemFactory;
 
 /**
@@ -47,7 +49,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * Returns new builder used to build a new item instance.
      *
      * @param registrationName Registration name of the builder.
-     * @param itemFactory
+     * @param itemFactory      Item factory used to construct finalized item instance.
      * @param <T>              Type of item.
      * @return New builder used to build a new item instance.
      */
@@ -60,6 +62,49 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @return New builder used to build a new item instance.
      */
     ItemBuilder<BuilderManager, Item> item(String registrationName);
+    // endregion
+
+    // region: Block
+
+    /**
+     * Returns new builder used to build a new block instance.
+     *
+     * @param parent           Parent element of the builder.
+     * @param registrationName Registration name of the builder.
+     * @param blockFactory     Block factory used to construct finalized block instance.
+     * @param <P>              Type of parent element.
+     * @param <T>              Type of block.
+     * @return New builder used to build a new block instance.
+     */
+    <P, T extends Block> BlockBuilder<P, T> block(P parent, String registrationName, BlockFactory<T> blockFactory);
+
+    /**
+     * Returns new builder used to build a new block instance.
+     *
+     * @param parent           Parent element of the builder.
+     * @param registrationName Registration name of the builder.
+     * @param <P>              Type of parent element.
+     * @return New builder used to build a new block instance.
+     */
+    <P> BlockBuilder<P, Block> block(P parent, String registrationName);
+
+    /**
+     * Returns new builder used to build a new block instance.
+     *
+     * @param registrationName Registration name of the builder.
+     * @param blockFactory     Block factory used to construct finalized block instance.
+     * @param <T>              Type of block.
+     * @return New builder used to build a new block instance.
+     */
+    <T extends Block> BlockBuilder<BuilderManager, T> block(String registrationName, BlockFactory<T> blockFactory);
+
+    /**
+     * Returns new builder used to build a new block instance.
+     *
+     * @param registrationName Registration name of the builder.
+     * @return New builder used to build a new block instance.
+     */
+    BlockBuilder<BuilderManager, Block> block(String registrationName);
     // endregion
 
     /**

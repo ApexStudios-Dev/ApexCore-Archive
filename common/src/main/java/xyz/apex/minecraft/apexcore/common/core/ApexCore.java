@@ -24,6 +24,8 @@ public interface ApexCore
         items.register(block.getRegistrationName(), () -> new BlockItem(block.get(), new Item.Properties()));*/
 
         /*var builders = BuilderManager.create(ID);
-        builders.item("test_item").register();*/
+        builders.item("test_item").register();
+        builders.block("test_block").defaultItem().end().register();
+        builders.block("test_block_no_item").register();*/
     }
 }

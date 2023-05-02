@@ -177,6 +177,8 @@ public final class ItemBuilder<P, T extends Item> extends AbstractBuilder<P, Ite
     @Override
     public ItemBuilder<P, T> requiredFeatures(FeatureFlag... requiredFeatures)
     {
+        if(getParent() instanceof FeatureElementBuilder<?, ?, ?, ?, ?> feature)
+            feature.requiredFeatures(requiredFeatures);
         return properties(properties -> properties.requiredFeatures(requiredFeatures));
     }
 
