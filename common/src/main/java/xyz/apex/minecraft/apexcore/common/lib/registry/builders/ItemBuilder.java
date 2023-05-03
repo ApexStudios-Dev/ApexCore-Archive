@@ -168,12 +168,6 @@ public final class ItemBuilder<P, T extends Item> extends AbstractBuilder<P, Ite
         return properties(Item.Properties::fireResistant);
     }
 
-    /**
-     * Set the required feature flags for this item to be enabled.
-     *
-     * @param requiredFeatures Required feature flags for this item to be enabled.
-     * @return This builder instance.
-     */
     @Override
     public ItemBuilder<P, T> requiredFeatures(FeatureFlag... requiredFeatures)
     {

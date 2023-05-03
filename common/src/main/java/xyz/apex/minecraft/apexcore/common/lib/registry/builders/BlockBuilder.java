@@ -475,12 +475,6 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
         return properties(BlockBehaviour.Properties::noParticlesOnBreak);
     }
 
-    /**
-     * Set the required feature flags for this block to be enabled.
-     *
-     * @param requiredFeatures Required feature flags for this block to be enabled.
-     * @return This builder instance.
-     */
     @Override
     public BlockBuilder<P, T> requiredFeatures(FeatureFlag... requiredFeatures)
     {
