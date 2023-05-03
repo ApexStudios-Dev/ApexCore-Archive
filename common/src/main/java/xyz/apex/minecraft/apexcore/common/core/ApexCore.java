@@ -48,7 +48,7 @@ public interface ApexCore
         }).simpleBlockEntity((blockEntityType, pos, blockState) -> new BlockEntity(blockEntityType, pos, blockState)
         {
         }).simpleItem().register();
-        builders.entityType("test_entity", (entityType, level) -> new Entity(entityType, level)
+        builders.entity("test_entity", (entityType, level) -> new Entity(entityType, level)
         {
             @Override
             protected void defineSynchedData()

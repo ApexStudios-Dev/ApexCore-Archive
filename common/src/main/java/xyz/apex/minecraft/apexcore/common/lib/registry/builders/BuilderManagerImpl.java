@@ -85,29 +85,29 @@ public non-sealed class BuilderManagerImpl implements BuilderManager
 
     // region: EntityType
     @Override
-    public final <P, T extends Entity> EntityTypeBuilder<P, T> entityType(P parent, String registrationName, EntityType.EntityFactory<T> entityFactory)
+    public final <P, T extends Entity> EntityBuilder<P, T> entity(P parent, String registrationName, EntityType.EntityFactory<T> entityFactory)
     {
-        return new EntityTypeBuilder<>(parent, this, registrationName, entityFactory);
+        return new EntityBuilder<>(parent, this, registrationName, entityFactory);
     }
 
     @Override
-    public final <T extends Entity> EntityTypeBuilder<BuilderManager, T> entityType(String registrationName, EntityType.EntityFactory<T> entityFactory)
+    public final <T extends Entity> EntityBuilder<BuilderManager, T> entity(String registrationName, EntityType.EntityFactory<T> entityFactory)
     {
-        return entityType(this, registrationName, entityFactory);
+        return entity(this, registrationName, entityFactory);
     }
     // endregion
 
     // region: BlockEntityType
     @Override
-    public final <P, T extends BlockEntity> BlockEntityTypeBuilder<P, T> blockEntityType(P parent, String registrationName, BlockEntityFactory<T> entityFactory)
+    public final <P, T extends BlockEntity> BlockEntityBuilder<P, T> blockEntity(P parent, String registrationName, BlockEntityFactory<T> entityFactory)
     {
-        return new BlockEntityTypeBuilder<>(parent, this, registrationName, entityFactory);
+        return new BlockEntityBuilder<>(parent, this, registrationName, entityFactory);
     }
 
     @Override
-    public final <T extends BlockEntity> BlockEntityTypeBuilder<BuilderManager, T> blockEntityType(String registrationName, BlockEntityFactory<T> entityFactory)
+    public final <T extends BlockEntity> BlockEntityBuilder<BuilderManager, T> blockEntity(String registrationName, BlockEntityFactory<T> entityFactory)
     {
-        return blockEntityType(this, registrationName, entityFactory);
+        return blockEntity(this, registrationName, entityFactory);
     }
     // endregion
 }

@@ -80,9 +80,9 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param <B>                Type of block entity.
      * @return New block entity type builder bound to this block.
      */
-    public <B extends BlockEntity> BlockEntityTypeBuilder<BlockBuilder<P, T>, B> blockEntity(BlockEntityFactory<B> blockEntityFactory)
+    public <B extends BlockEntity> BlockEntityBuilder<BlockBuilder<P, T>, B> blockEntity(BlockEntityFactory<B> blockEntityFactory)
     {
-        return builderManager.blockEntityType(this, getRegistrationName(), blockEntityFactory).validBlock(asSupplier());
+        return builderManager.blockEntity(this, getRegistrationName(), blockEntityFactory).validBlock(asSupplier());
     }
 
     /**

@@ -111,7 +111,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
     BlockBuilder<BuilderManager, Block> block(String registrationName);
     // endregion
 
-    // region: EntityType
+    // region: Entity
 
     /**
      * Returns new builder used to build a new entity type instance.
@@ -123,7 +123,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param <T>              Type of entity type.
      * @return New builder used to build a new entity type instance.
      */
-    <P, T extends Entity> EntityTypeBuilder<P, T> entityType(P parent, String registrationName, EntityType.EntityFactory<T> entityFactory);
+    <P, T extends Entity> EntityBuilder<P, T> entity(P parent, String registrationName, EntityType.EntityFactory<T> entityFactory);
 
     /**
      * Returns new builder used to build a new entity type instance.
@@ -133,10 +133,10 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param <T>              Type of entity type.
      * @return New builder used to build a new entity type instance.
      */
-    <T extends Entity> EntityTypeBuilder<BuilderManager, T> entityType(String registrationName, EntityType.EntityFactory<T> entityFactory);
+    <T extends Entity> EntityBuilder<BuilderManager, T> entity(String registrationName, EntityType.EntityFactory<T> entityFactory);
     // endregion
 
-    // region: BlockEntityType
+    // region: BlockEntity
 
     /**
      * Returns new builder used to build a new block entity type instance.
@@ -148,7 +148,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param <T>                Type of block entity.
      * @return New builder used to build a new block entity type instance.
      */
-    <P, T extends BlockEntity> BlockEntityTypeBuilder<P, T> blockEntityType(P parent, String registrationName, BlockEntityFactory<T> blockEntityFactory);
+    <P, T extends BlockEntity> BlockEntityBuilder<P, T> blockEntity(P parent, String registrationName, BlockEntityFactory<T> blockEntityFactory);
 
     /**
      * Returns new builder used to build a new block entity type instance.
@@ -158,7 +158,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param <T>                Type of block entity.
      * @return New builder used to build a new block entity type instance.
      */
-    <T extends BlockEntity> BlockEntityTypeBuilder<BuilderManager, T> blockEntityType(String registrationName, BlockEntityFactory<T> blockEntityFactory);
+    <T extends BlockEntity> BlockEntityBuilder<BuilderManager, T> blockEntity(String registrationName, BlockEntityFactory<T> blockEntityFactory);
     // endregion
 
     /**

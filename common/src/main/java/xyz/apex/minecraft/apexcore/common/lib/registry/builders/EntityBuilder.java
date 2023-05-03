@@ -10,7 +10,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.Services;
-import xyz.apex.minecraft.apexcore.common.lib.registry.entries.EntityTypeEntry;
+import xyz.apex.minecraft.apexcore.common.lib.registry.entries.EntityEntry;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -23,15 +23,15 @@ import java.util.stream.Stream;
  * @param <P> Type of parent element.
  * @param <T> Type of entity.
  */
-public final class EntityTypeBuilder<P, T extends Entity> extends AbstractBuilder<P, EntityType<?>, EntityType<T>, EntityTypeEntry<T>, EntityTypeBuilder<P, T>> implements FeatureElementBuilder<P, EntityType<?>, EntityType<T>, EntityTypeEntry<T>, EntityTypeBuilder<P, T>>
+public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P, EntityType<?>, EntityType<T>, EntityEntry<T>, EntityBuilder<P, T>> implements FeatureElementBuilder<P, EntityType<?>, EntityType<T>, EntityEntry<T>, EntityBuilder<P, T>>
 {
     private Function<EntityType.Builder<T>, EntityType.Builder<T>> entityTypeModifier = Function.identity();
     private MobCategory mobCategory = MobCategory.MISC;
     private final EntityType.EntityFactory<T> entityFactory;
 
-    EntityTypeBuilder(P parent, BuilderManager builderManager, String registrationName, EntityType.EntityFactory<T> entityFactory)
+    EntityBuilder(P parent, BuilderManager builderManager, String registrationName, EntityType.EntityFactory<T> entityFactory)
     {
-        super(parent, builderManager, Registries.ENTITY_TYPE, registrationName, EntityTypeEntry::new);
+        super(parent, builderManager, Registries.ENTITY_TYPE, registrationName, EntityEntry::new);
 
         this.entityFactory = entityFactory;
     }
@@ -50,7 +50,7 @@ public final class EntityTypeBuilder<P, T extends Entity> extends AbstractBuilde
      * @param renderer Renderer to be registered.
      * @return This builder instance
      */
-    public EntityTypeBuilder<P, T> renderer(Supplier<EntityRendererProvider<T>> renderer)
+    public EntityBuilder<P, T> renderer(Supplier<EntityRendererProvider<T>> renderer)
     {
         return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> Services.HOOKS.registerRenderer().registerEntityRenderer(() -> value, renderer)));
     }
@@ -61,7 +61,7 @@ public final class EntityTypeBuilder<P, T extends Entity> extends AbstractBuilde
      * @param mobCategory Category for this entity.
      * @return This builder instance.
      */
-    public EntityTypeBuilder<P, T> category(MobCategory mobCategory)
+    public EntityBuilder<P, T> category(MobCategory mobCategory)
     {
         this.mobCategory = mobCategory;
         return self();
@@ -73,7 +73,7 @@ public final class EntityTypeBuilder<P, T extends Entity> extends AbstractBuilde
      * @param entityTypeModifier Modifier used to modify the finalized entity type.
      * @return This builder instance.
      */
-    public EntityTypeBuilder<P, T> properties(UnaryOperator<EntityType.Builder<T>> entityTypeModifier)
+    public EntityBuilder<P, T> properties(UnaryOperator<EntityType.Builder<T>> entityTypeModifier)
     {
         this.entityTypeModifier = this.entityTypeModifier.andThen(entityTypeModifier);
         return self();
@@ -86,7 +86,7 @@ public final class EntityTypeBuilder<P, T extends Entity> extends AbstractBuilde
      * @param height Hitbox height.
      * @return This builder instance.
      */
-    public EntityTypeBuilder<P, T> sized(float width, float height)
+    public EntityBuilder<P, T> sized(float width, float height)
     {
         return properties(properties -> properties.sized(width, height));
     }
@@ -96,7 +96,7 @@ public final class EntityTypeBuilder<P, T extends Entity> extends AbstractBuilde
      *
      * @return This builder instance.
      */
-    public EntityTypeBuilder<P, T> noSummon()
+    public EntityBuilder<P, T> noSummon()
     {
         return properties(EntityType.Builder::noSummon);
     }
@@ -106,7 +106,7 @@ public final class EntityTypeBuilder<P, T extends Entity> extends AbstractBuilde
      *
      * @return This builder instance.
      */
-    public EntityTypeBuilder<P, T> noSave()
+    public EntityBuilder<P, T> noSave()
     {
         return properties(EntityType.Builder::noSave);
     }
@@ -116,7 +116,7 @@ public final class EntityTypeBuilder<P, T extends Entity> extends AbstractBuilde
      *
      * @return This builder instance.
      */
-    public EntityTypeBuilder<P, T> fireImmune()
+    public EntityBuilder<P, T> fireImmune()
     {
         return properties(EntityType.Builder::fireImmune);
     }
@@ -128,7 +128,7 @@ public final class EntityTypeBuilder<P, T extends Entity> extends AbstractBuilde
      * @return This builder instance.
      */
     @SafeVarargs
-    public final EntityTypeBuilder<P, T> immuneTo(Supplier<? extends Block>... blocks)
+    public final EntityBuilder<P, T> immuneTo(Supplier<? extends Block>... blocks)
     {
         return properties(properties -> {
             var immuneBlocks = Stream.of(blocks).map(Supplier::get).toArray(Block[]::new);
@@ -141,7 +141,7 @@ public final class EntityTypeBuilder<P, T extends Entity> extends AbstractBuilde
      *
      * @return This builder instance.
      */
-    public EntityTypeBuilder<P, T> canSpawnFarFromPlayer()
+    public EntityBuilder<P, T> canSpawnFarFromPlayer()
     {
         return properties(EntityType.Builder::canSpawnFarFromPlayer);
     }
@@ -152,7 +152,7 @@ public final class EntityTypeBuilder<P, T extends Entity> extends AbstractBuilde
      * @param clientTrackingRange Client tracking range for this entity.
      * @return This builder instance.
      */
-    public EntityTypeBuilder<P, T> clientTrackingRange(int clientTrackingRange)
+    public EntityBuilder<P, T> clientTrackingRange(int clientTrackingRange)
     {
         return properties(properties -> properties.clientTrackingRange(clientTrackingRange));
     }
@@ -163,13 +163,13 @@ public final class EntityTypeBuilder<P, T extends Entity> extends AbstractBuilde
      * @param updateInterval Update interval for this entity.
      * @return This builder instance.
      */
-    public EntityTypeBuilder<P, T> updateInterval(int updateInterval)
+    public EntityBuilder<P, T> updateInterval(int updateInterval)
     {
         return properties(properties -> properties.updateInterval(updateInterval));
     }
 
     @Override
-    public EntityTypeBuilder<P, T> requiredFeatures(FeatureFlag... requiredFeatures)
+    public EntityBuilder<P, T> requiredFeatures(FeatureFlag... requiredFeatures)
     {
         if(getParent() instanceof FeatureElementBuilder<?, ?, ?, ?, ?> feature)
             feature.requiredFeatures(requiredFeatures);

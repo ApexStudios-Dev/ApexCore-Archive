@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryEntry;
-import xyz.apex.minecraft.apexcore.common.lib.registry.builders.BlockEntityTypeBuilder;
+import xyz.apex.minecraft.apexcore.common.lib.registry.builders.BlockEntityBuilder;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -17,7 +17,7 @@ import java.util.Optional;
  * Main RegistryEntry class for all BlockEntityType entries.
  * <p>
  * While the constructor is publicly visible, you should never invoke or create instance of this class yourself.
- * Instances of this class are provided when registered using the {@link BlockEntityTypeBuilder} class.
+ * Instances of this class are provided when registered using the {@link BlockEntityBuilder} class.
  *
  * @param <T> Type of item.
  */

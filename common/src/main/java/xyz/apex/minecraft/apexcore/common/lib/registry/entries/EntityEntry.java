@@ -6,23 +6,23 @@ import net.minecraft.world.level.entity.EntityTypeTest;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryEntry;
-import xyz.apex.minecraft.apexcore.common.lib.registry.builders.EntityTypeBuilder;
+import xyz.apex.minecraft.apexcore.common.lib.registry.builders.EntityBuilder;
 
 /**
  * Main RegistryEntry class for all EntityType entries.
  * <p>
  * While the constructor is publicly visible, you should never invoke or create instance of this class yourself.
- * Instances of this class are provided when registered using the {@link EntityTypeBuilder} class.
+ * Instances of this class are provided when registered using the {@link EntityBuilder} class.
  *
  * @param <T> Type of entity type.
  */
-public final class EntityTypeEntry<T extends Entity> extends RegistryEntry.Delegated<EntityType<T>> implements FeatureElementEntry<EntityType<T>>, EntityTypeTest<Entity, T>
+public final class EntityEntry<T extends Entity> extends RegistryEntry.Delegated<EntityType<T>> implements FeatureElementEntry<EntityType<T>>, EntityTypeTest<Entity, T>
 {
     /**
      * DO NOT MANUALLY CALL PUBLIC FOR INTERNAL USAGES ONLY
      */
     @ApiStatus.Internal
-    public EntityTypeEntry(RegistryEntry<EntityType<T>> delegate)
+    public EntityEntry(RegistryEntry<EntityType<T>> delegate)
     {
         super(delegate);
     }
