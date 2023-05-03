@@ -24,7 +24,7 @@ public abstract class AbstractBuilder<P, T, R extends T, E extends RegistryEntry
     protected final ResourceKey<? extends Registry<T>> registryType;
     private final Function<RegistryEntry<R>, E> registryEntryFactory;
     private final Supplier<R> safeSupplier = Suppliers.memoize(this::createObject);
-    private final List<Runnable> listeners = Lists.newLinkedList();
+    private final List<Consumer<R>> listeners = Lists.newLinkedList();
 
     protected AbstractBuilder(P parent, BuilderManager builderManager, ResourceKey<? extends Registry<T>> registryType, String registrationName, Function<RegistryEntry<R>, E> registryEntryFactory)
     {
@@ -121,14 +121,14 @@ public abstract class AbstractBuilder<P, T, R extends T, E extends RegistryEntry
     @Override
     public final B addListener(Runnable listener)
     {
-        listeners.add(listener);
-        return self();
+        return addListener(value -> listener.run());
     }
 
     @Override
     public final B addListener(Consumer<R> listener)
     {
-        return addListener(() -> listener.accept(safeSupplier.get()));
+        listeners.add(listener);
+        return self();
     }
 
     @Override

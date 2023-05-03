@@ -23,6 +23,15 @@ public sealed interface Registrar<T> extends Iterable<RegistryEntry<T>> permits 
     RegistrarManager getRegistrarManager();
 
     /**
+     * Returns the vanilla registry this registrar is bound to.
+     * <p>
+     * Will throw exceptions if no vanilla registry could be found, custom registry types.
+     *
+     * @return The vanilla registry this registrar is bound to.
+     */
+    Registry<T> getVanillaRegistry();
+
+    /**
      * @return Type of entries this registrar can manage.
      */
     ResourceKey<? extends Registry<T>> getRegistryType();
@@ -107,7 +116,7 @@ public sealed interface Registrar<T> extends Iterable<RegistryEntry<T>> permits 
      * @param registryKey Registry key of registry entry to be passed to listener.
      * @param listener    Listener to be registered
      */
-    void addListener(ResourceKey<T> registryKey, Consumer<? super RegistryEntry<? extends T>> listener);
+    void addListener(ResourceKey<T> registryKey, Consumer<? extends T> listener);
     // endregion
 
     // region: RegistryName
@@ -153,7 +162,7 @@ public sealed interface Registrar<T> extends Iterable<RegistryEntry<T>> permits 
      * @param registryName Registry name of registry entry to be passed to listener.
      * @param listener     Listener to be registered
      */
-    void addListener(ResourceLocation registryName, Consumer<? super RegistryEntry<? extends T>> listener);
+    void addListener(ResourceLocation registryName, Consumer<? extends T> listener);
     // endregion
 
     // region: RegistrationName
@@ -198,7 +207,7 @@ public sealed interface Registrar<T> extends Iterable<RegistryEntry<T>> permits 
      * @param registrationName Registration name of registry entry to be passed to listener.
      * @param listener         Listener to be registered
      */
-    void addListener(String registrationName, Consumer<? super RegistryEntry<? extends T>> listener);
+    void addListener(String registrationName, Consumer<? extends T> listener);
     // endregion
 
     /**

@@ -35,15 +35,6 @@ public sealed interface RegistrarManager permits RegistrarManagerImpl
      * <p>
      * Invokes listener immediately if this registrar manager has already been registered.
      *
-     * @param listener Listener to be registered.
-     */
-    void addListener(Runnable listener);
-
-    /**
-     * Registers a new listener to be invoked after this registrar manager has been registered.
-     * <p>
-     * Invokes listener immediately if this registrar manager has already been registered.
-     *
      * @param registryType Type of registrar to be passed to the listener.
      * @param listener     Listener to be registered.
      * @param <T>          Type of registrar.

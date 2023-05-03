@@ -1,12 +1,11 @@
 package xyz.apex.minecraft.apexcore.common.lib.registry;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
+import xyz.apex.minecraft.apexcore.common.lib.Services;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -15,7 +14,6 @@ final class RegistrarManagerImpl implements RegistrarManager
     private static final Map<String, RegistrarManager> REGISTRAR_MANAGER_MAP = Maps.newHashMap();
 
     private final Map<ResourceKey<? extends Registry<?>>, Registrar<?>> registrarMap = Maps.newConcurrentMap();
-    private final List<Runnable> listeners = Lists.newLinkedList();
     private final String ownerId;
     private boolean registered = false;
 
@@ -38,16 +36,9 @@ final class RegistrarManagerImpl implements RegistrarManager
     }
 
     @Override
-    public void addListener(Runnable listener)
-    {
-        if(registered) listener.run();
-        else listeners.add(listener);
-    }
-
-    @Override
     public <T> void addListener(ResourceKey<? extends Registry<T>> registryType, Consumer<Registrar<T>> listener)
     {
-        addListener(() -> listener.accept(get(registryType)));
+        Services.REGISTRIES.addListener(registryType, ownerId, listener);
     }
 
     @Override
@@ -65,9 +56,6 @@ final class RegistrarManagerImpl implements RegistrarManager
             var registry = registrarMap.get(registryType);
             if(registry != null) registry.register();
         });
-
-        listeners.forEach(Runnable::run);
-        listeners.clear();
 
         registered = true;
     }

@@ -1,6 +1,5 @@
 package xyz.apex.minecraft.apexcore.common.lib.registry;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -18,10 +17,8 @@ final class RegistrarImpl<T> implements Registrar<T>
     private final ResourceKey<? extends Registry<T>> registryType;
     private final RegistrarManager registrarManager;
     private final Map<ResourceLocation, RegistryEntry<T>> entries = Maps.newLinkedHashMap();
-    private final Map<ResourceLocation, Supplier<? extends T>> factories = Maps.newHashMap();
     private final Set<ResourceLocation> keysView = Collections.unmodifiableSet(entries.keySet());
     private final Collection<RegistryEntry<T>> entriesView = Collections.unmodifiableCollection(entries.values());
-    private final List<Runnable> listeners = Lists.newLinkedList();
     private boolean registered = false;
 
     RegistrarImpl(RegistrarManager registrarManager, ResourceKey<? extends Registry<T>> registryType)
@@ -34,6 +31,13 @@ final class RegistrarImpl<T> implements Registrar<T>
     public RegistrarManager getRegistrarManager()
     {
         return registrarManager;
+    }
+
+    @Override
+    public Registry<T> getVanillaRegistry()
+    {
+        // TODO: Should this be nullable?
+        return RegistryApi.findVanillaRegistry(registryType).orElseThrow();
     }
 
     @Override
@@ -63,8 +67,7 @@ final class RegistrarImpl<T> implements Registrar<T>
     @Override
     public void addListener(Runnable listener)
     {
-        if(registered) listener.run();
-        else listeners.add(listener);
+        registrarManager.addListener(registryType, registrar -> listener.run());
     }
 
     @Override
@@ -73,20 +76,12 @@ final class RegistrarImpl<T> implements Registrar<T>
         return registered;
     }
 
-    private boolean shouldAppendToRegistry()
-    {
-        return registered || registrarManager.isRegistered();
-    }
-
     @Override
     public void register()
     {
         if(registered) return;
         RegistryApi.LOGGER.debug("[{}] Registering registry entries of type '{}'", getOwnerId(), registryType.location());
-        factories.forEach(this::registerEntry);
-        factories.clear();
-        listeners.forEach(Runnable::run);
-        listeners.clear();
+        Services.REGISTRIES.register(this);
         registered = true;
     }
 
@@ -94,12 +89,6 @@ final class RegistrarImpl<T> implements Registrar<T>
     public Iterator<RegistryEntry<T>> iterator()
     {
         return entriesView.iterator();
-    }
-
-    private void registerEntry(ResourceLocation registryName, Supplier<? extends T> registryEntryFactory)
-    {
-        RegistryApi.LOGGER.info("[{}] Registered registry entry '{}' of type '{}'", getOwnerId(), registryName, registryType.location());
-        Services.REGISTRIES.register(registryType, registryName, registryEntryFactory);
     }
 
     private ResourceLocation registryName(String registrationName)
@@ -139,9 +128,9 @@ final class RegistrarImpl<T> implements Registrar<T>
     }
 
     @Override
-    public void addListener(ResourceKey<T> registryKey, Consumer<? super RegistryEntry<? extends T>> listener)
+    public void addListener(ResourceKey<T> registryKey, Consumer<? extends T> listener)
     {
-        addListener(() -> listener.accept(get(registryKey)));
+        addListener(registryKey.location(), listener);
     }
     // endregion
 
@@ -181,9 +170,9 @@ final class RegistrarImpl<T> implements Registrar<T>
     }
 
     @Override
-    public void addListener(ResourceLocation registryName, Consumer<? super RegistryEntry<? extends T>> listener)
+    public void addListener(ResourceLocation registryName, Consumer<? extends T> listener)
     {
-        addListener(() -> listener.accept(get(registryName)));
+        Services.REGISTRIES.addListener(registryType, getOwnerId(), registryName, listener);
     }
     // endregion
 
@@ -200,18 +189,15 @@ final class RegistrarImpl<T> implements Registrar<T>
         return registryNames().map(ResourceLocation::getPath);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings("unchecked")
     @Override
     public <R extends T> RegistryEntry<R> register(String registrationName, Supplier<R> registryEntryFactory)
     {
         var registryName = registryName(registrationName);
-        var registryEntry = new RegistryEntryImpl<>((Registrar) this, registryName);
-        if(entries.put(registryName, registryEntry) != null)
-            throw new IllegalStateException("Attempt to register duplicate registry entry with name '%s' of type '%s'".formatted(registryName, registryType.location()));
-        if(factories.put(registryName, registryEntryFactory) != null)
-            throw new IllegalStateException("Attempt to register duplicate registry entry factory with name '%s' of type '%s'".formatted(registryName, registryType.location()));
         RegistryApi.LOGGER.debug("[{}] Captured registration of registry entry '{}' for type '{}'", getOwnerId(), registryName, registryType.location());
-        if(shouldAppendToRegistry()) registerEntry(registryName, registryEntryFactory);
+        var registryEntry = Services.REGISTRIES.register(this, registrationName, registryEntryFactory);
+        if(entries.put(registryName, (RegistryEntry<T>) registryEntry) != null)
+            throw new IllegalStateException("Attempt to register duplicate registry entry with name '%s' of type '%s'".formatted(registryName, registryType.location()));
         return registryEntry;
     }
 
@@ -228,9 +214,9 @@ final class RegistrarImpl<T> implements Registrar<T>
     }
 
     @Override
-    public void addListener(String registrationName, Consumer<? super RegistryEntry<? extends T>> listener)
+    public void addListener(String registrationName, Consumer<? extends T> listener)
     {
-        addListener(() -> listener.accept(get(registrationName)));
+        addListener(registryName(registrationName), listener);
     }
     // endregion
 }

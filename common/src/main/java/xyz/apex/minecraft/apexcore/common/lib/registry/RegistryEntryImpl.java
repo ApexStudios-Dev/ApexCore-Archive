@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.Services;
 
@@ -28,7 +29,11 @@ public class RegistryEntryImpl<T> implements RegistryEntry<T>
     @Nullable
     protected final ResourceKey<T> registryKey;
 
-    protected RegistryEntryImpl(Registrar<T> registrar, ResourceLocation registryName)
+    /**
+     * DO NOT MANUALLY CALL PUBLIC FOR INTERNAL USAGES ONLY
+     */
+    @ApiStatus.Internal
+    public RegistryEntryImpl(Registrar<T> registrar, ResourceLocation registryName)
     {
         this.registrar = registrar;
         this.registryName = registryName;
@@ -100,12 +105,7 @@ public class RegistryEntryImpl<T> implements RegistryEntry<T>
     @Override
     public final void addListener(Consumer<T> listener)
     {
-        // looks complex but its pretty simple
-        // if value currently exists, invoke the listener immediately
-        // otherwise register a listener on the registrar to be invoked after the entry has been registered
-        // use the passed registry entry to try and invoke the listener
-        // as this could be an optional entry and the value may not exist
-        ifPresentOrElse(listener, () -> getRegistrar().addListener(registryName, registryEntry -> registryEntry.ifPresent(listener)));
+        Services.REGISTRIES.addListener(getRegistryType(), getOwnerId(), registryName, listener);
     }
 
     @Override
