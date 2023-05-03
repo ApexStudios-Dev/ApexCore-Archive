@@ -1,5 +1,7 @@
 package xyz.apex.minecraft.apexcore.common.lib.registry.builders;
 
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
@@ -76,6 +78,20 @@ public non-sealed class BuilderManagerImpl implements BuilderManager
     public final BlockBuilder<BuilderManager, Block> block(String registrationName)
     {
         return block(this, registrationName, Block::new);
+    }
+    // endregion
+
+    // region: EntityType
+    @Override
+    public <P, T extends Entity> EntityTypeBuilder<P, T> entityType(P parent, String registrationName, EntityType.EntityFactory<T> entityFactory)
+    {
+        return new EntityTypeBuilder<>(parent, this, registrationName, entityFactory);
+    }
+
+    @Override
+    public <T extends Entity> EntityTypeBuilder<BuilderManager, T> entityType(String registrationName, EntityType.EntityFactory<T> entityFactory)
+    {
+        return entityType(this, registrationName, entityFactory);
     }
     // endregion
 }

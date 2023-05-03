@@ -1,5 +1,7 @@
 package xyz.apex.minecraft.apexcore.common.lib.registry.builders;
 
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
@@ -105,6 +107,31 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @return New builder used to build a new block instance.
      */
     BlockBuilder<BuilderManager, Block> block(String registrationName);
+    // endregion
+
+    // region: EntityType
+
+    /**
+     * Returns new builder used to build a new entity type instance.
+     *
+     * @param parent           Parent element of the builder.
+     * @param registrationName Registration name of the builder.
+     * @param entityFactory    Entity factory used to construct finalized entity type instance.
+     * @param <P>              Type of parent element.
+     * @param <T>              Type of entity type.
+     * @return New builder used to build a new entity type instance.
+     */
+    <P, T extends Entity> EntityTypeBuilder<P, T> entityType(P parent, String registrationName, EntityType.EntityFactory<T> entityFactory);
+
+    /**
+     * Returns new builder used to build a new entity type instance.
+     *
+     * @param registrationName Registration name of the builder.
+     * @param entityFactory    Entity factory used to construct finalized entity type instance.
+     * @param <T>              Type of entity type.
+     * @return New builder used to build a new entity type instance.
+     */
+    <T extends Entity> EntityTypeBuilder<BuilderManager, T> entityType(String registrationName, EntityType.EntityFactory<T> entityFactory);
     // endregion
 
     /**
