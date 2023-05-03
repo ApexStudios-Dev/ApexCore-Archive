@@ -14,11 +14,6 @@ import java.util.function.Supplier;
 public interface Hooks extends Services.Service
 {
     /**
-     * Global instance.
-     */
-    Hooks INSTANCE = Services.HOOKS;
-
-    /**
      * Hooks for registering various renderer elements.
      * <p>
      * May throw exceptions if used server side, wrap any calls in a client {@link PhysicalSide#runWhenOn(PhysicalSide, Supplier)}.

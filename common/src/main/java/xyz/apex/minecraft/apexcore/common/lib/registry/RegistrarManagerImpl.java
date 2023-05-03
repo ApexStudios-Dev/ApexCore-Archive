@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
+import xyz.apex.minecraft.apexcore.common.lib.Services;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -37,7 +38,7 @@ final class RegistrarManagerImpl implements RegistrarManager
     @Override
     public <T> void addListener(ResourceKey<? extends Registry<T>> registryType, Consumer<Registrar<T>> listener)
     {
-        RegistryApi.INSTANCE.addListener(registryType, ownerId, listener);
+        Services.REGISTRIES.addListener(registryType, ownerId, listener);
     }
 
     @Override

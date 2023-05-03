@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
-import xyz.apex.minecraft.apexcore.common.lib.hook.Hooks;
+import xyz.apex.minecraft.apexcore.common.lib.Services;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.BlockEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockEntityFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockFactory;
@@ -59,7 +59,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      */
     public BlockBuilder<P, T> colorHandler(Supplier<Supplier<BlockColor>> colorHandler)
     {
-        return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> Hooks.INSTANCE.registerColorHandler().registerBlockColor(() -> value, colorHandler)));
+        return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> Services.HOOKS.registerColorHandler().registerBlockColor(() -> value, colorHandler)));
     }
 
     /**
@@ -70,7 +70,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      */
     public BlockBuilder<P, T> renderType(Supplier<Supplier<RenderType>> renderType)
     {
-        return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> Hooks.INSTANCE.registerRenderer().setBlockRenderType(() -> value, renderType)));
+        return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> Services.HOOKS.registerRenderer().setBlockRenderType(() -> value, renderType)));
     }
 
     /**

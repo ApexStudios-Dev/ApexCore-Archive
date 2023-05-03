@@ -126,7 +126,7 @@ public enum PhysicalSide
      */
     public static PhysicalSide getPhysicalSide()
     {
-        return GameData.INSTANCE.getPhysicalSide();
+        return Services.GAME_DATA.getPhysicalSide();
     }
 
     /**

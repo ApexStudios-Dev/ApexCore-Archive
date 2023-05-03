@@ -8,7 +8,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.ItemLike;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
-import xyz.apex.minecraft.apexcore.common.lib.hook.Hooks;
+import xyz.apex.minecraft.apexcore.common.lib.Services;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.ItemEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.ItemFactory;
 
@@ -50,7 +50,7 @@ public final class ItemBuilder<P, T extends Item> extends AbstractBuilder<P, Ite
      */
     public ItemBuilder<P, T> colorHandler(Supplier<Supplier<ItemColor>> colorHandler)
     {
-        return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> Hooks.INSTANCE.registerColorHandler().registerItemColor(() -> value, colorHandler)));
+        return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> Services.HOOKS.registerColorHandler().registerItemColor(() -> value, colorHandler)));
     }
 
     /**

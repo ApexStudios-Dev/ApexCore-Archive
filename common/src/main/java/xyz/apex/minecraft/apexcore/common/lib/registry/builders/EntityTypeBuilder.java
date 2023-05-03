@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.common.lib.registry.builders;
 
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -7,6 +8,8 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.flag.FeatureFlag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
+import xyz.apex.minecraft.apexcore.common.lib.Services;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.EntityTypeEntry;
 
 import java.util.function.Function;
@@ -39,7 +42,18 @@ public final class EntityTypeBuilder<P, T extends Entity> extends AbstractBuilde
         return entityTypeModifier.apply(EntityType.Builder.of(entityFactory, mobCategory)).build(getRegistryName().toString());
     }
 
-    // TODO: spawn egg, renderer, attribute, spawn placement
+    // TODO: spawn egg, attribute, spawn placement
+
+    /**
+     * Registers renderer for this entity.
+     *
+     * @param renderer Renderer to be registered.
+     * @return This builder instance
+     */
+    public EntityTypeBuilder<P, T> renderer(Supplier<EntityRendererProvider<T>> renderer)
+    {
+        return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> Services.HOOKS.registerRenderer().registerEntityRenderer(() -> value, renderer)));
+    }
 
     /**
      * Set the category for this entity.

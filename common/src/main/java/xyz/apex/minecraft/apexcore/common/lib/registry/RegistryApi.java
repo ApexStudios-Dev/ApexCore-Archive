@@ -23,11 +23,6 @@ import java.util.function.Supplier;
 public interface RegistryApi extends Services.Service
 {
     /**
-     * Global instance.
-     */
-    RegistryApi INSTANCE = Services.REGISTRIES;
-
-    /**
      * Main Logger instance used for all Registry related logging.
      */
     Logger LOGGER = LogManager.getLogger();

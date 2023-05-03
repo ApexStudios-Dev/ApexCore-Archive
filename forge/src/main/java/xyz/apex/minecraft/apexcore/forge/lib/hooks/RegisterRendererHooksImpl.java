@@ -5,8 +5,15 @@ import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
@@ -42,6 +49,20 @@ final class RegisterRendererHooksImpl implements RegisterRendererHooks
         active().fluidRenderTypes.add(Pair.of(fluid, renderType));
     }
 
+    @Override
+    public <T extends BlockEntity> void registerBlockEntityRenderer(Supplier<? extends BlockEntityType<T>> blockEntityType, Supplier<BlockEntityRendererProvider<T>> blockEntityRendererProvider)
+    {
+        Validate.isTrue(PhysicalSide.isRunningOn(PhysicalSide.CLIENT));
+        active().blockEntityRenderers.add(Pair.of(blockEntityType, blockEntityRendererProvider));
+    }
+
+    @Override
+    public <T extends Entity> void registerEntityRenderer(Supplier<? extends EntityType<T>> entityType, Supplier<EntityRendererProvider<T>> entityRendererProvider)
+    {
+        Validate.isTrue(PhysicalSide.isRunningOn(PhysicalSide.CLIENT));
+        active().entityRenderers.add(Pair.of(entityType, entityRendererProvider));
+    }
+
     private ModData active()
     {
         return modDataMap.computeIfAbsent(ModLoadingContext.get().getActiveNamespace(), ModData::new);
@@ -51,6 +72,8 @@ final class RegisterRendererHooksImpl implements RegisterRendererHooks
     {
         private final List<Pair<Supplier<? extends Block>, Supplier<Supplier<RenderType>>>> blockRenderTypes = Lists.newArrayList();
         private final List<Pair<Supplier<? extends Fluid>, Supplier<Supplier<RenderType>>>> fluidRenderTypes = Lists.newArrayList();
+        private final List<Pair<Supplier<? extends BlockEntityType<?>>, Supplier<? extends BlockEntityRendererProvider<?>>>> blockEntityRenderers = Lists.newArrayList();
+        private final List<Pair<Supplier<? extends EntityType<?>>, Supplier<? extends EntityRendererProvider<?>>>> entityRenderers = Lists.newArrayList();
 
         private final String modId;
 
@@ -61,6 +84,7 @@ final class RegisterRendererHooksImpl implements RegisterRendererHooks
             var modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
             modBus.addListener(this::onClientSetup);
+            modBus.addListener(this::onRegisterRenderers);
             modBus.addListener(this::onLoadComplete);
         }
 
@@ -73,12 +97,36 @@ final class RegisterRendererHooksImpl implements RegisterRendererHooks
             fluidRenderTypes.clear();
         }
 
+        @SuppressWarnings({"unchecked", "rawtypes"})
+        private void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event)
+        {
+            blockEntityRenderers.forEach(pair -> registerBlockEntityRendererRenderer(event, (Pair) pair));
+            blockEntityRenderers.clear();
+
+            entityRenderers.forEach(pair -> registerEntityRendererRenderer(event, (Pair) pair));
+            entityRenderers.clear();
+        }
+
         private void onLoadComplete(FMLLoadCompleteEvent event)
         {
             if(!blockRenderTypes.isEmpty())
                 ApexCore.LOGGER.warn("Failed to register '{}' block render type registrations for mod '{}'!", blockRenderTypes.size(), modId);
             if(!fluidRenderTypes.isEmpty())
                 ApexCore.LOGGER.warn("Failed to register '{}' block render type registrations for mod '{}'!", fluidRenderTypes.size(), modId);
+            if(!blockEntityRenderers.isEmpty())
+                ApexCore.LOGGER.warn("Failed to register '{}' block entity renderers for mod '{}'!", blockEntityRenderers.size(), modId);
+            if(!entityRenderers.isEmpty())
+                ApexCore.LOGGER.warn("Failed to register '{}' entity renderers for mod '{}'!", entityRenderers.size(), modId);
+        }
+
+        private <T extends BlockEntity> void registerBlockEntityRendererRenderer(EntityRenderersEvent.RegisterRenderers event, Pair<Supplier<? extends BlockEntityType<T>>, Supplier<BlockEntityRendererProvider<T>>> pair)
+        {
+            event.registerBlockEntityRenderer(pair.getFirst().get(), pair.getSecond().get());
+        }
+
+        private <T extends Entity> void registerEntityRendererRenderer(EntityRenderersEvent.RegisterRenderers event, Pair<Supplier<? extends EntityType<T>>, Supplier<EntityRendererProvider<T>>> pair)
+        {
+            event.registerEntityRenderer(pair.getFirst().get(), pair.getSecond().get());
         }
     }
 }

@@ -64,6 +64,6 @@ public interface ApexCore
             protected void addAdditionalSaveData(CompoundTag compound)
             {
             }
-        }).register();
+        }).renderer(() -> NoopRenderer::new).register();
     }
 }
