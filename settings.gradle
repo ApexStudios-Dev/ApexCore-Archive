@@ -1,24 +1,24 @@
 pluginManagement {
-	repositories {
-		gradlePluginPortal()
-		mavenLocal()
+    repositories {
+        gradlePluginPortal()
+        mavenLocal()
 
-		maven { url 'https://maven.minecraftforge.net' }
-		maven { url 'https://maven.fabricmc.net' }
-		maven { url 'https://maven.parchmentmc.org' }
-	}
+        maven { url 'https://maven.minecraftforge.net' }
+        maven { url 'https://maven.fabricmc.net' }
+        maven { url 'https://maven.parchmentmc.org' }
+    }
 
-	resolutionStrategy {
-		eachPlugin {
-			if(requested.id.id == 'org.spongepowered.mixin') {
-				useModule("org.spongepowered:mixingradle:${requested.version}")
-			}
-		}
-	}
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == 'org.spongepowered.mixin') {
+                useModule("org.spongepowered:mixingradle:${requested.version}")
+            }
+        }
+    }
 }
 
 include 'common'
-include 'forge'
+// include 'forge'
 include 'fabric'
 
 rootProject.name = "${MOD_NAME}-${MINECRAFT_VERSION}"

@@ -4,7 +4,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
+import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockEntityFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.ItemFactory;
 
@@ -132,6 +134,31 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @return New builder used to build a new entity type instance.
      */
     <T extends Entity> EntityTypeBuilder<BuilderManager, T> entityType(String registrationName, EntityType.EntityFactory<T> entityFactory);
+    // endregion
+
+    // region: BlockEntityType
+
+    /**
+     * Returns new builder used to build a new block entity type instance.
+     *
+     * @param parent             Parent element of the builder.
+     * @param registrationName   Registration name of the builder.
+     * @param blockEntityFactory Block entity factory used to construct finalized block entity type instance.
+     * @param <P>                Type of parent element.
+     * @param <T>                Type of block entity.
+     * @return New builder used to build a new block entity type instance.
+     */
+    <P, T extends BlockEntity> BlockEntityTypeBuilder<P, T> blockEntityType(P parent, String registrationName, BlockEntityFactory<T> blockEntityFactory);
+
+    /**
+     * Returns new builder used to build a new block entity type instance.
+     *
+     * @param registrationName   Registration name of the builder.
+     * @param blockEntityFactory Block entity factory used to construct finalized block entity type instance.
+     * @param <T>                Type of block entity.
+     * @return New builder used to build a new block entity type instance.
+     */
+    <T extends BlockEntity> BlockEntityTypeBuilder<BuilderManager, T> blockEntityType(String registrationName, BlockEntityFactory<T> blockEntityFactory);
     // endregion
 
     /**

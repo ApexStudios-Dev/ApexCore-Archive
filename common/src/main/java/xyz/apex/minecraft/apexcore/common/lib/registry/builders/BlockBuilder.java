@@ -9,11 +9,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.BlockEntry;
+import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockEntityFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockFactory;
 
 import java.util.function.*;
@@ -48,6 +50,30 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
     }
 
     /**
+     * Returns new builder constructing block entity type bound to this block.
+     *
+     * @param blockEntityFactory Factory used to construct the block entity.
+     * @param <B>                Type of block entity.
+     * @return New block entity type builder bound to this block.
+     */
+    public <B extends BlockEntity> BlockEntityTypeBuilder<BlockBuilder<P, T>, B> blockEntity(BlockEntityFactory<B> blockEntityFactory)
+    {
+        return builderManager.blockEntityType(this, getRegistrationName(), blockEntityFactory).validBlock(asSupplier());
+    }
+
+    /**
+     * Builds and registers basic block entity type bound to this block.
+     *
+     * @param blockEntityFactory Factory used when constructing the block entity type.
+     * @param <B>                Type of block entity.
+     * @return This builder instance.
+     */
+    public <B extends BlockEntity> BlockBuilder<P, T> simpleBlockEntity(BlockEntityFactory<B> blockEntityFactory)
+    {
+        return blockEntity(blockEntityFactory).end();
+    }
+
+    /**
      * Returns new builder constructing item bound to this block.
      *
      * @param blockItemFactory Factory used to construct the block item.
@@ -65,6 +91,28 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
     public ItemBuilder<BlockBuilder<P, T>, BlockItem> defaultItem()
     {
         return item(BlockItem::new);
+    }
+
+    /**
+     * Builds and registers basic block item bound to this block.
+     *
+     * @param blockItemFactory Item factory used when constructing the item.
+     * @param <I>              Type of item.
+     * @return This builder instance.
+     */
+    public <I extends Item> BlockBuilder<P, T> simpleItem(BiFunction<T, Item.Properties, I> blockItemFactory)
+    {
+        return item(blockItemFactory).end();
+    }
+
+    /**
+     * Builds and registers basic block item bound to this block.
+     *
+     * @return This builder instance
+     */
+    public BlockBuilder<P, T> simpleItem()
+    {
+        return defaultItem().end();
     }
 
     /**
