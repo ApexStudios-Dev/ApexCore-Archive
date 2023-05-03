@@ -25,4 +25,12 @@ public interface Hooks extends Services.Service
      */
     @SideOnly(PhysicalSide.CLIENT)
     RegisterRendererHooks registerRenderer();
+
+    /**
+     * Hooks for registering block and item color handlers.
+     * <p>
+     * May throw exceptions if used server side, wrap any calls in a client {@link PhysicalSide#runWhenOn(PhysicalSide, Supplier)}.
+     */
+    @SideOnly(PhysicalSide.CLIENT)
+    RegisterColorHandlerHooks registerColorHandler();
 }

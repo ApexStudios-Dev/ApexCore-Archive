@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.common.lib.registry.builders;
 
+import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
@@ -44,12 +45,21 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
         this.blockFactory = blockFactory;
     }
 
-    // TODO: block color
-
     @Override
     protected T createObject()
     {
         return blockFactory.create(propertiesModifier.modify(initialProperties.get()));
+    }
+
+    /**
+     * Registers a color handler for this block.
+     *
+     * @param colorHandler Color handler to be registered.
+     * @return This builder instance.
+     */
+    public BlockBuilder<P, T> colorHandler(Supplier<Supplier<BlockColor>> colorHandler)
+    {
+        return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> Hooks.INSTANCE.registerColorHandler().registerBlockColor(() -> value, colorHandler)));
     }
 
     /**

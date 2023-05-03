@@ -7,11 +7,13 @@ import net.minecraft.world.level.material.Fluid;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
+import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
 import xyz.apex.minecraft.apexcore.common.lib.hook.RegisterRendererHooks;
 
 import java.util.function.Supplier;
 
 @ApiStatus.Internal
+@SideOnly(PhysicalSide.CLIENT)
 final class RegisterRendererHooksImpl implements RegisterRendererHooks
 {
     @Override

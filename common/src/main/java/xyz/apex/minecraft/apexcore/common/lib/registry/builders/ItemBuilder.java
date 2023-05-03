@@ -1,11 +1,14 @@
 package xyz.apex.minecraft.apexcore.common.lib.registry.builders;
 
+import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.flag.FeatureFlag;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.ItemLike;
+import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
+import xyz.apex.minecraft.apexcore.common.lib.hook.Hooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.ItemEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.ItemFactory;
 
@@ -31,12 +34,23 @@ public final class ItemBuilder<P, T extends Item> extends AbstractBuilder<P, Ite
         this.itemFactory = itemFactory;
     }
 
-    // TODO: creative mode tab, item color
+    // TODO: creative mode tab
 
     @Override
     protected T createObject()
     {
         return itemFactory.create(propertiesModifier.modify(initialProperties().get()));
+    }
+
+    /**
+     * Registers a color handler for this item.
+     *
+     * @param colorHandler Color handler to be registered.
+     * @return This builder instance.
+     */
+    public ItemBuilder<P, T> colorHandler(Supplier<Supplier<ItemColor>> colorHandler)
+    {
+        return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> Hooks.INSTANCE.registerColorHandler().registerItemColor(() -> value, colorHandler)));
     }
 
     /**
