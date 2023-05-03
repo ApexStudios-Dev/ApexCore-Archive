@@ -10,9 +10,11 @@ import java.util.ServiceLoader;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+@ApiStatus.Internal
 public interface Services
 {
-    RegistryApi REGISTRIES = Services.load(RegistryApi.class);
+    RegistryApi REGISTRIES = load(RegistryApi.class);
+    GameData GAME_DATA = load(GameData.class);
 
     /**
      * Returns first implementation of given service type from classpath, or default if one is specified.
