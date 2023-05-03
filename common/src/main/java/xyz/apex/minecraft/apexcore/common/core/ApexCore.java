@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.common.core;
 
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -34,6 +35,7 @@ public interface ApexCore
         builders.item("test_item").register();
         builders.block("test_block").defaultItem().end().register();
         builders.block("test_block_no_item").register();
+        builders.block("block_with_cutout").renderType(() -> RenderType::cutout).register();
         builders.block("block_and_item_with_differing_names").defaultItem().registrationModifier(str -> "item_and_block_with_differing_names").end().register();
         builders.block("block_with_entity", properties -> new BaseEntityBlock(properties)
         {

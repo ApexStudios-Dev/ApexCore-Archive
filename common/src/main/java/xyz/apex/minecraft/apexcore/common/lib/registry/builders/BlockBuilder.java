@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.common.lib.registry.builders;
 
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlag;
@@ -14,6 +15,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
+import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
+import xyz.apex.minecraft.apexcore.common.lib.hook.Hooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.BlockEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockEntityFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockFactory;
@@ -41,12 +44,23 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
         this.blockFactory = blockFactory;
     }
 
-    // TODO: render type, block entity type, block color
+    // TODO: block color
 
     @Override
     protected T createObject()
     {
         return blockFactory.create(propertiesModifier.modify(initialProperties.get()));
+    }
+
+    /**
+     * Registers a listener to set the render type for this block when it registers.
+     *
+     * @param renderType Render type to be set.
+     * @return This builder instance.
+     */
+    public BlockBuilder<P, T> renderType(Supplier<Supplier<RenderType>> renderType)
+    {
+        return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> Hooks.INSTANCE.registerRenderer().setBlockRenderType(() -> value, renderType)));
     }
 
     /**

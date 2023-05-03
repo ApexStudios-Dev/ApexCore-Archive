@@ -10,6 +10,11 @@ import org.jetbrains.annotations.ApiStatus;
 public interface GameData extends Services.Service
 {
     /**
+     * Global instance.
+     */
+    GameData INSTANCE = Services.GAME_DATA;
+
+    /**
      * @return The current side we are currently running on.
      */
     PhysicalSide getPhysicalSide();
