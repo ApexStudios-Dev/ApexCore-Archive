@@ -31,6 +31,8 @@ public final class ItemBuilder<P, T extends Item> extends AbstractBuilder<P, Ite
         this.itemFactory = itemFactory;
     }
 
+    // TODO: creative mode tab, item color
+
     @Override
     protected T createObject()
     {

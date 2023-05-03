@@ -39,6 +39,8 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
         this.blockFactory = blockFactory;
     }
 
+    // TODO: render type, block entity type, block color
+
     @Override
     protected T createObject()
     {
