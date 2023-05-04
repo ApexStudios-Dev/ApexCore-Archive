@@ -59,7 +59,9 @@
             "xyz.apex.minecraft.apexcore.fabric.core.ApexCoreFabric"
         ]
     },
-    "mixins": [],
+    "mixins": [
+        "${MOD_ID}-common.mixins.json"
+    ],
     "depends": {
         "minecraft": "~${MINECRAFT_VERSION}",
         "java": ">=${JAVA_VERSION}",

@@ -64,6 +64,6 @@ public interface ApexCore
             protected void addAdditionalSaveData(CompoundTag compound)
             {
             }
-        }).renderer(() -> NoopRenderer::new).register();
+        }).defaultSpawnEgg(0x0, 0x161616).renderer(() -> NoopRenderer::new).register();
     }
 }

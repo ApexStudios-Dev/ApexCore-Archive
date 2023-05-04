@@ -4,12 +4,14 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.flag.FeatureFlag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.Services;
+import xyz.apex.minecraft.apexcore.common.lib.item.ExtendedSpawnEggItem;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.EntityEntry;
 
 import java.util.function.Function;
@@ -42,7 +44,33 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
         return entityTypeModifier.apply(EntityType.Builder.of(entityFactory, mobCategory)).build(getRegistryName().toString());
     }
 
-    // TODO: spawn egg, attribute, spawn placement
+    // TODO: attribute, spawn placement
+
+    /**
+     * Returns item builder to construct
+     *
+     * @param spawnEggItemFactory
+     * @param backgroundColor
+     * @param highlightColor
+     * @param <I>
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public <I extends ExtendedSpawnEggItem> ItemBuilder<EntityBuilder<P, T>, I> spawnEgg(SpawnEggItemFactory<I> spawnEggItemFactory, int backgroundColor, int highlightColor)
+    {
+        return builderManager.item(self(), getRegistrationName(), properties -> spawnEggItemFactory.create(() -> (EntityType<? extends Mob>) asSupplier().get(), backgroundColor, highlightColor, properties))
+                .withRegistrationNameSuffix("_spawn_egg");
+    }
+
+    public ItemBuilder<EntityBuilder<P, T>, ExtendedSpawnEggItem> spawnEgg(int backgroundColor, int highlightColor)
+    {
+        return spawnEgg(ExtendedSpawnEggItem::new, backgroundColor, highlightColor);
+    }
+
+    public EntityBuilder<P, T> defaultSpawnEgg(int backgroundColor, int highlightColor)
+    {
+        return spawnEgg(backgroundColor, highlightColor).end();
+    }
 
     /**
      * Registers renderer for this entity.
@@ -177,8 +205,8 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
     }
 
     @FunctionalInterface
-    interface SpawnEggItemFactory<I extends Item, E extends Entity>
+    public interface SpawnEggItemFactory<I extends ExtendedSpawnEggItem>
     {
-        I create(Supplier<EntityType<E>> entityType, int backgroundColor, int highlightColor, Item.Properties properties);
+        I create(Supplier<? extends EntityType<? extends Mob>> entityType, int backgroundColor, int highlightColor, Item.Properties properties);
     }
 }
