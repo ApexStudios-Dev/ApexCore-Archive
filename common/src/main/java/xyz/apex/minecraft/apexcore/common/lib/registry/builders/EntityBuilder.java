@@ -2,10 +2,8 @@ package xyz.apex.minecraft.apexcore.common.lib.registry.builders;
 
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.flag.FeatureFlag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -44,7 +42,19 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
         return entityTypeModifier.apply(EntityType.Builder.of(entityFactory, mobCategory)).build(getRegistryName().toString());
     }
 
-    // TODO: attribute, spawn placement
+    // TODO: spawn placement
+
+    /**
+     * Registers given default attributes for this entity.
+     *
+     * @param attributes Attributes to be registered.
+     * @return This builder instance.
+     */
+    @SuppressWarnings("unchecked")
+    public EntityBuilder<P, T> attributes(Supplier<AttributeSupplier.Builder> attributes)
+    {
+        return addListener(value -> Services.HOOKS.registerEntityDefaultAttribute(() -> (EntityType<? extends LivingEntity>) value, attributes));
+    }
 
     /**
      * Returns item builder to construct spawn egg item build to this entity.
