@@ -47,26 +47,41 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
     // TODO: attribute, spawn placement
 
     /**
-     * Returns item builder to construct
+     * Returns item builder to construct spawn egg item build to this entity.
      *
-     * @param spawnEggItemFactory
-     * @param backgroundColor
-     * @param highlightColor
-     * @param <I>
-     * @return
+     * @param spawnEggItemFactory Factory used to construct spawn egg item.
+     * @param backgroundColor     Background color of spawn egg item model.
+     * @param highlightColor      Highlight color of spawn egg item model.
+     * @param <I>                 Spawn egg item type.
+     * @return Spawn egg item builder.
      */
     @SuppressWarnings("unchecked")
     public <I extends ExtendedSpawnEggItem> ItemBuilder<EntityBuilder<P, T>, I> spawnEgg(SpawnEggItemFactory<I> spawnEggItemFactory, int backgroundColor, int highlightColor)
     {
         return builderManager.item(self(), getRegistrationName(), properties -> spawnEggItemFactory.create(() -> (EntityType<? extends Mob>) asSupplier().get(), backgroundColor, highlightColor, properties))
-                .withRegistrationNameSuffix("_spawn_egg");
+                .withRegistrationNameSuffix("_spawn_egg")
+                .addListener(ExtendedSpawnEggItem::registerSpawnEgg);
     }
 
+    /**
+     * Returns item builder to construct spawn egg item build to this entity.
+     *
+     * @param backgroundColor Background color of spawn egg item model.
+     * @param highlightColor  Highlight color of spawn egg item model.
+     * @return Spawn egg item builder.
+     */
     public ItemBuilder<EntityBuilder<P, T>, ExtendedSpawnEggItem> spawnEgg(int backgroundColor, int highlightColor)
     {
         return spawnEgg(ExtendedSpawnEggItem::new, backgroundColor, highlightColor);
     }
 
+    /**
+     * Builds and registers default spawn egg item bound to this entity.
+     *
+     * @param backgroundColor Background color of spawn egg item model.
+     * @param highlightColor  Highlight color of spawn egg item model.
+     * @return This builder instance.
+     */
     public EntityBuilder<P, T> defaultSpawnEgg(int backgroundColor, int highlightColor)
     {
         return spawnEgg(backgroundColor, highlightColor).end();
