@@ -7,6 +7,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.flag.FeatureFlag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.levelgen.Heightmap;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.Services;
 import xyz.apex.minecraft.apexcore.common.lib.item.ExtendedSpawnEggItem;
@@ -42,7 +43,11 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
         return entityTypeModifier.apply(EntityType.Builder.of(entityFactory, mobCategory)).build(getRegistryName().toString());
     }
 
-    // TODO: spawn placement
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public EntityBuilder<P, T> spawnPlacement(SpawnPlacements.Type spawnPlacementType, Heightmap.Types heightMapType, SpawnPlacements.SpawnPredicate<T> spawnPredicate)
+    {
+        return addListener(value -> Services.HOOKS.registerEntitySpawnPlacement(() -> (EntityType) value, spawnPlacementType, heightMapType, (SpawnPlacements.SpawnPredicate) spawnPredicate));
+    }
 
     /**
      * Registers given default attributes for this entity.

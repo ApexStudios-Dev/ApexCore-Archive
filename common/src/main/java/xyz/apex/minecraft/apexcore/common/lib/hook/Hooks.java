@@ -2,7 +2,10 @@ package xyz.apex.minecraft.apexcore.common.lib.hook;
 
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.level.levelgen.Heightmap;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.Services;
@@ -39,4 +42,15 @@ public interface Hooks extends Services.Service
      * @param defaultAttributes Default attributes to be registered.
      */
     void registerEntityDefaultAttribute(Supplier<EntityType<? extends LivingEntity>> entityType, Supplier<AttributeSupplier.Builder> defaultAttributes);
+
+    /**
+     * Registers spawn placement details for the given entity type.
+     *
+     * @param entityType         Entity type to register spawn placement for.
+     * @param spawnPlacementType Type of spawn placement.
+     * @param heightmapType      Where on the height map this entity can spawn.
+     * @param spawnPredicate     Predicate stating if the entity is allowed to spawn or not.
+     * @param <T>                Type of entity.
+     */
+    <T extends Mob> void registerEntitySpawnPlacement(Supplier<EntityType<T>> entityType, SpawnPlacements.Type spawnPlacementType, Heightmap.Types heightmapType, SpawnPlacements.SpawnPredicate<T> spawnPredicate);
 }
