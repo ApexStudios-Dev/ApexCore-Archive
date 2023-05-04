@@ -2,6 +2,7 @@ package xyz.apex.minecraft.apexcore.common.lib.registry.entries;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -43,7 +44,16 @@ public final class BlockEntityEntry<T extends BlockEntity> extends RegistryEntry
         return map(value -> value.isValid(blockState)).orElse(false);
     }
 
-    // TODO: public boolean isValid(Block block)
+    /**
+     * Returns true if the given block is valid for this registry entry.
+     *
+     * @param block Block to validate.
+     * @return True if the given block is valid for this registry entry.
+     */
+    public boolean isValid(Block block)
+    {
+        return map(value -> value.validBlocks.contains(block)).orElse(false);
+    }
 
     /**
      * Returns new block entity instance for given block state and position.

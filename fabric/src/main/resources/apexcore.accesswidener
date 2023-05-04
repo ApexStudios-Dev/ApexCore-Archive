@@ -1,4 +1,10 @@
 accessWidener v2 named
 
+#################################################################
+# Below here must be kept in sync with forge access transformer #
+#################################################################
 # Made public for use in BlockEntityBuilder
 transitive-accessible class net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
+
+# Made public for use in BlockEntityEntry
+transitive-accessible field net/minecraft/world/level/block/entity/BlockEntityType validBlocks Ljava/util/Set;
