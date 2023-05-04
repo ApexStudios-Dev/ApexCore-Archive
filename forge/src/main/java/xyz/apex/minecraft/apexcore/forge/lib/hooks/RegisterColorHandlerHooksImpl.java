@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.ApiStatus;
@@ -17,6 +16,7 @@ import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
 import xyz.apex.minecraft.apexcore.common.lib.hook.RegisterColorHandlerHooks;
+import xyz.apex.minecraft.apexcore.forge.lib.EventBuses;
 
 import java.util.List;
 import java.util.Map;
@@ -58,11 +58,11 @@ final class RegisterColorHandlerHooksImpl implements RegisterColorHandlerHooks
         {
             this.modId = modId;
 
-            var modBus = FMLJavaModLoadingContext.get().getModEventBus();
-
-            modBus.addListener(this::onRegisterBlockColorHandler);
-            modBus.addListener(this::onRegisterItemColorHandler);
-            modBus.addListener(this::onLoadComplete);
+            EventBuses.addListener(modId, modBus -> {
+                modBus.addListener(this::onRegisterBlockColorHandler);
+                modBus.addListener(this::onRegisterItemColorHandler);
+                modBus.addListener(this::onLoadComplete);
+            });
         }
 
         private void onRegisterBlockColorHandler(RegisterColorHandlersEvent.Block event)

@@ -6,8 +6,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegisterEvent;
 import net.minecraftforge.registries.RegistryManager;
 import org.apache.commons.lang3.Validate;
@@ -17,6 +15,7 @@ import xyz.apex.minecraft.apexcore.common.lib.registry.Registrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryApi;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryEntryImpl;
+import xyz.apex.minecraft.apexcore.forge.lib.EventBuses;
 
 import java.util.List;
 import java.util.Map;
@@ -93,10 +92,10 @@ public final class RegistryApiImpl implements RegistryApi
 
         public void register()
         {
-            Validate.isTrue(ModLoadingContext.get().getActiveNamespace().equals(ownerId));
-            var modBus = FMLJavaModLoadingContext.get().getModEventBus();
-            modBus.addListener(EventPriority.HIGHEST, this::registerEntries);
-            modBus.addListener(this::postListeners);
+            EventBuses.addListener(ownerId, modBus -> {
+                modBus.addListener(EventPriority.HIGHEST, this::registerEntries);
+                modBus.addListener(this::postListeners);
+            });
         }
 
         @SuppressWarnings({"unchecked", "rawtypes"})
