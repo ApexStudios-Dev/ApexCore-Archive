@@ -20,6 +20,11 @@ import java.util.function.Supplier;
 public interface Hooks extends Services.Service
 {
     /**
+     * Hooks for various entity related things.
+     */
+    EntityHooks entity();
+
+    /**
      * Hooks for registering various renderer elements.
      * <p>
      * May throw exceptions if used server side, wrap any calls in a client {@link PhysicalSide#runWhenOn(PhysicalSide, Supplier)}.
