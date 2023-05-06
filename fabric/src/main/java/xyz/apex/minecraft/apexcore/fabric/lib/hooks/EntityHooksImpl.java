@@ -28,7 +28,12 @@ final class EntityHooksImpl implements EntityHooks
     {
         // TODO: Change to just check instance of in 1.20
         //  Fake-Player-API added during a 1.19.4 build, not all of 1.19.4 will have the API
-        if(isApiPresent.get()) return entity instanceof FakePlayer;
+        if(isApiPresent.get()) return isFakePlayerApi(entity);
         return entity instanceof ServerPlayer && entity.getClass() != ServerPlayer.class;
+    }
+
+    private boolean isFakePlayerApi(@Nullable Entity entity)
+    {
+        return entity instanceof FakePlayer;
     }
 }
