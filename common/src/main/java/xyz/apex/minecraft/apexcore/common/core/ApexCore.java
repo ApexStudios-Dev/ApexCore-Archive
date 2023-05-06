@@ -9,6 +9,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -16,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.Services;
+import xyz.apex.minecraft.apexcore.common.lib.hook.GameRuleHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.builders.BuilderManager;
 
@@ -80,6 +82,6 @@ public interface ApexCore
                 return HumanoidArm.LEFT;
             }
         }).defaultSpawnEgg(0x0, 0x161616).renderer(() -> NoopRenderer::new).attributes(LivingEntity::createLivingAttributes).register();
-        Services.HOOKS.gameRules().registerBoolean(ID, "testing_game_rule", GameRules.Category.MISC, false);
+        GameRuleHooks.get().registerBoolean(ID, "testing_game_rule", GameRules.Category.MISC, false);
     }
 }

@@ -17,4 +17,12 @@ public interface EntityHooks
      * @return True if given entity is a fake player.
      */
     boolean isFakePlayer(@Nullable Entity entity);
+
+    /**
+     * @return Global instance.
+     */
+    static EntityHooks get()
+    {
+        return Hooks.get().entity();
+    }
 }

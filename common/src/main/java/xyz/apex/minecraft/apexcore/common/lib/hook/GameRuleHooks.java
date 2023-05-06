@@ -111,4 +111,12 @@ public interface GameRuleHooks
      * @return New registered game rule type.
      */
     <T extends GameRules.Value<T>> GameRules.Key<T> register(String ownerId, String registrationName, GameRules.Category gameRuleCategory, GameRules.Type<T> gameRuleType);
+
+    /**
+     * @return Global instance.
+     */
+    static GameRuleHooks get()
+    {
+        return Hooks.get().gameRules();
+    }
 }

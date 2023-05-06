@@ -9,7 +9,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.Heightmap;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
-import xyz.apex.minecraft.apexcore.common.lib.Services;
+import xyz.apex.minecraft.apexcore.common.lib.hook.Hooks;
+import xyz.apex.minecraft.apexcore.common.lib.hook.RegisterRendererHooks;
 import xyz.apex.minecraft.apexcore.common.lib.item.ExtendedSpawnEggItem;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.EntityEntry;
 
@@ -46,7 +47,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
     @SuppressWarnings({"unchecked", "rawtypes"})
     public EntityBuilder<P, T> spawnPlacement(SpawnPlacements.Type spawnPlacementType, Heightmap.Types heightMapType, SpawnPlacements.SpawnPredicate<T> spawnPredicate)
     {
-        return addListener(value -> Services.HOOKS.registerEntitySpawnPlacement(() -> (EntityType) value, spawnPlacementType, heightMapType, (SpawnPlacements.SpawnPredicate) spawnPredicate));
+        return addListener(value -> Hooks.get().registerEntitySpawnPlacement(() -> (EntityType) value, spawnPlacementType, heightMapType, (SpawnPlacements.SpawnPredicate) spawnPredicate));
     }
 
     /**
@@ -58,7 +59,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
     @SuppressWarnings("unchecked")
     public EntityBuilder<P, T> attributes(Supplier<AttributeSupplier.Builder> attributes)
     {
-        return addListener(value -> Services.HOOKS.registerEntityDefaultAttribute(() -> (EntityType<? extends LivingEntity>) value, attributes));
+        return addListener(value -> Hooks.get().registerEntityDefaultAttribute(() -> (EntityType<? extends LivingEntity>) value, attributes));
     }
 
     /**
@@ -110,7 +111,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
      */
     public EntityBuilder<P, T> renderer(Supplier<EntityRendererProvider<T>> renderer)
     {
-        return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> Services.HOOKS.registerRenderer().registerEntityRenderer(() -> value, renderer)));
+        return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> RegisterRendererHooks.get().registerEntityRenderer(() -> value, renderer)));
     }
 
     /**

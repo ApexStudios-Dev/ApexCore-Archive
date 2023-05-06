@@ -55,4 +55,12 @@ public interface RegisterRendererHooks
      * @param <T>                    Entity type.
      */
     <T extends Entity> void registerEntityRenderer(Supplier<? extends EntityType<T>> entityType, Supplier<EntityRendererProvider<T>> entityRendererProvider);
+
+    /**
+     * @return Global instance.
+     */
+    static RegisterRendererHooks get()
+    {
+        return Hooks.get().registerRenderer();
+    }
 }

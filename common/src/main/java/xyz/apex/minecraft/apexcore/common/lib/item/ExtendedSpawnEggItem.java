@@ -20,7 +20,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
-import xyz.apex.minecraft.apexcore.common.lib.Services;
+import xyz.apex.minecraft.apexcore.common.lib.hook.RegisterColorHandlerHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.builders.EntityBuilder;
 
@@ -210,7 +210,7 @@ public class ExtendedSpawnEggItem extends SpawnEggItem
         BY_ID.put(Objects.requireNonNull(spawnEgg.entityType.get()), spawnEgg);
 
         // register color handler
-        PhysicalSide.CLIENT.runWhenOn(() -> () -> Services.HOOKS.registerColorHandler().registerItemColor(() -> spawnEgg, () -> () -> spawnEgg::getSpawnEggColor));
+        PhysicalSide.CLIENT.runWhenOn(() -> () -> RegisterColorHandlerHooks.get().registerItemColor(() -> spawnEgg, () -> () -> spawnEgg::getSpawnEggColor));
     }
 
     @SuppressWarnings("unchecked")

@@ -82,4 +82,12 @@ public interface RegistryApi extends Services.Service
     {
         return BuiltInRegistries.REGISTRY.getOptional((ResourceKey) registryType);
     }
+
+    /**
+     * @return Global instance.
+     */
+    static RegistryApi get()
+    {
+        return Services.REGISTRIES;
+    }
 }

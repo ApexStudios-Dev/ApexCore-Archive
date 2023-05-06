@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import xyz.apex.minecraft.apexcore.common.lib.Services;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -81,7 +80,7 @@ final class RegistrarImpl<T> implements Registrar<T>
     {
         if(registered) return;
         RegistryApi.LOGGER.debug("[{}] Registering registry entries of type '{}'", getOwnerId(), registryType.location());
-        Services.REGISTRIES.register(this);
+        RegistryApi.get().register(this);
         registered = true;
     }
 
@@ -172,7 +171,7 @@ final class RegistrarImpl<T> implements Registrar<T>
     @Override
     public void addListener(ResourceLocation registryName, Consumer<? extends T> listener)
     {
-        Services.REGISTRIES.addListener(registryType, getOwnerId(), registryName, listener);
+        RegistryApi.get().addListener(registryType, getOwnerId(), registryName, listener);
     }
     // endregion
 
@@ -195,7 +194,7 @@ final class RegistrarImpl<T> implements Registrar<T>
     {
         var registryName = registryName(registrationName);
         RegistryApi.LOGGER.debug("[{}] Captured registration of registry entry '{}' for type '{}'", getOwnerId(), registryName, registryType.location());
-        var registryEntry = Services.REGISTRIES.register(this, registrationName, registryEntryFactory);
+        var registryEntry = RegistryApi.get().register(this, registrationName, registryEntryFactory);
         if(entries.put(registryName, (RegistryEntry<T>) registryEntry) != null)
             throw new IllegalStateException("Attempt to register duplicate registry entry with name '%s' of type '%s'".formatted(registryName, registryType.location()));
         return registryEntry;

@@ -63,4 +63,12 @@ public interface Hooks extends Services.Service
      * @param <T>                Type of entity.
      */
     <T extends Mob> void registerEntitySpawnPlacement(Supplier<EntityType<T>> entityType, SpawnPlacements.Type spawnPlacementType, Heightmap.Types heightmapType, SpawnPlacements.SpawnPredicate<T> spawnPredicate);
+
+    /**
+     * @return Global instance.
+     */
+    static Hooks get()
+    {
+        return Services.HOOKS;
+    }
 }

@@ -40,4 +40,12 @@ public interface GameData extends Services.Service
         LogManager.getLogger().info("Bootstrapping ApexCore-GameData for Minecraft-{}{}", getVersion(), isDevelopment() ? "-dev" : "");
         Services.Service.super.bootstrap();
     }
+
+    /**
+     * @return Global instance.
+     */
+    static GameData get()
+    {
+        return Services.GAME_DATA;
+    }
 }

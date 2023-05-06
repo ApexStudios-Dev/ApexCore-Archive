@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.apache.commons.compress.utils.Lists;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
-import xyz.apex.minecraft.apexcore.common.lib.Services;
+import xyz.apex.minecraft.apexcore.common.lib.hook.RegisterRendererHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.BlockEntityEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockEntityFactory;
 
@@ -53,7 +53,7 @@ public final class BlockEntityBuilder<P, T extends BlockEntity> extends Abstract
      */
     public BlockEntityBuilder<P, T> renderer(Supplier<BlockEntityRendererProvider<T>> renderer)
     {
-        return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> Services.HOOKS.registerRenderer().registerBlockEntityRenderer(() -> value, renderer)));
+        return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> RegisterRendererHooks.get().registerBlockEntityRenderer(() -> value, renderer)));
     }
 
     /**

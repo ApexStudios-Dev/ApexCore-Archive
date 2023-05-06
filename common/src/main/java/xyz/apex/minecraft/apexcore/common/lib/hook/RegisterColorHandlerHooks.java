@@ -32,4 +32,12 @@ public interface RegisterColorHandlerHooks
      * @param itemColor Color handler to be registered.
      */
     void registerItemColor(Supplier<ItemLike> item, Supplier<Supplier<ItemColor>> itemColor);
+
+    /**
+     * @return Global instance.
+     */
+    static RegisterColorHandlerHooks get()
+    {
+        return Hooks.get().registerColorHandler();
+    }
 }

@@ -8,7 +8,6 @@ import net.minecraft.tags.TagKey;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
-import xyz.apex.minecraft.apexcore.common.lib.Services;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -105,7 +104,7 @@ public class RegistryEntryImpl<T> implements RegistryEntry<T>
     @Override
     public final void addListener(Consumer<T> listener)
     {
-        Services.REGISTRIES.addListener(getRegistryType(), getOwnerId(), registryName, listener);
+        RegistryApi.get().addListener(getRegistryType(), getOwnerId(), registryName, listener);
     }
 
     @Override
@@ -126,7 +125,7 @@ public class RegistryEntryImpl<T> implements RegistryEntry<T>
     {
         if(isEmpty()) return Optional.empty();
         // none null cause not empty
-        return Services.REGISTRIES.getDelegate(registrar.getRegistryType(), registryKey);
+        return RegistryApi.get().getDelegate(registrar.getRegistryType(), registryKey);
     }
 
     @Nullable
