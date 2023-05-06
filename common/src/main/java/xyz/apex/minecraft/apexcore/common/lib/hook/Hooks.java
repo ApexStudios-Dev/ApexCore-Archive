@@ -25,6 +25,11 @@ public interface Hooks extends Services.Service
     EntityHooks entity();
 
     /**
+     * Hooks for registering custom game rule types.
+     */
+    GameRuleHooks gameRules();
+
+    /**
      * Hooks for registering various renderer elements.
      * <p>
      * May throw exceptions if used server side, wrap any calls in a client {@link PhysicalSide#runWhenOn(PhysicalSide, Supplier)}.

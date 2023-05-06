@@ -9,10 +9,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
 import org.jetbrains.annotations.ApiStatus;
-import xyz.apex.minecraft.apexcore.common.lib.hook.EntityHooks;
-import xyz.apex.minecraft.apexcore.common.lib.hook.Hooks;
-import xyz.apex.minecraft.apexcore.common.lib.hook.RegisterColorHandlerHooks;
-import xyz.apex.minecraft.apexcore.common.lib.hook.RegisterRendererHooks;
+import xyz.apex.minecraft.apexcore.common.lib.hook.*;
 
 import java.util.function.Supplier;
 
@@ -22,11 +19,18 @@ public final class HooksImpl implements Hooks
     private final RegisterRendererHooks registerRendererHooks = new RegisterRendererHooksImpl();
     private final RegisterColorHandlerHooks registerColorHandlerHooks = new RegisterColorHandlerHooksImpl();
     private final EntityHooks entityHooks = new EntityHooksImpl();
+    private final GameRuleHooks gameRuleHooks = new GameRuleHooksImpl();
 
     @Override
     public EntityHooks entity()
     {
         return entityHooks;
+    }
+
+    @Override
+    public GameRuleHooks gameRules()
+    {
+        return gameRuleHooks;
     }
 
     @Override

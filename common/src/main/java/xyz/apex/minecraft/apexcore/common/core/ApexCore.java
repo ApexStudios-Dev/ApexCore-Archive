@@ -80,5 +80,6 @@ public interface ApexCore
                 return HumanoidArm.LEFT;
             }
         }).defaultSpawnEgg(0x0, 0x161616).renderer(() -> NoopRenderer::new).attributes(LivingEntity::createLivingAttributes).register();
+        Services.HOOKS.gameRules().registerBoolean(ID, "testing_game_rule", GameRules.Category.MISC, false);
     }
 }
