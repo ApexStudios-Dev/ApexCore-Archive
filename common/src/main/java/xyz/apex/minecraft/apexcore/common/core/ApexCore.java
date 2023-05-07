@@ -8,6 +8,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -17,8 +18,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.Services;
+import xyz.apex.minecraft.apexcore.common.lib.hook.CreativeModeTabHooks;
 import xyz.apex.minecraft.apexcore.common.lib.hook.GameRuleHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
+import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.builders.BuilderManager;
 
 import java.util.Collections;
@@ -39,9 +42,10 @@ public interface ApexCore
     private void enableTestElements()
     {
         var mgr = RegistrarManager.get(ID);
+        var items = mgr.get(Registries.ITEM);
 
         var builders = BuilderManager.create(mgr);
-        builders.item("test_item").register();
+        var testItem = builders.item("test_item").register();
         builders.block("test_block").defaultItem().end().register();
         builders.block("test_block_no_item").register();
         builders.block("block_with_cutout").renderType(() -> RenderType::cutout).register();
@@ -57,7 +61,7 @@ public interface ApexCore
         }).simpleBlockEntity((blockEntityType, pos, blockState) -> new BlockEntity(blockEntityType, pos, blockState)
         {
         }).simpleItem().register();
-        builders.entity("test_entity", (entityType, level) -> new LivingEntity((EntityType) entityType, level)
+        var testEntity = builders.entity("test_entity", (entityType, level) -> new LivingEntity((EntityType) entityType, level)
         {
             @Override
             public Iterable<ItemStack> getArmorSlots()
@@ -83,5 +87,17 @@ public interface ApexCore
             }
         }).defaultSpawnEgg(0x0, 0x161616).renderer(() -> NoopRenderer::new).attributes(LivingEntity::createLivingAttributes).register();
         GameRuleHooks.get().registerBoolean(ID, "testing_game_rule", GameRules.Category.MISC, false);
+
+        CreativeModeTabHooks.get().register(ID, "test", builder -> builder
+                .icon(testItem::asStack)
+                .displayItems((params, output) -> items.entries()
+                        .filter(RegistryEntry::isPresent)
+                        .map(RegistryEntry::get)
+                        .filter(item -> item.isEnabled(params.enabledFeatures()))
+                        .forEach(output::accept)
+                )
+        );
+
+        CreativeModeTabHooks.get().modify(CreativeModeTabs.SPAWN_EGGS, b -> b.accept(() -> items.get(testEntity.getRegistryName().withSuffix("_spawn_egg")).get()));
     }
 }

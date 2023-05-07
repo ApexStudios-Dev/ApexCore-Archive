@@ -30,6 +30,11 @@ public interface Hooks extends Services.Service
     GameRuleHooks gameRules();
 
     /**
+     * Various for registering new and modifying existing creative mode tabs.
+     */
+    CreativeModeTabHooks creativeModeTabs();
+
+    /**
      * Hooks for registering various renderer elements.
      * <p>
      * May throw exceptions if used server side, wrap any calls in a client {@link PhysicalSide#runWhenOn(PhysicalSide, Supplier)}.

@@ -20,6 +20,7 @@ public final class HooksImpl implements Hooks
     private final RegisterColorHandlerHooks registerColorHandlerHooks = new RegisterColorHandlerHooksImpl();
     private final EntityHooks entityHooks = new EntityHooksImpl();
     private final GameRuleHooks gameRuleHooks = new GameRuleHooksImpl();
+    private final CreativeModeTabHooks creativeModeTabHooks = new CreativeModeTabHooksImpl();
 
     @Override
     public EntityHooks entity()
@@ -31,6 +32,12 @@ public final class HooksImpl implements Hooks
     public GameRuleHooks gameRules()
     {
         return gameRuleHooks;
+    }
+
+    @Override
+    public CreativeModeTabHooks creativeModeTabs()
+    {
+        return creativeModeTabHooks;
     }
 
     @Override
