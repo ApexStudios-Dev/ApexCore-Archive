@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.Services;
 import xyz.apex.minecraft.apexcore.common.lib.hook.CreativeModeTabHooks;
 import xyz.apex.minecraft.apexcore.common.lib.hook.GameRuleHooks;
+import xyz.apex.minecraft.apexcore.common.lib.modloader.ModLoader;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.builders.BuilderManager;
@@ -99,5 +100,7 @@ public interface ApexCore
         );
 
         CreativeModeTabHooks.get().modify(CreativeModeTabs.SPAWN_EGGS, b -> b.accept(() -> items.get(testEntity.getRegistryName().withSuffix("_spawn_egg")).get()));
+
+        ModLoader.get().findMod(ID).orElseThrow(); // throw exception if we cant find apexcore mod
     }
 }

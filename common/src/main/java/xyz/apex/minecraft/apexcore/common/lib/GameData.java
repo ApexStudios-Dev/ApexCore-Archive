@@ -34,6 +34,16 @@ public interface GameData extends Services.Service
      */
     boolean isDataGenActive();
 
+    /**
+     * @return True if running in a MinecraftForge environment.
+     */
+    boolean isForge();
+
+    /**
+     * @return True if running in a Fabric environment.
+     */
+    boolean isFabric();
+
     @Override
     default void bootstrap()
     {

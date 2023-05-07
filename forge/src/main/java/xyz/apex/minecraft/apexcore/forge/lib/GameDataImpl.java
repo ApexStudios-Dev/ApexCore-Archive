@@ -43,4 +43,16 @@ public final class GameDataImpl implements GameData
     {
         return DatagenModLoader.isRunningDataGen();
     }
+
+    @Override
+    public boolean isForge()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean isFabric()
+    {
+        return false;
+    }
 }

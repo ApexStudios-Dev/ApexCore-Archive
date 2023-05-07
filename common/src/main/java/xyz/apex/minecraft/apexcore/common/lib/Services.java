@@ -5,6 +5,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.hook.Hooks;
+import xyz.apex.minecraft.apexcore.common.lib.modloader.ModLoader;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryApi;
 
 import java.util.ServiceLoader;
@@ -17,6 +18,7 @@ public interface Services
     RegistryApi REGISTRIES = load(RegistryApi.class);
     GameData GAME_DATA = load(GameData.class);
     Hooks HOOKS = load(Hooks.class);
+    ModLoader MOD_LOADER = load(ModLoader.class);
 
     /**
      * Returns first implementation of given service type from classpath, or default if one is specified.

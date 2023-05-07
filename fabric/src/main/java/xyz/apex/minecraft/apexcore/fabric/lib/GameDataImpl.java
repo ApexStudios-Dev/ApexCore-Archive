@@ -43,4 +43,16 @@ public final class GameDataImpl implements GameData
     {
         return FabricDataGenHelper.ENABLED;
     }
+
+    @Override
+    public boolean isForge()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isFabric()
+    {
+        return true;
+    }
 }
