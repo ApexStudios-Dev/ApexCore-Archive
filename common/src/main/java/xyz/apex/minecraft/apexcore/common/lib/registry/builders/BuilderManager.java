@@ -3,11 +3,15 @@ package xyz.apex.minecraft.apexcore.common.lib.registry.builders;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import xyz.apex.minecraft.apexcore.common.lib.enchantment.SimpleEnchantment;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockEntityFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockFactory;
+import xyz.apex.minecraft.apexcore.common.lib.registry.factories.EnchantmentFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.ItemFactory;
 
 /**
@@ -160,6 +164,64 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      */
     <T extends BlockEntity> BlockEntityBuilder<BuilderManager, T> blockEntity(String registrationName, BlockEntityFactory<T> blockEntityFactory);
     // endregion
+
+    // region: Enchantment
+
+    /**
+     * Returns new builder used to build a new enchantment instance.
+     *
+     * @param parent              Parent element of the builder.
+     * @param registrationName    Registration name of the builder.
+     * @param enchantmentCategory Enchantment category.
+     * @param enchantmentFactory  Enchantment factory used to construct finalized enchantment instance.
+     * @param <P>                 Type of parent element.
+     * @param <T>                 Type of enchantment.
+     * @return New builder used to build a new block entity type instance.
+     */
+    <P, T extends Enchantment> EnchantmentBuilder<P, T> enchantment(P parent, String registrationName, EnchantmentCategory enchantmentCategory, EnchantmentFactory<T> enchantmentFactory);
+
+    /**
+     * Returns new builder used to build a new enchantment instance.
+     *
+     * @param parent              Parent element of the builder.
+     * @param registrationName    Registration name of the builder.
+     * @param enchantmentCategory Enchantment category.
+     * @param <P>                 Type of parent element.
+     * @return New builder used to build a new block entity type instance.
+     */
+    <P> EnchantmentBuilder<P, SimpleEnchantment> enchantment(P parent, String registrationName, EnchantmentCategory enchantmentCategory);
+
+    /**
+     * Returns new builder used to build a new enchantment instance.
+     *
+     * @param registrationName    Registration name of the builder.
+     * @param enchantmentCategory Enchantment category.
+     * @param enchantmentFactory  Enchantment factory used to construct finalized enchantment instance.
+     * @param <T>                 Type of enchantment.
+     * @return New builder used to build a new block entity type instance.
+     */
+    <T extends Enchantment> EnchantmentBuilder<BuilderManager, T> enchantment(String registrationName, EnchantmentCategory enchantmentCategory, EnchantmentFactory<T> enchantmentFactory);
+
+    /**
+     * Returns new builder used to build a new enchantment instance.
+     *
+     * @param registrationName    Registration name of the builder.
+     * @param enchantmentCategory Enchantment category.
+     * @return New builder used to build a new block entity type instance.
+     */
+    EnchantmentBuilder<BuilderManager, SimpleEnchantment> enchantment(String registrationName, EnchantmentCategory enchantmentCategory);
+    // endregion
+
+    // TODO:
+    //  DamageType
+    //  Fluid
+    //  MenuType
+    //  MobEffect
+    //  ParticleType
+    //  PoiType
+    //  SoundEvent
+    //  TrimMaterial
+    //  TrimPattern
 
     /**
      * Returns new builder manager bound to the given registrar manager.

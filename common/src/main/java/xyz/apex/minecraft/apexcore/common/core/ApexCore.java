@@ -10,6 +10,8 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -101,16 +103,27 @@ public interface ApexCore
             }
         }).simpleItem().register();
 
+        var enchantment = builders.enchantment("shiny", EnchantmentCategory.ARMOR).armorSlots().rarity(Enchantment.Rarity.RARE).register();
+
         GameRuleHooks.get().registerBoolean(ID, "testing_game_rule", GameRules.Category.MISC, false);
 
         CreativeModeTabHooks.get().register(ID, "test", builder -> builder
                 .icon(testItem::asStack)
-                .displayItems((params, output) -> items.entries()
-                        .filter(RegistryEntry::isPresent)
-                        .map(RegistryEntry::get)
-                        .filter(item -> item.isEnabled(params.enabledFeatures()))
-                        .forEach(output::accept)
-                )
+                .displayItems((params, output) -> {
+                    items.entries()
+                            .filter(RegistryEntry::isPresent)
+                            .map(RegistryEntry::get)
+                            .filter(item -> item.isEnabled(params.enabledFeatures()))
+                            .forEach(output::accept);
+
+                    // add stack to tab for every level of this enchantment
+                    enchantment.ifPresent(ench -> {
+                        for(var i = ench.getMinLevel(); i <= ench.getMaxLevel(); i++)
+                        {
+                            output.accept(enchantment.asStack(i));
+                        }
+                    });
+                })
         );
 
         CreativeModeTabHooks.get().modify(CreativeModeTabs.SPAWN_EGGS, b -> b.accept(() -> items.get(testEntity.getRegistryName().withSuffix("_spawn_egg")).get()));

@@ -3,11 +3,15 @@ package xyz.apex.minecraft.apexcore.common.lib.registry.builders;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import xyz.apex.minecraft.apexcore.common.lib.enchantment.SimpleEnchantment;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockEntityFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockFactory;
+import xyz.apex.minecraft.apexcore.common.lib.registry.factories.EnchantmentFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.ItemFactory;
 
 public non-sealed class BuilderManagerImpl implements BuilderManager
@@ -108,6 +112,32 @@ public non-sealed class BuilderManagerImpl implements BuilderManager
     public final <T extends BlockEntity> BlockEntityBuilder<BuilderManager, T> blockEntity(String registrationName, BlockEntityFactory<T> entityFactory)
     {
         return blockEntity(this, registrationName, entityFactory);
+    }
+    // endregion
+
+    // region: Enchantment
+    @Override
+    public final <P, T extends Enchantment> EnchantmentBuilder<P, T> enchantment(P parent, String registrationName, EnchantmentCategory enchantmentCategory, EnchantmentFactory<T> enchantmentFactory)
+    {
+        return new EnchantmentBuilder<>(parent, this, registrationName, enchantmentCategory, enchantmentFactory);
+    }
+
+    @Override
+    public <P> EnchantmentBuilder<P, SimpleEnchantment> enchantment(P parent, String registrationName, EnchantmentCategory enchantmentCategory)
+    {
+        return enchantment(parent, registrationName, enchantmentCategory, SimpleEnchantment::new);
+    }
+
+    @Override
+    public final <T extends Enchantment> EnchantmentBuilder<BuilderManager, T> enchantment(String registrationName, EnchantmentCategory enchantmentCategory, EnchantmentFactory<T> enchantmentFactory)
+    {
+        return enchantment(this, registrationName, enchantmentCategory, enchantmentFactory);
+    }
+
+    @Override
+    public EnchantmentBuilder<BuilderManager, SimpleEnchantment> enchantment(String registrationName, EnchantmentCategory enchantmentCategory)
+    {
+        return enchantment(this, registrationName, enchantmentCategory, SimpleEnchantment::new);
     }
     // endregion
 }
