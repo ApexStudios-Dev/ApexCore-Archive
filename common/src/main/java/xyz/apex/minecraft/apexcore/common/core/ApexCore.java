@@ -18,6 +18,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.Services;
+import xyz.apex.minecraft.apexcore.common.lib.component.block.BlockComponentHolder;
+import xyz.apex.minecraft.apexcore.common.lib.component.block.BlockComponentTypes;
 import xyz.apex.minecraft.apexcore.common.lib.hook.CreativeModeTabHooks;
 import xyz.apex.minecraft.apexcore.common.lib.hook.GameRuleHooks;
 import xyz.apex.minecraft.apexcore.common.lib.modloader.ModLoader;
@@ -87,6 +89,16 @@ public interface ApexCore
                 return HumanoidArm.LEFT;
             }
         }).defaultSpawnEgg(0x0, 0x161616).renderer(() -> () -> NoopRenderer::new).attributes(LivingEntity::createLivingAttributes).register();
+
+        builders.block("component_block", properties -> new BlockComponentHolder(properties)
+        {
+            @Override
+            protected void registerComponents(Registrar registrar)
+            {
+                registrar.register(BlockComponentTypes.WATER_LOGGED);
+            }
+        }).simpleItem().register();
+
         GameRuleHooks.get().registerBoolean(ID, "testing_game_rule", GameRules.Category.MISC, false);
 
         CreativeModeTabHooks.get().register(ID, "test", builder -> builder
