@@ -45,4 +45,9 @@ public class ItemComponent extends BaseComponent<Item, ItemComponentHolder>
     {
         return true;
     }
+
+    protected ItemStack getDefaultInstance(ItemStack stack)
+    {
+        return stack;
+    }
 }

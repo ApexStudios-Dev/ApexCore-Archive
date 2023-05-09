@@ -210,6 +210,20 @@ public class ItemComponentHolder extends Item implements ComponentHolder<Item, I
     {
         return itemComponents().anyMatch(ItemComponent::canFitInsideContainerItems);
     }
+
+    @OverridingMethodsMustInvokeSuper
+    @Override
+    public ItemStack getDefaultInstance()
+    {
+        var defaultInstance = super.getDefaultInstance();
+
+        for(var component : getItemComponents())
+        {
+            defaultInstance = component.getDefaultInstance(defaultInstance);
+        }
+
+        return defaultInstance;
+    }
     // endregion
 
     @FunctionalInterface
