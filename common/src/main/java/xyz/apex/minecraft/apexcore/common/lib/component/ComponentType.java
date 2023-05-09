@@ -3,6 +3,7 @@ package xyz.apex.minecraft.apexcore.common.lib.component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.BlockComponentTypes;
+import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.BlockEntityComponentTypes;
 import xyz.apex.minecraft.apexcore.common.lib.component.item.ItemComponentTypes;
 
 /**
@@ -39,5 +40,6 @@ public sealed interface ComponentType<V, H extends ComponentHolder<V, H>, T exte
     {
         BlockComponentTypes.bootstrap();
         ItemComponentTypes.bootstrap();
+        BlockEntityComponentTypes.bootstrap();
     }
 }

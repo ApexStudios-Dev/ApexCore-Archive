@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.Services;
+import xyz.apex.minecraft.apexcore.common.lib.component.ComponentType;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.BlockComponentHolder;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.BlockComponentTypes;
 import xyz.apex.minecraft.apexcore.common.lib.hook.CreativeModeTabHooks;
@@ -37,6 +38,7 @@ public interface ApexCore
     default void bootstrap()
     {
         Services.bootstrap();
+        ComponentType.bootstrap();
         // enableTestElements();
         RegistrarManager.register(ID);
     }
