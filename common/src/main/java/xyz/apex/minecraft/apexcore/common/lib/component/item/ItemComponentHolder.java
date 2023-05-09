@@ -1,13 +1,23 @@
 package xyz.apex.minecraft.apexcore.common.lib.component.item;
 
 import com.google.common.collect.ImmutableList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.component.Component;
 import xyz.apex.minecraft.apexcore.common.lib.component.ComponentHolder;
 import xyz.apex.minecraft.apexcore.common.lib.component.ComponentManager;
 import xyz.apex.minecraft.apexcore.common.lib.component.ComponentType;
 
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -156,6 +166,49 @@ public class ItemComponentHolder extends Item implements ComponentHolder<Item, I
     public final Item toGameObject()
     {
         return this;
+    }
+    // endregion
+
+    // region: Hooks
+    @OverridingMethodsMustInvokeSuper
+    @Override
+    public void verifyTagAfterLoad(CompoundTag compoundTag)
+    {
+        itemComponents().forEach(component -> component.verifyTagAfterLoad(compoundTag));
+    }
+
+    @OverridingMethodsMustInvokeSuper
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand)
+    {
+        for(var component : getItemComponents())
+        {
+            var result = component.use(level, player, usedHand);
+            if(result.getResult().consumesAction()) return result;
+        }
+
+        return super.use(level, player, usedHand);
+    }
+
+    @OverridingMethodsMustInvokeSuper
+    @Override
+    public boolean overrideStackedOnOther(ItemStack stack, Slot slot, ClickAction action, Player player)
+    {
+        return itemComponents().anyMatch(component -> component.overrideStackedOnOther(stack, slot, action, player));
+    }
+
+    @OverridingMethodsMustInvokeSuper
+    @Override
+    public boolean overrideOtherStackedOnMe(ItemStack stack, ItemStack other, Slot slot, ClickAction action, Player player, SlotAccess access)
+    {
+        return itemComponents().anyMatch(component -> component.overrideOtherStackedOnMe(stack, other, slot, action, player, access));
+    }
+
+    @OverridingMethodsMustInvokeSuper
+    @Override
+    public boolean canFitInsideContainerItems()
+    {
+        return itemComponents().anyMatch(ItemComponent::canFitInsideContainerItems);
     }
     // endregion
 
