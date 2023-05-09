@@ -39,16 +39,16 @@ final class RegisterRendererHooksImpl implements RegisterRendererHooks
     }
 
     @Override
-    public <T extends BlockEntity> void registerBlockEntityRenderer(Supplier<? extends BlockEntityType<T>> blockEntityType, Supplier<BlockEntityRendererProvider<T>> blockEntityRendererProvider)
+    public <T extends BlockEntity> void registerBlockEntityRenderer(Supplier<? extends BlockEntityType<T>> blockEntityType, Supplier<Supplier<BlockEntityRendererProvider<T>>> blockEntityRendererProvider)
     {
         Validate.isTrue(PhysicalSide.isRunningOn(PhysicalSide.CLIENT));
-        BlockEntityRenderers.register(blockEntityType.get(), blockEntityRendererProvider.get());
+        BlockEntityRenderers.register(blockEntityType.get(), blockEntityRendererProvider.get().get());
     }
 
     @Override
-    public <T extends Entity> void registerEntityRenderer(Supplier<? extends EntityType<T>> entityType, Supplier<EntityRendererProvider<T>> entityRendererProvider)
+    public <T extends Entity> void registerEntityRenderer(Supplier<? extends EntityType<T>> entityType, Supplier<Supplier<EntityRendererProvider<T>>> entityRendererProvider)
     {
         Validate.isTrue(PhysicalSide.isRunningOn(PhysicalSide.CLIENT));
-        EntityRendererRegistry.register(entityType.get(), entityRendererProvider.get());
+        EntityRendererRegistry.register(entityType.get(), entityRendererProvider.get().get());
     }
 }

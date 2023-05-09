@@ -45,7 +45,7 @@ public interface RegisterRendererHooks
      * @param blockEntityRendererProvider Block entity renderer to register.
      * @param <T>                         Block entity type.
      */
-    <T extends BlockEntity> void registerBlockEntityRenderer(Supplier<? extends BlockEntityType<T>> blockEntityType, Supplier<BlockEntityRendererProvider<T>> blockEntityRendererProvider);
+    <T extends BlockEntity> void registerBlockEntityRenderer(Supplier<? extends BlockEntityType<T>> blockEntityType, Supplier<Supplier<BlockEntityRendererProvider<T>>> blockEntityRendererProvider);
 
     /**
      * Registers renderer for given entity type.
@@ -54,7 +54,7 @@ public interface RegisterRendererHooks
      * @param entityRendererProvider Entity renderer to register.
      * @param <T>                    Entity type.
      */
-    <T extends Entity> void registerEntityRenderer(Supplier<? extends EntityType<T>> entityType, Supplier<EntityRendererProvider<T>> entityRendererProvider);
+    <T extends Entity> void registerEntityRenderer(Supplier<? extends EntityType<T>> entityType, Supplier<Supplier<EntityRendererProvider<T>>> entityRendererProvider);
 
     /**
      * @return Global instance.

@@ -109,7 +109,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
      * @param renderer Renderer to be registered.
      * @return This builder instance
      */
-    public EntityBuilder<P, T> renderer(Supplier<EntityRendererProvider<T>> renderer)
+    public EntityBuilder<P, T> renderer(Supplier<Supplier<EntityRendererProvider<T>>> renderer)
     {
         return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> RegisterRendererHooks.get().registerEntityRenderer(() -> value, renderer)));
     }

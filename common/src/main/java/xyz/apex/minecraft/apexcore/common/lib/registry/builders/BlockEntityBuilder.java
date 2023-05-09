@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.common.lib.registry.builders;
 
+import com.google.common.collect.Lists;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.registries.Registries;
@@ -7,7 +8,6 @@ import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import org.apache.commons.compress.utils.Lists;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.hook.RegisterRendererHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.BlockEntityEntry;
@@ -51,7 +51,7 @@ public final class BlockEntityBuilder<P, T extends BlockEntity> extends Abstract
      * @param renderer Renderer to be registered.
      * @return This builder instance
      */
-    public BlockEntityBuilder<P, T> renderer(Supplier<BlockEntityRendererProvider<T>> renderer)
+    public BlockEntityBuilder<P, T> renderer(Supplier<Supplier<BlockEntityRendererProvider<T>>> renderer)
     {
         return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> RegisterRendererHooks.get().registerBlockEntityRenderer(() -> value, renderer)));
     }

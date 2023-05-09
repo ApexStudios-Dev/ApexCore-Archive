@@ -86,7 +86,7 @@ public interface ApexCore
             {
                 return HumanoidArm.LEFT;
             }
-        }).defaultSpawnEgg(0x0, 0x161616).renderer(() -> NoopRenderer::new).attributes(LivingEntity::createLivingAttributes).register();
+        }).defaultSpawnEgg(0x0, 0x161616).renderer(() -> () -> NoopRenderer::new).attributes(LivingEntity::createLivingAttributes).register();
         GameRuleHooks.get().registerBoolean(ID, "testing_game_rule", GameRules.Category.MISC, false);
 
         CreativeModeTabHooks.get().register(ID, "test", builder -> builder
