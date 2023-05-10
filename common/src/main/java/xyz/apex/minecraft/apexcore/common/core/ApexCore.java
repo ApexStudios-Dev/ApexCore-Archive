@@ -30,6 +30,7 @@ import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.BlockEntity
 import xyz.apex.minecraft.apexcore.common.lib.hook.CreativeModeTabHooks;
 import xyz.apex.minecraft.apexcore.common.lib.hook.GameRuleHooks;
 import xyz.apex.minecraft.apexcore.common.lib.modloader.ModLoader;
+import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockPattern;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.builders.BuilderManager;
@@ -226,7 +227,12 @@ public interface ApexCore
             @Override
             protected void registerComponents(Registrar registrar)
             {
-                registrar.register(BlockComponentTypes.MULTI_BLOCK, component -> component.withPattern(MultiBlockPatterns.MB_3x3x3));
+                registrar.register(BlockComponentTypes.MULTI_BLOCK, component -> component.withPattern(MultiBlockPattern.builder()
+                        .with("XXX", "XXX", "XXX")
+                        .with("XXX", "XXX", "XXX")
+                        .with("XXX", "XXX", "XXX")
+                        .build()
+                ));
             }
         }).simpleItem().blockEntity(MultiBlockEntityTest::new).addListener(multiBlockEntity::set).end().register();
     }
