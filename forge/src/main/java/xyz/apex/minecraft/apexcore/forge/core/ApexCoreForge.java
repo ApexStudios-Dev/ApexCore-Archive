@@ -11,5 +11,30 @@ public final class ApexCoreForge implements ApexCore
     {
         bootstrap();
         EventBuses.registerForJavaFML();
+
+        // TODO: Fix this, requires components but they are registered after capabilities are attached
+        //MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, this::onAttachBlockEntityCapabilities);
     }
+
+    /*private void onAttachBlockEntityCapabilities(AttachCapabilitiesEvent<BlockEntity> event)
+    {
+        if(!(event.getObject() instanceof BlockEntityComponentHolder holder)) return;
+
+        holder.getOptionalComponent(BlockEntityComponentTypes.MULTI_BLOCK)
+                .filter(Predicate.not(MultiBlockEntityComponent::isMaster))
+                .ifPresent(component -> event.addCapability(new ResourceLocation(ApexCore.ID, "capability_proxy"), new ICapabilityProvider()
+                        {
+                            @NotNull
+                            @Override
+                            public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side)
+                            {
+                                var masterPos = component.getMasterPos();
+                                var blockEntity = component.getLevel().getBlockEntity(masterPos);
+                                if(blockEntity == null) return LazyOptional.empty();
+                                return blockEntity.getCapability(cap, side);
+                            }
+                        })
+                )
+        ;
+    }*/
 }
