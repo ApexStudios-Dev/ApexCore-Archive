@@ -28,3 +28,7 @@ transitive-accessible class net/minecraft/world/level/block/entity/BlockEntityTy
 
 # Made public for use in BlockEntityEntry
 transitive-accessible field net/minecraft/world/level/block/entity/BlockEntityType validBlocks Ljava/util/Set;
+
+# Made public for menu type registration
+transitive-accessible method net/minecraft/client/gui/screens/MenuScreens register (Lnet/minecraft/world/inventory/MenuType;Lnet/minecraft/client/gui/screens/MenuScreens$ScreenConstructor;)V
+transitive-accessible class net/minecraft/client/gui/screens/MenuScreens$ScreenConstructor

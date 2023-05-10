@@ -35,6 +35,11 @@ public interface Hooks extends Services.Service
     CreativeModeTabHooks creativeModeTabs();
 
     /**
+     * Hooks for various menu related things.
+     */
+    MenuHooks menu();
+
+    /**
      * Hooks for registering various renderer elements.
      * <p>
      * May throw exceptions if used server side, wrap any calls in a client {@link PhysicalSide#runWhenOn(PhysicalSide, Supplier)}.

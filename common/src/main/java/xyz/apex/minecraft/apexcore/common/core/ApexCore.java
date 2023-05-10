@@ -129,5 +129,75 @@ public interface ApexCore
         CreativeModeTabHooks.get().modify(CreativeModeTabs.SPAWN_EGGS, b -> b.accept(() -> items.get(testEntity.getRegistryName().withSuffix("_spawn_egg")).get()));
 
         ModLoader.get().findMod(ID).orElseThrow(); // throw exception if we cant find apexcore mod
+
+        // Kills server as we try to create instance of AbstractContainerScreen which is not present server side.
+        /*var menu = new AtomicReference<MenuType<?>>();
+
+        class NoopMenu extends AbstractContainerMenu
+        {
+            private final ContainerLevelAccess levelAccess;
+
+            private NoopMenu(int windowId, ContainerLevelAccess levelAccess)
+            {
+                super(menu.get(), windowId);
+
+                this.levelAccess = levelAccess;
+            }
+
+            @Override
+            public ItemStack quickMoveStack(Player player, int index)
+            {
+                return ItemStack.EMPTY;
+            }
+
+            @Override
+            public boolean stillValid(Player player)
+            {
+                return true;
+            }
+        }
+
+        var menuEntry = MenuEntry.<NoopMenu, AbstractContainerScreen<NoopMenu>>register(
+                ID, "test_menu",
+                (windowId, playerInventory, extraData) -> new NoopMenu(windowId, ContainerLevelAccess.create(playerInventory.player.level, extraData.readBlockPos())),
+                (windowId, playerInventory) -> new NoopMenu(windowId, ContainerLevelAccess.NULL),
+                () -> () -> ($, playerInventory, displayName) -> new AbstractContainerScreen<>($, playerInventory, displayName)
+                {
+                    @Override
+                    protected void renderBg(PoseStack pose, float partialTick, int mouseX, int mouseY)
+                    {
+                        renderBackground(pose);
+                        drawString(pose, font, "%d, %d".formatted(mouseX, mouseY), mouseX + 8, mouseY + 8, 0);
+
+                        menu.levelAccess.execute((level, pos) -> {
+                            var blockState = level.getBlockState(pos);
+                            if(blockState.isAir()) return;
+                            var seed = (int) blockState.getSeed(pos);
+                            var item = blockState.getBlock().asItem().getDefaultInstance();
+                            itemRenderer.renderAndDecorateItem(pose, item, mouseX, mouseY, seed, 0);
+                        });
+                    }
+                }
+        );
+        menuEntry.addListener(menu::set);
+        builders.block("menu_block", properties -> new Block(properties)
+        {
+            @Override
+            public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
+            {
+                if(player instanceof ServerPlayer sp)
+                {
+                    menuEntry.open(sp, getName(), data -> data.writeBlockPos(pos.below()));
+                    return InteractionResult.SUCCESS;
+                }
+                return super.use(state, level, pos, player, hand, hit);
+            }
+
+            @Override
+            public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos)
+            {
+                return menuEntry.asProvider(getName(), data -> data.writeBlockPos(pos.below()));
+            }
+        }).simpleItem().register();*/
     }
 }

@@ -20,6 +20,7 @@ public final class HooksImpl implements Hooks
     private final EntityHooks entityHooks = new EntityHooksImpl();
     private final GameRuleHooks gameRuleHooks = new GameRuleHooksImpl();
     private final CreativeModeTabHooks creativeModeTabHooks = new CreativeModeTabHooksImpl();
+    private final MenuHooks menuHooks = new MenuHooksImpl();
 
     @Override
     public EntityHooks entity()
@@ -37,6 +38,12 @@ public final class HooksImpl implements Hooks
     public CreativeModeTabHooks creativeModeTabs()
     {
         return creativeModeTabHooks;
+    }
+
+    @Override
+    public MenuHooks menu()
+    {
+        return menuHooks;
     }
 
     @Override
