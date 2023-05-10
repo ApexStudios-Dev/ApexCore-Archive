@@ -40,22 +40,22 @@ public class BlockEntityComponent extends BaseComponent<BlockEntity, BlockEntity
         return false;
     }
 
-    protected final void setChanged()
+    public final void setChanged()
     {
         toGameObject().setChanged();
     }
 
-    protected final Level getLevel()
+    public final Level getLevel()
     {
         return Objects.requireNonNull(toGameObject().getLevel());
     }
 
-    protected final BlockPos getPos()
+    public final BlockPos getPos()
     {
         return toGameObject().getBlockPos();
     }
 
-    protected final BlockState getBlockState()
+    public final BlockState getBlockState()
     {
         return toGameObject().getBlockState();
     }
