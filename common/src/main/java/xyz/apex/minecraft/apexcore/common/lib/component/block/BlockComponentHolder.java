@@ -13,6 +13,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
@@ -231,6 +232,16 @@ public class BlockComponentHolder extends Block implements ComponentHolder<Block
 
     @OverridingMethodsMustInvokeSuper
     @Override
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player)
+    {
+        blockComponents().forEach(component -> component.playerWillDestroy(level, pos, blockState, player));
+
+        // spawn particles, anger piglins, fire game event
+        super.playerWillDestroy(level, pos, blockState, player);
+    }
+
+    @OverridingMethodsMustInvokeSuper
+    @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack)
     {
         blockComponents().forEach(component -> component.setPlacedBy(level, pos, blockState, placer, stack));
@@ -254,6 +265,13 @@ public class BlockComponentHolder extends Block implements ComponentHolder<Block
         }
 
         return blockState;
+    }
+
+    @OverridingMethodsMustInvokeSuper
+    @Override
+    public boolean canSurvive(BlockState blockState, LevelReader level, BlockPos pos)
+    {
+        return blockComponents().anyMatch(component -> component.canSurvive(blockState, level, pos));
     }
 
     @OverridingMethodsMustInvokeSuper

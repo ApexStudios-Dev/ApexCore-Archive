@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
@@ -43,6 +44,10 @@ public class BlockComponent extends BaseComponent<Block, BlockComponentHolder>
     {
     }
 
+    protected void playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player)
+    {
+    }
+
     protected void setPlacedBy(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack)
     {
     }
@@ -59,6 +64,11 @@ public class BlockComponent extends BaseComponent<Block, BlockComponentHolder>
     protected BlockState updateShape(BlockState blockState, Direction direction, BlockState neighborBlockState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos)
     {
         return blockState;
+    }
+
+    protected boolean canSurvive(BlockState blockState, LevelReader level, BlockPos pos)
+    {
+        return true;
     }
 
     protected void neighborChanged(BlockState blockState, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving)
