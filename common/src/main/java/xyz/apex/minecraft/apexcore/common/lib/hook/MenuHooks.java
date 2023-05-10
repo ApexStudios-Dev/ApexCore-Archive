@@ -8,6 +8,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.apex.minecraft.apexcore.common.lib.GameData;
 import xyz.apex.minecraft.apexcore.common.lib.PlatformOnly;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.MenuEntry;
 
@@ -54,7 +55,7 @@ public interface MenuHooks
      * @param <T>                   Type of menu.
      * @return Menu provider for given properties.
      */
-    <T extends AbstractContainerMenu> MenuProvider createMenuProvider(Component displayName, ClientMenuConstructor<T> clientMenuConstructor, @PlatformOnly("fabric") Consumer<FriendlyByteBuf> extraData);
+    <T extends AbstractContainerMenu> MenuProvider createMenuProvider(Component displayName, ClientMenuConstructor<T> clientMenuConstructor, @PlatformOnly(GameData.FABRIC_ID) Consumer<FriendlyByteBuf> extraData);
 
     /**
      * @return Global instance.

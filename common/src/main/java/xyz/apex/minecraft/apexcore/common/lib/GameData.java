@@ -10,6 +10,16 @@ import org.jetbrains.annotations.ApiStatus;
 public interface GameData extends Services.Service
 {
     /**
+     * Mod ID for Forge
+     */
+    String FORGE_ID = "forge";
+
+    /**
+     * Mod ID for Fabric / FabricLoader
+     */
+    String FABRIC_ID = "fabricloader";
+
+    /**
      * @return The current side we are currently running on.
      */
     PhysicalSide getPhysicalSide();

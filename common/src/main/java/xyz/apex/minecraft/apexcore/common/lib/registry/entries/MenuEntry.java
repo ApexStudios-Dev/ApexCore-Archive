@@ -13,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.inventory.MenuType;
+import xyz.apex.minecraft.apexcore.common.lib.GameData;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.PlatformOnly;
 import xyz.apex.minecraft.apexcore.common.lib.hook.MenuHooks;
@@ -61,7 +62,7 @@ public final class MenuEntry<T extends AbstractContainerMenu> extends RegistryEn
      * @param extraData   Extra data to be written when this menu provider is used.
      * @return Menu provider for this menu type.
      */
-    public MenuProvider asProvider(Component displayName, @PlatformOnly("fabric") Consumer<FriendlyByteBuf> extraData)
+    public MenuProvider asProvider(Component displayName, @PlatformOnly(GameData.FABRIC_ID) Consumer<FriendlyByteBuf> extraData)
     {
         return MenuHooks.get().createMenuProvider(displayName, clientMenuConstructor, extraData);
     }
