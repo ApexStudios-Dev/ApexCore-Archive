@@ -15,6 +15,7 @@ import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,6 +24,9 @@ import xyz.apex.minecraft.apexcore.common.lib.Services;
 import xyz.apex.minecraft.apexcore.common.lib.component.ComponentType;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.BlockComponentHolder;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.BlockComponentTypes;
+import xyz.apex.minecraft.apexcore.common.lib.component.block.EntityBlockComponentHolder;
+import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.BlockEntityComponentHolder;
+import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.BlockEntityComponentTypes;
 import xyz.apex.minecraft.apexcore.common.lib.hook.CreativeModeTabHooks;
 import xyz.apex.minecraft.apexcore.common.lib.hook.GameRuleHooks;
 import xyz.apex.minecraft.apexcore.common.lib.modloader.ModLoader;
@@ -31,6 +35,7 @@ import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.builders.BuilderManager;
 
 import java.util.Collections;
+import java.util.concurrent.atomic.AtomicReference;
 
 public interface ApexCore
 {
@@ -199,5 +204,30 @@ public interface ApexCore
                 return menuEntry.asProvider(getName(), data -> data.writeBlockPos(pos.below()));
             }
         }).simpleItem().register();*/
+
+        class MultiBlockEntityTest extends BlockEntityComponentHolder
+        {
+            public MultiBlockEntityTest(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState blockState)
+            {
+                super(blockEntityType, pos, blockState);
+            }
+
+            @Override
+            protected void registerComponents(Registrar registrar)
+            {
+                registrar.register(BlockEntityComponentTypes.MULTI_BLOCK);
+            }
+        }
+
+        var multiBlockEntity = new AtomicReference<BlockEntityType<MultiBlockEntityTest>>();
+
+        builders.block("multi_block_test", properties -> new EntityBlockComponentHolder(multiBlockEntity::get, properties)
+        {
+            @Override
+            protected void registerComponents(Registrar registrar)
+            {
+                registrar.register(BlockComponentTypes.MULTI_BLOCK, component -> component.withPattern(MultiBlockPatterns.MB_3x3x3));
+            }
+        }).simpleItem().blockEntity(MultiBlockEntityTest::new).addListener(multiBlockEntity::set).end().register();
     }
 }

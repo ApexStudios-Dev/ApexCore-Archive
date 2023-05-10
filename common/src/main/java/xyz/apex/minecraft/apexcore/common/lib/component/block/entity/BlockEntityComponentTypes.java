@@ -1,10 +1,13 @@
 package xyz.apex.minecraft.apexcore.common.lib.component.block.entity;
 
 import org.jetbrains.annotations.ApiStatus;
+import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockEntityComponent;
 
 @ApiStatus.NonExtendable
 public interface BlockEntityComponentTypes
 {
+    BlockEntityComponentType<MultiBlockEntityComponent> MULTI_BLOCK = MultiBlockEntityComponent.COMPONENT_TYPE;
+
     /**
      * Registers and returns new block entity component type.
      *
