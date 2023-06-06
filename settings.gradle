@@ -15,4 +15,4 @@ pluginManagement {
 	}
 }
 
-rootProject.name = "${mod_name}-${minecraft_version}"
+rootProject.name = "ApexCore"
