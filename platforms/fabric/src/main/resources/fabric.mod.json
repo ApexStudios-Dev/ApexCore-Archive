@@ -56,7 +56,10 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "xyz.apex.minecraft.apexcore.fabric.ApexCoreFabric"
+            "xyz.apex.minecraft.apexcore.fabric.core.ApexCoreImpl"
+        ],
+        "client": [
+            "xyz.apex.minecraft.apexcore.fabric.core.ApexCoreClient"
         ]
     },
     "depends": {

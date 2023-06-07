@@ -100,7 +100,7 @@ dependencies {
 
     annotationProcessor "org.spongepowered:mixin:${MIXIN_VERSION}:processor"
 
-    compileOnly project(':common')
+    compileOnly project(path: ':common', configuration: 'namedElements')
 
     if(rootProject.hasProperty('DEVLOGIN_VERSION')) {
         runtimeOnly "net.covers1624:DevLogin:${DEVLOGIN_VERSION}"

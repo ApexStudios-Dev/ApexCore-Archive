@@ -50,8 +50,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
     modApi "net.fabricmc.fabric-api:fabric-api:${FABRIC_API_VERSION}+${MINECRAFT_VERSION}"
 
-    compileOnly project(':common')
-    implementation project(path: ':common', configuration: 'namedElements')
+    compileOnly project(path: ':common', configuration: 'namedElements')
 
     if(rootProject.hasProperty('DEVLOGIN_VERSION')) {
         localRuntime "net.covers1624:DevLogin:${DEVLOGIN_VERSION}"
