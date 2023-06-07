@@ -28,9 +28,9 @@ public abstract class ApexCore
         EventType.bootstrap();
     }
 
-    public abstract PhysicalSide getPhysicalSide();
+    public abstract PhysicalSide physicalSide();
 
-    public abstract ModLoader getModLoader();
+    public abstract ModLoader modLoader();
 
     public abstract NetworkManager createNetworkManager(String ownerId);
 

@@ -52,13 +52,13 @@ public final class ApexCoreImpl extends ApexCore implements ModInitializer
     }
 
     @Override
-    public PhysicalSide getPhysicalSide()
+    public PhysicalSide physicalSide()
     {
         return physicalSide;
     }
 
     @Override
-    public ModLoader getModLoader()
+    public ModLoader modLoader()
     {
         return modLoader;
     }
