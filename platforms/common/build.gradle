@@ -1,8 +1,8 @@
 apply plugin: 'fabric-loom'
 
 loom {
-    if(file("${AW_FILE}").exists()) {
-        accessWidenerPath = "${AW_FILE}"
+    if(getRootProject().file("${AW_FILE}").exists()) {
+        accessWidenerPath = getRootProject().file("${AW_FILE}")
     }
 
     mixin.defaultRefmapName = "${MOD_ID}.refmap.json"

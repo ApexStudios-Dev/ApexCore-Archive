@@ -62,6 +62,7 @@
             "xyz.apex.minecraft.apexcore.fabric.core.ApexCoreClient"
         ]
     },
+    "accessWidener": "apexcore.accesswidener",
     "depends": {
         "minecraft": "~${MINECRAFT_VERSION}",
         "java": ">=${JAVA_VERSION}",

@@ -18,9 +18,11 @@ import xyz.apex.minecraft.apexcore.common.lib.event.EventType;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.EntityEvents;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.PlayerEvents;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.ServerEvents;
+import xyz.apex.minecraft.apexcore.common.lib.hook.Hooks;
 import xyz.apex.minecraft.apexcore.common.lib.modloader.ModLoader;
 import xyz.apex.minecraft.apexcore.common.lib.network.NetworkManager;
 import xyz.apex.minecraft.apexcore.forge.lib.EventBuses;
+import xyz.apex.minecraft.apexcore.forge.lib.hook.HooksImpl;
 import xyz.apex.minecraft.apexcore.forge.lib.modloader.ModLoaderImpl;
 import xyz.apex.minecraft.apexcore.forge.lib.network.NetworkManagerImpl;
 
@@ -35,6 +37,7 @@ public final class ApexCoreImpl extends ApexCore
     };
 
     private final ModLoader modLoader = new ModLoaderImpl();
+    private final Hooks hooks = new HooksImpl();
 
     public ApexCoreImpl()
     {
@@ -68,6 +71,12 @@ public final class ApexCoreImpl extends ApexCore
     public ModLoader modLoader()
     {
         return modLoader;
+    }
+
+    @Override
+    public Hooks hooks()
+    {
+        return hooks;
     }
 
     @Override

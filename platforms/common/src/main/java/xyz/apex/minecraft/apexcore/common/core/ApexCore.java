@@ -7,6 +7,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.event.EventType;
+import xyz.apex.minecraft.apexcore.common.lib.hook.Hooks;
 import xyz.apex.minecraft.apexcore.common.lib.modloader.ModLoader;
 import xyz.apex.minecraft.apexcore.common.lib.network.NetworkManager;
 
@@ -31,6 +32,8 @@ public abstract class ApexCore
     public abstract PhysicalSide physicalSide();
 
     public abstract ModLoader modLoader();
+
+    public abstract Hooks hooks();
 
     public abstract NetworkManager createNetworkManager(String ownerId);
 
