@@ -15,8 +15,8 @@ minecraft {
         mappings channel: 'official', version: "${MINECRAFT_VERSION}"
     }
 
-    if(file("${AT_FILE}").exists()) {
-        accessTransformer = "${AT_FILE}"
+    if(rootProject.file("${AT_FILE}").exists()) {
+        accessTransformer = rootProject.file("${AT_FILE}")
     }
 
     runs {

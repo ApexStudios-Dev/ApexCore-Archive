@@ -4,6 +4,7 @@ import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
+import xyz.apex.minecraft.apexcore.common.lib.registry.Registrar;
 
 import java.util.function.Supplier;
 
@@ -32,6 +33,13 @@ public interface Hooks
      * Hooks for various menu related things.
      */
     MenuHooks menu();
+
+    /**
+     * Hooks for registering & looking up entries to platform specific registries.
+     * <p>
+     * Recommended to never use this directly, but make use of {@link Registrar Registrars}.
+     */
+    RegistryHooks registry();
 
     /**
      * Hooks for registering various renderer elements.

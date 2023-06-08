@@ -28,7 +28,7 @@ public interface EntityHooks
      * @param entityType        Entity type to register default attributes for.
      * @param defaultAttributes Default attributes to be registered.
      */
-    void registerDefaultAttribute(Supplier<EntityType<? extends LivingEntity>> entityType, Supplier<AttributeSupplier.Builder> defaultAttributes);
+    void registerDefaultAttributes(Supplier<EntityType<? extends LivingEntity>> entityType, Supplier<AttributeSupplier.Builder> defaultAttributes);
 
     /**
      * Registers spawn placement details for the given entity type.

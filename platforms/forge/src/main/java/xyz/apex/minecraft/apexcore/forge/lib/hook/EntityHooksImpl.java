@@ -21,7 +21,7 @@ final class EntityHooksImpl implements EntityHooks
     }
 
     @Override
-    public void registerDefaultAttribute(Supplier<EntityType<? extends LivingEntity>> entityType, Supplier<AttributeSupplier.Builder> defaultAttributes)
+    public void registerDefaultAttributes(Supplier<EntityType<? extends LivingEntity>> entityType, Supplier<AttributeSupplier.Builder> defaultAttributes)
     {
         ModEvents.active().addListener(EntityAttributeCreationEvent.class, event -> event.put(entityType.get(), defaultAttributes.get().build()));
     }

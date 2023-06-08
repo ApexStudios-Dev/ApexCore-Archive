@@ -36,7 +36,7 @@ final class EntityHooksImpl implements EntityHooks
     }
 
     @Override
-    public void registerDefaultAttribute(Supplier<EntityType<? extends LivingEntity>> entityType, Supplier<AttributeSupplier.Builder> defaultAttributes)
+    public void registerDefaultAttributes(Supplier<EntityType<? extends LivingEntity>> entityType, Supplier<AttributeSupplier.Builder> defaultAttributes)
     {
         FabricDefaultAttributeRegistry.register(entityType.get(), defaultAttributes.get());
     }
