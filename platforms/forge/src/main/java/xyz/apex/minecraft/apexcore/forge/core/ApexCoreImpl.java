@@ -1,6 +1,7 @@
 package xyz.apex.minecraft.apexcore.forge.core;
 
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -39,8 +40,16 @@ public final class ApexCoreImpl extends ApexCore
     private final ModLoader modLoader = new ModLoaderImpl();
     private final Hooks hooks = new HooksImpl();
 
-    public ApexCoreImpl()
+    @Override
+    protected void bootstrap()
     {
+        // check if entity is instance of forges fake player class
+        // register before the one in common
+        // to ensure forge specific check happens first
+        EntityEvents.IS_FAKE_PLAYER.addListener(FakePlayer.class::isInstance);
+
+        super.bootstrap();
+
         EventBuses.registerForJavaFML();
         setupEvents();
         PhysicalSide.CLIENT.runWhenOn(() -> ApexCoreClient::new);

@@ -20,14 +20,15 @@ import java.util.function.UnaryOperator;
  *
  * @param <P> Type of parent element.
  * @param <T> Type of item.
+ * @param <M> Type of builder manager.
  */
-public final class ItemBuilder<P, T extends Item> extends AbstractBuilder<P, Item, T, ItemEntry<T>, ItemBuilder<P, T>> implements FeatureElementBuilder<P, Item, T, ItemEntry<T>, ItemBuilder<P, T>>
+public final class ItemBuilder<P, T extends Item, M extends BuilderManager<M>> extends AbstractBuilder<P, Item, T, ItemEntry<T>, ItemBuilder<P, T, M>, M> implements FeatureElementBuilder<P, Item, T, ItemEntry<T>, ItemBuilder<P, T, M>, M>
 {
     private Supplier<Item.Properties> initialProperties = Item.Properties::new;
     private ItemPropertiesModifier propertiesModifier = ItemPropertiesModifier.identity();
     private final ItemFactory<T> itemFactory;
 
-    ItemBuilder(P parent, BuilderManager builderManager, String registrationName, ItemFactory<T> itemFactory)
+    ItemBuilder(P parent, M builderManager, String registrationName, ItemFactory<T> itemFactory)
     {
         super(parent, builderManager, Registries.ITEM, registrationName, ItemEntry::new);
 
@@ -46,7 +47,7 @@ public final class ItemBuilder<P, T extends Item> extends AbstractBuilder<P, Ite
      * @param colorHandler Color handler to be registered.
      * @return This builder instance.
      */
-    public ItemBuilder<P, T> colorHandler(Supplier<Supplier<ItemColor>> colorHandler)
+    public ItemBuilder<P, T, M> colorHandler(Supplier<Supplier<ItemColor>> colorHandler)
     {
         return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> ColorHandlerHooks.get().registerItemHandler(() -> value, colorHandler)));
     }
@@ -57,7 +58,7 @@ public final class ItemBuilder<P, T extends Item> extends AbstractBuilder<P, Ite
      * @param initialProperties Initial item properties.
      * @return This builder instance
      */
-    public ItemBuilder<P, T> initialProperties(Supplier<Item.Properties> initialProperties)
+    public ItemBuilder<P, T, M> initialProperties(Supplier<Item.Properties> initialProperties)
     {
         this.initialProperties = initialProperties;
         return self();
@@ -69,7 +70,7 @@ public final class ItemBuilder<P, T extends Item> extends AbstractBuilder<P, Ite
      * @param initialProperties Initial item properties.
      * @return This builder instance.
      */
-    public ItemBuilder<P, T> initialProperties(ItemPropertiesModifier initialProperties)
+    public ItemBuilder<P, T, M> initialProperties(ItemPropertiesModifier initialProperties)
     {
         this.initialProperties = () -> initialProperties.modify(new Item.Properties());
         return self();
@@ -97,7 +98,7 @@ public final class ItemBuilder<P, T extends Item> extends AbstractBuilder<P, Ite
      * @param propertiesModifier Modifier used to modify the finalized item properties.
      * @return This builder instance.
      */
-    public ItemBuilder<P, T> properties(ItemPropertiesModifier propertiesModifier)
+    public ItemBuilder<P, T, M> properties(ItemPropertiesModifier propertiesModifier)
     {
         this.propertiesModifier = this.propertiesModifier.andThen(propertiesModifier);
         return self();
@@ -109,7 +110,7 @@ public final class ItemBuilder<P, T extends Item> extends AbstractBuilder<P, Ite
      * @param foodProperties Food properties to bind to this item marking it as an edible item.
      * @return This builder instance.
      */
-    public ItemBuilder<P, T> food(FoodProperties foodProperties)
+    public ItemBuilder<P, T, M> food(FoodProperties foodProperties)
     {
         return properties(properties -> properties.food(foodProperties));
     }
@@ -120,7 +121,7 @@ public final class ItemBuilder<P, T extends Item> extends AbstractBuilder<P, Ite
      * @param maxStackSize Max stack size for this item (1 - 64)
      * @return This builder instance.
      */
-    public ItemBuilder<P, T> stacksTo(int maxStackSize)
+    public ItemBuilder<P, T, M> stacksTo(int maxStackSize)
     {
         return properties(properties -> properties.stacksTo(maxStackSize));
     }
@@ -131,7 +132,7 @@ public final class ItemBuilder<P, T extends Item> extends AbstractBuilder<P, Ite
      * @param maxDamage Durability for this item.
      * @return This builder instance.
      */
-    public ItemBuilder<P, T> defaultDurability(int maxDamage)
+    public ItemBuilder<P, T, M> defaultDurability(int maxDamage)
     {
         return properties(properties -> properties.defaultDurability(maxDamage));
     }
@@ -142,7 +143,7 @@ public final class ItemBuilder<P, T extends Item> extends AbstractBuilder<P, Ite
      * @param maxDamage Durability of this item.
      * @return This builder instance.
      */
-    public ItemBuilder<P, T> durability(int maxDamage)
+    public ItemBuilder<P, T, M> durability(int maxDamage)
     {
         return properties(properties -> properties.durability(maxDamage));
     }
@@ -156,7 +157,7 @@ public final class ItemBuilder<P, T extends Item> extends AbstractBuilder<P, Ite
      * @param craftingRemainderItem Remainder item left behind after crafting with this item.
      * @return This builder instance.
      */
-    public ItemBuilder<P, T> craftingRemainderItem(Supplier<ItemLike> craftingRemainderItem)
+    public ItemBuilder<P, T, M> craftingRemainderItem(Supplier<ItemLike> craftingRemainderItem)
     {
         return properties(properties -> properties.craftRemainder(craftingRemainderItem.get().asItem()));
     }
@@ -167,7 +168,7 @@ public final class ItemBuilder<P, T extends Item> extends AbstractBuilder<P, Ite
      * @param rarity Rarity for this item.
      * @return This builder instance/
      */
-    public ItemBuilder<P, T> itemRarity(Rarity rarity)
+    public ItemBuilder<P, T, M> itemRarity(Rarity rarity)
     {
         return properties(properties -> properties.rarity(rarity));
     }
@@ -177,15 +178,15 @@ public final class ItemBuilder<P, T extends Item> extends AbstractBuilder<P, Ite
      *
      * @return This builder instance.
      */
-    public ItemBuilder<P, T> fireResistant()
+    public ItemBuilder<P, T, M> fireResistant()
     {
         return properties(Item.Properties::fireResistant);
     }
 
     @Override
-    public ItemBuilder<P, T> requiredFeatures(FeatureFlag... requiredFeatures)
+    public ItemBuilder<P, T, M> requiredFeatures(FeatureFlag... requiredFeatures)
     {
-        if(getParent() instanceof FeatureElementBuilder<?, ?, ?, ?, ?> feature)
+        if(getParent() instanceof FeatureElementBuilder<?, ?, ?, ?, ?, ?> feature)
             feature.requiredFeatures(requiredFeatures);
         return properties(properties -> properties.requiredFeatures(requiredFeatures));
     }

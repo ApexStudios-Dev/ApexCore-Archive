@@ -9,8 +9,9 @@ import xyz.apex.minecraft.apexcore.common.lib.registry.entries.FeatureElementEnt
  *
  * @param <P> Type of parent element.
  * @param <T> Type of feature element like object.
+ * @param <M> Type of builder manager.
  */
-public interface FeatureElementBuilder<P, T extends FeatureElement, R extends T, E extends FeatureElementEntry<R>, B extends FeatureElementBuilder<P, T, R, E, B>> extends Builder<P, T, R, E, B>
+public non-sealed interface FeatureElementBuilder<P, T extends FeatureElement, R extends T, E extends FeatureElementEntry<R>, B extends FeatureElementBuilder<P, T, R, E, B, M>, M extends BuilderManager<M>> extends Builder<P, T, R, E, B, M>
 {
     /**
      * Set the required feature flags for this element to be enabled.

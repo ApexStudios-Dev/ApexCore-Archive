@@ -3,12 +3,13 @@ package xyz.apex.minecraft.apexcore.common.lib.hook;
 
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.apex.minecraft.apexcore.common.lib.registry.builders.CreativeModeTabBuilder;
 
 import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 
 /**
  * Various for registering new and modifying existing creative mode tabs.
@@ -17,13 +18,14 @@ import java.util.function.UnaryOperator;
 public interface CreativeModeTabHooks
 {
     /**
-     * Registers new creative mode tab.
+     * Returns new raw CreativeModeTab builder instance.
+     * <p>
+     * For internal usages only, recommended to use {@link CreativeModeTabBuilder} instead.
      *
-     * @param ownerId          ID of owner to register the tab for.
-     * @param registrationName Registration name.
-     * @param builder          Builder used to construct the tab.
+     * @return New raw CreativeModeTab builder instance.
      */
-    void register(String ownerId, String registrationName, UnaryOperator<CreativeModeTab.Builder> builder);
+    @ApiStatus.Internal
+    CreativeModeTab.Builder createNewBuilder();
 
     /**
      * Registers listener to modify given creative mode tab.
@@ -31,16 +33,7 @@ public interface CreativeModeTabHooks
      * @param creativeModeTab Tab to be modified.
      * @param modifier        Listener to be invoked.
      */
-    void modify(CreativeModeTab creativeModeTab, Consumer<CreativeModeTab.Output> modifier);
-
-    /**
-     * Registers listener to modify creative mode tab for given registry name.
-     *
-     * @param ownerId          ID of owner tab was registered for.
-     * @param registrationName Registration name for the tab.
-     * @param modifier         Listener to be invoked.
-     */
-    void modify(String ownerId, String registrationName, Consumer<CreativeModeTab.Output> modifier);
+    void modify(ResourceKey<CreativeModeTab> creativeModeTab, Consumer<CreativeModeTab.Output> modifier);
 
     /**
      * @return Global instance.

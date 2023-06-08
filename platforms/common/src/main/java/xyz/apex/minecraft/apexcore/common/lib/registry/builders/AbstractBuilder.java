@@ -16,17 +16,17 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-public abstract class AbstractBuilder<P, T, R extends T, E extends RegistryEntry<R>, B extends AbstractBuilder<P, T, R, E, B>> implements Builder<P, T, R, E, B>
+public abstract non-sealed class AbstractBuilder<P, T, R extends T, E extends RegistryEntry<R>, B extends AbstractBuilder<P, T, R, E, B, M>, M extends BuilderManager<M>> implements Builder<P, T, R, E, B, M>
 {
     private final P parent;
-    protected final BuilderManager builderManager;
+    protected final M builderManager;
     protected ResourceKey<T> registryKey;
     protected final ResourceKey<? extends Registry<T>> registryType;
     private final Function<RegistryEntry<R>, E> registryEntryFactory;
     private final Supplier<R> safeSupplier = Suppliers.memoize(this::createObject);
     private final List<Consumer<R>> listeners = Lists.newLinkedList();
 
-    protected AbstractBuilder(P parent, BuilderManager builderManager, ResourceKey<? extends Registry<T>> registryType, String registrationName, Function<RegistryEntry<R>, E> registryEntryFactory)
+    protected AbstractBuilder(P parent, M builderManager, ResourceKey<? extends Registry<T>> registryType, String registrationName, Function<RegistryEntry<R>, E> registryEntryFactory)
     {
         this.parent = parent;
         this.builderManager = builderManager;
@@ -39,7 +39,7 @@ public abstract class AbstractBuilder<P, T, R extends T, E extends RegistryEntry
     protected abstract R createObject();
 
     @Override
-    public final BuilderManager getBuilderManager()
+    public final M getBuilderManager()
     {
         return builderManager;
     }

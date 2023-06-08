@@ -24,14 +24,15 @@ import java.util.stream.Stream;
  *
  * @param <P> Type of parent element.
  * @param <T> Type of entity.
+ * @param <M> Type of builder manager.
  */
-public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P, EntityType<?>, EntityType<T>, EntityEntry<T>, EntityBuilder<P, T>> implements FeatureElementBuilder<P, EntityType<?>, EntityType<T>, EntityEntry<T>, EntityBuilder<P, T>>
+public final class EntityBuilder<P, T extends Entity, M extends BuilderManager<M>> extends AbstractBuilder<P, EntityType<?>, EntityType<T>, EntityEntry<T>, EntityBuilder<P, T, M>, M> implements FeatureElementBuilder<P, EntityType<?>, EntityType<T>, EntityEntry<T>, EntityBuilder<P, T, M>, M>
 {
     private Function<EntityType.Builder<T>, EntityType.Builder<T>> entityTypeModifier = Function.identity();
     private MobCategory mobCategory = MobCategory.MISC;
     private final EntityType.EntityFactory<T> entityFactory;
 
-    EntityBuilder(P parent, BuilderManager builderManager, String registrationName, EntityType.EntityFactory<T> entityFactory)
+    EntityBuilder(P parent, M builderManager, String registrationName, EntityType.EntityFactory<T> entityFactory)
     {
         super(parent, builderManager, Registries.ENTITY_TYPE, registrationName, EntityEntry::new);
 
@@ -45,7 +46,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public EntityBuilder<P, T> spawnPlacement(SpawnPlacements.Type spawnPlacementType, Heightmap.Types heightMapType, SpawnPlacements.SpawnPredicate<T> spawnPredicate)
+    public EntityBuilder<P, T, M> spawnPlacement(SpawnPlacements.Type spawnPlacementType, Heightmap.Types heightMapType, SpawnPlacements.SpawnPredicate<T> spawnPredicate)
     {
         return addListener(value -> EntityHooks.get().registerSpawnPlacement(() -> (EntityType) value, spawnPlacementType, heightMapType, (SpawnPlacements.SpawnPredicate) spawnPredicate));
     }
@@ -57,7 +58,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
      * @return This builder instance.
      */
     @SuppressWarnings("unchecked")
-    public EntityBuilder<P, T> attributes(Supplier<AttributeSupplier.Builder> attributes)
+    public EntityBuilder<P, T, M> attributes(Supplier<AttributeSupplier.Builder> attributes)
     {
         return addListener(value -> EntityHooks.get().registerDefaultAttributes(() -> (EntityType<? extends LivingEntity>) value, attributes));
     }
@@ -70,7 +71,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
      * @return Spawn egg item builder.
      */
     @SuppressWarnings("unchecked")
-    public ItemBuilder<EntityBuilder<P, T>, SpawnEggItem> spawnEgg(int backgroundColor, int highlightColor)
+    public ItemBuilder<EntityBuilder<P, T, M>, SpawnEggItem, M> spawnEgg(int backgroundColor, int highlightColor)
     {
         return builderManager.item(self(), getRegistrationName(), properties -> RegistryHooks.get().createSpawnEgg(() -> (EntityType<? extends Mob>) asSupplier().get(), backgroundColor, highlightColor, properties))
                 .withRegistrationNameSuffix("_spawn_egg");
@@ -83,7 +84,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
      * @param highlightColor  Highlight color of spawn egg item model.
      * @return This builder instance.
      */
-    public EntityBuilder<P, T> defaultSpawnEgg(int backgroundColor, int highlightColor)
+    public EntityBuilder<P, T, M> defaultSpawnEgg(int backgroundColor, int highlightColor)
     {
         return spawnEgg(backgroundColor, highlightColor).end();
     }
@@ -94,7 +95,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
      * @param renderer Renderer to be registered.
      * @return This builder instance
      */
-    public EntityBuilder<P, T> renderer(Supplier<Supplier<EntityRendererProvider<T>>> renderer)
+    public EntityBuilder<P, T, M> renderer(Supplier<Supplier<EntityRendererProvider<T>>> renderer)
     {
         return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> RendererHooks.get().registerEntityRenderer(() -> value, renderer)));
     }
@@ -105,7 +106,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
      * @param mobCategory Category for this entity.
      * @return This builder instance.
      */
-    public EntityBuilder<P, T> category(MobCategory mobCategory)
+    public EntityBuilder<P, T, M> category(MobCategory mobCategory)
     {
         this.mobCategory = mobCategory;
         return self();
@@ -117,7 +118,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
      * @param entityTypeModifier Modifier used to modify the finalized entity type.
      * @return This builder instance.
      */
-    public EntityBuilder<P, T> properties(UnaryOperator<EntityType.Builder<T>> entityTypeModifier)
+    public EntityBuilder<P, T, M> properties(UnaryOperator<EntityType.Builder<T>> entityTypeModifier)
     {
         this.entityTypeModifier = this.entityTypeModifier.andThen(entityTypeModifier);
         return self();
@@ -130,7 +131,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
      * @param height Hitbox height.
      * @return This builder instance.
      */
-    public EntityBuilder<P, T> sized(float width, float height)
+    public EntityBuilder<P, T, M> sized(float width, float height)
     {
         return properties(properties -> properties.sized(width, height));
     }
@@ -140,7 +141,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
      *
      * @return This builder instance.
      */
-    public EntityBuilder<P, T> noSummon()
+    public EntityBuilder<P, T, M> noSummon()
     {
         return properties(EntityType.Builder::noSummon);
     }
@@ -150,7 +151,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
      *
      * @return This builder instance.
      */
-    public EntityBuilder<P, T> noSave()
+    public EntityBuilder<P, T, M> noSave()
     {
         return properties(EntityType.Builder::noSave);
     }
@@ -160,7 +161,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
      *
      * @return This builder instance.
      */
-    public EntityBuilder<P, T> fireImmune()
+    public EntityBuilder<P, T, M> fireImmune()
     {
         return properties(EntityType.Builder::fireImmune);
     }
@@ -172,7 +173,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
      * @return This builder instance.
      */
     @SafeVarargs
-    public final EntityBuilder<P, T> immuneTo(Supplier<? extends Block>... blocks)
+    public final EntityBuilder<P, T, M> immuneTo(Supplier<? extends Block>... blocks)
     {
         return properties(properties -> {
             var immuneBlocks = Stream.of(blocks).map(Supplier::get).toArray(Block[]::new);
@@ -185,7 +186,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
      *
      * @return This builder instance.
      */
-    public EntityBuilder<P, T> canSpawnFarFromPlayer()
+    public EntityBuilder<P, T, M> canSpawnFarFromPlayer()
     {
         return properties(EntityType.Builder::canSpawnFarFromPlayer);
     }
@@ -196,7 +197,7 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
      * @param clientTrackingRange Client tracking range for this entity.
      * @return This builder instance.
      */
-    public EntityBuilder<P, T> clientTrackingRange(int clientTrackingRange)
+    public EntityBuilder<P, T, M> clientTrackingRange(int clientTrackingRange)
     {
         return properties(properties -> properties.clientTrackingRange(clientTrackingRange));
     }
@@ -207,15 +208,15 @@ public final class EntityBuilder<P, T extends Entity> extends AbstractBuilder<P,
      * @param updateInterval Update interval for this entity.
      * @return This builder instance.
      */
-    public EntityBuilder<P, T> updateInterval(int updateInterval)
+    public EntityBuilder<P, T, M> updateInterval(int updateInterval)
     {
         return properties(properties -> properties.updateInterval(updateInterval));
     }
 
     @Override
-    public EntityBuilder<P, T> requiredFeatures(FeatureFlag... requiredFeatures)
+    public EntityBuilder<P, T, M> requiredFeatures(FeatureFlag... requiredFeatures)
     {
-        if(getParent() instanceof FeatureElementBuilder<?, ?, ?, ?, ?> feature)
+        if(getParent() instanceof FeatureElementBuilder<?, ?, ?, ?, ?, ?> feature)
             feature.requiredFeatures(requiredFeatures);
         return properties(properties -> properties.requiredFeatures(requiredFeatures));
     }

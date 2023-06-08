@@ -20,14 +20,15 @@ import java.util.function.UnaryOperator;
  * @param <R> Type of game object to be registered.
  * @param <E> Type of registry entry.
  * @param <B> Type of builder.
+ * @param <M> Type of builder manager.
  */
 @ApiStatus.NonExtendable
-public interface Builder<P, T, R extends T, E extends RegistryEntry<R>, B extends Builder<P, T, R, E, B>>
+public sealed interface Builder<P, T, R extends T, E extends RegistryEntry<R>, B extends Builder<P, T, R, E, B, M>, M extends BuilderManager<M>> permits AbstractBuilder, FeatureElementBuilder
 {
     /**
      * @return The builder manager this builder is bound to.
      */
-    BuilderManager getBuilderManager();
+    M getBuilderManager();
 
     /**
      * @return The registrar manager this builder is bound to.

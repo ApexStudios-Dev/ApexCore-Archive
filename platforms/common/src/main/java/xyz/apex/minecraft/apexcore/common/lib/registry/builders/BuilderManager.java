@@ -16,8 +16,10 @@ import xyz.apex.minecraft.apexcore.common.lib.registry.factories.ItemFactory;
 
 /**
  * Builder Manager used to construct various builders.
+ *
+ * @param <M> Type of builder manager.
  */
-public sealed interface BuilderManager permits BuilderManagerImpl
+public sealed interface BuilderManager<M extends BuilderManager<M>> permits SimpleBuilderManager
 {
     /**
      * @return Registrar manager this builder manager is bound to.
@@ -28,6 +30,11 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @return Owning mod id this builder manager is bound to.
      */
     String getOwnerId();
+
+    /**
+     * @return This builder manager.
+     */
+    M self();
 
     // region: Item
 
@@ -41,7 +48,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param <T>              Type of item.
      * @return New builder used to build a new item instance.
      */
-    <P, T extends Item> ItemBuilder<P, T> item(P parent, String registrationName, ItemFactory<T> itemFactory);
+    <P, T extends Item> ItemBuilder<P, T, M> item(P parent, String registrationName, ItemFactory<T> itemFactory);
 
     /**
      * Returns new builder used to build a new item instance.
@@ -51,7 +58,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param <P>              Type of parent element.
      * @return New builder used to build a new item instance.
      */
-    <P> ItemBuilder<P, Item> item(P parent, String registrationName);
+    <P> ItemBuilder<P, Item, M> item(P parent, String registrationName);
 
     /**
      * Returns new builder used to build a new item instance.
@@ -61,7 +68,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param <T>              Type of item.
      * @return New builder used to build a new item instance.
      */
-    <T extends Item> ItemBuilder<BuilderManager, T> item(String registrationName, ItemFactory<T> itemFactory);
+    <T extends Item> ItemBuilder<M, T, M> item(String registrationName, ItemFactory<T> itemFactory);
 
     /**
      * Returns new builder used to build a new item instance.
@@ -69,7 +76,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param registrationName Registration name of the builder.
      * @return New builder used to build a new item instance.
      */
-    ItemBuilder<BuilderManager, Item> item(String registrationName);
+    ItemBuilder<M, Item, M> item(String registrationName);
     // endregion
 
     // region: Block
@@ -84,7 +91,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param <T>              Type of block.
      * @return New builder used to build a new block instance.
      */
-    <P, T extends Block> BlockBuilder<P, T> block(P parent, String registrationName, BlockFactory<T> blockFactory);
+    <P, T extends Block> BlockBuilder<P, T, M> block(P parent, String registrationName, BlockFactory<T> blockFactory);
 
     /**
      * Returns new builder used to build a new block instance.
@@ -94,7 +101,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param <P>              Type of parent element.
      * @return New builder used to build a new block instance.
      */
-    <P> BlockBuilder<P, Block> block(P parent, String registrationName);
+    <P> BlockBuilder<P, Block, M> block(P parent, String registrationName);
 
     /**
      * Returns new builder used to build a new block instance.
@@ -104,7 +111,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param <T>              Type of block.
      * @return New builder used to build a new block instance.
      */
-    <T extends Block> BlockBuilder<BuilderManager, T> block(String registrationName, BlockFactory<T> blockFactory);
+    <T extends Block> BlockBuilder<M, T, M> block(String registrationName, BlockFactory<T> blockFactory);
 
     /**
      * Returns new builder used to build a new block instance.
@@ -112,7 +119,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param registrationName Registration name of the builder.
      * @return New builder used to build a new block instance.
      */
-    BlockBuilder<BuilderManager, Block> block(String registrationName);
+    BlockBuilder<M, Block, M> block(String registrationName);
     // endregion
 
     // region: Entity
@@ -127,7 +134,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param <T>              Type of entity type.
      * @return New builder used to build a new entity type instance.
      */
-    <P, T extends Entity> EntityBuilder<P, T> entity(P parent, String registrationName, EntityType.EntityFactory<T> entityFactory);
+    <P, T extends Entity> EntityBuilder<P, T, M> entity(P parent, String registrationName, EntityType.EntityFactory<T> entityFactory);
 
     /**
      * Returns new builder used to build a new entity type instance.
@@ -137,7 +144,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param <T>              Type of entity type.
      * @return New builder used to build a new entity type instance.
      */
-    <T extends Entity> EntityBuilder<BuilderManager, T> entity(String registrationName, EntityType.EntityFactory<T> entityFactory);
+    <T extends Entity> EntityBuilder<M, T, M> entity(String registrationName, EntityType.EntityFactory<T> entityFactory);
     // endregion
 
     // region: BlockEntity
@@ -152,7 +159,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param <T>                Type of block entity.
      * @return New builder used to build a new block entity type instance.
      */
-    <P, T extends BlockEntity> BlockEntityBuilder<P, T> blockEntity(P parent, String registrationName, BlockEntityFactory<T> blockEntityFactory);
+    <P, T extends BlockEntity> BlockEntityBuilder<P, T, M> blockEntity(P parent, String registrationName, BlockEntityFactory<T> blockEntityFactory);
 
     /**
      * Returns new builder used to build a new block entity type instance.
@@ -162,7 +169,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param <T>                Type of block entity.
      * @return New builder used to build a new block entity type instance.
      */
-    <T extends BlockEntity> BlockEntityBuilder<BuilderManager, T> blockEntity(String registrationName, BlockEntityFactory<T> blockEntityFactory);
+    <T extends BlockEntity> BlockEntityBuilder<M, T, M> blockEntity(String registrationName, BlockEntityFactory<T> blockEntityFactory);
     // endregion
 
     // region: Enchantment
@@ -178,7 +185,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param <T>                 Type of enchantment.
      * @return New builder used to build a new block entity type instance.
      */
-    <P, T extends Enchantment> EnchantmentBuilder<P, T> enchantment(P parent, String registrationName, EnchantmentCategory enchantmentCategory, EnchantmentFactory<T> enchantmentFactory);
+    <P, T extends Enchantment> EnchantmentBuilder<P, T, M> enchantment(P parent, String registrationName, EnchantmentCategory enchantmentCategory, EnchantmentFactory<T> enchantmentFactory);
 
     /**
      * Returns new builder used to build a new enchantment instance.
@@ -189,7 +196,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param <P>                 Type of parent element.
      * @return New builder used to build a new block entity type instance.
      */
-    <P> EnchantmentBuilder<P, SimpleEnchantment> enchantment(P parent, String registrationName, EnchantmentCategory enchantmentCategory);
+    <P> EnchantmentBuilder<P, SimpleEnchantment, M> enchantment(P parent, String registrationName, EnchantmentCategory enchantmentCategory);
 
     /**
      * Returns new builder used to build a new enchantment instance.
@@ -200,7 +207,7 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param <T>                 Type of enchantment.
      * @return New builder used to build a new block entity type instance.
      */
-    <T extends Enchantment> EnchantmentBuilder<BuilderManager, T> enchantment(String registrationName, EnchantmentCategory enchantmentCategory, EnchantmentFactory<T> enchantmentFactory);
+    <T extends Enchantment> EnchantmentBuilder<M, T, M> enchantment(String registrationName, EnchantmentCategory enchantmentCategory, EnchantmentFactory<T> enchantmentFactory);
 
     /**
      * Returns new builder used to build a new enchantment instance.
@@ -209,7 +216,28 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param enchantmentCategory Enchantment category.
      * @return New builder used to build a new block entity type instance.
      */
-    EnchantmentBuilder<BuilderManager, SimpleEnchantment> enchantment(String registrationName, EnchantmentCategory enchantmentCategory);
+    EnchantmentBuilder<M, SimpleEnchantment, M> enchantment(String registrationName, EnchantmentCategory enchantmentCategory);
+    // endregion
+
+    // region: CreativeModeTab
+
+    /**
+     * Returns new builder used to build a new creative mode tab instance.
+     *
+     * @param parent           Parent element of the builder.
+     * @param registrationName Registration name of the builder.
+     * @param <P>              Type of parent element.
+     * @return New builder used to build a new creative mode tab instance.
+     */
+    <P> CreativeModeTabBuilder<P, M> creativeModeTab(P parent, String registrationName);
+
+    /**
+     * Returns new builder used to build a new creative mode tab instance.
+     *
+     * @param registrationName Registration name of the builder.
+     * @return New builder used to build a new creative mode tab instance.
+     */
+    CreativeModeTabBuilder<M, M> creativeModeTab(String registrationName);
     // endregion
 
     // TODO:
@@ -229,9 +257,9 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param registrarManager Registrar manager to bind the builder manager to.
      * @return New builder manager bound to the given registrar manager.
      */
-    static BuilderManager create(RegistrarManager registrarManager)
+    static BuilderManager<Impl> create(RegistrarManager registrarManager)
     {
-        return new BuilderManagerImpl(registrarManager);
+        return new Impl(registrarManager);
     }
 
     /**
@@ -240,8 +268,16 @@ public sealed interface BuilderManager permits BuilderManagerImpl
      * @param ownerId Mod id to bind the builder manager to.
      * @return New builder manager bound to the given mod id.
      */
-    static BuilderManager create(String ownerId)
+    static BuilderManager<Impl> create(String ownerId)
     {
         return create(RegistrarManager.get(ownerId));
+    }
+
+    final class Impl extends SimpleBuilderManager<Impl>
+    {
+        private Impl(RegistrarManager registrarManager)
+        {
+            super(registrarManager);
+        }
     }
 }

@@ -11,14 +11,14 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
-public final class EnchantmentBuilder<P, T extends Enchantment> extends AbstractBuilder<P, Enchantment, T, EnchantmentEntry<T>, EnchantmentBuilder<P, T>>
+public final class EnchantmentBuilder<P, T extends Enchantment, M extends BuilderManager<M>> extends AbstractBuilder<P, Enchantment, T, EnchantmentEntry<T>, EnchantmentBuilder<P, T, M>, M>
 {
     private final EnchantmentFactory<T> enchantmentFactory;
     private final EnchantmentCategory enchantmentCategory;
     private final Set<EquipmentSlot> equipmentSlots = EnumSet.noneOf(EquipmentSlot.class);
     private Enchantment.Rarity rarity = Enchantment.Rarity.COMMON;
 
-    EnchantmentBuilder(P parent, BuilderManager builderManager, String registrationName, EnchantmentCategory enchantmentCategory, EnchantmentFactory<T> enchantmentFactory)
+    EnchantmentBuilder(P parent, M builderManager, String registrationName, EnchantmentCategory enchantmentCategory, EnchantmentFactory<T> enchantmentFactory)
     {
         super(parent, builderManager, Registries.ENCHANTMENT, registrationName, EnchantmentEntry::new);
 
@@ -32,7 +32,7 @@ public final class EnchantmentBuilder<P, T extends Enchantment> extends Abstract
      * @param rarity Rarity for this enchantment.
      * @return This build instance.
      */
-    public EnchantmentBuilder<P, T> rarity(Enchantment.Rarity rarity)
+    public EnchantmentBuilder<P, T, M> rarity(Enchantment.Rarity rarity)
     {
         this.rarity = rarity;
         return self();
@@ -44,7 +44,7 @@ public final class EnchantmentBuilder<P, T extends Enchantment> extends Abstract
      * @param equipmentSlot Valid equipment slot.
      * @return This builder instance.
      */
-    public EnchantmentBuilder<P, T> equipmentSlot(EquipmentSlot equipmentSlot)
+    public EnchantmentBuilder<P, T, M> equipmentSlot(EquipmentSlot equipmentSlot)
     {
         this.equipmentSlots.add(equipmentSlot);
         return self();
@@ -56,7 +56,7 @@ public final class EnchantmentBuilder<P, T extends Enchantment> extends Abstract
      * @param equipmentSlots Valid equipment slots.
      * @return This builder instance.
      */
-    public EnchantmentBuilder<P, T> equipmentSlots(EquipmentSlot... equipmentSlots)
+    public EnchantmentBuilder<P, T, M> equipmentSlots(EquipmentSlot... equipmentSlots)
     {
         Collections.addAll(this.equipmentSlots, equipmentSlots);
         return self();
@@ -67,7 +67,7 @@ public final class EnchantmentBuilder<P, T extends Enchantment> extends Abstract
      *
      * @return This builder instance.
      */
-    public EnchantmentBuilder<P, T> armorSlots()
+    public EnchantmentBuilder<P, T, M> armorSlots()
     {
         return equipmentSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET);
     }

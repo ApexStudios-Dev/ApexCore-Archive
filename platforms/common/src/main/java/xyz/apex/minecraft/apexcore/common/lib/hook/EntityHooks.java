@@ -1,10 +1,12 @@
 package xyz.apex.minecraft.apexcore.common.lib.hook;
 
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
@@ -14,14 +16,6 @@ import java.util.function.Supplier;
 @ApiStatus.NonExtendable
 public interface EntityHooks
 {
-    /**
-     * Returns true if given entity is a fake player.
-     *
-     * @param entity Entity to validate.
-     * @return True if given entity is a fake player.
-     */
-    boolean isFakePlayer(@Nullable Entity entity);
-
     /**
      * Registers default attributes for given entity type.
      *

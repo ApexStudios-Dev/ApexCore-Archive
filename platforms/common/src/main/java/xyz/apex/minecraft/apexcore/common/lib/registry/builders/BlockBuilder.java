@@ -14,8 +14,9 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.hook.ColorHandlerHooks;
 import xyz.apex.minecraft.apexcore.common.lib.hook.RendererHooks;
@@ -30,8 +31,9 @@ import java.util.function.*;
  *
  * @param <P> Type of parent element.
  * @param <T> Type of block.
+ * @param <M> Type of builder manager.
  */
-public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, Block, T, BlockEntry<T>, BlockBuilder<P, T>> implements FeatureElementBuilder<P, Block, T, BlockEntry<T>, BlockBuilder<P, T>>
+public final class BlockBuilder<P, T extends Block, M extends BuilderManager<M>> extends AbstractBuilder<P, Block, T, BlockEntry<T>, BlockBuilder<P, T, M>, M> implements FeatureElementBuilder<P, Block, T, BlockEntry<T>, BlockBuilder<P, T, M>, M>
 {
     public static final Supplier<BlockBehaviour.Properties> STONE_PROPERTIES = () -> BlockBehaviour.Properties.copy(Blocks.STONE);
 
@@ -39,7 +41,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
     private BlockPropertiesModifier propertiesModifier = BlockPropertiesModifier.identity();
     private final BlockFactory<T> blockFactory;
 
-    BlockBuilder(P parent, BuilderManager builderManager, String registrationName, BlockFactory<T> blockFactory)
+    BlockBuilder(P parent, M builderManager, String registrationName, BlockFactory<T> blockFactory)
     {
         super(parent, builderManager, Registries.BLOCK, registrationName, BlockEntry::new);
 
@@ -58,7 +60,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param colorHandler Color handler to be registered.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> colorHandler(Supplier<Supplier<BlockColor>> colorHandler)
+    public BlockBuilder<P, T, M> colorHandler(Supplier<Supplier<BlockColor>> colorHandler)
     {
         return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> ColorHandlerHooks.get().registerBlockHandler(() -> value, colorHandler)));
     }
@@ -69,7 +71,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param renderType Render type to be set.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> renderType(Supplier<Supplier<RenderType>> renderType)
+    public BlockBuilder<P, T, M> renderType(Supplier<Supplier<RenderType>> renderType)
     {
         return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> RendererHooks.get().setBlockRenderType(() -> value, renderType)));
     }
@@ -81,7 +83,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param <B>                Type of block entity.
      * @return New block entity type builder bound to this block.
      */
-    public <B extends BlockEntity> BlockEntityBuilder<BlockBuilder<P, T>, B> blockEntity(BlockEntityFactory<B> blockEntityFactory)
+    public <B extends BlockEntity> BlockEntityBuilder<BlockBuilder<P, T, M>, B, M> blockEntity(BlockEntityFactory<B> blockEntityFactory)
     {
         return builderManager.blockEntity(this, getRegistrationName(), blockEntityFactory).validBlock(asSupplier());
     }
@@ -93,7 +95,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param <B>                Type of block entity.
      * @return This builder instance.
      */
-    public <B extends BlockEntity> BlockBuilder<P, T> simpleBlockEntity(BlockEntityFactory<B> blockEntityFactory)
+    public <B extends BlockEntity> BlockBuilder<P, T, M> simpleBlockEntity(BlockEntityFactory<B> blockEntityFactory)
     {
         return blockEntity(blockEntityFactory).end();
     }
@@ -105,7 +107,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param <I>              Type of block item.
      * @return New block item builder bound to this block.
      */
-    public <I extends Item> ItemBuilder<BlockBuilder<P, T>, I> item(BiFunction<T, Item.Properties, I> blockItemFactory)
+    public <I extends Item> ItemBuilder<BlockBuilder<P, T, M>, I, M> item(BiFunction<T, Item.Properties, I> blockItemFactory)
     {
         return builderManager.item(self(), getRegistrationName(), properties -> blockItemFactory.apply(asSupplier().get(), properties));
     }
@@ -113,7 +115,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
     /**
      * @return New block item builder bound to this block.
      */
-    public ItemBuilder<BlockBuilder<P, T>, BlockItem> defaultItem()
+    public ItemBuilder<BlockBuilder<P, T, M>, BlockItem, M> defaultItem()
     {
         return item(BlockItem::new);
     }
@@ -125,7 +127,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param <I>              Type of item.
      * @return This builder instance.
      */
-    public <I extends Item> BlockBuilder<P, T> simpleItem(BiFunction<T, Item.Properties, I> blockItemFactory)
+    public <I extends Item> BlockBuilder<P, T, M> simpleItem(BiFunction<T, Item.Properties, I> blockItemFactory)
     {
         return item(blockItemFactory).end();
     }
@@ -135,56 +137,9 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      *
      * @return This builder instance
      */
-    public BlockBuilder<P, T> simpleItem()
+    public BlockBuilder<P, T, M> simpleItem()
     {
         return defaultItem().end();
-    }
-
-    /**
-     * Initial item properties for this block.
-     *
-     * @param material Material for this block.
-     * @return This builder instance.
-     */
-    public BlockBuilder<P, T> initialProperties(Material material)
-    {
-        return initialProperties(() -> BlockBehaviour.Properties.of(material));
-    }
-
-    /**
-     * Initial item properties for this block.
-     *
-     * @param material      Material for this block.
-     * @param materialColor Material color for this block.
-     * @return This builder instance.
-     */
-    public BlockBuilder<P, T> initialProperties(Material material, DyeColor materialColor)
-    {
-        return initialProperties(() -> BlockBehaviour.Properties.of(material, materialColor));
-    }
-
-    /**
-     * Initial item properties for this block.
-     *
-     * @param material      Material for this block.
-     * @param materialColor Material color for this block.
-     * @return This builder instance.
-     */
-    public BlockBuilder<P, T> initialProperties(Material material, MaterialColor materialColor)
-    {
-        return initialProperties(() -> BlockBehaviour.Properties.of(material, materialColor));
-    }
-
-    /**
-     * Initial item properties for this block.
-     *
-     * @param material      Material for this block.
-     * @param materialColor Material color for this block.
-     * @return This builder instance.
-     */
-    public BlockBuilder<P, T> initialProperties(Material material, Function<BlockState, MaterialColor> materialColor)
-    {
-        return initialProperties(() -> BlockBehaviour.Properties.of(material, materialColor));
     }
 
     /**
@@ -193,7 +148,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param block Block to copy properties from.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> copyInitialPropertiesFrom(Supplier<BlockBehaviour> block)
+    public BlockBuilder<P, T, M> copyInitialPropertiesFrom(Supplier<BlockBehaviour> block)
     {
         return initialProperties(() -> BlockBehaviour.Properties.copy(block.get()));
     }
@@ -204,7 +159,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param initialProperties Initial block properties.
      * @return This builder instance
      */
-    public BlockBuilder<P, T> initialProperties(Supplier<BlockBehaviour.Properties> initialProperties)
+    public BlockBuilder<P, T, M> initialProperties(Supplier<BlockBehaviour.Properties> initialProperties)
     {
         this.initialProperties = initialProperties;
         return self();
@@ -216,7 +171,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param initialProperties Initial block properties.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> initialProperties(BlockPropertiesModifier initialProperties)
+    public BlockBuilder<P, T, M> initialProperties(BlockPropertiesModifier initialProperties)
     {
         this.initialProperties = () -> initialProperties.modify(STONE_PROPERTIES.get());
         return self();
@@ -244,10 +199,43 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param propertiesModifier Modifier used to modify the finalized block properties.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> properties(BlockPropertiesModifier propertiesModifier)
+    public BlockBuilder<P, T, M> properties(BlockPropertiesModifier propertiesModifier)
     {
         this.propertiesModifier = this.propertiesModifier.andThen(propertiesModifier);
         return self();
+    }
+
+    /**
+     * Set the map color of this block.
+     *
+     * @param mapColor Map color for this block.
+     * @return This builder instance.
+     */
+    public BlockBuilder<P, T, M> mapColor(DyeColor mapColor)
+    {
+        return properties(properties -> properties.mapColor(mapColor));
+    }
+
+    /**
+     * Set the map color of this block.
+     *
+     * @param mapColor Map color for this block.
+     * @return This builder instance.
+     */
+    public BlockBuilder<P, T, M> mapColor(MapColor mapColor)
+    {
+        return properties(properties -> properties.mapColor(mapColor));
+    }
+
+    /**
+     * Set the map color of this block.
+     *
+     * @param mapColor Map color for this block.
+     * @return This builder instance.
+     */
+    public BlockBuilder<P, T, M> mapColor(Function<BlockState, MapColor> mapColor)
+    {
+        return properties(properties -> properties.mapColor(mapColor));
     }
 
     /**
@@ -255,7 +243,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      *
      * @return This builder instance
      */
-    public BlockBuilder<P, T> noCollision()
+    public BlockBuilder<P, T, M> noCollision()
     {
         return properties(BlockBehaviour.Properties::noCollission);
     }
@@ -265,7 +253,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      *
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> noOcclusion()
+    public BlockBuilder<P, T, M> noOcclusion()
     {
         return properties(BlockBehaviour.Properties::noOcclusion);
     }
@@ -276,7 +264,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param friction Friction for this block.
      * @return This builder instance
      */
-    public BlockBuilder<P, T> friction(float friction)
+    public BlockBuilder<P, T, M> friction(float friction)
     {
         return properties(properties -> properties.friction(friction));
     }
@@ -287,7 +275,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param speedFactor Speed factor for this block.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> speedFactor(float speedFactor)
+    public BlockBuilder<P, T, M> speedFactor(float speedFactor)
     {
         return properties(properties -> properties.speedFactor(speedFactor));
     }
@@ -298,7 +286,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param jumpFactor Jump factor for this block.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> jumpFactor(float jumpFactor)
+    public BlockBuilder<P, T, M> jumpFactor(float jumpFactor)
     {
         return properties(properties -> properties.jumpFactor(jumpFactor));
     }
@@ -309,7 +297,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param soundType Sound type for this block.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> sound(SoundType soundType)
+    public BlockBuilder<P, T, M> sound(SoundType soundType)
     {
         return properties(properties -> properties.sound(soundType));
     }
@@ -320,7 +308,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param lightEmission Light level for this block.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> lightLevel(ToIntFunction<BlockState> lightEmission)
+    public BlockBuilder<P, T, M> lightLevel(ToIntFunction<BlockState> lightEmission)
     {
         return properties(properties -> properties.lightLevel(lightEmission));
     }
@@ -331,7 +319,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param lightEmission Light level for this block.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> lightLevel(int lightEmission)
+    public BlockBuilder<P, T, M> lightLevel(int lightEmission)
     {
         return lightLevel(blockState -> lightEmission);
     }
@@ -343,7 +331,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param explosionResistance Explosion resistance of this block.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> strength(float destroyTime, float explosionResistance)
+    public BlockBuilder<P, T, M> strength(float destroyTime, float explosionResistance)
     {
         return properties(properties -> properties.strength(destroyTime, explosionResistance));
     }
@@ -353,7 +341,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      *
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> instabreak()
+    public BlockBuilder<P, T, M> instabreak()
     {
         return properties(BlockBehaviour.Properties::instabreak);
     }
@@ -364,7 +352,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param strength Strength of this block.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> strength(float strength)
+    public BlockBuilder<P, T, M> strength(float strength)
     {
         return properties(properties -> properties.strength(strength));
     }
@@ -374,7 +362,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      *
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> randomTicks()
+    public BlockBuilder<P, T, M> randomTicks()
     {
         return properties(BlockBehaviour.Properties::randomTicks);
     }
@@ -384,7 +372,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      *
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> dynamicShape()
+    public BlockBuilder<P, T, M> dynamicShape()
     {
         return properties(BlockBehaviour.Properties::dynamicShape);
     }
@@ -394,7 +382,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      *
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> noLootTable()
+    public BlockBuilder<P, T, M> noLootTable()
     {
         return properties(BlockBehaviour.Properties::noLootTable);
     }
@@ -405,9 +393,60 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param dropsLike Block to inherit loot table from.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> dropsLike(Supplier<? extends Block> dropsLike)
+    public BlockBuilder<P, T, M> dropsLike(Supplier<? extends Block> dropsLike)
     {
         return properties(properties -> properties.dropsLike(dropsLike.get()));
+    }
+
+    /**
+     * Marks this block as being ignited by lava.
+     *
+     * @return This builder instance.
+     */
+    public BlockBuilder<P, T, M> ignitedByLava()
+    {
+        return properties(BlockBehaviour.Properties::ignitedByLava);
+    }
+
+    /**
+     * Marks this block as being a liquid.
+     *
+     * @return This builder instance.
+     */
+    public BlockBuilder<P, T, M> liquid()
+    {
+        return properties(BlockBehaviour.Properties::liquid);
+    }
+
+    /**
+     * Forces this block to always be solid.
+     *
+     * @return This builder instance.
+     */
+    public BlockBuilder<P, T, M> forceSolidOn()
+    {
+        return properties(BlockBehaviour.Properties::forceSolidOn);
+    }
+
+    /**
+     * Forces this block to never be solid.
+     *
+     * @return This builder instance.
+     */
+    public BlockBuilder<P, T, M> forceSolidOff()
+    {
+        return properties(BlockBehaviour.Properties::forceSolidOff);
+    }
+
+    /**
+     * Sets this blocks piston push reaction.
+     *
+     * @param pushReaction Piston push reaction.
+     * @return This builder instance.
+     */
+    public BlockBuilder<P, T, M> pushReaction(PushReaction pushReaction)
+    {
+        return properties(properties -> properties.pushReaction(pushReaction));
     }
 
     /**
@@ -415,7 +454,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      *
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> air()
+    public BlockBuilder<P, T, M> air()
     {
         return properties(BlockBehaviour.Properties::air);
     }
@@ -426,7 +465,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param isValidSpawn Entity spawn predicate.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> isValidSpawn(BlockBehaviour.StateArgumentPredicate<EntityType<?>> isValidSpawn)
+    public BlockBuilder<P, T, M> isValidSpawn(BlockBehaviour.StateArgumentPredicate<EntityType<?>> isValidSpawn)
     {
         return properties(properties -> properties.isValidSpawn(isValidSpawn));
     }
@@ -437,7 +476,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param isSuffocating Predicate used when checking if suffocation should occur.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> isSuffocating(BlockBehaviour.StatePredicate isSuffocating)
+    public BlockBuilder<P, T, M> isSuffocating(BlockBehaviour.StatePredicate isSuffocating)
     {
         return properties(properties -> properties.isSuffocating(isSuffocating));
     }
@@ -448,7 +487,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param isViewBlocking Predicate used when checking if this block should block players view.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> isViewBlocking(BlockBehaviour.StatePredicate isViewBlocking)
+    public BlockBuilder<P, T, M> isViewBlocking(BlockBehaviour.StatePredicate isViewBlocking)
     {
         return properties(properties -> properties.isViewBlocking(isViewBlocking));
     }
@@ -459,7 +498,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param hasPostProcess Predicate used when checking if this block shoul be post processed.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> hasPostProcess(BlockBehaviour.StatePredicate hasPostProcess)
+    public BlockBuilder<P, T, M> hasPostProcess(BlockBehaviour.StatePredicate hasPostProcess)
     {
         return properties(properties -> properties.hasPostProcess(hasPostProcess));
     }
@@ -470,7 +509,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param emissiveRendering Predicate when checking if this block should be rendered with emissive lighting.
      * @return This buildiner instance.
      */
-    public BlockBuilder<P, T> emissiveRendering(BlockBehaviour.StatePredicate emissiveRendering)
+    public BlockBuilder<P, T, M> emissiveRendering(BlockBehaviour.StatePredicate emissiveRendering)
     {
         return properties(properties -> properties.emissiveRendering(emissiveRendering));
     }
@@ -480,31 +519,9 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      *
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> requiresCorrectToolForDrops()
+    public BlockBuilder<P, T, M> requiresCorrectToolForDrops()
     {
         return properties(BlockBehaviour.Properties::requiresCorrectToolForDrops);
-    }
-
-    /**
-     * Set the material color of this block.
-     *
-     * @param materialColor Material color for this block.
-     * @return This builder instance.
-     */
-    public BlockBuilder<P, T> materialColor(MaterialColor materialColor)
-    {
-        return properties(properties -> properties.color(materialColor));
-    }
-
-    /**
-     * Set the material color of this block.
-     *
-     * @param materialColor Material color for this block.
-     * @return This builder instance.
-     */
-    public BlockBuilder<P, T> materialColor(DyeColor materialColor)
-    {
-        return materialColor(materialColor.getMaterialColor());
     }
 
     /**
@@ -513,7 +530,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param destroyTime Destroy time of this block.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> destroyTime(float destroyTime)
+    public BlockBuilder<P, T, M> destroyTime(float destroyTime)
     {
         return properties(properties -> properties.destroyTime(destroyTime));
     }
@@ -524,7 +541,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param explosionResistance Explosion resistance of this block.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> explosionResistance(float explosionResistance)
+    public BlockBuilder<P, T, M> explosionResistance(float explosionResistance)
     {
         return properties(properties -> properties.explosionResistance(explosionResistance));
     }
@@ -535,7 +552,7 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      * @param offsetType Offset type for this block.
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> offsetType(BlockBehaviour.OffsetType offsetType)
+    public BlockBuilder<P, T, M> offsetType(BlockBehaviour.OffsetType offsetType)
     {
         return properties(properties -> properties.offsetType(offsetType));
     }
@@ -545,15 +562,36 @@ public final class BlockBuilder<P, T extends Block> extends AbstractBuilder<P, B
      *
      * @return This builder instance.
      */
-    public BlockBuilder<P, T> noParticlesOnBreak()
+    public BlockBuilder<P, T, M> noParticlesOnBreak()
     {
         return properties(BlockBehaviour.Properties::noParticlesOnBreak);
     }
 
-    @Override
-    public BlockBuilder<P, T> requiredFeatures(FeatureFlag... requiredFeatures)
+    /**
+     * Sets this blocks note block instrument.
+     *
+     * @param instrument Note block instrument for this block.
+     * @return This builder instance.
+     */
+    public BlockBuilder<P, T, M> instrument(NoteBlockInstrument instrument)
     {
-        if(getParent() instanceof FeatureElementBuilder<?, ?, ?, ?, ?> feature)
+        return properties(properties -> properties.instrument(instrument));
+    }
+
+    /**
+     * Marks this block as being replaceable by other blocks.
+     *
+     * @return This builder instance.
+     */
+    public BlockBuilder<P, T, M> replaceable()
+    {
+        return properties(BlockBehaviour.Properties::replaceable);
+    }
+
+    @Override
+    public BlockBuilder<P, T, M> requiredFeatures(FeatureFlag... requiredFeatures)
+    {
+        if(getParent() instanceof FeatureElementBuilder<?, ?, ?, ?, ?, ?> feature)
             feature.requiredFeatures(requiredFeatures);
         return properties(properties -> properties.requiredFeatures(requiredFeatures));
     }

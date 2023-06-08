@@ -1,6 +1,6 @@
 package xyz.apex.minecraft.apexcore.common.lib.event.types;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.ApiStatus;
@@ -39,14 +39,14 @@ public interface ScreenEvents
     @ApiStatus.NonExtendable
     interface PreRender extends Event
     {
-        void handle(Screen screen, PoseStack stack, int mouseX, int mouseY, float partialTick);
+        void handle(Screen screen, GuiGraphics graphics, int mouseX, int mouseY, float partialTick);
     }
 
     @FunctionalInterface
     @ApiStatus.NonExtendable
     interface PostRender extends Event
     {
-        void handle(Screen screen, PoseStack stack, int mouseX, int mouseY, float partialTick);
+        void handle(Screen screen, GuiGraphics graphics, int mouseX, int mouseY, float partialTick);
     }
 
     @FunctionalInterface

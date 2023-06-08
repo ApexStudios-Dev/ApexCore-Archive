@@ -1,6 +1,7 @@
 package xyz.apex.minecraft.apexcore.fabric.core;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
@@ -28,9 +29,15 @@ public final class ApexCoreImpl extends ApexCore implements ModInitializer
     private final ModLoader modLoader = new ModLoaderImpl();
     private final Hooks hooks = new HooksImpl();
 
-    public ApexCoreImpl()
+    @Override
+    protected void bootstrap()
     {
-        super();
+        // check if entity is instance of fabrics fake player class
+        // register before the one in common
+        // to ensure fabric specific check happens first
+        EntityEvents.IS_FAKE_PLAYER.addListener(FakePlayer.class::isInstance);
+
+        super.bootstrap();
     }
 
     @Override

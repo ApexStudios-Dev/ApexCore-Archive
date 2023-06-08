@@ -7,11 +7,16 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.GameShuttingDownEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
+import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
+import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.ClientEvents;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.ScreenEvents;
 import xyz.apex.minecraft.apexcore.forge.lib.EventBuses;
 
+@ApiStatus.Internal
+@SideOnly(PhysicalSide.CLIENT)
 public final class ApexCoreClient
 {
     ApexCoreClient()
@@ -28,8 +33,8 @@ public final class ApexCoreClient
             ScreenEvents.MODIFY_WIDGETS.post().handle(screen, widgets, event::addListener, event::removeListener);
         });
 
-        ApexCoreImpl.wrapEvent(ScreenEvent.Render.Pre.class, MinecraftForge.EVENT_BUS, ScreenEvents.PRE_RENDER, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getScreen(), forgeEvent.getPoseStack(), forgeEvent.getMouseX(), forgeEvent.getMouseY(), forgeEvent.getPartialTick()));
-        ApexCoreImpl.wrapEvent(ScreenEvent.Render.Post.class, MinecraftForge.EVENT_BUS, ScreenEvents.POST_RENDER, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getScreen(), forgeEvent.getPoseStack(), forgeEvent.getMouseX(), forgeEvent.getMouseY(), forgeEvent.getPartialTick()));
+        ApexCoreImpl.wrapEvent(ScreenEvent.Render.Pre.class, MinecraftForge.EVENT_BUS, ScreenEvents.PRE_RENDER, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getScreen(), forgeEvent.getGuiGraphics(), forgeEvent.getMouseX(), forgeEvent.getMouseY(), forgeEvent.getPartialTick()));
+        ApexCoreImpl.wrapEvent(ScreenEvent.Render.Post.class, MinecraftForge.EVENT_BUS, ScreenEvents.POST_RENDER, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getScreen(), forgeEvent.getGuiGraphics(), forgeEvent.getMouseX(), forgeEvent.getMouseY(), forgeEvent.getPartialTick()));
 
         EventBuses.addListener(ApexCore.ID, bus -> bus.addListener(EventPriority.NORMAL, false, FMLClientSetupEvent.class, event -> {
             var client = Minecraft.getInstance();

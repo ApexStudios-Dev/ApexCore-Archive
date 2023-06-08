@@ -23,13 +23,14 @@ import java.util.function.Supplier;
  *
  * @param <P> Type of parent element.
  * @param <T> Type of block entity.
+ * @param <M> Type of builder manager.
  */
-public final class BlockEntityBuilder<P, T extends BlockEntity> extends AbstractBuilder<P, BlockEntityType<?>, BlockEntityType<T>, BlockEntityEntry<T>, BlockEntityBuilder<P, T>>
+public final class BlockEntityBuilder<P, T extends BlockEntity, M extends BuilderManager<M>> extends AbstractBuilder<P, BlockEntityType<?>, BlockEntityType<T>, BlockEntityEntry<T>, BlockEntityBuilder<P, T, M>, M>
 {
     private final BlockEntityFactory<T> blockEntityFactory;
     private final List<Supplier<? extends Block>> validBlocks = Lists.newArrayList();
 
-    BlockEntityBuilder(P parent, BuilderManager builderManager, String registrationName, BlockEntityFactory<T> blockEntityFactory)
+    BlockEntityBuilder(P parent, M builderManager, String registrationName, BlockEntityFactory<T> blockEntityFactory)
     {
         super(parent, builderManager, Registries.BLOCK_ENTITY_TYPE, registrationName, BlockEntityEntry::new);
 
@@ -51,7 +52,7 @@ public final class BlockEntityBuilder<P, T extends BlockEntity> extends Abstract
      * @param renderer Renderer to be registered.
      * @return This builder instance
      */
-    public BlockEntityBuilder<P, T> renderer(Supplier<Supplier<BlockEntityRendererProvider<T>>> renderer)
+    public BlockEntityBuilder<P, T, M> renderer(Supplier<Supplier<BlockEntityRendererProvider<T>>> renderer)
     {
         return addListener(value -> PhysicalSide.CLIENT.runWhenOn(() -> () -> RendererHooks.get().registerBlockEntityRenderer(() -> value, renderer)));
     }
@@ -62,7 +63,7 @@ public final class BlockEntityBuilder<P, T extends BlockEntity> extends Abstract
      * @param validBlock Block to mark as being valid for this block entity.
      * @return This builder instance.
      */
-    public BlockEntityBuilder<P, T> validBlock(Supplier<? extends Block> validBlock)
+    public BlockEntityBuilder<P, T, M> validBlock(Supplier<? extends Block> validBlock)
     {
         validBlocks.add(validBlock);
         return self();
@@ -75,7 +76,7 @@ public final class BlockEntityBuilder<P, T extends BlockEntity> extends Abstract
      * @return This builder instance.
      */
     @SafeVarargs
-    public final BlockEntityBuilder<P, T> validBlocks(Supplier<? extends Block>... validBlocks)
+    public final BlockEntityBuilder<P, T, M> validBlocks(Supplier<? extends Block>... validBlocks)
     {
         Collections.addAll(this.validBlocks, validBlocks);
         return self();

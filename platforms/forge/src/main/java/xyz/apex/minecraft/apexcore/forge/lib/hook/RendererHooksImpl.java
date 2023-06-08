@@ -21,7 +21,7 @@ import xyz.apex.minecraft.apexcore.forge.core.ModEvents;
 
 import java.util.function.Supplier;
 
-@SuppressWarnings("removal")
+@SuppressWarnings("deprecation")
 @ApiStatus.Internal
 @SideOnly(PhysicalSide.CLIENT)
 final class RendererHooksImpl implements RendererHooks
