@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
+import xyz.apex.minecraft.apexcore.common.lib.component.block.types.BlockComponentTypes;
 import xyz.apex.minecraft.apexcore.common.lib.event.EventType;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.EntityEvents;
 import xyz.apex.minecraft.apexcore.common.lib.hook.Hooks;
@@ -42,6 +43,7 @@ public abstract class ApexCore
         // meaning the platform specific check should happen first before this one
         EntityEvents.IS_FAKE_PLAYER.addListener(entity -> entity instanceof ServerPlayer && entity.getClass() != ServerPlayer.class);
         EventType.bootstrap();
+        BlockComponentTypes.bootstrap();
         RegistrarManager.register(ID);
     }
 
