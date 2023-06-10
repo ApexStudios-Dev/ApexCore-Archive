@@ -40,6 +40,13 @@ public final class ApexCoreImpl extends ApexCore
     private final ModLoader modLoader = new ModLoaderImpl();
     private final Hooks hooks = new HooksImpl();
 
+    public ApexCoreImpl()
+    {
+        super();
+
+        bootstrap();
+    }
+
     @Override
     protected void bootstrap()
     {
@@ -68,6 +75,8 @@ public final class ApexCoreImpl extends ApexCore
         wrapEvent(ServerStartedEvent.class, MinecraftForge.EVENT_BUS, ServerEvents.STARTED, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getServer()));
         wrapEvent(ServerStoppedEvent.class, MinecraftForge.EVENT_BUS, ServerEvents.STOPPING, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getServer()));
         wrapEvent(ServerStoppedEvent.class, MinecraftForge.EVENT_BUS, ServerEvents.STOPPED, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getServer()));
+
+        ForgeEvents.register();
     }
 
     @Override

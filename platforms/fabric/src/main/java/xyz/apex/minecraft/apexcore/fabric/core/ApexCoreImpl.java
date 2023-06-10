@@ -38,12 +38,14 @@ public final class ApexCoreImpl extends ApexCore implements ModInitializer
         EntityEvents.IS_FAKE_PLAYER.addListener(FakePlayer.class::isInstance);
 
         super.bootstrap();
+
+        setupEvents();
     }
 
     @Override
     public void onInitialize()
     {
-        setupEvents();
+        bootstrap();
     }
 
     private void setupEvents()

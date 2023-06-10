@@ -28,6 +28,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.BlockEntityComponentHolder;
 import xyz.apex.minecraft.apexcore.common.lib.helper.BlockHelper;
 
 import java.util.*;
@@ -36,6 +37,12 @@ import java.util.function.Consumer;
 public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock implements BlockComponentHolder
 {
     private final Map<BlockComponentType<?>, BlockComponent> componentRegistry = registerComponents();
+
+    // methods tied to these do not have a BlockPos parameter
+    // which means we can not easily callback the block entity
+    // not the best solution but this works
+    private final Map<BlockState, Boolean> isSignalSource = Maps.newHashMap();
+    private final Map<BlockState, Boolean> hasAnalogOutputSignal = Maps.newHashMap();
 
     public BaseBlockComponentHolder(Properties properties)
     {
@@ -164,6 +171,9 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
     @Override
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState blockState, @Nullable BlockEntity blockEntity, ItemStack tool)
     {
+        if(blockEntity instanceof BlockEntityComponentHolder blockEntityComponentHolder)
+            blockEntityComponentHolder.playerDestroy(level, player, tool);
+
         getComponents().forEach(component -> component.playerDestroy(level, player, pos, blockState, blockEntity, tool));
         super.playerDestroy(level, player, pos, blockState, blockEntity, tool);
     }
@@ -172,12 +182,19 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
     public void setPlacedBy(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack)
     {
         super.setPlacedBy(level, pos, blockState, placer, stack);
+
+        if(level.getBlockEntity(pos) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
+            blockEntityComponentHolder.setPlacedBy(level, placer, stack);
+
         getComponents().forEach(component -> component.setPlacedBy(level, pos, blockState, placer, stack));
     }
 
     @Override
     public void playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player)
     {
+        if(level.getBlockEntity(pos) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
+            blockEntityComponentHolder.playerWillDestroy(level, player);
+
         getComponents().forEach(component -> component.playerWillDestroy(level, pos, blockState, player));
         super.playerWillDestroy(level, pos, blockState, player);
     }
@@ -207,11 +224,17 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
     {
         super.onPlace(blockState, level, pos, oldBlockState, isMoving);
         getComponents().forEach(component -> component.onPlace(blockState, level, pos, oldBlockState, isMoving));
+
+        if(level.getBlockEntity(pos) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
+            blockEntityComponentHolder.onPlace(level, oldBlockState);
     }
 
     @Override
     public void onRemove(BlockState blockState, Level level, BlockPos pos, BlockState newBlockState, boolean isMoving)
     {
+        if(level.getBlockEntity(pos) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
+            blockEntityComponentHolder.onRemove(level, newBlockState);
+
         getComponents().forEach(component -> component.onRemove(blockState, level, pos, newBlockState, isMoving));
         super.onRemove(blockState, level, pos, newBlockState, isMoving);
     }
@@ -219,6 +242,14 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
     @Override
     public InteractionResult use(BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
     {
+        if(level.getBlockEntity(pos) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
+        {
+            var result = blockEntityComponentHolder.use(level, player, hand, hit);
+
+            if(result.consumesAction())
+                return result;
+        }
+
         for(var component : getComponents())
         {
             var result = component.use(blockState, level, pos, player, hand, hit);
@@ -241,7 +272,7 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
                 return renderShape;
         }
 
-        return super.getRenderShape(blockState);
+        return RenderShape.MODEL; // super gives us INVISIBLE
     }
 
     @Override
@@ -330,18 +361,36 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
     @Override
     public boolean isSignalSource(BlockState blockState)
     {
+        var isSignalSource = this.isSignalSource.get(blockState);
+
+        if(isSignalSource != null && isSignalSource)
+            return true;
+
         return getComponents().stream().anyMatch(component -> component.isSignalSource(blockState));
     }
 
     @Override
     public boolean hasAnalogOutputSignal(BlockState blockState)
     {
+        var hasAnalogOutputSignal = this.hasAnalogOutputSignal.get(blockState);
+
+        if(hasAnalogOutputSignal != null && hasAnalogOutputSignal)
+            return true;
+
         return getComponents().stream().anyMatch(component -> component.hasAnalogOutputSignal(blockState));
     }
 
     @Override
     public int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos)
     {
+        if(level.getBlockEntity(pos) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
+        {
+            var analogOutputSignal = blockEntityComponentHolder.getAnalogOutputSignal(level);
+
+            if(analogOutputSignal > 0)
+                return analogOutputSignal;
+        }
+
         for(var component : getComponents())
         {
             var analogOutputSignal = component.getAnalogOutputSignal(blockState, level, pos);
@@ -356,6 +405,14 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
     @Override
     public int getSignal(BlockState blockState, BlockGetter level, BlockPos pos, Direction direction)
     {
+        if(level.getBlockEntity(pos) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
+        {
+            var analogOutputSignal = blockEntityComponentHolder.getSignal(level, direction);
+
+            if(analogOutputSignal > 0)
+                return analogOutputSignal;
+        }
+
         for(var component : getComponents())
         {
             var analogOutputSignal = component.getSignal(blockState, level, pos, direction);
@@ -372,7 +429,15 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
     public final BlockEntity newBlockEntity(BlockPos pos, BlockState blockState)
     {
         var blockEntityType = getBlockEntityType();
-        return blockEntityType == null ? null : blockEntityType.create(pos, blockState);
+        var blockEntity = blockEntityType == null ? null : blockEntityType.create(pos, blockState);
+
+        if(blockEntity instanceof BlockEntityComponentHolder blockEntityComponentHolder)
+        {
+            isSignalSource.put(blockState, blockEntityComponentHolder.isSignalSource());
+            hasAnalogOutputSignal.put(blockState, blockEntityComponentHolder.hasAnalogOutputSignal());
+        }
+
+        return blockEntity;
     }
 
     @Override
