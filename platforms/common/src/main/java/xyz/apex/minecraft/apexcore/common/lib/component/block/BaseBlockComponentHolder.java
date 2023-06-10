@@ -24,11 +24,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.lib.helper.BlockHelper;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -84,6 +84,15 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
             registrar.listeners.get(componentType).forEach(listener -> listener.accept(component));
             map.put(componentType, component);
         }
+
+        BlockHelper.rebuildStateDefinition(this, builder -> map.values().forEach(component -> component.createBlockStateDefinition(builder)), defaultBlockState -> {
+            for(var component : map.values())
+            {
+                defaultBlockState = component.registerDefaultBlockState(defaultBlockState);
+            }
+
+            return defaultBlockState;
+        });
 
         return ImmutableMap.copyOf(map);
     }
@@ -171,16 +180,6 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
     {
         getComponents().forEach(component -> component.playerWillDestroy(level, pos, blockState, player));
         super.playerWillDestroy(level, pos, blockState, player);
-    }
-
-    @SuppressWarnings("ConstantValue")
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
-    {
-        super.createBlockStateDefinition(builder);
-
-        if(componentRegistry != null)
-            getComponents().forEach(component -> component.createBlockStateDefinition(builder));
     }
 
     @Override
