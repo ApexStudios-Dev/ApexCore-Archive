@@ -13,6 +13,7 @@ import xyz.apex.minecraft.apexcore.common.lib.event.EventType;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.EntityEvents;
 import xyz.apex.minecraft.apexcore.common.lib.hook.Hooks;
 import xyz.apex.minecraft.apexcore.common.lib.modloader.ModLoader;
+import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockTypes;
 import xyz.apex.minecraft.apexcore.common.lib.network.NetworkManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
 
@@ -42,9 +43,11 @@ public abstract class ApexCore
         // platform listeners are registered before this one
         // meaning the platform specific check should happen first before this one
         EntityEvents.IS_FAKE_PLAYER.addListener(entity -> entity instanceof ServerPlayer && entity.getClass() != ServerPlayer.class);
+        ApexTags.bootstrap();
         EventType.bootstrap();
         BlockComponentTypes.bootstrap();
         BlockEntityComponentTypes.bootstrap();
+        MultiBlockTypes.bootstrap();
 
         ApexCoreTests.register();
         RegistrarManager.register(ID);

@@ -1,6 +1,7 @@
 package xyz.apex.minecraft.apexcore.common.core;
 
 import org.jetbrains.annotations.ApiStatus;
+import xyz.apex.minecraft.apexcore.common.core.client.BlockPlacementRenderer;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
 
@@ -11,5 +12,6 @@ public interface ApexCoreClient
 {
     default void bootstrap()
     {
+        BlockPlacementRenderer.INSTANCE.register();
     }
 }
