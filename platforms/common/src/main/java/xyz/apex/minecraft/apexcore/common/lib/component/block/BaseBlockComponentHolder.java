@@ -283,7 +283,7 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
         {
             var fluidState = component.getFluidState(blockState);
 
-            if(!fluidState.isEmpty())
+            if(fluidState != null && !fluidState.isEmpty())
                 return fluidState;
         }
 
