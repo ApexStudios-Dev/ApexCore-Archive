@@ -89,6 +89,7 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
         {
             var component = componentType.newInstance(this);
             registrar.listeners.get(componentType).forEach(listener -> listener.accept(component));
+            ((BaseBlockComponent) component).postRegistration();
             map.put(componentType, component);
         }
 

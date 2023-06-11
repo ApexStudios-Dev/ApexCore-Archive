@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.common.lib.component.block;
 
+import com.google.errorprone.annotations.DoNotCall;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -31,6 +33,7 @@ import java.util.Set;
 public non-sealed class BaseBlockComponent implements BlockComponent
 {
     protected final BlockComponentHolder componentHolder;
+    private boolean registered = false;
 
     protected BaseBlockComponent(BlockComponentHolder componentHolder)
     {
@@ -38,6 +41,13 @@ public non-sealed class BaseBlockComponent implements BlockComponent
     }
 
     // region: Components
+    @DoNotCall
+    @ApiStatus.Internal
+    void postRegistration()
+    {
+        registered = true;
+    }
+
     @Nullable
     @Override
     public final <C extends BlockComponent> C getComponent(BlockComponentType<C> componentType)
@@ -85,6 +95,11 @@ public non-sealed class BaseBlockComponent implements BlockComponent
     public final BlockComponentHolder getComponentHolder()
     {
         return componentHolder;
+    }
+
+    protected final boolean isRegistered()
+    {
+        return registered;
     }
     // endregion
 
