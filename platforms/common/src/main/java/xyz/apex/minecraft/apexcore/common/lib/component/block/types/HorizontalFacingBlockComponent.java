@@ -39,7 +39,7 @@ public final class HorizontalFacingBlockComponent extends BaseBlockComponent
     @Override
     public BlockState getStateForPlacement(BlockState placementBlockState, BlockPlaceContext context)
     {
-        return placementBlockState.setValue(FACING, context.getNearestLookingDirection());
+        return placementBlockState.setValue(FACING, context.getHorizontalDirection());
     }
 
     @Override
