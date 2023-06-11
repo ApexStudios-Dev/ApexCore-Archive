@@ -59,7 +59,7 @@ public final class ApexCoreImpl extends ApexCore
 
         EventBuses.registerForJavaFML();
         setupEvents();
-        PhysicalSide.CLIENT.runWhenOn(() -> ApexCoreClient::new);
+        PhysicalSide.CLIENT.runWhenOn(() -> ApexCoreClientImpl::new);
     }
 
     private void setupEvents()

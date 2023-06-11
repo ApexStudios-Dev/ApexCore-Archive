@@ -60,7 +60,7 @@
             "xyz.apex.minecraft.apexcore.fabric.core.ApexCoreImpl"
         ],
         "client": [
-            "xyz.apex.minecraft.apexcore.fabric.core.ApexCoreClient"
+            "xyz.apex.minecraft.apexcore.fabric.core.ApexCoreClientImpl"
         ]
     },
     "accessWidener": "apexcore.accesswidener",

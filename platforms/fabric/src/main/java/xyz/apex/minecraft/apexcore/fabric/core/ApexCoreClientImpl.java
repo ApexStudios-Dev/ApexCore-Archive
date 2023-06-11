@@ -2,18 +2,25 @@ package xyz.apex.minecraft.apexcore.fabric.core;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
+import net.minecraft.client.Minecraft;
+import xyz.apex.minecraft.apexcore.common.core.ApexCoreClient;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.ClientEvents;
+import xyz.apex.minecraft.apexcore.common.lib.event.types.LevelRendererEvents;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.ScreenEvents;
 
+import java.util.Objects;
+
 @SideOnly(PhysicalSide.CLIENT)
-public final class ApexCoreClient implements ClientModInitializer
+public final class ApexCoreClientImpl implements ApexCoreClient, ClientModInitializer
 {
     @Override
     public void onInitializeClient()
     {
+        bootstrap();
         setupEvents();
     }
 
@@ -39,6 +46,37 @@ public final class ApexCoreClient implements ClientModInitializer
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
             ClientEvents.STOPPING.post().handle(client);
             ClientEvents.STOPPED.post().handle(client);
+        });
+
+        WorldRenderEvents.AFTER_ENTITIES.register(context -> LevelRendererEvents.AFTER_ENTITIES.post().handle(
+                context.worldRenderer(),
+                context.matrixStack(),
+                context.projectionMatrix(),
+                context.tickDelta(),
+                context.camera(),
+                Objects.requireNonNull(context.frustum()) // none null during this event
+        ));
+
+        WorldRenderEvents.AFTER_TRANSLUCENT.register(context -> LevelRendererEvents.AFTER_TRANSLUCENT.post().handle(
+                context.worldRenderer(),
+                context.matrixStack(),
+                context.projectionMatrix(),
+                context.tickDelta(),
+                context.camera(),
+                Objects.requireNonNull(context.frustum()) // none null during this event
+        ));
+
+        WorldRenderEvents.BLOCK_OUTLINE.register((renderContext, outlineContext) -> {
+            var canceled = LevelRendererEvents.BLOCK_HIGHLIGHT.post().handle(
+                    renderContext.worldRenderer(),
+                    renderContext.matrixStack(),
+                    Minecraft.getInstance().renderBuffers().bufferSource(),
+                    renderContext.tickDelta(),
+                    renderContext.camera()
+            );
+
+            // invert because fabric wants invert of what forge wants
+            return !canceled;
         });
     }
 }

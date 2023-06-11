@@ -2,6 +2,8 @@ package xyz.apex.minecraft.apexcore.forge.core;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraftforge.client.event.RenderHighlightEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.GameShuttingDownEvent;
@@ -9,18 +11,21 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
+import xyz.apex.minecraft.apexcore.common.core.ApexCoreClient;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.ClientEvents;
+import xyz.apex.minecraft.apexcore.common.lib.event.types.LevelRendererEvents;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.ScreenEvents;
 import xyz.apex.minecraft.apexcore.forge.lib.EventBuses;
 
 @ApiStatus.Internal
 @SideOnly(PhysicalSide.CLIENT)
-public final class ApexCoreClient
+public final class ApexCoreClientImpl implements ApexCoreClient
 {
-    ApexCoreClient()
+    ApexCoreClientImpl()
     {
+        bootstrap();
         setupEvents();
     }
 
@@ -46,6 +51,26 @@ public final class ApexCoreClient
             var client = Minecraft.getInstance();
             ClientEvents.STOPPING.post().handle(client);
             ClientEvents.STOPPED.post().handle(client);
+        });
+
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, RenderLevelStageEvent.class, event -> {
+            var levelRenderer = event.getLevelRenderer();
+            var pose = event.getPoseStack();
+            var projection = event.getProjectionMatrix();
+            var partialTick = event.getPartialTick();
+            var camera = event.getCamera();
+            var frustum = event.getFrustum();
+            var stage = event.getStage();
+
+            if(stage == RenderLevelStageEvent.Stage.AFTER_ENTITIES)
+                LevelRendererEvents.AFTER_ENTITIES.post().handle(levelRenderer, pose, projection, partialTick, camera, frustum);
+            else if(stage == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS)
+                LevelRendererEvents.AFTER_TRANSLUCENT.post().handle(levelRenderer, pose, projection, partialTick, camera, frustum);
+        });
+
+        ApexCoreImpl.wrapEvent(RenderHighlightEvent.Block.class, MinecraftForge.EVENT_BUS, LevelRendererEvents.BLOCK_HIGHLIGHT, (forgeEvent, ourEvent) -> {
+            if(ourEvent.handle(forgeEvent.getLevelRenderer(), forgeEvent.getPoseStack(), forgeEvent.getMultiBufferSource(), forgeEvent.getPartialTick(), forgeEvent.getCamera()))
+                forgeEvent.setCanceled(true);
         });
     }
 }

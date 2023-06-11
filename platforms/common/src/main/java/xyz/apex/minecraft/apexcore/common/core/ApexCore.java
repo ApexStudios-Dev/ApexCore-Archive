@@ -46,7 +46,7 @@ public abstract class ApexCore
         BlockComponentTypes.bootstrap();
         BlockEntityComponentTypes.bootstrap();
 
-        // ApexCoreTests.register();
+        ApexCoreTests.register();
         RegistrarManager.register(ID);
     }
 
