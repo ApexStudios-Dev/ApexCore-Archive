@@ -24,6 +24,7 @@ minecraft {
             workingDirectory file('run/client')
             property 'forge.logging.markers', ''
             property 'forge.logging.console.level', 'debug'
+            property "${MOD_ID}.test_elements.enabled", 'true'
             ideaModule "${rootProject.name}.${project.name}.main"
             jvmArg '-XX:+AllowEnhancedClassRedefinition' // requires JBR
             folderName 'forge'
@@ -48,6 +49,7 @@ minecraft {
             workingDirectory file('run/server')
             property 'forge.logging.markers', ''
             property 'forge.logging.console.level', 'debug'
+            property "${MOD_ID}.test_elements.enabled", 'true'
             ideaModule "${rootProject.name}.${project.name}.main"
             args 'nogui'
             jvmArg '-XX:+AllowEnhancedClassRedefinition' // requires JBR

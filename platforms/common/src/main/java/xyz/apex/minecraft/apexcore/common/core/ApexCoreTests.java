@@ -1,10 +1,14 @@
 package xyz.apex.minecraft.apexcore.common.core;
 
+import joptsimple.internal.Strings;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.BaseBlockComponentHolder;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.BlockComponentRegistrar;
@@ -15,40 +19,81 @@ import xyz.apex.minecraft.apexcore.common.lib.component.block.types.BlockCompone
 import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockComponent;
 import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockType;
 import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockTypes;
-import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.builders.BuilderManager;
-import xyz.apex.minecraft.apexcore.common.lib.registry.entries.BlockEntityEntry;
-import xyz.apex.minecraft.apexcore.common.lib.registry.entries.BlockEntry;
+
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 @ApiStatus.Internal
 final class ApexCoreTests
 {
-    private static final BuilderManager<BuilderManager.Impl> BUILDERS = BuilderManager.create(ApexCore.ID);
+    private static final AtomicReference<BlockEntityType<DummyBlockEntity>> DUMMY_BLOCK_ENTITY = new AtomicReference<>();
+    private static final AtomicReference<BlockEntityType<InventoryBlockEntity>> INVENTORY_BLOCK_ENTITY = new AtomicReference<>();
 
-    private static final BlockEntry<DummyBlock> DUMMY_BLOCK = BUILDERS.block("dummy", DummyBlock::new).copyInitialPropertiesFrom(() -> Blocks.CHEST).noLootTable().simpleItem().register();
-    private static final BlockEntityEntry<DummyBlockEntity> DUMMY_BLOCK_ENTITY = BUILDERS.<DummyBlockEntity>blockEntity("dummy", DummyBlockEntity::new).validBlock(DUMMY_BLOCK).register();
-
-    private static final BlockEntry<InventoryBlock> INVENTORY_BLOCK = BUILDERS.block("inventory", InventoryBlock::new).copyInitialPropertiesFrom(() -> Blocks.CHEST).noLootTable().simpleItem().register();
-    private static final BlockEntityEntry<InventoryBlockEntity> INVENTORY_BLOCK_ENTITY = BUILDERS.<InventoryBlockEntity>blockEntity("inventory", InventoryBlockEntity::new).validBlock(INVENTORY_BLOCK).register();
-
-    private static final MultiBlockType MB_STAIR = MultiBlockType.builder()
-            .with("XXX", "XXX", "XXX")
-            .with("XXX", "XXX", "   ")
-            .with("XXX", "   ", "   ")
-    .build();
-
-    private static final BlockEntry<MultiBlockCube> MULTI_BLOCK_CUBE = BUILDERS.block("multi_block/cube", MultiBlockCube::new).copyInitialPropertiesFrom(() -> Blocks.DIRT).noLootTable().simpleItem().register();
-    private static final BlockEntry<MultiBlockStair> MULTI_BLOCK_STAIR = BUILDERS.block("multi_block/stair", MultiBlockStair::new).copyInitialPropertiesFrom(() -> Blocks.DIRT).noLootTable().simpleItem().register();
-
-    private static final RegistryEntry<CreativeModeTab> TEST_TAB = BUILDERS.creativeModeTab("test").icon(() -> INVENTORY_BLOCK.asStack()).displayItems((params, output) -> {
-        output.accept(DUMMY_BLOCK);
-        output.accept(INVENTORY_BLOCK);
-        output.accept(MULTI_BLOCK_CUBE);
-        output.accept(MULTI_BLOCK_STAIR);
-    }).register();
+    private static final String PROPERTY = "%s.test_elements.enabled".formatted(ApexCore.ID);
+    public static final boolean ENABLED = BooleanUtils.toBoolean(System.getProperty(PROPERTY, "false"));
+    public static final Marker MARKER = MarkerManager.getMarker("Tests");
 
     static void register()
     {
+        if(!ENABLED)
+            return;
+
+        var messages = new String[] {
+                "ApexCore Test Elements Enabled!",
+                "Errors, Bugs and Glitches may arise, you are on your own.",
+                "No support will be provided while Test Elements are Enabled!"
+        };
+
+        var maxLen = Stream.of(messages).mapToInt(String::length).max().orElse(1);
+        var header = Strings.repeat('*', maxLen + 4);
+        ApexCore.LOGGER.warn(MARKER, header);
+        Stream.of(messages).map(str -> StringUtils.center(str, maxLen, ' ')).forEach(str -> ApexCore.LOGGER.warn(MARKER, "* {} *", str));
+        ApexCore.LOGGER.warn(MARKER, header);
+
+        var builders = BuilderManager.create(ApexCore.ID);
+
+        var dummyBlock = builders.block("dummy", DummyBlock::new)
+                                 .copyInitialPropertiesFrom(() -> Blocks.CHEST)
+                                 .noLootTable()
+                                 .simpleItem()
+
+                                 .<DummyBlockEntity>blockEntity(DummyBlockEntity::new)
+                                    .addListener(DUMMY_BLOCK_ENTITY::set)
+                                 .end()
+         .register();
+
+        var inventoryBlock = builders.block("inventory", InventoryBlock::new)
+                                     .copyInitialPropertiesFrom(() -> Blocks.CHEST)
+                                     .noLootTable()
+                                     .simpleItem()
+
+                                     .<InventoryBlockEntity>blockEntity(InventoryBlockEntity::new)
+                                        .addListener(INVENTORY_BLOCK_ENTITY::set)
+                                     .end()
+         .register();
+
+        var multiBlockCube = builders.block("multi_block/cube", MultiBlockCube::new)
+                                     .copyInitialPropertiesFrom(() -> Blocks.DIRT)
+                                     .noLootTable()
+                                     .simpleItem()
+        .register();
+
+        var multiBlockStair = builders.block("multi_block/stair", MultiBlockStair::new)
+                                      .copyInitialPropertiesFrom(() -> Blocks.DIRT)
+                                      .noLootTable()
+                                      .simpleItem()
+        .register();
+
+        builders.creativeModeTab("test")
+                .icon(() -> inventoryBlock.asStack())
+                .displayItems((params, output) -> {
+                    output.accept(dummyBlock);
+                    output.accept(inventoryBlock);
+                    output.accept(multiBlockCube);
+                    output.accept(multiBlockStair);
+                })
+        .register();
     }
 
     private static final class DummyBlock extends BaseBlockComponentHolder
@@ -118,6 +163,12 @@ final class ApexCoreTests
 
     private static final class MultiBlockStair extends BaseBlockComponentHolder
     {
+        private final MultiBlockType multiBlockType = MultiBlockType.builder()
+                .with("XXX", "XXX", "XXX")
+                .with("XXX", "XXX", "   ")
+                .with("XXX", "   ", "   ")
+        .build();
+
         private MultiBlockStair(Properties properties)
         {
             super(properties);
@@ -126,7 +177,7 @@ final class ApexCoreTests
         @Override
         protected void registerComponents(BlockComponentRegistrar registrar)
         {
-            registrar.register(MultiBlockComponent.COMPONENT_TYPE, component -> component.setMultiBlockType(MB_STAIR));
+            registrar.register(MultiBlockComponent.COMPONENT_TYPE, component -> component.setMultiBlockType(multiBlockType));
             registrar.register(BlockComponentTypes.HORIZONTAL_FACING);
         }
     }

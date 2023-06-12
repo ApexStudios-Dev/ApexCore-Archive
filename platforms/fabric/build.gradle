@@ -10,14 +10,14 @@ loom {
     runs {
         client {
             client()
-            property "${MOD_ID}.enable_test_elements", 'true'
+            property "${MOD_ID}.test_elements.enabled", 'true'
             vmArg '-XX:+AllowEnhancedClassRedefinition' // Requires JBR
             ideConfigGenerated true
         }
 
         server {
             server()
-            property "${MOD_ID}.enable_test_elements", 'true'
+            property "${MOD_ID}.test_elements.enabled", 'true'
             vmArg '-XX:+AllowEnhancedClassRedefinition' // Requires JBR
             ideConfigGenerated true
         }
