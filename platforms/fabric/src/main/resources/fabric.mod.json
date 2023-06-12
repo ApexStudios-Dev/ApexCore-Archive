@@ -71,7 +71,11 @@
     },
     "custom": {
         "modmenu": {
-            "modmenu.discord": "https://discord.apexstudios.dev/"
+            "links": {
+                "modmenu.discord": "https://discord.apexstudios.dev/"
+            },
+            "badges": [ "library" ],
+            "update_checker": true
         }
     }
 }
