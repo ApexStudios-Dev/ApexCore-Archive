@@ -82,6 +82,8 @@ minecraft {
 }
 
 mixin {
+    add sourceSets.main, "${MOD_ID}.refmap.json"
+
     if(file("src/main/resources/${MOD_ID}.mixins.json").exists()) {
         config "${MOD_ID}.mixins.json"
     }
