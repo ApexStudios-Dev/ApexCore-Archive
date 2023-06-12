@@ -72,6 +72,12 @@ sourcesJar {
     from project(':common').sourceSets.main.allJava
 }
 
+collectJars {
+    def tasks = [ remapJar, remapSourcesJar ]
+    dependsOn tasks
+    from tasks
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {

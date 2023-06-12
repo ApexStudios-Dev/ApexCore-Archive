@@ -36,6 +36,12 @@ dependencies {
     compileOnly 'com.google.errorprone:error_prone_annotations:2.11.0'
 }
 
+collectJars {
+    def tasks = [ remapJar, remapSourcesJar ]
+    dependsOn tasks
+    from tasks
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {

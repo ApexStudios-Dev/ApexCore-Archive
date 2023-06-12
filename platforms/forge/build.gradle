@@ -138,6 +138,12 @@ reobf {
 jar.finalizedBy('reobfJar')
 tasks.jarJar.finalizedBy('reobfJarJar')
 
+collectJars {
+    def tasks = [ jar, sourcesJar, tasks.jarJar ]
+    dependsOn tasks
+    from tasks
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {

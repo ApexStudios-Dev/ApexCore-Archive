@@ -23,3 +23,6 @@ run
 
 # Ignore generated data files
 **/generated/**
+
+# Ignore compiled jars
+jars
