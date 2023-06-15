@@ -82,6 +82,9 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             loom.disableDeprecatedPomGeneration(it)
+
+            artifact remapJar
+            artifact sourcesJar
         }
     }
 }
