@@ -163,12 +163,6 @@ final class ApexCoreTests
 
     private static final class MultiBlockStair extends BaseBlockComponentHolder
     {
-        private final MultiBlockType multiBlockType = MultiBlockType.builder()
-                .with("XXX", "XXX", "XXX")
-                .with("XXX", "XXX", "   ")
-                .with("XXX", "   ", "   ")
-        .build();
-
         private MultiBlockStair(Properties properties)
         {
             super(properties);
@@ -177,7 +171,14 @@ final class ApexCoreTests
         @Override
         protected void registerComponents(BlockComponentRegistrar registrar)
         {
-            registrar.register(MultiBlockComponent.COMPONENT_TYPE, component -> component.setMultiBlockType(multiBlockType));
+            registrar.register(MultiBlockComponent.COMPONENT_TYPE, component -> component.setMultiBlockType(MultiBlockType
+                    .builder()
+                        .with("XXX", "XXX", "XXX")
+                        .with("XXX", "XXX", "   ")
+                        .with("XXX", "   ", "   ")
+                    .build()
+            ));
+
             registrar.register(BlockComponentTypes.HORIZONTAL_FACING);
         }
     }
