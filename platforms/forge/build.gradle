@@ -19,12 +19,14 @@ minecraft {
         accessTransformer = rootProject.file("${AT_FILE}")
     }
 
+    enableIdeaPrepareRuns = false
+    copyIdeResources = true
+    generateRunFolders = true
+
     runs {
-        client {
-            workingDirectory file('run/client')
+        configureEach {
             property 'forge.logging.markers', ''
             property 'forge.logging.console.level', 'debug'
-            property "${MOD_ID}.test_elements.enabled", 'true'
             ideaModule "${rootProject.name}.${project.name}.main"
             jvmArg '-XX:+AllowEnhancedClassRedefinition' // requires JBR
             folderName 'forge'
@@ -34,6 +36,11 @@ minecraft {
                     source sourceSets.main
                 }
             }
+        }
+
+        client {
+            property "${MOD_ID}.test_elements.enabled", 'true'
+            workingDirectory file('run/client')
         }
 
         if(rootProject.hasProperty('DEVLOGIN_VERSION')) {
@@ -46,39 +53,18 @@ minecraft {
         }
 
         server {
-            workingDirectory file('run/server')
-            property 'forge.logging.markers', ''
-            property 'forge.logging.console.level', 'debug'
             property "${MOD_ID}.test_elements.enabled", 'true'
-            ideaModule "${rootProject.name}.${project.name}.main"
+            workingDirectory file('run/server')
             args 'nogui'
-            jvmArg '-XX:+AllowEnhancedClassRedefinition' // requires JBR
-            folderName 'forge'
-
-            mods {
-                "${MOD_ID}" {
-                    source sourceSets.main
-                }
-            }
         }
 
         data {
             workingDirectory file('run/client')
-            property 'forge.logging.markers', ''
-            property 'forge.logging.console.level', 'debug'
-            ideaModule "${rootProject.name}.${project.name}.main"
-            folderName 'forge'
 
             args '--mod', MOD_ID, '--client', '--server', '--validate'
             args '--output', file('src/generated/resources')
             args '--existing', project(':common').file('src/main/resources/')
             args '--existing', file('src/main/resources/')
-
-            mods {
-                "${MOD_ID}" {
-                    source sourceSets.main
-                }
-            }
         }
     }
 }
