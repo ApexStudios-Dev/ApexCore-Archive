@@ -3,12 +3,12 @@ package xyz.apex.minecraft.apexcore.fabric.core;
 import com.google.errorprone.annotations.DoNotCall;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.world.entity.player.Player;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
@@ -16,6 +16,7 @@ import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.EntityEvents;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.PlayerEvents;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.ServerEvents;
+import xyz.apex.minecraft.apexcore.common.lib.event.types.TickEvents;
 import xyz.apex.minecraft.apexcore.common.lib.hook.Hooks;
 import xyz.apex.minecraft.apexcore.common.lib.modloader.ModLoader;
 import xyz.apex.minecraft.apexcore.common.lib.network.NetworkManager;
@@ -56,6 +57,12 @@ final class ApexCoreImpl extends ApexCore
 
     private void setupEvents()
     {
+        ServerTickEvents.START_SERVER_TICK.register(server -> TickEvents.START_SERVER.post().handle(server));
+        ServerTickEvents.END_SERVER_TICK.register(server -> TickEvents.END_SERVER.post().handle(server));
+
+        EntityTrackingEvents.START_TRACKING.register((trackedEntity, player) -> PlayerEvents.START_TRACKING_ENTITY.post().handle(trackedEntity, player));
+        EntityTrackingEvents.STOP_TRACKING.register((trackedEntity, player) -> PlayerEvents.END_TRACKING_ENTITY.post().handle(trackedEntity, player));
+
         ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> EntityEvents.JOIN_LEVEL.post().handle(entity, level));
         ServerEntityEvents.ENTITY_UNLOAD.register((entity, level) -> EntityEvents.LEAVE_LEVEL.post().handle(entity, level));
 
@@ -67,13 +74,6 @@ final class ApexCoreImpl extends ApexCore
         ServerLifecycleEvents.SERVER_STARTED.register(server -> ServerEvents.STARTED.post().handle(server));
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> ServerEvents.STOPPING.post().handle(server));
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> ServerEvents.STOPPED.post().handle(server));
-
-        ServerLivingEntityEvents.ALLOW_DEATH.register((entity, damageSource, damageAmount) -> {
-            if(entity instanceof Player player && PlayerEvents.DEATH.post().handle(player, damageSource))
-                return true;
-
-            return EntityEvents.LIVING_DEATH.post().handle(entity, damageSource);
-        });
     }
 
     @Override

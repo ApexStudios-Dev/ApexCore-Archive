@@ -11,33 +11,31 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.items.wrapper.InvWrapper;
-import org.apache.commons.lang3.function.ToBooleanBiFunction;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.BlockEntityComponentHolder;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.types.BlockEntityComponentTypes;
-import xyz.apex.minecraft.apexcore.common.lib.event.EventType;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.EntityEvents;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.PlayerEvents;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.ServerEvents;
+import xyz.apex.minecraft.apexcore.common.lib.event.types.TickEvents;
 
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 @ApiStatus.Internal
 final class NeoForgeEvents
@@ -48,44 +46,63 @@ final class NeoForgeEvents
     {
         MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, NeoForgeEvents::onAttachBlockEntityCapability);
 
-        wrapEvent(EntityJoinLevelEvent.class, MinecraftForge.EVENT_BUS, EntityEvents.JOIN_LEVEL, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getEntity(), forgeEvent.getLevel()));
-        wrapEvent(EntityLeaveLevelEvent.class, MinecraftForge.EVENT_BUS, EntityEvents.LEAVE_LEVEL, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getEntity(), forgeEvent.getLevel()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerEvent.StartTracking.class, event -> PlayerEvents.START_TRACKING_ENTITY.post().handle(event.getTarget(), event.getEntity()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerEvent.StopTracking.class, event -> PlayerEvents.END_TRACKING_ENTITY.post().handle(event.getTarget(), event.getEntity()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, EntityJoinLevelEvent.class, event -> EntityEvents.JOIN_LEVEL.post().handle(event.getEntity(), event.getLevel()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, EntityLeaveLevelEvent.class, event -> EntityEvents.LEAVE_LEVEL.post().handle(event.getEntity(), event.getLevel()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerEvent.Clone.class, event -> PlayerEvents.COPY.post().handle(event.getOriginal(), event.getEntity(), event.isWasDeath()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerEvent.PlayerChangedDimensionEvent.class, event -> PlayerEvents.CHANGE_DIMENSION.post().handle(event.getEntity(), event.getFrom(), event.getTo()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerEvent.PlayerRespawnEvent.class, event -> PlayerEvents.RESPAWN.post().handle(event.getEntity(), event.isEndConquered()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerEvent.PlayerLoggedInEvent.class, event -> PlayerEvents.LOGGED_IN.post().handle(event.getEntity()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerEvent.PlayerLoggedOutEvent.class, event -> PlayerEvents.LOGGED_OUT.post().handle(event.getEntity()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerEvent.ItemCraftedEvent.class, event -> PlayerEvents.CRAFT_ITEM.post().handle(event.getEntity(), event.getCrafting(), event.getInventory()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, ServerStartingEvent.class, event -> ServerEvents.STARTING.post().handle(event.getServer()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, ServerStartedEvent.class, event -> ServerEvents.STARTED.post().handle(event.getServer()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, ServerStoppedEvent.class, event -> ServerEvents.STOPPING.post().handle(event.getServer()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, ServerStoppedEvent.class, event -> ServerEvents.STOPPED.post().handle(event.getServer()));
 
-        wrapEvent(PlayerEvent.Clone.class, MinecraftForge.EVENT_BUS, PlayerEvents.COPY, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getOriginal(), forgeEvent.getEntity(), forgeEvent.isWasDeath()));
-        wrapEvent(PlayerEvent.PlayerChangedDimensionEvent.class, MinecraftForge.EVENT_BUS, PlayerEvents.CHANGE_DIMENSION, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getEntity(), forgeEvent.getFrom(), forgeEvent.getTo()));
-        wrapEvent(PlayerEvent.PlayerRespawnEvent.class, MinecraftForge.EVENT_BUS, PlayerEvents.RESPAWN, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getEntity(), forgeEvent.isEndConquered()));
-        wrapEvent(PlayerEvent.PlayerLoggedInEvent.class, MinecraftForge.EVENT_BUS, PlayerEvents.LOGGED_IN, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getEntity()));
-        wrapEvent(PlayerEvent.PlayerLoggedOutEvent.class, MinecraftForge.EVENT_BUS, PlayerEvents.LOGGED_OUT, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getEntity()));
-        wrapCancelableEvent(EntityItemPickupEvent.class, MinecraftForge.EVENT_BUS, PlayerEvents.PICKUP_ITEM, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getEntity(), forgeEvent.getItem()));
-        wrapCancelableEvent(PlayerXpEvent.PickupXp.class, MinecraftForge.EVENT_BUS, PlayerEvents.PICKUP_EXPERIENCE, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getEntity(), forgeEvent.getOrb()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, TickEvent.ServerTickEvent.class, event -> {
+            var server = event.getServer();
 
-        wrapEvent(ServerStartingEvent.class, MinecraftForge.EVENT_BUS, ServerEvents.STARTING, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getServer()));
-        wrapEvent(ServerStartedEvent.class, MinecraftForge.EVENT_BUS, ServerEvents.STARTED, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getServer()));
-        wrapEvent(ServerStoppedEvent.class, MinecraftForge.EVENT_BUS, ServerEvents.STOPPING, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getServer()));
-        wrapEvent(ServerStoppedEvent.class, MinecraftForge.EVENT_BUS, ServerEvents.STOPPED, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getServer()));
-
-        wrapCancelableEvent(LivingDeathEvent.class, MinecraftForge.EVENT_BUS, EntityEvents.LIVING_DEATH, (forgeEvent, ourEvent) -> {
-            var entity = forgeEvent.getEntity();
-            var damageSource = forgeEvent.getSource();
-
-            if(entity instanceof Player player && PlayerEvents.DEATH.post().handle(player, damageSource))
-                return true;
-            return EntityEvents.LIVING_DEATH.post().handle(entity, damageSource);
+            switch(event.phase)
+            {
+                case START -> TickEvents.START_SERVER.post().handle(server);
+                case END -> TickEvents.END_SERVER.post().handle(server);
+            }
         });
-    }
 
-    public static <F extends Event, E extends xyz.apex.minecraft.apexcore.common.lib.event.Event> void wrapEvent(Class<F> forgeEventType, IEventBus forgeEventBus, EventType<E> ourEventType, BiConsumer<F, E> ourHandler)
-    {
-        forgeEventBus.addListener(EventPriority.NORMAL, false, forgeEventType, forgeEvent -> ourHandler.accept(forgeEvent, ourEventType.post()));
-    }
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, TickEvent.PlayerTickEvent.class, event -> {
+            switch(event.phase)
+            {
+                case START -> TickEvents.START_PLAYER.post().handle(event.player);
+                case END -> TickEvents.END_PLAYER.post().handle(event.player);
+            }
+        });
 
-    public static <F extends Event, E extends xyz.apex.minecraft.apexcore.common.lib.event.Event> void wrapCancelableEvent(Class<F> forgeEventType, IEventBus forgeEventBus, EventType<E> ourEventType, ToBooleanBiFunction<F, E> ourHandler)
-    {
-        forgeEventBus.addListener(EventPriority.NORMAL, false, forgeEventType, forgeEvent -> {
-            var cancelled = ourHandler.applyAsBoolean(forgeEvent, ourEventType.post());
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, LivingEvent.LivingTickEvent.class, event -> TickEvents.START_LIVING_ENTITY.post().handle(event.getEntity()));
 
-            if(forgeEvent.isCancelable() && cancelled)
-                forgeEvent.setCanceled(true);
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, EntityItemPickupEvent.class, event -> {
+            if(PlayerEvents.PICKUP_ITEM.post().handle(event.getEntity(), event.getItem()))
+                event.setCanceled(true);
+        });
+
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerXpEvent.PickupXp.class, event -> {
+            if(PlayerEvents.PICKUP_EXPERIENCE.post().handle(event.getEntity(), event.getOrb()))
+                event.setCanceled(true);
+        });
+
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, LivingDeathEvent.class, event -> {
+            var entity = event.getEntity();
+            var damageSource = event.getSource();
+
+            if(entity instanceof Player player)
+            {
+                if(PlayerEvents.DEATH.post().handle(player, damageSource))
+                    event.setCanceled(true);
+            }
+
+            if(EntityEvents.LIVING_DEATH.post().handle(entity, damageSource))
+                event.setCanceled(true);
         });
     }
 

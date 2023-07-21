@@ -51,12 +51,16 @@ public sealed interface EventType<T extends Event> permits EventTypeImpl
     static void bootstrap()
     {
         PhysicalSide.CLIENT.runWhenOn(() -> () -> {
+            ClientConnectionEvents.bootstrap();
             ClientEvents.bootstrap();
+            InputEvents.bootstrap();
             ScreenEvents.bootstrap();
         });
 
+        LevelRendererEvents.bootstrap();
         EntityEvents.bootstrap();
         PlayerEvents.bootstrap();
         ServerEvents.bootstrap();
+        TickEvents.bootstrap();
     }
 }

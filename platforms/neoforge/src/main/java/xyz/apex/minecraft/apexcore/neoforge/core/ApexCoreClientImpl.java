@@ -2,11 +2,10 @@ package xyz.apex.minecraft.apexcore.neoforge.core;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraftforge.client.event.RenderHighlightEvent;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.GameShuttingDownEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.jetbrains.annotations.ApiStatus;
@@ -14,9 +13,7 @@ import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.core.ApexCoreClient;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
-import xyz.apex.minecraft.apexcore.common.lib.event.types.ClientEvents;
-import xyz.apex.minecraft.apexcore.common.lib.event.types.LevelRendererEvents;
-import xyz.apex.minecraft.apexcore.common.lib.event.types.ScreenEvents;
+import xyz.apex.minecraft.apexcore.common.lib.event.types.*;
 import xyz.apex.minecraft.apexcore.neoforge.lib.EventBuses;
 
 @ApiStatus.Internal
@@ -31,6 +28,28 @@ public final class ApexCoreClientImpl implements ApexCoreClient
 
     private void setupEvents()
     {
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, ClientPlayerNetworkEvent.LoggingIn.class, event -> ClientConnectionEvents.LOGGING_IN.post().handle(event.getPlayer(), event.getMultiPlayerGameMode(), event.getConnection()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, ClientPlayerNetworkEvent.LoggingOut.class, event -> ClientConnectionEvents.LOGGING_OUT.post().handle(event.getConnection()));
+
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, TickEvent.ClientTickEvent.class, event -> {
+            switch(event.phase)
+            {
+                case START -> TickEvents.START_CLIENT.post().handle();
+                case END -> TickEvents.END_CLIENT.post().handle();
+            }
+        });
+
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, TickEvent.RenderTickEvent.class, event -> {
+            switch(event.phase)
+            {
+                case START -> TickEvents.START_RENDER.post().handle(event.renderTickTime);
+                case END -> TickEvents.END_RENDER.post().handle(event.renderTickTime);
+            }
+        });
+
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, InputEvent.Key.class, event -> InputEvents.KEY.post().handle(event.getKey(), event.getScanCode(), event.getAction(), event.getModifiers()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, InputEvent.InteractionKeyMappingTriggered.class, event -> InputEvents.CLICK.post().handle(event.isAttack(), event.isUseItem(), event.isPickBlock(), event.getHand()));
+
         MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, ScreenEvent.Init.Post.class, event -> {
             var screen = event.getScreen();
             ScreenEvents.INIT.post().handle(screen);
@@ -38,10 +57,10 @@ public final class ApexCoreClientImpl implements ApexCoreClient
             ScreenEvents.MODIFY_WIDGETS.post().handle(screen, widgets, event::addListener, event::removeListener);
         });
 
-        NeoForgeEvents.wrapEvent(ScreenEvent.Render.Pre.class, MinecraftForge.EVENT_BUS, ScreenEvents.PRE_RENDER, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getScreen(), forgeEvent.getGuiGraphics(), forgeEvent.getMouseX(), forgeEvent.getMouseY(), forgeEvent.getPartialTick()));
-        NeoForgeEvents.wrapEvent(ScreenEvent.Render.Post.class, MinecraftForge.EVENT_BUS, ScreenEvents.POST_RENDER, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getScreen(), forgeEvent.getGuiGraphics(), forgeEvent.getMouseX(), forgeEvent.getMouseY(), forgeEvent.getPartialTick()));
-        NeoForgeEvents.wrapEvent(ScreenEvent.Opening.class, MinecraftForge.EVENT_BUS, ScreenEvents.OPENED, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getScreen()));
-        NeoForgeEvents.wrapEvent(ScreenEvent.Closing.class, MinecraftForge.EVENT_BUS, ScreenEvents.CLOSED, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getScreen()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, ScreenEvent.Render.Pre.class, event -> ScreenEvents.PRE_RENDER.post().handle(event.getScreen(), event.getGuiGraphics(), event.getMouseX(), event.getMouseY(), event.getPartialTick()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, ScreenEvent.Render.Post.class, event -> ScreenEvents.POST_RENDER.post().handle(event.getScreen(), event.getGuiGraphics(), event.getMouseX(), event.getMouseY(), event.getPartialTick()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST, false, ScreenEvent.Opening.class, event -> ScreenEvents.OPENED.post().handle(event.getScreen()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGHEST, false, ScreenEvent.Opening.class, event -> ScreenEvents.CLOSED.post().handle(event.getScreen()));
 
         EventBuses.addListener(ApexCore.ID, bus -> bus.addListener(EventPriority.NORMAL, false, FMLClientSetupEvent.class, event -> {
             var client = Minecraft.getInstance();
@@ -54,6 +73,8 @@ public final class ApexCoreClientImpl implements ApexCoreClient
             ClientEvents.STOPPING.post().handle(client);
             ClientEvents.STOPPED.post().handle(client);
         });
+
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, false, MovementInputUpdateEvent.class, event -> ClientEvents.PLAYER_INPUT.post().handle(event.getEntity(), event.getInput()));
 
         MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, RenderLevelStageEvent.class, event -> {
             var levelRenderer = event.getLevelRenderer();
@@ -70,6 +91,9 @@ public final class ApexCoreClientImpl implements ApexCoreClient
                 LevelRendererEvents.AFTER_TRANSLUCENT.post().handle(levelRenderer, pose, projection, partialTick, camera, frustum);
         });
 
-        NeoForgeEvents.wrapCancelableEvent(RenderHighlightEvent.Block.class, MinecraftForge.EVENT_BUS, LevelRendererEvents.BLOCK_HIGHLIGHT, (forgeEvent, ourEvent) -> ourEvent.handle(forgeEvent.getLevelRenderer(), forgeEvent.getPoseStack(), forgeEvent.getMultiBufferSource(), forgeEvent.getPartialTick(), forgeEvent.getCamera()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, RenderHighlightEvent.Block.class, event -> {
+            if(LevelRendererEvents.BLOCK_HIGHLIGHT.post().handle(event.getLevelRenderer(), event.getPoseStack(), event.getMultiBufferSource(), event.getPartialTick(), event.getCamera()))
+                event.setCanceled(true);
+        });
     }
 }

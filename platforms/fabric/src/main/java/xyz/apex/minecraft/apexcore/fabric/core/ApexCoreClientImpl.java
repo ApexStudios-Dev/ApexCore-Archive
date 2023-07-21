@@ -2,15 +2,15 @@ package xyz.apex.minecraft.apexcore.fabric.core;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.Minecraft;
 import xyz.apex.minecraft.apexcore.common.core.ApexCoreClient;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
-import xyz.apex.minecraft.apexcore.common.lib.event.types.ClientEvents;
-import xyz.apex.minecraft.apexcore.common.lib.event.types.LevelRendererEvents;
-import xyz.apex.minecraft.apexcore.common.lib.event.types.ScreenEvents;
+import xyz.apex.minecraft.apexcore.common.lib.event.types.*;
 
 import java.util.Objects;
 
@@ -26,6 +26,13 @@ public final class ApexCoreClientImpl implements ApexCoreClient, ClientModInitia
 
     private void setupEvents()
     {
+        ClientTickEvents.START_CLIENT_TICK.register(client -> TickEvents.START_CLIENT.post().handle());
+        ClientTickEvents.END_CLIENT_TICK.register(client -> TickEvents.END_CLIENT.post().handle());
+
+        // should be non-null when invoked
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> ClientConnectionEvents.LOGGING_IN.post().handle(Objects.requireNonNull(client.player), Objects.requireNonNull(client.gameMode), handler.getConnection()));
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ClientConnectionEvents.LOGGING_OUT.post().handle(handler.getConnection()));
+
         net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
             ScreenEvents.INIT.post().handle(screen);
 
