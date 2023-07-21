@@ -3,10 +3,12 @@ package xyz.apex.minecraft.apexcore.fabric.core;
 import com.google.errorprone.annotations.DoNotCall;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.world.entity.player.Player;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
@@ -65,6 +67,13 @@ final class ApexCoreImpl extends ApexCore
         ServerLifecycleEvents.SERVER_STARTED.register(server -> ServerEvents.STARTED.post().handle(server));
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> ServerEvents.STOPPING.post().handle(server));
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> ServerEvents.STOPPED.post().handle(server));
+
+        ServerLivingEntityEvents.ALLOW_DEATH.register((entity, damageSource, damageAmount) -> {
+            if(entity instanceof Player player && PlayerEvents.DEATH.post().handle(player, damageSource))
+                return true;
+
+            return EntityEvents.LIVING_DEATH.post().handle(entity, damageSource);
+        });
     }
 
     @Override

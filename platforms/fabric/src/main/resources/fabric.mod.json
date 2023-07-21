@@ -54,7 +54,10 @@
     ],
     "license": "${MOD_LICENSE}",
     "environment": "*",
-    "mixins": [ "${MOD_ID}-common.mixins.json" ],
+    "mixins": [
+        "${MOD_ID}.mixins.json",
+        "${MOD_ID}-common.mixins.json"
+    ],
     "entrypoints": {
         "main": [
             "xyz.apex.minecraft.apexcore.fabric.core.ApexCoreFabricMod"
