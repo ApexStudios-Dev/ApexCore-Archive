@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 
 final class RegistrarManagerImpl implements RegistrarManager
 {
-    private static final Map<String, RegistrarManager> REGISTRAR_MANAGER_MAP = Maps.newHashMap();
+    private static final Map<String, RegistrarManager> REGISTRAR_MANAGER_MAP = Maps.newConcurrentMap();
 
     private final Map<ResourceKey<? extends Registry<?>>, Registrar<?>> registrarMap = Maps.newConcurrentMap();
     private final String ownerId;
