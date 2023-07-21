@@ -1,7 +1,9 @@
 pluginManagement {
 	repositories {
 		exclusiveContent {
-			forRepository { maven { url 'https://maven.minecraftforge.net' } }
+			forRepository { maven { url 'https://maven.neoforged.net' } }
+			filter { includeGroupByRegex 'net\\.neoforged.*' }
+			// TODO: Why is this still needed? we are running NeoForge not MinecraftForge
 			filter { includeGroupByRegex 'net\\.minecraftforge.*' }
 		}
 
@@ -35,13 +37,13 @@ pluginManagement {
 	}
 }
 
-[
-	"common",
-	"forge",
-	"fabric",
-].forEach { platform ->
-	include(platform)
+def includePlatform = { platform ->
+	include platform
 	project(":${platform}").projectDir = file("platforms/${platform}")
 }
+
+includePlatform 'common'
+includePlatform 'neoforge'
+includePlatform 'fabric'
 
 rootProject.name = "${MOD_NAME}-${MINECRAFT_VERSION}"
