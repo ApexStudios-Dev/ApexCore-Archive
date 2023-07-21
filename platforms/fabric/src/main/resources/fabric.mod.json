@@ -57,7 +57,7 @@
     "mixins": [ "${MOD_ID}-common.mixins.json" ],
     "entrypoints": {
         "main": [
-            "xyz.apex.minecraft.apexcore.fabric.core.ApexCoreImpl"
+            "xyz.apex.minecraft.apexcore.fabric.core.ApexCoreFabricMod"
         ],
         "client": [
             "xyz.apex.minecraft.apexcore.fabric.core.ApexCoreClientImpl"

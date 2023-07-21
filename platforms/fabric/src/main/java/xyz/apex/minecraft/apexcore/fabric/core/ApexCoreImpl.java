@@ -1,12 +1,14 @@
 package xyz.apex.minecraft.apexcore.fabric.core;
 
-import net.fabricmc.api.ModInitializer;
+import com.google.errorprone.annotations.DoNotCall;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.EntityEvents;
@@ -19,8 +21,11 @@ import xyz.apex.minecraft.apexcore.fabric.lib.hook.HooksImpl;
 import xyz.apex.minecraft.apexcore.fabric.lib.modloader.ModLoaderImpl;
 import xyz.apex.minecraft.apexcore.fabric.lib.network.NetworkManagerImpl;
 
-public final class ApexCoreImpl extends ApexCore implements ModInitializer
+@ApiStatus.Internal
+final class ApexCoreImpl extends ApexCore
 {
+    private static final ApexCoreImpl INSTANCE = new ApexCoreImpl();
+
     private final PhysicalSide physicalSide = switch(FabricLoader.getInstance().getEnvironmentType()) {
         case CLIENT -> PhysicalSide.CLIENT;
         case SERVER -> PhysicalSide.DEDICATED_SERVER;
@@ -28,6 +33,11 @@ public final class ApexCoreImpl extends ApexCore implements ModInitializer
 
     private final ModLoader modLoader = new ModLoaderImpl();
     private final Hooks hooks = new HooksImpl();
+
+    private ApexCoreImpl()
+    {
+        super();
+    }
 
     @Override
     protected void bootstrap()
@@ -40,12 +50,6 @@ public final class ApexCoreImpl extends ApexCore implements ModInitializer
         super.bootstrap();
 
         setupEvents();
-    }
-
-    @Override
-    public void onInitialize()
-    {
-        bootstrap();
     }
 
     private void setupEvents()
@@ -85,5 +89,12 @@ public final class ApexCoreImpl extends ApexCore implements ModInitializer
     public NetworkManager createNetworkManager(String ownerId)
     {
         return NetworkManagerImpl.getOrCreate(ownerId);
+    }
+
+    @DoNotCall
+    static void bootstrap0()
+    {
+        Validate.isTrue(ApexCore.get() == INSTANCE); // THIS SHOULD NEVER FAIL
+        INSTANCE.bootstrap();
     }
 }
