@@ -11,6 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.hook.RegistryHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.Registrar;
@@ -24,7 +25,8 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-final class RegistryHooksImpl implements RegistryHooks
+@ApiStatus.Internal
+public final class RegistryHooksImpl implements RegistryHooks
 {
     private final Table<String, ResourceKey<? extends Registry<?>>, RegistryData<?>> registryDataTable = HashBasedTable.create();
 

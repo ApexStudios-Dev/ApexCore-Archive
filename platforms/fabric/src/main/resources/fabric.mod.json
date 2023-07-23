@@ -60,10 +60,10 @@
     ],
     "entrypoints": {
         "main": [
-            "xyz.apex.minecraft.apexcore.fabric.core.ApexCoreFabricMod"
+            "xyz.apex.minecraft.apexcore.fabric.entrypoint.ApexCoreModInitializer"
         ],
         "client": [
-            "xyz.apex.minecraft.apexcore.fabric.core.ApexCoreClientImpl"
+            "xyz.apex.minecraft.apexcore.fabric.entrypoint.ApexCoreClientModInitializer"
         ]
     },
     "accessWidener": "apexcore.accesswidener",

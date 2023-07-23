@@ -1,6 +1,5 @@
 package xyz.apex.minecraft.apexcore.fabric.core;
 
-import com.google.errorprone.annotations.DoNotCall;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -9,7 +8,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
@@ -17,40 +15,26 @@ import xyz.apex.minecraft.apexcore.common.lib.event.types.EntityEvents;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.PlayerEvents;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.ServerEvents;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.TickEvents;
-import xyz.apex.minecraft.apexcore.common.lib.hook.Hooks;
-import xyz.apex.minecraft.apexcore.common.lib.modloader.ModLoader;
 import xyz.apex.minecraft.apexcore.common.lib.network.NetworkManager;
-import xyz.apex.minecraft.apexcore.fabric.lib.hook.HooksImpl;
-import xyz.apex.minecraft.apexcore.fabric.lib.modloader.ModLoaderImpl;
 import xyz.apex.minecraft.apexcore.fabric.lib.network.NetworkManagerImpl;
 
 @ApiStatus.Internal
-final class ApexCoreImpl extends ApexCore
+public final class ApexCoreImpl implements ApexCore
 {
-    private static final ApexCoreImpl INSTANCE = new ApexCoreImpl();
-
     private final PhysicalSide physicalSide = switch(FabricLoader.getInstance().getEnvironmentType()) {
         case CLIENT -> PhysicalSide.CLIENT;
         case SERVER -> PhysicalSide.DEDICATED_SERVER;
     };
 
-    private final ModLoader modLoader = new ModLoaderImpl();
-    private final Hooks hooks = new HooksImpl();
-
-    private ApexCoreImpl()
-    {
-        super();
-    }
-
     @Override
-    protected void bootstrap()
+    public void bootstrap()
     {
         // check if entity is instance of fabrics fake player class
         // register before the one in common
         // to ensure fabric specific check happens first
         EntityEvents.IS_FAKE_PLAYER.addListener(FakePlayer.class::isInstance);
 
-        super.bootstrap();
+        ApexCore.super.bootstrap();
 
         setupEvents();
     }
@@ -83,27 +67,8 @@ final class ApexCoreImpl extends ApexCore
     }
 
     @Override
-    public ModLoader modLoader()
-    {
-        return modLoader;
-    }
-
-    @Override
-    public Hooks hooks()
-    {
-        return hooks;
-    }
-
-    @Override
     public NetworkManager createNetworkManager(String ownerId)
     {
         return NetworkManagerImpl.getOrCreate(ownerId);
-    }
-
-    @DoNotCall
-    static void bootstrap0()
-    {
-        Validate.isTrue(ApexCore.get() == INSTANCE); // THIS SHOULD NEVER FAIL
-        INSTANCE.bootstrap();
     }
 }

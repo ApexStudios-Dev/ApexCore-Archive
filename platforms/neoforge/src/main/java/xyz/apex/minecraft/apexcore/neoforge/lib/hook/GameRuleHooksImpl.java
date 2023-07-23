@@ -2,11 +2,13 @@ package xyz.apex.minecraft.apexcore.neoforge.lib.hook;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
+import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.lib.hook.GameRuleHooks;
 
 import java.util.function.BiConsumer;
 
-final class GameRuleHooksImpl implements GameRuleHooks
+@ApiStatus.Internal
+public final class GameRuleHooksImpl implements GameRuleHooks
 {
     @Override
     public GameRules.Type<GameRules.BooleanValue> createBooleanValue(boolean defaultValue, BiConsumer<MinecraftServer, GameRules.BooleanValue> changeListener)

@@ -128,7 +128,7 @@ public enum PhysicalSide
      */
     public static PhysicalSide getPhysicalSide()
     {
-        return ApexCore.get().physicalSide();
+        return ApexCore.INSTANCE.physicalSide();
     }
 
     /**

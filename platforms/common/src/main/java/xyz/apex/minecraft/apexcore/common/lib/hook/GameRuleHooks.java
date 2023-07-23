@@ -3,6 +3,7 @@ package xyz.apex.minecraft.apexcore.common.lib.hook;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 
 import java.util.function.BiConsumer;
 
@@ -117,6 +118,6 @@ public interface GameRuleHooks
      */
     static GameRuleHooks get()
     {
-        return Hooks.get().gameRules();
+        return ApexCore.GAME_RULE_HOOKS;
     }
 }

@@ -5,6 +5,7 @@ import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.apex.minecraft.apexcore.common.core.ApexCoreClient;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
 
@@ -38,6 +39,6 @@ public interface ColorHandlerHooks
      */
     static ColorHandlerHooks get()
     {
-        return Hooks.get().colorHandler();
+        return ApexCoreClient.COLOR_HANDLER_HOOKS;
     }
 }

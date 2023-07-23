@@ -61,6 +61,6 @@ public interface ModLoader
 
     static ModLoader get()
     {
-        return ApexCore.get().modLoader();
+        return ApexCore.MOD_LOADER;
     }
 }

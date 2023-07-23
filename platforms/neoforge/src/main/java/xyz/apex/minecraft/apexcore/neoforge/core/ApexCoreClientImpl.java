@@ -20,9 +20,10 @@ import xyz.apex.minecraft.apexcore.neoforge.lib.EventBuses;
 @SideOnly(PhysicalSide.CLIENT)
 public final class ApexCoreClientImpl implements ApexCoreClient
 {
-    ApexCoreClientImpl()
+    @Override
+    public void bootstrap()
     {
-        bootstrap();
+        ApexCoreClient.super.bootstrap();
         setupEvents();
     }
 

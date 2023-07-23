@@ -8,6 +8,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.PlatformOnly;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.MenuEntry;
 
@@ -61,7 +62,7 @@ public interface MenuHooks
      */
     static MenuHooks get()
     {
-        return Hooks.get().menu();
+        return ApexCore.MENU_HOOKS;
     }
 
     /**

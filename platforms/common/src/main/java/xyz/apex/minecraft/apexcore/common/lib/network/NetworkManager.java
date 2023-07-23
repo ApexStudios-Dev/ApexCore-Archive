@@ -50,7 +50,7 @@ public interface NetworkManager
      */
     static NetworkManager create(String ownerId)
     {
-        return ApexCore.get().createNetworkManager(ownerId);
+        return ApexCore.INSTANCE.createNetworkManager(ownerId);
     }
 
     /**

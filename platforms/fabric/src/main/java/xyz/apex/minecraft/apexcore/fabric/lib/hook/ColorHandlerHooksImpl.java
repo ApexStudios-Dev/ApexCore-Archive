@@ -13,7 +13,7 @@ import xyz.apex.minecraft.apexcore.common.lib.hook.ColorHandlerHooks;
 import java.util.function.Supplier;
 
 @ApiStatus.Internal
-final class ColorHandlerHooksImpl implements ColorHandlerHooks
+public final class ColorHandlerHooksImpl implements ColorHandlerHooks
 {
     @Override
     public void registerBlockHandler(Supplier<? extends Block> block, Supplier<Supplier<BlockColor>> blockColor)

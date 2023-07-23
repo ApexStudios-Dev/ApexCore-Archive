@@ -9,11 +9,13 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.network.NetworkHooks;
+import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.lib.hook.MenuHooks;
 
 import java.util.function.Consumer;
 
-final class MenuHooksImpl implements MenuHooks
+@ApiStatus.Internal
+public final class MenuHooksImpl implements MenuHooks
 {
     @Override
     public <T extends AbstractContainerMenu> void openMenu(ServerPlayer player, Component displayName, ClientMenuConstructor<T> clientMenuConstructor, Consumer<FriendlyByteBuf> extraData)

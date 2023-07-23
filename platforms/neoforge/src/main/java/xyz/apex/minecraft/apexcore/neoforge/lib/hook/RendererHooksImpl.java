@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 @SuppressWarnings("deprecation")
 @ApiStatus.Internal
 @SideOnly(PhysicalSide.CLIENT)
-final class RendererHooksImpl implements RendererHooks
+public final class RendererHooksImpl implements RendererHooks
 {
     @Override
     public void setBlockRenderType(Supplier<? extends Block> block, Supplier<Supplier<RenderType>> renderType)

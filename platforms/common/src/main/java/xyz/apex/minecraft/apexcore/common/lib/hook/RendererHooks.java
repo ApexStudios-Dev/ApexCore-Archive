@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.apex.minecraft.apexcore.common.core.ApexCoreClient;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
 
@@ -61,6 +62,6 @@ public interface RendererHooks
      */
     static RendererHooks get()
     {
-        return Hooks.get().renderer();
+        return ApexCoreClient.RENDERER_HOOKS;
     }
 }

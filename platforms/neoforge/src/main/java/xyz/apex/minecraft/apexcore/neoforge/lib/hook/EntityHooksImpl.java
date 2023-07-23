@@ -8,12 +8,14 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
+import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.lib.hook.EntityHooks;
 import xyz.apex.minecraft.apexcore.neoforge.core.ModEvents;
 
 import java.util.function.Supplier;
 
-final class EntityHooksImpl implements EntityHooks
+@ApiStatus.Internal
+public final class EntityHooksImpl implements EntityHooks
 {
     @Override
     public void registerDefaultAttributes(Supplier<EntityType<? extends LivingEntity>> entityType, Supplier<AttributeSupplier.Builder> defaultAttributes)

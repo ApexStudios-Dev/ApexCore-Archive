@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 
 @ApiStatus.Internal
 @SideOnly(PhysicalSide.CLIENT)
-final class ColorHandlerHooksImpl implements ColorHandlerHooks
+public final class ColorHandlerHooksImpl implements ColorHandlerHooks
 {
     @Override
     public void registerBlockHandler(Supplier<? extends Block> block, Supplier<Supplier<BlockColor>> blockColor)

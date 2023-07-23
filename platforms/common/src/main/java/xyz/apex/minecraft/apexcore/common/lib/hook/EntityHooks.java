@@ -7,6 +7,7 @@ import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 
 import java.util.function.Supplier;
 
@@ -40,6 +41,6 @@ public interface EntityHooks
      */
     static EntityHooks get()
     {
-        return Hooks.get().entity();
+        return ApexCore.ENTITY_HOOKS;
     }
 }

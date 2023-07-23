@@ -1,12 +1,12 @@
 package xyz.apex.minecraft.apexcore.fabric.core;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.Minecraft;
+import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.core.ApexCoreClient;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
@@ -15,12 +15,13 @@ import xyz.apex.minecraft.apexcore.common.lib.event.types.*;
 import java.util.Objects;
 
 @SideOnly(PhysicalSide.CLIENT)
-public final class ApexCoreClientImpl implements ApexCoreClient, ClientModInitializer
+@ApiStatus.Internal
+public final class ApexCoreClientImpl implements ApexCoreClient
 {
     @Override
-    public void onInitializeClient()
+    public void bootstrap()
     {
-        bootstrap();
+        ApexCoreClient.super.bootstrap();
         setupEvents();
     }
 

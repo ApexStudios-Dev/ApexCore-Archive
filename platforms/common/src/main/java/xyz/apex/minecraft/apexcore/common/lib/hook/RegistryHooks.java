@@ -11,6 +11,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.registry.Registrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryEntry;
 
@@ -100,6 +101,6 @@ public interface RegistryHooks
      */
     static RegistryHooks get()
     {
-        return Hooks.get().registry();
+        return ApexCore.REGISTRY_HOOKS;
     }
 }

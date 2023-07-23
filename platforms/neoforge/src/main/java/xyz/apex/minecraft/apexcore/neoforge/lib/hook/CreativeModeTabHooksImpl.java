@@ -4,12 +4,14 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.common.CreativeModeTabRegistry;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.lib.hook.CreativeModeTabHooks;
 import xyz.apex.minecraft.apexcore.neoforge.core.ModEvents;
 
 import java.util.function.Consumer;
 
-final class CreativeModeTabHooksImpl implements CreativeModeTabHooks
+@ApiStatus.Internal
+public final class CreativeModeTabHooksImpl implements CreativeModeTabHooks
 {
     @Override
     public CreativeModeTab.Builder createNewBuilder()
