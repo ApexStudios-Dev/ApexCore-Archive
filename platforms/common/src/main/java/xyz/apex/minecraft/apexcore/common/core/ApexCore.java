@@ -51,6 +51,9 @@ public interface ApexCore
 
         ApexCoreTests.register();
         RegistrarManager.register(ID);
+
+        // tell listeners that ApexCore has been initialized
+        Services.stream(ApexCoreLoaded.class).forEach(ApexCoreLoaded::onApexCoreLoaded);
     }
 
     PhysicalSide physicalSide();
