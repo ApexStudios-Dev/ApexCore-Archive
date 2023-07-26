@@ -30,6 +30,9 @@ transitive-accessible class net/minecraft/client/gui/screens/MenuScreens$ScreenC
 #################################################################
 # Below here must be kept in sync with forge access transformer #
 #################################################################
+# Made public for ElementBuilder
+accessible method net/minecraft/client/renderer/block/model/BlockElement uvsByFace (Lnet/minecraft/core/Direction;)[F
+
 # Made public for use in BlockEntityEntry
 transitive-accessible field net/minecraft/world/level/block/entity/BlockEntityType validBlocks Ljava/util/Set;
 
