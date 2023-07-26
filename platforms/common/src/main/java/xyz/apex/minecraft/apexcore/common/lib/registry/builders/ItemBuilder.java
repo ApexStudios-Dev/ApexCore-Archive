@@ -11,7 +11,10 @@ import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.hook.ColorHandlerHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.ItemEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.ItemFactory;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelProvider;
 
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -33,6 +36,8 @@ public final class ItemBuilder<P, T extends Item, M extends BuilderManager<M>> e
         super(parent, builderManager, Registries.ITEM, registrationName, ItemEntry::new);
 
         this.itemFactory = itemFactory;
+
+        defaultModel();
     }
 
     @Override
@@ -189,6 +194,34 @@ public final class ItemBuilder<P, T extends Item, M extends BuilderManager<M>> e
         if(getParent() instanceof FeatureElementBuilder<?, ?, ?, ?, ?, ?> feature)
             feature.requiredFeatures(requiredFeatures);
         return properties(properties -> properties.requiredFeatures(requiredFeatures));
+    }
+
+    // TODO: Resource Gen providers [ recipe, lang, tag, model ]
+
+    public ItemBuilder<P, T, M> model(BiConsumer<ModelProvider, ProviderType.RegistryContext<Item, T>> consumer)
+    {
+        return setProvider(ModelProvider.PROVIDER_TYPE, consumer);
+    }
+
+    public ItemBuilder<P, T, M> noModel()
+    {
+        return clearProvider(ModelProvider.PROVIDER_TYPE);
+    }
+
+    public ItemBuilder<P, T, M> defaultModel()
+    {
+        return model((provider, context) -> provider.generated(
+                context.registryName().withPrefix("item/"),
+                context.registryName().withPrefix("item/")
+        ));
+    }
+
+    public ItemBuilder<P, T, M> defaultBlockItemModel()
+    {
+        return model((provider, context) -> provider.withParent(
+                context.registryName().withPrefix("item/"),
+                context.registryName().withPrefix("block/")
+        ));
     }
 
     /**

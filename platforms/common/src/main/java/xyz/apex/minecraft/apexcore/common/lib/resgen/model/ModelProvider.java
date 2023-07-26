@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public final class ModelProvider implements DataProvider
+public final class ModelProvider implements DataProvider, Models
 {
     public static final ProviderType<ModelProvider> PROVIDER_TYPE = ProviderType.simple(new ResourceLocation(ApexCore.ID, "models"), ModelProvider::new);
 
@@ -33,16 +33,6 @@ public final class ModelProvider implements DataProvider
     public ModelBuilder getBuilder(String modelPath)
     {
         return getBuilder(new ResourceLocation(modelPath));
-    }
-
-    public ModelFile existingModel(ResourceLocation modelPath)
-    {
-        return new ModelFile(modelPath);
-    }
-
-    public ModelFile existingModel(String modelPath)
-    {
-        return existingModel(new ResourceLocation(modelPath));
     }
 
     @Override

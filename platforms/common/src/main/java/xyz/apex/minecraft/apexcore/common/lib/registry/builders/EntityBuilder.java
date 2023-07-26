@@ -213,6 +213,8 @@ public final class EntityBuilder<P, T extends Entity, M extends BuilderManager<M
         return properties(properties -> properties.updateInterval(updateInterval));
     }
 
+    // TODO: Resource Gen providers [ loot table, lang, tag ]
+
     @Override
     public EntityBuilder<P, T, M> requiredFeatures(FeatureFlag... requiredFeatures)
     {

@@ -72,6 +72,8 @@ public final class EnchantmentBuilder<P, T extends Enchantment, M extends Builde
         return equipmentSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET);
     }
 
+    // TODO: Resource Gen providers [ lang, tag ]
+
     @Override
     protected T createObject()
     {

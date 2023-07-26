@@ -4,17 +4,16 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import net.minecraft.Util;
 import net.minecraft.core.Registry;
+import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import xyz.apex.minecraft.apexcore.common.lib.registry.Registrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryEntry;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 
 public abstract non-sealed class AbstractBuilder<P, T, R extends T, E extends RegistryEntry<R>, B extends AbstractBuilder<P, T, R, E, B, M>, M extends BuilderManager<M>> implements Builder<P, T, R, E, B, M>
 {
@@ -152,5 +151,26 @@ public abstract non-sealed class AbstractBuilder<P, T, R extends T, E extends Re
     public final B self()
     {
         return (B) this;
+    }
+
+    @Override
+    public final <D extends DataProvider> B addProvider(ProviderType<D> providerType, BiConsumer<D, ProviderType.RegistryContext<T, R>> listener)
+    {
+        providerType.addListener(registryKey, listener);
+        return self();
+    }
+
+    @Override
+    public final <D extends DataProvider> B setProvider(ProviderType<D> providerType, BiConsumer<D, ProviderType.RegistryContext<T, R>> listener)
+    {
+        providerType.setListener(registryKey, listener);
+        return self();
+    }
+
+    @Override
+    public final <D extends DataProvider> B clearProvider(ProviderType<D> providerType)
+    {
+        providerType.clearListener(registryKey);
+        return self();
     }
 }

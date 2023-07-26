@@ -29,11 +29,11 @@ public sealed interface ProviderType<P extends DataProvider>
 
     void addListener(Consumer<P> listener);
 
-    <T, R extends T> void addListener(ResourceKey<R> registryKey, BiConsumer<P, RegistryContext<T, R>> listener);
+    <T, R extends T> void addListener(ResourceKey<T> registryKey, BiConsumer<P, RegistryContext<T, R>> listener);
 
-    <T, R extends T> void setListener(ResourceKey<R> registryKey, BiConsumer<P, RegistryContext<T, R>> listener);
+    <T, R extends T> void setListener(ResourceKey<T> registryKey, BiConsumer<P, RegistryContext<T, R>> listener);
 
-    <T, R extends T> void clearListener(ResourceKey<R> registryKey);
+    <T> void clearListener(ResourceKey<T> registryKey);
 
     @ApiStatus.Internal
     @DoNotCall
@@ -92,20 +92,20 @@ public sealed interface ProviderType<P extends DataProvider>
         }
 
         @Override
-        public <T, R extends T> void addListener(ResourceKey<R> registryKey, BiConsumer<P, RegistryContext<T, R>> listener)
+        public <T, R extends T> void addListener(ResourceKey<T> registryKey, BiConsumer<P, RegistryContext<T, R>> listener)
         {
             registryListeners.put(registryKey, listener);
         }
 
         @Override
-        public <T, R extends T> void setListener(ResourceKey<R> registryKey, BiConsumer<P, RegistryContext<T, R>> listener)
+        public <T, R extends T> void setListener(ResourceKey<T> registryKey, BiConsumer<P, RegistryContext<T, R>> listener)
         {
             clearListener(registryKey);
             addListener(registryKey, listener);
         }
 
         @Override
-        public <T, R extends T> void clearListener(ResourceKey<R> registryKey)
+        public <T> void clearListener(ResourceKey<T> registryKey)
         {
             registryListeners.removeAll(registryKey);
         }
@@ -115,11 +115,11 @@ public sealed interface ProviderType<P extends DataProvider>
         public void provide(P provider)
         {
             listeners.forEach(listener -> listener.accept(provider));
-            registryListeners.forEach((registryKey, listener) -> provide((ResourceKey) registryKey, provider, (BiConsumer) listener));
+            registryListeners.forEach((registryKey, listener) -> provide(registryKey, provider, (BiConsumer) listener));
         }
 
         @SuppressWarnings("unchecked")
-        private <T, R extends T> void provide(ResourceKey<R> registryKey, P provider, BiConsumer<P, RegistryContext<T, R>> listener)
+        private <T, R extends T> void provide(ResourceKey<T> registryKey, P provider, BiConsumer<P, RegistryContext<T, R>> listener)
         {
             var registryType = ResourceKey.<T>createRegistryKey(registryKey.registry());
             var registry = RegistryHooks.findVanillaRegistry(registryType).orElseThrow();
@@ -128,7 +128,7 @@ public sealed interface ProviderType<P extends DataProvider>
                     registryType,
                     registryKey,
                     registryKey.location(),
-                    (Holder<R>) registry.getHolderOrThrow((ResourceKey<T>) registryKey)
+                    (Holder<R>) registry.getHolderOrThrow(registryKey)
             );
 
             listener.accept(provider, context);
@@ -163,7 +163,7 @@ public sealed interface ProviderType<P extends DataProvider>
         }
     }
 
-    record RegistryContext<T, R extends T>(ResourceKey<? extends Registry<T>> registryType, ResourceKey<R> registryKey, ResourceLocation registryName, Holder<R> registryHolder) implements Supplier<R>, Holder<R>
+    record RegistryContext<T, R extends T>(ResourceKey<? extends Registry<T>> registryType, ResourceKey<T> registryKey, ResourceLocation registryName, Holder<R> registryHolder) implements Supplier<R>, Holder<R>
     {
         @Override
         public R get()

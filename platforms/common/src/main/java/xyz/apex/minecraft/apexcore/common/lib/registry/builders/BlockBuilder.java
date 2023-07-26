@@ -109,7 +109,8 @@ public final class BlockBuilder<P, T extends Block, M extends BuilderManager<M>>
      */
     public <I extends Item> ItemBuilder<BlockBuilder<P, T, M>, I, M> item(BiFunction<T, Item.Properties, I> blockItemFactory)
     {
-        return builderManager.item(self(), getRegistrationName(), properties -> blockItemFactory.apply(asSupplier().get(), properties));
+        return builderManager.item(self(), getRegistrationName(), properties -> blockItemFactory.apply(asSupplier().get(), properties))
+                             .defaultBlockItemModel();
     }
 
     /**
@@ -587,6 +588,8 @@ public final class BlockBuilder<P, T extends Block, M extends BuilderManager<M>>
     {
         return properties(BlockBehaviour.Properties::replaceable);
     }
+
+    // TODO: Resource Gen providers [ blockstate, loot table, recipe, lang, tag ]
 
     @Override
     public BlockBuilder<P, T, M> requiredFeatures(FeatureFlag... requiredFeatures)

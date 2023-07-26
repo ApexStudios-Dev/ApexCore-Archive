@@ -2,10 +2,6 @@ package xyz.apex.minecraft.apexcore.common.core;
 
 import joptsimple.internal.Strings;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,7 +20,6 @@ import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockComponent;
 import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockType;
 import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockTypes;
 import xyz.apex.minecraft.apexcore.common.lib.registry.builders.BuilderManager;
-import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelProvider;
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
@@ -99,51 +94,6 @@ public final class ApexCoreTests
                     output.accept(multiBlockStair);
                 })
         .register();
-    }
-
-    public static void registerTestResourceGen()
-    {
-        if(!ENABLED)
-            return;
-
-        // NOTE: DO NOT KEEP THIS ASSET, DELETE IT
-        ModelProvider.PROVIDER_TYPE.addListener(ResourceKey.create(Registries.BLOCK, new ResourceLocation("stone")), (provider, context) -> {
-            provider.getBuilder(context.registryName().withPrefix("block/"))
-                    .parent(provider.existingModel("block/block"))
-                    .texture("all", "block/bamboo_stalk")
-                    .texture("particle", "#all")
-                    .element()
-                        .from(7, 0, 7)
-                        .to(9, 16, 9)
-                        .face(Direction.DOWN)
-                            .uv(13, 4, 15, 6)
-                            .texture("#all")
-                            .cullFace(Direction.DOWN)
-                        .end()
-                            .face(Direction.UP)
-                            .uv(13, 0, 15, 2)
-                            .texture("#all")
-                            .cullFace(Direction.UP)
-                        .end()
-                            .face(Direction.NORTH)
-                            .uv(3, 0, 5, 16)
-                            .texture("#all")
-                        .end()
-                            .face(Direction.SOUTH)
-                            .uv(3, 0, 5, 16)
-                            .texture("#all")
-                        .end()
-                            .face(Direction.WEST)
-                            .uv(3, 0, 5, 16)
-                            .texture("#all")
-                        .end()
-                            .face(Direction.EAST)
-                            .uv(3, 0, 5, 16)
-                            .texture("#all")
-                        .end()
-                    .end()
-                ;
-        });
     }
 
     private static final class DummyBlock extends BaseBlockComponentHolder

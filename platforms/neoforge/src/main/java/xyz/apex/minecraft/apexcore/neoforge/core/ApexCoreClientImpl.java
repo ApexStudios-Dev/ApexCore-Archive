@@ -12,7 +12,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.core.ApexCoreClient;
-import xyz.apex.minecraft.apexcore.common.core.ApexCoreTests;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.*;
@@ -100,16 +99,12 @@ public final class ApexCoreClientImpl implements ApexCoreClient
                 event.setCanceled(true);
         });
 
-        EventBuses.addListener(ApexCore.ID, eventBus -> eventBus.addListener(EventPriority.NORMAL, false, GatherDataEvent.class, event -> {
-            ApexDataProvider.register(func -> {
-                var generator = event.getGenerator();
-                generator.addProvider(
-                        event.includeClient() || event.includeServer(),
-                        func.apply(generator.getPackOutput(), event.getLookupProvider())
-                );
-            });
-
-            ApexCoreTests.registerTestResourceGen();
-        }));
+        EventBuses.addListener(ApexCore.ID, eventBus -> eventBus.addListener(EventPriority.NORMAL, false, GatherDataEvent.class, event -> ApexDataProvider.register(func -> {
+            var generator = event.getGenerator();
+            generator.addProvider(
+                    event.includeClient() || event.includeServer(),
+                    func.apply(generator.getPackOutput(), event.getLookupProvider())
+            );
+        })));
     }
 }
