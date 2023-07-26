@@ -18,8 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
 import xyz.apex.minecraft.apexcore.common.lib.PlatformOnly;
-import xyz.apex.minecraft.apexcore.common.lib.resgen.ResourceGenerators;
-import xyz.apex.minecraft.apexcore.common.lib.resgen.ResourceType;
 
 import java.util.List;
 import java.util.Locale;
@@ -37,9 +35,19 @@ public final class ModelBuilder extends ModelFile
     @Nullable @PlatformOnly(PlatformOnly.FORGE) private ResourceLocation renderType = null;
 
     @ApiStatus.Internal
-    ModelBuilder(ResourceLocation location, ResourceType resourceType)
+    ModelBuilder(ResourceLocation location)
     {
-        super(location, resourceType);
+        super(location);
+    }
+
+    public ModelBuilder parent(ResourceLocation modelPath)
+    {
+        return parent(new ModelFile(modelPath));
+    }
+
+    public ModelBuilder parent(String modelPath)
+    {
+        return parent(new ModelFile(modelPath));
     }
 
     public ModelBuilder parent(ModelFile parent)
@@ -166,7 +174,7 @@ public final class ModelBuilder extends ModelFile
     BlockModel toVanilla()
     {
         return new BlockModel(
-                parent == null ? null : parent.getResourcePath(false),
+                parent == null ? null : parent.getModelPath(),
                 toVanillaElements(),
                 toVanillaTextureMap(),
                 ambientOcclusion,
@@ -183,11 +191,7 @@ public final class ModelBuilder extends ModelFile
         var json = new JsonObject();
 
         if(parent != null)
-        {
-            ResourceGenerators.resourceHelper().validateExistence(parent);
-            json.addProperty("parent", parent.getResourcePath(false).toString());
-        }
-
+            json.addProperty("parent", parent.getModelPath().toString());
         if(!ambientOcclusion)
             json.addProperty("ambientocclusion", ambientOcclusion);
         // TODO: We should maybe AT the 'name' field to be accessible, and use that instead
@@ -263,11 +267,7 @@ public final class ModelBuilder extends ModelFile
         if(texture.charAt(0) == '#')
             json.addProperty(key, texture);
         else
-        {
-            // TODO
-            // ResourceGenerators.resourceHelper().validateExistence(texture);
             json.addProperty(key, new ResourceLocation(texture).toString());
-        }
     }
 
     public static void addJsonIfNotEmpty(JsonObject json, String key, JsonElement element)

@@ -5,9 +5,8 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
-import xyz.apex.minecraft.apexcore.common.lib.resgen.ResourceGenerators;
-import xyz.apex.minecraft.apexcore.common.lib.resgen.ResourceType;
 
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -15,25 +14,33 @@ public abstract class ModelProvider implements DataProvider
 {
     private final PackOutput output;
     private final Map<ResourceLocation, ModelBuilder> models = Maps.newHashMap();
-    private final ResourceType resourceType;
     protected boolean serializePlatformOnly = true;
 
-    protected ModelProvider(PackOutput output, ResourceType resourceType)
+    public ModelProvider(PackOutput output)
     {
         this.output = output;
-        this.resourceType = resourceType;
     }
 
     protected abstract void registerModels();
 
     public final ModelBuilder getBuilder(ResourceLocation modelPath)
     {
-        return models.computeIfAbsent(modelPath, path -> new ModelBuilder(path, resourceType));
+        return models.computeIfAbsent(modelPath, ModelBuilder::new);
     }
 
     public final ModelBuilder getBuilder(String modelPath)
     {
         return getBuilder(new ResourceLocation(modelPath));
+    }
+
+    public final ModelFile existingModel(ResourceLocation modelPath)
+    {
+        return new ModelFile(modelPath);
+    }
+
+    public final ModelFile existingModel(String modelPath)
+    {
+        return existingModel(new ResourceLocation(modelPath));
     }
 
     @Override
@@ -44,14 +51,22 @@ public abstract class ModelProvider implements DataProvider
         return CompletableFuture.allOf(models
                 .values()
                 .stream()
-                .peek(model -> ResourceGenerators.resourceHelper().track(model))
                 .map(model -> DataProvider.saveStable(
                         output,
                         model.toJson(serializePlatformOnly),
-                        model.getResourceFilePath(this.output)
+                        compileModelPath(model)
                 ))
                 .toArray(CompletableFuture[]::new)
         );
+    }
+
+    private Path compileModelPath(ModelFile model)
+    {
+        var modelPath = model.getModelPath();
+        return output.getOutputFolder(PackOutput.Target.RESOURCE_PACK)
+                     .resolve(modelPath.getNamespace())
+                     .resolve("models")
+                     .resolve("%s.json".formatted(modelPath.getPath()));
     }
 
     @Override

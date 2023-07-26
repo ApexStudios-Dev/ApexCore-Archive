@@ -25,8 +25,7 @@ import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockComponent;
 import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockType;
 import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockTypes;
 import xyz.apex.minecraft.apexcore.common.lib.registry.builders.BuilderManager;
-import xyz.apex.minecraft.apexcore.common.lib.resgen.ResourceGenerators;
-import xyz.apex.minecraft.apexcore.common.lib.resgen.model.BlockModelProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelProvider;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
@@ -111,14 +110,13 @@ public final class ApexCoreTests
         if(!ENABLED)
             return;
 
-        ResourceGenerators.resourceHelper().disable();
-
-        dataProviderRegistrar.accept(PackType.CLIENT_RESOURCES, (output, completableFuture) -> new BlockModelProvider(output)
+        dataProviderRegistrar.accept(PackType.CLIENT_RESOURCES, (output, completableFuture) -> new ModelProvider(output)
         {
             @Override
             protected void registerModels()
             {
-                getBuilder("minecraft:bamboo2_age0")
+                getBuilder("minecraft:block/bamboo2_age0")
+                        .parent(existingModel("block/block"))
                         .texture("all", "block/bamboo_stalk")
                         .texture("particle", "#all")
                         .element()

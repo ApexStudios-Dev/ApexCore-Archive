@@ -16,9 +16,7 @@ import xyz.apex.minecraft.apexcore.common.core.ApexCoreTests;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.*;
-import xyz.apex.minecraft.apexcore.common.lib.resgen.ResourceGenerators;
 import xyz.apex.minecraft.apexcore.neoforge.lib.EventBuses;
-import xyz.apex.minecraft.apexcore.neoforge.lib.resgen.ExistingResourceHelperImpl;
 
 @ApiStatus.Internal
 @SideOnly(PhysicalSide.CLIENT)
@@ -102,9 +100,6 @@ public final class ApexCoreClientImpl implements ApexCoreClient
         });
 
         EventBuses.addListener(ApexCore.ID, eventBus -> eventBus.addListener(EventPriority.NORMAL, false, GatherDataEvent.class, event -> {
-            ResourceGenerators.initialize();
-            ((ExistingResourceHelperImpl) ResourceGenerators.resourceHelper()).setExistingFileHelper(event.getExistingFileHelper());
-
             var generator = event.getGenerator();
             var registries = event.getLookupProvider();
             var output = generator.getPackOutput();
