@@ -12,6 +12,7 @@ public final class ApexCoreDataGeneratorEntrypoint implements DataGeneratorEntry
     public void onInitializeDataGenerator(FabricDataGenerator generator)
     {
         var pack = generator.createPack();
-        ApexCoreTests.registerTestResourceGen((packType, dataProviderFunction) -> pack.addProvider(dataProviderFunction::apply));
+
+        ApexCoreTests.registerTestResourceGen();
     }
 }

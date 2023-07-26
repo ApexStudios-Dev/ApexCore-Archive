@@ -16,6 +16,7 @@ import xyz.apex.minecraft.apexcore.common.core.ApexCoreTests;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.*;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ApexDataProvider;
 import xyz.apex.minecraft.apexcore.neoforge.lib.EventBuses;
 
 @ApiStatus.Internal
@@ -100,16 +101,15 @@ public final class ApexCoreClientImpl implements ApexCoreClient
         });
 
         EventBuses.addListener(ApexCore.ID, eventBus -> eventBus.addListener(EventPriority.NORMAL, false, GatherDataEvent.class, event -> {
-            var generator = event.getGenerator();
-            var registries = event.getLookupProvider();
-            var output = generator.getPackOutput();
-            var includeClient = event.includeClient();
-            var includeServer = event.includeServer();
+            ApexDataProvider.register(func -> {
+                var generator = event.getGenerator();
+                generator.addProvider(
+                        event.includeClient() || event.includeServer(),
+                        func.apply(generator.getPackOutput(), event.getLookupProvider())
+                );
+            });
 
-            ApexCoreTests.registerTestResourceGen((packType, dataProviderFunction) -> generator.addProvider(switch(packType) {
-                case CLIENT_RESOURCES -> includeClient;
-                case SERVER_DATA -> includeServer;
-            }, dataProviderFunction.apply(output, registries)));
+            ApexCoreTests.registerTestResourceGen();
         }));
     }
 }

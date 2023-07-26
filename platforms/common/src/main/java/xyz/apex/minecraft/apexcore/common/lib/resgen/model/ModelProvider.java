@@ -5,49 +5,49 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import xyz.apex.minecraft.apexcore.common.core.ApexCore;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public abstract class ModelProvider implements DataProvider
+public final class ModelProvider implements DataProvider
 {
+    public static final ProviderType<ModelProvider> PROVIDER_TYPE = ProviderType.simple(new ResourceLocation(ApexCore.ID, "models"), ModelProvider::new);
+
     private final PackOutput output;
     private final Map<ResourceLocation, ModelBuilder> models = Maps.newHashMap();
-    protected boolean serializePlatformOnly = true;
+    private boolean serializePlatformOnly = true; // TODO: expose this some how
 
-    public ModelProvider(PackOutput output)
+    private ModelProvider(PackOutput output)
     {
         this.output = output;
     }
 
-    protected abstract void registerModels();
-
-    public final ModelBuilder getBuilder(ResourceLocation modelPath)
+    public ModelBuilder getBuilder(ResourceLocation modelPath)
     {
         return models.computeIfAbsent(modelPath, ModelBuilder::new);
     }
 
-    public final ModelBuilder getBuilder(String modelPath)
+    public ModelBuilder getBuilder(String modelPath)
     {
         return getBuilder(new ResourceLocation(modelPath));
     }
 
-    public final ModelFile existingModel(ResourceLocation modelPath)
+    public ModelFile existingModel(ResourceLocation modelPath)
     {
         return new ModelFile(modelPath);
     }
 
-    public final ModelFile existingModel(String modelPath)
+    public ModelFile existingModel(String modelPath)
     {
         return existingModel(new ResourceLocation(modelPath));
     }
 
     @Override
-    public final CompletableFuture<?> run(CachedOutput output)
+    public CompletableFuture<?> run(CachedOutput output)
     {
-        registerModels();
-
         return CompletableFuture.allOf(models
                 .values()
                 .stream()
