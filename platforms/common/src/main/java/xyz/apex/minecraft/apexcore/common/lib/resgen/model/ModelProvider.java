@@ -5,6 +5,8 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ResourceGenerators;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ResourceType;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -12,21 +14,21 @@ import java.util.concurrent.CompletableFuture;
 public abstract class ModelProvider implements DataProvider
 {
     private final PackOutput output;
-    private final String folder;
     private final Map<ResourceLocation, ModelBuilder> models = Maps.newHashMap();
+    private final ResourceType resourceType;
     protected boolean serializePlatformOnly = true;
 
-    protected ModelProvider(PackOutput output, String folder)
+    protected ModelProvider(PackOutput output, ResourceType resourceType)
     {
         this.output = output;
-        this.folder = folder;
+        this.resourceType = resourceType;
     }
 
     protected abstract void registerModels();
 
     public final ModelBuilder getBuilder(ResourceLocation modelPath)
     {
-        return models.computeIfAbsent(modelPath, ModelBuilder::new);
+        return models.computeIfAbsent(modelPath, path -> new ModelBuilder(path, resourceType));
     }
 
     public final ModelBuilder getBuilder(String modelPath)
@@ -39,21 +41,22 @@ public abstract class ModelProvider implements DataProvider
     {
         registerModels();
 
-        return CompletableFuture.allOf(models.values().stream().map(model -> {
-            var path = this.output
-                    .getOutputFolder(PackOutput.Target.RESOURCE_PACK)
-                    .resolve(model.location.getNamespace())
-                    .resolve("models")
-                    .resolve(folder)
-                    .resolve("%s.json".formatted(model.location.getPath()));
-
-            return DataProvider.saveStable(output, model.toJson(serializePlatformOnly), path);
-        }).toArray(CompletableFuture[]::new));
+        return CompletableFuture.allOf(models
+                .values()
+                .stream()
+                .peek(model -> ResourceGenerators.resourceHelper().track(model))
+                .map(model -> DataProvider.saveStable(
+                        output,
+                        model.toJson(serializePlatformOnly),
+                        model.getResourceFilePath(this.output)
+                ))
+                .toArray(CompletableFuture[]::new)
+        );
     }
 
     @Override
     public String getName()
     {
-        return "Model Provider (%s)".formatted(folder);
+        return "Model Provider";
     }
 }

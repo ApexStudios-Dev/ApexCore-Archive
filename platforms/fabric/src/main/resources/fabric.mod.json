@@ -64,6 +64,9 @@
         ],
         "client": [
             "xyz.apex.minecraft.apexcore.fabric.entrypoint.ApexCoreClientModInitializer"
+        ],
+        "fabric-datagen": [
+            "xyz.apex.minecraft.apexcore.fabric.entrypoint.ApexCoreDataGeneratorEntrypoint"
         ]
     },
     "accessWidener": "apexcore.accesswidener",

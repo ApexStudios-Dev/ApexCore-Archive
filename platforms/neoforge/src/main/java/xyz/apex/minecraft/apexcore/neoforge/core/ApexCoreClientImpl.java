@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.GameShuttingDownEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -11,10 +12,13 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.core.ApexCoreClient;
+import xyz.apex.minecraft.apexcore.common.core.ApexCoreTests;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.*;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ResourceGenerators;
 import xyz.apex.minecraft.apexcore.neoforge.lib.EventBuses;
+import xyz.apex.minecraft.apexcore.neoforge.lib.resgen.ExistingResourceHelperImpl;
 
 @ApiStatus.Internal
 @SideOnly(PhysicalSide.CLIENT)
@@ -96,5 +100,21 @@ public final class ApexCoreClientImpl implements ApexCoreClient
             if(LevelRendererEvents.BLOCK_HIGHLIGHT.post().handle(event.getLevelRenderer(), event.getPoseStack(), event.getMultiBufferSource(), event.getPartialTick(), event.getCamera()))
                 event.setCanceled(true);
         });
+
+        EventBuses.addListener(ApexCore.ID, eventBus -> eventBus.addListener(EventPriority.NORMAL, false, GatherDataEvent.class, event -> {
+            ResourceGenerators.initialize();
+            ((ExistingResourceHelperImpl) ResourceGenerators.resourceHelper()).setExistingFileHelper(event.getExistingFileHelper());
+
+            var generator = event.getGenerator();
+            var registries = event.getLookupProvider();
+            var output = generator.getPackOutput();
+            var includeClient = event.includeClient();
+            var includeServer = event.includeServer();
+
+            ApexCoreTests.registerTestResourceGen((packType, dataProviderFunction) -> generator.addProvider(switch(packType) {
+                case CLIENT_RESOURCES -> includeClient;
+                case SERVER_DATA -> includeServer;
+            }, dataProviderFunction.apply(output, registries)));
+        }));
     }
 }

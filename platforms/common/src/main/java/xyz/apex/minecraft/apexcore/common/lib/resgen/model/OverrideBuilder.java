@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ResourceGenerators;
 
 public final class OverrideBuilder
 {
@@ -44,7 +45,7 @@ public final class OverrideBuilder
         Validate.notNull(model);
 
         return new ItemOverride(
-                model.location,
+                model.getResourcePath(false),
                 properties.object2FloatEntrySet()
                           .stream()
                           .map(entry -> new ItemOverride.Predicate(entry.getKey(), entry.getFloatValue()))
@@ -59,7 +60,8 @@ public final class OverrideBuilder
 
         var json = new JsonObject();
 
-        json.addProperty("model", model.location.toString());
+        ResourceGenerators.resourceHelper().validateExistence(model);
+        json.addProperty("model", model.getResourcePath(false).toString());
 
         if(!properties.isEmpty())
         {

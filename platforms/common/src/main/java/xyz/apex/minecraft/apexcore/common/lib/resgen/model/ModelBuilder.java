@@ -18,6 +18,8 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
 import xyz.apex.minecraft.apexcore.common.lib.PlatformOnly;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ResourceGenerators;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ResourceType;
 
 import java.util.List;
 import java.util.Locale;
@@ -35,9 +37,9 @@ public final class ModelBuilder extends ModelFile
     @Nullable @PlatformOnly(PlatformOnly.FORGE) private ResourceLocation renderType = null;
 
     @ApiStatus.Internal
-    ModelBuilder(ResourceLocation location)
+    ModelBuilder(ResourceLocation location, ResourceType resourceType)
     {
-        super(location);
+        super(location, resourceType);
     }
 
     public ModelBuilder parent(ModelFile parent)
@@ -164,7 +166,7 @@ public final class ModelBuilder extends ModelFile
     BlockModel toVanilla()
     {
         return new BlockModel(
-                parent == null ? null : parent.location,
+                parent == null ? null : parent.getResourcePath(false),
                 toVanillaElements(),
                 toVanillaTextureMap(),
                 ambientOcclusion,
@@ -181,7 +183,11 @@ public final class ModelBuilder extends ModelFile
         var json = new JsonObject();
 
         if(parent != null)
-            json.addProperty("parent", parent.location.toString());
+        {
+            ResourceGenerators.resourceHelper().validateExistence(parent);
+            json.addProperty("parent", parent.getResourcePath(false).toString());
+        }
+
         if(!ambientOcclusion)
             json.addProperty("ambientocclusion", ambientOcclusion);
         // TODO: We should maybe AT the 'name' field to be accessible, and use that instead
@@ -257,8 +263,11 @@ public final class ModelBuilder extends ModelFile
         if(texture.charAt(0) == '#')
             json.addProperty(key, texture);
         else
+        {
+            // TODO
+            // ResourceGenerators.resourceHelper().validateExistence(texture);
             json.addProperty(key, new ResourceLocation(texture).toString());
-
+        }
     }
 
     public static void addJsonIfNotEmpty(JsonObject json, String key, JsonElement element)
