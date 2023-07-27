@@ -6,6 +6,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.EnchantmentEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.EnchantmentFactory;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -72,7 +73,13 @@ public final class EnchantmentBuilder<P, T extends Enchantment, M extends Builde
         return equipmentSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET);
     }
 
-    // TODO: Resource Gen providers [ lang, tag ]
+    // TODO: Resource Gen providers [ tag ]
+
+    @Override
+    protected String getDescriptionId(ProviderType.RegistryContext<Enchantment, T> context)
+    {
+        return context.value().getDescriptionId();
+    }
 
     @Override
     protected T createObject()

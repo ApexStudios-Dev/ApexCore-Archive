@@ -12,6 +12,7 @@ import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.hook.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.BlockEntityEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockEntityFactory;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +36,8 @@ public final class BlockEntityBuilder<P, T extends BlockEntity, M extends Builde
         super(parent, builderManager, Registries.BLOCK_ENTITY_TYPE, registrationName, BlockEntityEntry::new);
 
         this.blockEntityFactory = blockEntityFactory;
+
+        noLang();
     }
 
     @SuppressWarnings("DataFlowIssue")
@@ -80,5 +83,11 @@ public final class BlockEntityBuilder<P, T extends BlockEntity, M extends Builde
     {
         Collections.addAll(this.validBlocks, validBlocks);
         return self();
+    }
+
+    @Override
+    protected String getDescriptionId(ProviderType.RegistryContext<BlockEntityType<?>, BlockEntityType<T>> context)
+    {
+        return Util.makeDescriptionId("block_entity", context.registryName());
     }
 }

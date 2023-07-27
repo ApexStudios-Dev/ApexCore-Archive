@@ -29,6 +29,8 @@ public sealed interface ProviderType<P extends DataProvider>
 
     void addListener(Consumer<P> listener);
 
+    <T, R extends T> void addMiscListener(ResourceKey<T> registryKey, BiConsumer<P, RegistryContext<T, R>> listener);
+
     <T, R extends T> void addListener(ResourceKey<T> registryKey, BiConsumer<P, RegistryContext<T, R>> listener);
 
     <T, R extends T> void setListener(ResourceKey<T> registryKey, BiConsumer<P, RegistryContext<T, R>> listener);
@@ -41,9 +43,9 @@ public sealed interface ProviderType<P extends DataProvider>
 
     @ApiStatus.Internal
     @DoNotCall
-    P create(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries);
+    P create(ProviderContext context);
 
-    static <P extends DataProvider> ProviderType<P> forRegistries(ResourceLocation providerName, BiFunction<PackOutput, CompletableFuture<HolderLookup.Provider>, P> providerFactory)
+    static <P extends DataProvider> ProviderType<P> register(ResourceLocation providerName, Function<ProviderContext, P> providerFactory)
     {
         var providerType = new ProviderTypeImpl<>(providerName, providerFactory);
 
@@ -51,11 +53,6 @@ public sealed interface ProviderType<P extends DataProvider>
             throw new IllegalStateException("Attempt to register ProviderType with duplicate name: '%s'".formatted(providerName));
 
         return providerType;
-    }
-
-    static <P extends DataProvider> ProviderType<P> simple(ResourceLocation providerName, Function<PackOutput, P> providerFactory)
-    {
-        return forRegistries(providerName, (packOutput, completableFuture) -> providerFactory.apply(packOutput));
     }
 
     static Collection<ProviderType<?>> providerTypes()
@@ -69,11 +66,11 @@ public sealed interface ProviderType<P extends DataProvider>
         private static final Map<ResourceLocation, ProviderType<?>> PROVIDER_TYPES = Maps.newHashMap();
 
         private final ResourceLocation providerName;
-        private final BiFunction<PackOutput, CompletableFuture<HolderLookup.Provider>, P> providerFactory;
+        private final Function<ProviderContext, P> providerFactory;
         private final List<Consumer<P>> listeners = Lists.newLinkedList();
         private final Multimap<ResourceKey<?>, BiConsumer<P, ? extends RegistryContext<?, ?>>> registryListeners = MultimapBuilder.hashKeys().linkedListValues().build();
 
-        private ProviderTypeImpl(ResourceLocation providerName, BiFunction<PackOutput, CompletableFuture<HolderLookup.Provider>, P> providerFactory)
+        private ProviderTypeImpl(ResourceLocation providerName, Function<ProviderContext, P> providerFactory)
         {
             this.providerName = providerName;
             this.providerFactory = providerFactory;
@@ -89,6 +86,12 @@ public sealed interface ProviderType<P extends DataProvider>
         public void addListener(Consumer<P> listener)
         {
             listeners.add(listener);
+        }
+
+        @Override
+        public <T, R extends T> void addMiscListener(ResourceKey<T> registryKey, BiConsumer<P, RegistryContext<T, R>> listener)
+        {
+            addListener(provider -> listener.accept(provider, buildRegistryContext(registryKey)));
         }
 
         @Override
@@ -110,34 +113,38 @@ public sealed interface ProviderType<P extends DataProvider>
             registryListeners.removeAll(registryKey);
         }
 
-        @SuppressWarnings({"unchecked", "rawtypes"})
         @Override
         public void provide(P provider)
         {
             listeners.forEach(listener -> listener.accept(provider));
-            registryListeners.forEach((registryKey, listener) -> provide(registryKey, provider, (BiConsumer) listener));
+            registryListeners.keys().forEach(registryKey -> provide(registryKey, provider));
         }
 
         @SuppressWarnings("unchecked")
-        private <T, R extends T> void provide(ResourceKey<T> registryKey, P provider, BiConsumer<P, RegistryContext<T, R>> listener)
+        private <T, R extends T> RegistryContext<T, R> buildRegistryContext(ResourceKey<T> registryKey)
         {
             var registryType = ResourceKey.<T>createRegistryKey(registryKey.registry());
             var registry = RegistryHooks.findVanillaRegistry(registryType).orElseThrow();
 
-            var context = new RegistryContext<T, R>(
+            return new RegistryContext<T, R>(
                     registryType,
                     registryKey,
                     registryKey.location(),
                     (Holder<R>) registry.getHolderOrThrow(registryKey)
             );
+        }
 
-            listener.accept(provider, context);
+        @SuppressWarnings("unchecked")
+        private <T, R extends T> void provide(ResourceKey<T> registryKey, P provider)
+        {
+            var registryContext = this.<T, R>buildRegistryContext(registryKey);
+            registryListeners.get(registryKey).forEach(listener -> ((BiConsumer<P, RegistryContext<T, R>>) listener).accept(provider, registryContext));
         }
 
         @Override
-        public P create(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries)
+        public P create(ProviderContext context)
         {
-            return providerFactory.apply(packOutput, registries);
+            return providerFactory.apply(context);
         }
 
         @Override
@@ -162,6 +169,8 @@ public sealed interface ProviderType<P extends DataProvider>
             return "ProviderType<%s>".formatted(providerName);
         }
     }
+
+    record ProviderContext(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries, String ownerId) { }
 
     record RegistryContext<T, R extends T>(ResourceKey<? extends Registry<T>> registryType, ResourceKey<T> registryKey, ResourceLocation registryName, Holder<R> registryHolder) implements Supplier<R>, Holder<R>
     {

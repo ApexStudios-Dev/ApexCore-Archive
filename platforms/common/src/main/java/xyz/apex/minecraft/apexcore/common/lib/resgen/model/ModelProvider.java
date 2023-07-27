@@ -14,15 +14,15 @@ import java.util.concurrent.CompletableFuture;
 
 public final class ModelProvider implements DataProvider, Models
 {
-    public static final ProviderType<ModelProvider> PROVIDER_TYPE = ProviderType.simple(new ResourceLocation(ApexCore.ID, "models"), ModelProvider::new);
+    public static final ProviderType<ModelProvider> PROVIDER_TYPE = ProviderType.register(new ResourceLocation(ApexCore.ID, "models"), ModelProvider::new);
 
-    private final PackOutput output;
+    private final ProviderType.ProviderContext context;
     private final Map<ResourceLocation, ModelBuilder> models = Maps.newHashMap();
     private boolean serializePlatformOnly = true; // TODO: expose this some how
 
-    private ModelProvider(PackOutput output)
+    private ModelProvider(ProviderType.ProviderContext context)
     {
-        this.output = output;
+        this.context = context;
     }
 
     public ModelBuilder getBuilder(ResourceLocation modelPath)
@@ -53,7 +53,8 @@ public final class ModelProvider implements DataProvider, Models
     private Path compileModelPath(ModelFile model)
     {
         var modelPath = model.getModelPath();
-        return output.getOutputFolder(PackOutput.Target.RESOURCE_PACK)
+        return context.packOutput()
+                      .getOutputFolder(PackOutput.Target.RESOURCE_PACK)
                      .resolve(modelPath.getNamespace())
                      .resolve("models")
                      .resolve("%s.json".formatted(modelPath.getPath()));

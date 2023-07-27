@@ -3,9 +3,12 @@ package xyz.apex.minecraft.apexcore.neoforge.lib;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ApexDataProvider;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -34,6 +37,7 @@ public final class EventBuses
         if(MOD_EVENT_BUS_MAP.put(ownerId, modBus) != null)
             throw new IllegalStateException("Attempt to replace event for mod '%s'".formatted(ownerId));
 
+        registerForInternal(ownerId, modBus);
         MOD_REGISTRATION_LISTENERS.removeAll(ownerId).forEach(listener -> listener.accept(modBus));
         return modBus;
     }
@@ -62,5 +66,19 @@ public final class EventBuses
         var modBus = MOD_EVENT_BUS_MAP.get(ownerId);
         if(modBus == null) MOD_REGISTRATION_LISTENERS.put(ownerId, listener);
         else listener.accept(modBus);
+    }
+
+    private static void registerForInternal(String ownerId, IEventBus eventBus)
+    {
+        eventBus.addListener(EventPriority.HIGHEST, false, GatherDataEvent.class, event -> ApexDataProvider.register(
+                ownerId,
+                func -> {
+                    var generator = event.getGenerator();
+                    generator.addProvider(
+                            event.includeClient() || event.includeServer(),
+                            func.apply(generator.getPackOutput(), event.getLookupProvider())
+                    );
+                })
+        );
     }
 }

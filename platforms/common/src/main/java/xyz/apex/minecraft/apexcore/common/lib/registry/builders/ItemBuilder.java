@@ -224,6 +224,12 @@ public final class ItemBuilder<P, T extends Item, M extends BuilderManager<M>> e
         ));
     }
 
+    @Override
+    protected String getDescriptionId(ProviderType.RegistryContext<Item, T> context)
+    {
+        return context.value().getDescriptionId();
+    }
+
     /**
      * Functional modifier class used to keep track of item property modifications.
      */

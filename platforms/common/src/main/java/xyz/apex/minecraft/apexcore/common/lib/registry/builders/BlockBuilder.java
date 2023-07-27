@@ -23,6 +23,7 @@ import xyz.apex.minecraft.apexcore.common.lib.hook.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.BlockEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockEntityFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockFactory;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 
 import java.util.function.*;
 
@@ -110,7 +111,9 @@ public final class BlockBuilder<P, T extends Block, M extends BuilderManager<M>>
     public <I extends Item> ItemBuilder<BlockBuilder<P, T, M>, I, M> item(BiFunction<T, Item.Properties, I> blockItemFactory)
     {
         return builderManager.item(self(), getRegistrationName(), properties -> blockItemFactory.apply(asSupplier().get(), properties))
-                             .defaultBlockItemModel();
+                             .defaultBlockItemModel()
+                             .noLang()
+        ;
     }
 
     /**
@@ -589,7 +592,7 @@ public final class BlockBuilder<P, T extends Block, M extends BuilderManager<M>>
         return properties(BlockBehaviour.Properties::replaceable);
     }
 
-    // TODO: Resource Gen providers [ blockstate, loot table, recipe, lang, tag ]
+    // TODO: Resource Gen providers [ blockstate, loot table, recipe, tag ]
 
     @Override
     public BlockBuilder<P, T, M> requiredFeatures(FeatureFlag... requiredFeatures)
@@ -597,6 +600,12 @@ public final class BlockBuilder<P, T extends Block, M extends BuilderManager<M>>
         if(getParent() instanceof FeatureElementBuilder<?, ?, ?, ?, ?, ?> feature)
             feature.requiredFeatures(requiredFeatures);
         return properties(properties -> properties.requiredFeatures(requiredFeatures));
+    }
+
+    @Override
+    protected String getDescriptionId(ProviderType.RegistryContext<Block, T> context)
+    {
+        return context.value().getDescriptionId();
     }
 
     /**

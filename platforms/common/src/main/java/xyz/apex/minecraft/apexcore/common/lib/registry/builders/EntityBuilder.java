@@ -13,6 +13,7 @@ import xyz.apex.minecraft.apexcore.common.lib.hook.EntityHooks;
 import xyz.apex.minecraft.apexcore.common.lib.hook.RegistryHooks;
 import xyz.apex.minecraft.apexcore.common.lib.hook.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.EntityEntry;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -213,7 +214,7 @@ public final class EntityBuilder<P, T extends Entity, M extends BuilderManager<M
         return properties(properties -> properties.updateInterval(updateInterval));
     }
 
-    // TODO: Resource Gen providers [ loot table, lang, tag ]
+    // TODO: Resource Gen providers [ loot table, tag ]
 
     @Override
     public EntityBuilder<P, T, M> requiredFeatures(FeatureFlag... requiredFeatures)
@@ -221,5 +222,11 @@ public final class EntityBuilder<P, T extends Entity, M extends BuilderManager<M
         if(getParent() instanceof FeatureElementBuilder<?, ?, ?, ?, ?, ?> feature)
             feature.requiredFeatures(requiredFeatures);
         return properties(properties -> properties.requiredFeatures(requiredFeatures));
+    }
+
+    @Override
+    protected String getDescriptionId(ProviderType.RegistryContext<EntityType<?>, EntityType<T>> context)
+    {
+        return context.value().getDescriptionId();
     }
 }

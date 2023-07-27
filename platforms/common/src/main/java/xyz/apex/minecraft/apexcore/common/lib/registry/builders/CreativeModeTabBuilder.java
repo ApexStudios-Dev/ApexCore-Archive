@@ -3,11 +3,13 @@ package xyz.apex.minecraft.apexcore.common.lib.registry.builders;
 import net.minecraft.Util;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import xyz.apex.minecraft.apexcore.common.lib.hook.CreativeModeTabHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.DelegatedRegistryEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryEntry;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -112,6 +114,15 @@ public final class CreativeModeTabBuilder<P, M extends BuilderManager<M>> extend
     public CreativeModeTabBuilder<P, M> backgroundSuffix(String backgroundSuffix)
     {
         return properties(properties -> properties.backgroundSuffix(backgroundSuffix));
+    }
+
+    @Override
+    protected String getDescriptionId(ProviderType.RegistryContext<CreativeModeTab, CreativeModeTab> context)
+    {
+        if(context.value().getDisplayName().getContents() instanceof TranslatableContents translatable)
+            return translatable.getKey();
+
+        return Util.makeDescriptionId("itemGroup", context.registryName());
     }
 
     @Override

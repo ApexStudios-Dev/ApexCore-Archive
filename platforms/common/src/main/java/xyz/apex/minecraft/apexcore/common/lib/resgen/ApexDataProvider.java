@@ -13,13 +13,11 @@ import java.util.stream.Collectors;
 
 public final class ApexDataProvider implements DataProvider
 {
-    private final PackOutput packOutput;
-    private final CompletableFuture<HolderLookup.Provider> registries;
+    private final ProviderType.ProviderContext context;
 
-    private ApexDataProvider(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries)
+    private ApexDataProvider(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries, String ownerId)
     {
-        this.packOutput = packOutput;
-        this.registries = registries;
+        context = new ProviderType.ProviderContext(packOutput, registries, ownerId);
     }
 
     @Override
@@ -35,7 +33,7 @@ public final class ApexDataProvider implements DataProvider
 
     private <P extends DataProvider> CompletableFuture<?> provide(ProviderType<P> providerType, CachedOutput cache)
     {
-        var provider = providerType.create(packOutput, registries);
+        var provider = providerType.create(context);
         providerType.provide(provider);
         return provider.run(cache);
     }
@@ -47,8 +45,8 @@ public final class ApexDataProvider implements DataProvider
     }
 
     // must be called from DataGeneration entry points per mod
-    public static void register(Consumer<BiFunction<PackOutput, CompletableFuture<HolderLookup.Provider>, DataProvider>> providerRegistrar)
+    public static void register(String ownerId, Consumer<BiFunction<PackOutput, CompletableFuture<HolderLookup.Provider>, DataProvider>> providerRegistrar)
     {
-        providerRegistrar.accept(ApexDataProvider::new);
+        providerRegistrar.accept((packOutput, registries) -> new ApexDataProvider(packOutput, registries, ownerId));
     }
 }

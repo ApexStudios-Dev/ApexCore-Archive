@@ -7,10 +7,13 @@ import net.minecraft.core.Registry;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.lib.registry.Registrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.lang.LanguageBuilder;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.lang.LanguageProvider;
 
 import java.util.List;
 import java.util.function.*;
@@ -33,6 +36,8 @@ public abstract non-sealed class AbstractBuilder<P, T, R extends T, E extends Re
         this.registryEntryFactory = Util.memoize(registryEntryFactory);
 
         registryKey = ResourceKey.create(registryType, new ResourceLocation(builderManager.getOwnerId(), registrationName));
+
+        defaultLangGB().defaultLangUS();
     }
 
     protected abstract R createObject();
@@ -161,6 +166,13 @@ public abstract non-sealed class AbstractBuilder<P, T, R extends T, E extends Re
     }
 
     @Override
+    public final <D extends DataProvider> B addMiscProvider(ProviderType<D> providerType, BiConsumer<D, ProviderType.RegistryContext<T, R>> listener)
+    {
+        providerType.addMiscListener(registryKey, listener);
+        return self();
+    }
+
+    @Override
     public final <D extends DataProvider> B setProvider(ProviderType<D> providerType, BiConsumer<D, ProviderType.RegistryContext<T, R>> listener)
     {
         providerType.setListener(registryKey, listener);
@@ -172,5 +184,52 @@ public abstract non-sealed class AbstractBuilder<P, T, R extends T, E extends Re
     {
         providerType.clearListener(registryKey);
         return self();
+    }
+
+    @ApiStatus.Internal
+    protected abstract String getDescriptionId(ProviderType.RegistryContext<T, R> context);
+
+    public final B defaultLangUS()
+    {
+        return lang("en_us", (provider, context) -> LanguageProvider.toEnglishName(context.registryName()));
+    }
+
+    public final B defaultLangGB()
+    {
+        return lang("en_gb", (provider, context) -> LanguageProvider.toEnglishName(context.registryName()));
+    }
+
+    public final B lang(String region, String value)
+    {
+        return lang(region, (provider, context) -> value);
+    }
+
+    public final B lang(String region, BiFunction<LanguageBuilder, ProviderType.RegistryContext<T, R>, String> valueProvider)
+    {
+        return setProvider(
+                LanguageProvider.PROVIDER_TYPE,
+                (provider, context) -> {
+                    var builder = provider.region(region);
+                    builder.add(
+                            getDescriptionId(context),
+                            valueProvider.apply(builder, context)
+                    );
+                }
+        );
+    }
+
+    public final B noLang()
+    {
+        return clearProvider(LanguageProvider.PROVIDER_TYPE);
+    }
+
+    public final B addMiscLang(BiConsumer<LanguageProvider, ProviderType.RegistryContext<T, R>> listener)
+    {
+        return addMiscProvider(LanguageProvider.PROVIDER_TYPE, listener);
+    }
+
+    public final B addMiscLang(String region, BiConsumer<LanguageBuilder, ProviderType.RegistryContext<T, R>> listener)
+    {
+        return addMiscLang((provider, context) -> listener.accept(provider.region(region), context));
     }
 }

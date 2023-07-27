@@ -152,6 +152,18 @@ public sealed interface Builder<P, T, R extends T, E extends RegistryEntry<R>, B
     <D extends DataProvider> B addProvider(ProviderType<D> providerType, BiConsumer<D, ProviderType.RegistryContext<T, R>> listener);
 
     /**
+     * Registers misc listener to be invoked during resource generation for given provider.
+     * <p>
+     * This listener will not be cleared when {@link #clearProvider(ProviderType)} is used.
+     *
+     * @param providerType Provider type to register for.
+     * @param listener Listener to be invoked.
+     * @return This builder instance.
+     * @param <D> Provider type.
+     */
+    <D extends DataProvider> B addMiscProvider(ProviderType<D> providerType, BiConsumer<D, ProviderType.RegistryContext<T, R>> listener);
+
+    /**
      * Registers listener to be invoked during resource generation for given provider.
      * <p>
      * This will wipe out all previously registered listeners.
