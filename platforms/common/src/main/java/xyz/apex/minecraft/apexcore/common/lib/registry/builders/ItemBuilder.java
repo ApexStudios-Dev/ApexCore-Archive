@@ -198,7 +198,7 @@ public final class ItemBuilder<P, T extends Item, M extends BuilderManager<M>> e
         return properties(properties -> properties.requiredFeatures(requiredFeatures));
     }
 
-    // TODO: Resource Gen providers [ recipe, lang, tag, model ]
+    // TODO: Resource Gen providers [ recipe, lang, model ]
 
     public ItemBuilder<P, T, M> model(BiConsumer<ModelProvider, ProviderType.RegistryContext<Item, T>> consumer)
     {
