@@ -2,6 +2,7 @@ package xyz.apex.minecraft.apexcore.common.core;
 
 import joptsimple.internal.Strings;
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -57,6 +58,7 @@ public final class ApexCoreTests
                                  .copyInitialPropertiesFrom(() -> Blocks.CHEST)
                                  .noLootTable()
                                  .simpleItem()
+                                 .tag(BlockTags.CLIMBABLE)
 
                                  .<DummyBlockEntity>blockEntity(DummyBlockEntity::new)
                                     .addListener(DUMMY_BLOCK_ENTITY::set)
@@ -77,12 +79,14 @@ public final class ApexCoreTests
                                      .copyInitialPropertiesFrom(() -> Blocks.DIRT)
                                      .noLootTable()
                                      .simpleItem()
+                                     .tag(BlockTags.WITHER_IMMUNE)
         .register();
 
         var multiBlockStair = builders.block("multi_block/stair", MultiBlockStair::new)
                                       .copyInitialPropertiesFrom(() -> Blocks.DIRT)
                                       .noLootTable()
                                       .simpleItem()
+                                      .tag(BlockTags.DRAGON_IMMUNE)
         .register();
 
         builders.creativeModeTab("test")

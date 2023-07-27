@@ -3,6 +3,7 @@ package xyz.apex.minecraft.apexcore.common.lib.registry.builders;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlag;
 import net.minecraft.world.item.BlockItem;
@@ -24,6 +25,7 @@ import xyz.apex.minecraft.apexcore.common.lib.registry.entries.BlockEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockEntityFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockFactory;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
 
 import java.util.function.*;
 
@@ -592,7 +594,7 @@ public final class BlockBuilder<P, T extends Block, M extends BuilderManager<M>>
         return properties(BlockBehaviour.Properties::replaceable);
     }
 
-    // TODO: Resource Gen providers [ blockstate, loot table, recipe, tag ]
+    // TODO: Resource Gen providers [ blockstate, loot table, recipe ]
 
     @Override
     public BlockBuilder<P, T, M> requiredFeatures(FeatureFlag... requiredFeatures)
@@ -600,6 +602,26 @@ public final class BlockBuilder<P, T extends Block, M extends BuilderManager<M>>
         if(getParent() instanceof FeatureElementBuilder<?, ?, ?, ?, ?, ?> feature)
             feature.requiredFeatures(requiredFeatures);
         return properties(properties -> properties.requiredFeatures(requiredFeatures));
+    }
+
+    public BlockBuilder<P, T, M> tag(TagKey<Block>... tags)
+    {
+        return tag((provider, context) -> {
+            for(var tag : tags)
+            {
+                provider.tag(tag).addElement(context.registryName());
+            }
+        });
+    }
+
+    public BlockBuilder<P, T, M> tag(BiConsumer<TagsProvider<Block>, ProviderType.RegistryContext<Block, T>> listener)
+    {
+        return addProvider(TagsProvider.BLOCK, listener);
+    }
+
+    public BlockBuilder<P, T, M> noTags()
+    {
+        return clearProvider(TagsProvider.BLOCK);
     }
 
     @Override

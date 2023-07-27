@@ -2,6 +2,7 @@ package xyz.apex.minecraft.apexcore.common.lib.registry.builders;
 
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.flag.FeatureFlag;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
@@ -13,6 +14,7 @@ import xyz.apex.minecraft.apexcore.common.lib.registry.entries.ItemEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.ItemFactory;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
 
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -222,6 +224,26 @@ public final class ItemBuilder<P, T extends Item, M extends BuilderManager<M>> e
                 context.registryName().withPrefix("item/"),
                 context.registryName().withPrefix("block/")
         ));
+    }
+
+    public ItemBuilder<P, T, M> tag(TagKey<Item>... tags)
+    {
+        return tag((provider, context) -> {
+            for(var tag : tags)
+            {
+                provider.tag(tag).addElement(context.registryName());
+            }
+        });
+    }
+
+    public ItemBuilder<P, T, M> tag(BiConsumer<TagsProvider<Item>, ProviderType.RegistryContext<Item, T>> listener)
+    {
+        return addProvider(TagsProvider.ITEM, listener);
+    }
+
+    public ItemBuilder<P, T, M> noTags()
+    {
+        return clearProvider(TagsProvider.ITEM);
     }
 
     @Override

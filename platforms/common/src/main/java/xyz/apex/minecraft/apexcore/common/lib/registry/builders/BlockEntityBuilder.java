@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -13,10 +14,12 @@ import xyz.apex.minecraft.apexcore.common.lib.hook.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.BlockEntityEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockEntityFactory;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 /**
@@ -83,6 +86,26 @@ public final class BlockEntityBuilder<P, T extends BlockEntity, M extends Builde
     {
         Collections.addAll(this.validBlocks, validBlocks);
         return self();
+    }
+
+    public BlockEntityBuilder<P, T, M> tag(TagKey<BlockEntityType<?>>... tags)
+    {
+        return tag((provider, context) -> {
+            for(var tag : tags)
+            {
+                provider.tag(tag).addElement(context.registryName());
+            }
+        });
+    }
+
+    public BlockEntityBuilder<P, T, M> tag(BiConsumer<TagsProvider<BlockEntityType<?>>, ProviderType.RegistryContext<BlockEntityType<?>, BlockEntityType<T>>> listener)
+    {
+        return addProvider(TagsProvider.BLOCK_ENTITY_TYPE, listener);
+    }
+
+    public BlockEntityBuilder<P, T, M> noTags()
+    {
+        return clearProvider(TagsProvider.BLOCK_ENTITY_TYPE);
     }
 
     @Override

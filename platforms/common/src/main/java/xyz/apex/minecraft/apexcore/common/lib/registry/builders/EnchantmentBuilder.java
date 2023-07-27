@@ -1,16 +1,19 @@
 package xyz.apex.minecraft.apexcore.common.lib.registry.builders;
 
 import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.EnchantmentEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.EnchantmentFactory;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
 
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 public final class EnchantmentBuilder<P, T extends Enchantment, M extends BuilderManager<M>> extends AbstractBuilder<P, Enchantment, T, EnchantmentEntry<T>, EnchantmentBuilder<P, T, M>, M>
 {
@@ -73,7 +76,25 @@ public final class EnchantmentBuilder<P, T extends Enchantment, M extends Builde
         return equipmentSlots(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET);
     }
 
-    // TODO: Resource Gen providers [ tag ]
+    public EnchantmentBuilder<P, T, M> tag(TagKey<Enchantment>... tags)
+    {
+        return tag((provider, context) -> {
+            for(var tag : tags)
+            {
+                provider.tag(tag).addElement(context.registryName());
+            }
+        });
+    }
+
+    public EnchantmentBuilder<P, T, M> tag(BiConsumer<TagsProvider<Enchantment>, ProviderType.RegistryContext<Enchantment, T>> listener)
+    {
+        return addProvider(TagsProvider.ENCHANTMENT, listener);
+    }
+
+    public EnchantmentBuilder<P, T, M> noTags()
+    {
+        return clearProvider(TagsProvider.ENCHANTMENT);
+    }
 
     @Override
     protected String getDescriptionId(ProviderType.RegistryContext<Enchantment, T> context)

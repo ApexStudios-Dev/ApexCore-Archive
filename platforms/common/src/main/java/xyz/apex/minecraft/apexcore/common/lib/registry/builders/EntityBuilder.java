@@ -2,6 +2,7 @@ package xyz.apex.minecraft.apexcore.common.lib.registry.builders;
 
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.flag.FeatureFlag;
@@ -14,7 +15,9 @@ import xyz.apex.minecraft.apexcore.common.lib.hook.RegistryHooks;
 import xyz.apex.minecraft.apexcore.common.lib.hook.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.EntityEntry;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
 
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -214,7 +217,27 @@ public final class EntityBuilder<P, T extends Entity, M extends BuilderManager<M
         return properties(properties -> properties.updateInterval(updateInterval));
     }
 
-    // TODO: Resource Gen providers [ loot table, tag ]
+    // TODO: Resource Gen providers [ loot table ]
+
+    public EntityBuilder<P, T, M> tag(TagKey<EntityType<?>>... tags)
+    {
+        return tag((provider, context) -> {
+            for(var tag : tags)
+            {
+                provider.tag(tag).addElement(context.registryName());
+            }
+        });
+    }
+
+    public EntityBuilder<P, T, M> tag(BiConsumer<TagsProvider<EntityType<?>>, ProviderType.RegistryContext<EntityType<?>, EntityType<T>>> listener)
+    {
+        return addProvider(TagsProvider.ENTITY_TYPE, listener);
+    }
+
+    public EntityBuilder<P, T, M> noTags()
+    {
+        return clearProvider(TagsProvider.ENTITY_TYPE);
+    }
 
     @Override
     public EntityBuilder<P, T, M> requiredFeatures(FeatureFlag... requiredFeatures)
