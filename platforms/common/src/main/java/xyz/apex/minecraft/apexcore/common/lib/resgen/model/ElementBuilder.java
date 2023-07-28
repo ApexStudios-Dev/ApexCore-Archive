@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 import org.joml.*;
 import xyz.apex.minecraft.apexcore.common.lib.PlatformOnly;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.JsonHelper;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -148,11 +149,11 @@ public final class ElementBuilder
         var json = new JsonObject();
 
         if(!from.equals(0F, 0F, 0F))
-            ModelBuilder.addJsonIfNotEmpty(json, "from", ModelBuilder.toJson(from));
+            JsonHelper.addJsonIfNotEmpty(json, "from", JsonHelper.toJson(from));
         if(!to.equals(16F, 16F, 16F))
-            ModelBuilder.addJsonIfNotEmpty(json, "to", ModelBuilder.toJson(to));
+            JsonHelper.addJsonIfNotEmpty(json, "to", JsonHelper.toJson(to));
         if(rotation != null)
-            ModelBuilder.addJsonIfNotEmpty(json, "rotation", rotation.toJson());
+            JsonHelper.addJsonIfNotEmpty(json, "rotation", rotation.toJson());
         if(!shade)
             json.addProperty("shade", shade);
 
@@ -161,17 +162,17 @@ public final class ElementBuilder
             var element = toVanilla();
             var facesJson = new JsonObject();
 
-            faceBuilders.forEach((face, value) -> ModelBuilder.addJsonIfNotEmpty(
+            faceBuilders.forEach((face, value) -> JsonHelper.addJsonIfNotEmpty(
                     facesJson,
                     face.getSerializedName(),
                     value.toJson(face, element, serializePlatformOnly)
             ));
 
-            ModelBuilder.addJsonIfNotEmpty(json, "faces", facesJson);
+            JsonHelper.addJsonIfNotEmpty(json, "faces", facesJson);
         }
 
         if(serializePlatformOnly)
-            ModelBuilder.addJsonIfNotEmpty(json, "forge_data", serializeForgeData(color, blockLight, skyLight, ambientOcclusion));
+            JsonHelper.addJsonIfNotEmpty(json, "forge_data", serializeForgeData(color, blockLight, skyLight, ambientOcclusion));
 
         return json;
     }
@@ -249,7 +250,7 @@ public final class ElementBuilder
             var json = new JsonObject();
 
             if(!origin.equals(0F, 0F, 0F))
-                ModelBuilder.addJsonIfNotEmpty(json, "origin", ModelBuilder.toJson(origin));
+                JsonHelper.addJsonIfNotEmpty(json, "origin", JsonHelper.toJson(origin));
             if(axis != Direction.Axis.X)
                 json.addProperty("axis", axis.getSerializedName());
             if(angle != 0F)
@@ -364,10 +365,10 @@ public final class ElementBuilder
             var vanilla = toVanilla();
             var json = new JsonObject();
 
-            ModelBuilder.addTexture(json, "texture", texture);
+            JsonHelper.addTexture(json, "texture", texture);
 
             if(!Arrays.equals(vanilla.uv.uvs, element.uvsByFace(face)))
-                ModelBuilder.addJsonIfNotEmpty(json, "uv", ModelBuilder.toJson(uv));
+                JsonHelper.addJsonIfNotEmpty(json, "uv", JsonHelper.toJson(uv));
             if(cullFace != null)
                 json.addProperty("cullface", cullFace.getSerializedName());
             if(rotation != 0)
@@ -375,7 +376,7 @@ public final class ElementBuilder
             if(tintIndex != -1)
                 json.addProperty("tintindex", tintIndex);
             if(serializePlatformOnly)
-                ModelBuilder.addJsonIfNotEmpty(json, "forge_data", serializeForgeData(color, blockLight, skyLight, ambientOcclusion));
+                JsonHelper.addJsonIfNotEmpty(json, "forge_data", serializeForgeData(color, blockLight, skyLight, ambientOcclusion));
 
             return json;
         }

@@ -6,6 +6,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import xyz.apex.minecraft.apexcore.common.lib.PlatformOnly;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.JsonHelper;
 
 public final class TransformBuilder
 {
@@ -101,13 +102,13 @@ public final class TransformBuilder
         var json = new JsonObject();
 
         if(!rotation.equals(0F, 0F, 0F))
-            ModelBuilder.addJsonIfNotEmpty(json, "rotation", ModelBuilder.toJson(rotation));
+            JsonHelper.addJsonIfNotEmpty(json, "rotation", JsonHelper.toJson(rotation));
         if(!translation.equals(0F, 0F, 0F))
-            ModelBuilder.addJsonIfNotEmpty(json, "translation", ModelBuilder.toJson(translation));
+            JsonHelper.addJsonIfNotEmpty(json, "translation", JsonHelper.toJson(translation));
         if(!scale.equals(1F, 1F, 1F))
-            ModelBuilder.addJsonIfNotEmpty(json, "scale", ModelBuilder.toJson(scale));
+            JsonHelper.addJsonIfNotEmpty(json, "scale", JsonHelper.toJson(scale));
         if(serializePlatformOnly && !rightRotation.equals(0F, 0F, 0F))
-            ModelBuilder.addJsonIfNotEmpty(json, "right_rotation", ModelBuilder.toJson(rightRotation));
+            JsonHelper.addJsonIfNotEmpty(json, "right_rotation", JsonHelper.toJson(rightRotation));
 
         return json;
     }

@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.JsonHelper;
 
 public final class OverrideBuilder
 {
@@ -73,7 +74,7 @@ public final class OverrideBuilder
         {
             var propertiesJson = new JsonObject();
             properties.forEach((propertyName, propertyValue) -> propertiesJson.addProperty(propertyName.toString(), propertyValue));
-            ModelBuilder.addJsonIfNotEmpty(json, "predicate", propertiesJson);
+            JsonHelper.addJsonIfNotEmpty(json, "predicate", propertiesJson);
         }
 
         return json;
