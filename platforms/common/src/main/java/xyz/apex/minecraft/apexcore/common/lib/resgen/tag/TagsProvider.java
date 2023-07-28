@@ -44,21 +44,21 @@ import java.util.stream.Collectors;
 
 public final class TagsProvider<T> implements DataProvider
 {
-    public static final ProviderType<TagsProvider<BannerPattern>> BANNER_PATTERN = register(new ResourceLocation(ApexCore.ID, "tags/banner_pattern"), Registries.BANNER_PATTERN);
-    public static final ProviderType<TagsProvider<Biome>> BIOME = register(new ResourceLocation(ApexCore.ID, "tags/biome"), Registries.BIOME);
     public static final ProviderType<TagsProvider<Block>> BLOCK = register(new ResourceLocation(ApexCore.ID, "tags/block"), Registries.BLOCK, block -> block.builtInRegistryHolder().key());
-    public static final ProviderType<TagsProvider<BlockEntityType<?>>> BLOCK_ENTITY_TYPE = register(new ResourceLocation(ApexCore.ID, "tags/block_entity_type"), Registries.BLOCK_ENTITY_TYPE);
+    public static final ProviderType<TagsProvider<Fluid>> FLUID = register(new ResourceLocation(ApexCore.ID, "tags/fluid"), Registries.FLUID, fluid -> fluid.builtInRegistryHolder().key(), BLOCK);
+    public static final ProviderType<TagsProvider<Item>> ITEM = register(new ResourceLocation(ApexCore.ID, "tags/item"), Registries.ITEM, item -> item.builtInRegistryHolder().key(), BLOCK);
+    public static final ProviderType<TagsProvider<Enchantment>> ENCHANTMENT = register(new ResourceLocation(ApexCore.ID, "tags/enchantment"), Registries.ENCHANTMENT, ITEM);
+    public static final ProviderType<TagsProvider<EntityType<?>>> ENTITY_TYPE = register(new ResourceLocation(ApexCore.ID, "tags/entity_type"), Registries.ENTITY_TYPE, entityType -> entityType.builtInRegistryHolder().key(), ITEM);
+    public static final ProviderType<TagsProvider<BlockEntityType<?>>> BLOCK_ENTITY_TYPE = register(new ResourceLocation(ApexCore.ID, "tags/block_entity_type"), Registries.BLOCK_ENTITY_TYPE, BLOCK);
+    public static final ProviderType<TagsProvider<PaintingVariant>> PAINTING_VARIANT = register(new ResourceLocation(ApexCore.ID, "tags/painting_variant"), Registries.PAINTING_VARIANT);
+    public static final ProviderType<TagsProvider<PoiType>> POINT_OF_INTEREST_TYPE = register(new ResourceLocation(ApexCore.ID, "tags/point_of_interest_type"), Registries.POINT_OF_INTEREST_TYPE, BLOCK);
+    public static final ProviderType<TagsProvider<Biome>> BIOME = register(new ResourceLocation(ApexCore.ID, "tags/biome"), Registries.BIOME);
+    public static final ProviderType<TagsProvider<BannerPattern>> BANNER_PATTERN = register(new ResourceLocation(ApexCore.ID, "tags/banner_pattern"), Registries.BANNER_PATTERN);
     public static final ProviderType<TagsProvider<CatVariant>> CAT_VARIANT = register(new ResourceLocation(ApexCore.ID, "tags/cat_variant"), Registries.CAT_VARIANT);
     public static final ProviderType<TagsProvider<DamageType>> DAMAGE_TYPE = register(new ResourceLocation(ApexCore.ID, "tags/damage_type"), Registries.DAMAGE_TYPE);
-    public static final ProviderType<TagsProvider<Enchantment>> ENCHANTMENT = register(new ResourceLocation(ApexCore.ID, "tags/enchantment"), Registries.ENCHANTMENT);
-    public static final ProviderType<TagsProvider<EntityType<?>>> ENTITY_TYPE = register(new ResourceLocation(ApexCore.ID, "tags/entity_type"), Registries.ENTITY_TYPE, block -> block.builtInRegistryHolder().key());
     public static final ProviderType<TagsProvider<FlatLevelGeneratorPreset>> FLAT_LEVEL_GENERATOR_PRESET = register(new ResourceLocation(ApexCore.ID, "tags/flat_level_generator_preset"), Registries.FLAT_LEVEL_GENERATOR_PRESET);
-    public static final ProviderType<TagsProvider<Fluid>> FLUID = register(new ResourceLocation(ApexCore.ID, "tags/fluid"), Registries.FLUID, block -> block.builtInRegistryHolder().key());
-    public static final ProviderType<TagsProvider<GameEvent>> GAME_EVENT = register(new ResourceLocation(ApexCore.ID, "tags/game_event"), Registries.GAME_EVENT, block -> block.builtInRegistryHolder().key());
-    public static final ProviderType<TagsProvider<Item>> ITEM = register(new ResourceLocation(ApexCore.ID, "tags/item"), Registries.ITEM, block -> block.builtInRegistryHolder().key());
+    public static final ProviderType<TagsProvider<GameEvent>> GAME_EVENT = register(new ResourceLocation(ApexCore.ID, "tags/game_event"), Registries.GAME_EVENT, gameEvent -> gameEvent.builtInRegistryHolder().key());
     public static final ProviderType<TagsProvider<Instrument>> INSTRUMENT = register(new ResourceLocation(ApexCore.ID, "tags/instrument"), Registries.INSTRUMENT);
-    public static final ProviderType<TagsProvider<PaintingVariant>> PAINTING_VARIANT = register(new ResourceLocation(ApexCore.ID, "tags/painting_variant"), Registries.PAINTING_VARIANT);
-    public static final ProviderType<TagsProvider<PoiType>> POINT_OF_INTEREST_TYPE = register(new ResourceLocation(ApexCore.ID, "tags/point_of_interest_type"), Registries.POINT_OF_INTEREST_TYPE);
     public static final ProviderType<TagsProvider<Structure>> STRUCTURE = register(new ResourceLocation(ApexCore.ID, "tags/structure"), Registries.STRUCTURE);
     public static final ProviderType<TagsProvider<WorldPreset>> WORLD_PRESET = register(new ResourceLocation(ApexCore.ID, "tags/world_preset"), Registries.WORLD_PRESET);
 
@@ -128,13 +128,13 @@ public final class TagsProvider<T> implements DataProvider
         return "Tags for %s".formatted(registryType.location());
     }
 
-    public static <T> ProviderType<TagsProvider<T>> register(ResourceLocation providerName, ResourceKey<? extends Registry<T>> registryType, Function<T, ResourceKey<T>> intrinsicKeyExtractor)
+    public static <T> ProviderType<TagsProvider<T>> register(ResourceLocation providerName, ResourceKey<? extends Registry<T>> registryType, Function<T, ResourceKey<T>> intrinsicKeyExtractor, ProviderType<?>... parents)
     {
-        return ProviderType.register(providerName, context -> new TagsProvider<>(context, registryType, intrinsicKeyExtractor));
+        return ProviderType.register(providerName, context -> new TagsProvider<>(context, registryType, intrinsicKeyExtractor), parents);
     }
 
-    public static <T> ProviderType<TagsProvider<T>> register(ResourceLocation providerName, ResourceKey<? extends Registry<T>> registryType)
+    public static <T> ProviderType<TagsProvider<T>> register(ResourceLocation providerName, ResourceKey<? extends Registry<T>> registryType, ProviderType<?>... parents)
     {
-        return ProviderType.register(providerName, context -> new TagsProvider<>(context, registryType, null));
+        return ProviderType.register(providerName, context -> new TagsProvider<>(context, registryType, null), parents);
     }
 }

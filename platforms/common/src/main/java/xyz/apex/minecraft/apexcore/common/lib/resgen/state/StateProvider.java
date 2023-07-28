@@ -13,10 +13,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.StateHolder;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.hook.RegistryHooks;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelProvider;
 
 import java.util.Map;
 import java.util.Objects;
@@ -97,13 +99,13 @@ public final class StateProvider<T, S extends StateHolder<T, S>> implements Data
         return "States for %s".formatted(registryType.location());
     }
 
-    public static <T, S extends StateHolder<T, S>> ProviderType<StateProvider<T, S>> register(ResourceLocation providerName, Function<T, StateDefinition<T, S>> stateDefinitionFunction, ResourceKey<? extends Registry<T>> registryType, Function<T, ResourceKey<T>> intrinsicKeyExtractor)
+    public static <T, S extends StateHolder<T, S>> ProviderType<StateProvider<T, S>> register(ResourceLocation providerName, Function<T, StateDefinition<T, S>> stateDefinitionFunction, ResourceKey<? extends Registry<T>> registryType, Function<T, ResourceKey<T>> intrinsicKeyExtractor, ProviderType<?>... parents)
     {
-        return ProviderType.register(providerName, context -> new StateProvider<>(context, stateDefinitionFunction, registryType, intrinsicKeyExtractor));
+        return ProviderType.register(providerName, context -> new StateProvider<>(context, stateDefinitionFunction, registryType, intrinsicKeyExtractor), ArrayUtils.add(parents, ModelProvider.PROVIDER_TYPE));
     }
 
-    public static <T, S extends StateHolder<T, S>> ProviderType<StateProvider<T, S>> register(ResourceLocation providerName, Function<T, StateDefinition<T, S>> stateDefinitionFunction, ResourceKey<? extends Registry<T>> registryType)
+    public static <T, S extends StateHolder<T, S>> ProviderType<StateProvider<T, S>> register(ResourceLocation providerName, Function<T, StateDefinition<T, S>> stateDefinitionFunction, ResourceKey<? extends Registry<T>> registryType, ProviderType<?>... parents)
     {
-        return ProviderType.register(providerName, context -> new StateProvider<>(context, stateDefinitionFunction, registryType, null));
+        return ProviderType.register(providerName, context -> new StateProvider<>(context, stateDefinitionFunction, registryType, null), ArrayUtils.add(parents, ModelProvider.PROVIDER_TYPE));
     }
 }

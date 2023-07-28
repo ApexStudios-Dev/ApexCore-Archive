@@ -37,6 +37,8 @@ public sealed interface ProviderType<P extends DataProvider>
 
     <T> void clearListener(ResourceKey<T> registryKey);
 
+    boolean hasListeners();
+
     @ApiStatus.Internal
     @DoNotCall
     void provide(P provider);
@@ -45,9 +47,11 @@ public sealed interface ProviderType<P extends DataProvider>
     @DoNotCall
     P create(ProviderContext context);
 
-    static <P extends DataProvider> ProviderType<P> register(ResourceLocation providerName, Function<ProviderContext, P> providerFactory)
+    Collection<ProviderType<?>> parents();
+
+    static <P extends DataProvider> ProviderType<P> register(ResourceLocation providerName, Function<ProviderContext, P> providerFactory, ProviderType<?>... parents)
     {
-        var providerType = new ProviderTypeImpl<>(providerName, providerFactory);
+        var providerType = new ProviderTypeImpl<>(providerName, providerFactory, parents);
 
         if(ProviderTypeImpl.PROVIDER_TYPES.put(providerName, providerType) != null)
             throw new IllegalStateException("Attempt to register ProviderType with duplicate name: '%s'".formatted(providerName));
@@ -69,11 +73,13 @@ public sealed interface ProviderType<P extends DataProvider>
         private final Function<ProviderContext, P> providerFactory;
         private final List<Consumer<P>> listeners = Lists.newLinkedList();
         private final Multimap<ResourceKey<?>, BiConsumer<P, ? extends RegistryContext<?, ?>>> registryListeners = MultimapBuilder.hashKeys().linkedListValues().build();
+        private final Collection<ProviderType<?>> parents;
 
-        private ProviderTypeImpl(ResourceLocation providerName, Function<ProviderContext, P> providerFactory)
+        private ProviderTypeImpl(ResourceLocation providerName, Function<ProviderContext, P> providerFactory, ProviderType<?>... parents)
         {
             this.providerName = providerName;
             this.providerFactory = providerFactory;
+            this.parents = List.of(parents);
         }
 
         @Override
@@ -114,6 +120,12 @@ public sealed interface ProviderType<P extends DataProvider>
         }
 
         @Override
+        public boolean hasListeners()
+        {
+            return !listeners.isEmpty() || !registryListeners.isEmpty();
+        }
+
+        @Override
         public void provide(P provider)
         {
             listeners.forEach(listener -> listener.accept(provider));
@@ -145,6 +157,12 @@ public sealed interface ProviderType<P extends DataProvider>
         public P create(ProviderContext context)
         {
             return providerFactory.apply(context);
+        }
+
+        @Override
+        public Collection<ProviderType<?>> parents()
+        {
+            return parents;
         }
 
         @Override
