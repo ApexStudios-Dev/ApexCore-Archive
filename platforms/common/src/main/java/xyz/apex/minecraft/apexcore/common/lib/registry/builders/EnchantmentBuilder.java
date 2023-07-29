@@ -7,13 +7,13 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.EnchantmentEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.EnchantmentFactory;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderRegistryListener;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
 
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
-import java.util.function.BiConsumer;
 
 public final class EnchantmentBuilder<P, T extends Enchantment, M extends BuilderManager<M>> extends AbstractBuilder<P, Enchantment, T, EnchantmentEntry<T>, EnchantmentBuilder<P, T, M>, M>
 {
@@ -78,7 +78,7 @@ public final class EnchantmentBuilder<P, T extends Enchantment, M extends Builde
 
     public EnchantmentBuilder<P, T, M> tag(TagKey<Enchantment>... tags)
     {
-        return tag((provider, context) -> {
+        return tag((provider, lookup, context) -> {
             for(var tag : tags)
             {
                 provider.tag(tag).addElement(context.registryName());
@@ -86,7 +86,7 @@ public final class EnchantmentBuilder<P, T extends Enchantment, M extends Builde
         });
     }
 
-    public EnchantmentBuilder<P, T, M> tag(BiConsumer<TagsProvider<Enchantment>, ProviderType.RegistryContext<Enchantment, T>> listener)
+    public EnchantmentBuilder<P, T, M> tag(ProviderRegistryListener<TagsProvider<Enchantment>, Enchantment, T> listener)
     {
         return addProvider(TagsProvider.ENCHANTMENT, listener);
     }

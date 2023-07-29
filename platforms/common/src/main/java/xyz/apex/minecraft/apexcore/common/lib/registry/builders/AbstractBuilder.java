@@ -11,6 +11,7 @@ import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.lib.registry.Registrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryEntry;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderRegistryListener;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.lang.LanguageBuilder;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.lang.LanguageProvider;
@@ -159,21 +160,21 @@ public abstract non-sealed class AbstractBuilder<P, T, R extends T, E extends Re
     }
 
     @Override
-    public final <D extends DataProvider> B addProvider(ProviderType<D> providerType, BiConsumer<D, ProviderType.RegistryContext<T, R>> listener)
+    public final <D extends DataProvider> B addProvider(ProviderType<D> providerType, ProviderRegistryListener<D, T, R> listener)
     {
         providerType.addListener(registryKey, listener);
         return self();
     }
 
     @Override
-    public final <D extends DataProvider> B addMiscProvider(ProviderType<D> providerType, BiConsumer<D, ProviderType.RegistryContext<T, R>> listener)
+    public final <D extends DataProvider> B addMiscProvider(ProviderType<D> providerType, ProviderRegistryListener<D, T, R> listener)
     {
         providerType.addMiscListener(registryKey, listener);
         return self();
     }
 
     @Override
-    public final <D extends DataProvider> B setProvider(ProviderType<D> providerType, BiConsumer<D, ProviderType.RegistryContext<T, R>> listener)
+    public final <D extends DataProvider> B setProvider(ProviderType<D> providerType, ProviderRegistryListener<D, T, R> listener)
     {
         providerType.setListener(registryKey, listener);
         return self();
@@ -208,7 +209,7 @@ public abstract non-sealed class AbstractBuilder<P, T, R extends T, E extends Re
     {
         return setProvider(
                 LanguageProvider.PROVIDER_TYPE,
-                (provider, context) -> {
+                (provider, lookup, context) -> {
                     var builder = provider.region(region);
                     builder.add(
                             getDescriptionId(context),
@@ -223,13 +224,13 @@ public abstract non-sealed class AbstractBuilder<P, T, R extends T, E extends Re
         return clearProvider(LanguageProvider.PROVIDER_TYPE);
     }
 
-    public final B addMiscLang(BiConsumer<LanguageProvider, ProviderType.RegistryContext<T, R>> listener)
+    public final B addMiscLang(ProviderRegistryListener<LanguageProvider, T, R> listener)
     {
         return addMiscProvider(LanguageProvider.PROVIDER_TYPE, listener);
     }
 
     public final B addMiscLang(String region, BiConsumer<LanguageBuilder, ProviderType.RegistryContext<T, R>> listener)
     {
-        return addMiscLang((provider, context) -> listener.accept(provider.region(region), context));
+        return addMiscLang((provider, lookup, context) -> listener.accept(provider.region(region), context));
     }
 }

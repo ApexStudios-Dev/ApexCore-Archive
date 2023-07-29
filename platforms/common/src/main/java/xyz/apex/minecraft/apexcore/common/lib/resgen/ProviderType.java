@@ -20,20 +20,22 @@ import xyz.apex.minecraft.apexcore.common.lib.hook.RegistryHooks;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public sealed interface ProviderType<P extends DataProvider>
 {
     ResourceLocation providerName();
 
-    void addListener(Consumer<P> listener);
+    void addListener(ProviderListener<P> listener);
 
-    <T, R extends T> void addMiscListener(ResourceKey<T> registryKey, BiConsumer<P, RegistryContext<T, R>> listener);
+    <T, R extends T> void addMiscListener(ResourceKey<T> registryKey, ProviderRegistryListener<P, T, R> listener);
 
-    <T, R extends T> void addListener(ResourceKey<T> registryKey, BiConsumer<P, RegistryContext<T, R>> listener);
+    <T, R extends T> void addListener(ResourceKey<T> registryKey, ProviderRegistryListener<P, T, R> listener);
 
-    <T, R extends T> void setListener(ResourceKey<T> registryKey, BiConsumer<P, RegistryContext<T, R>> listener);
+    <T, R extends T> void setListener(ResourceKey<T> registryKey, ProviderRegistryListener<P, T, R> listener);
 
     <T> void clearListener(ResourceKey<T> registryKey);
 
@@ -41,7 +43,7 @@ public sealed interface ProviderType<P extends DataProvider>
 
     @ApiStatus.Internal
     @DoNotCall
-    void provide(P provider);
+    void provide(P provider, ProviderLookup lookup);
 
     @ApiStatus.Internal
     @DoNotCall
@@ -71,8 +73,8 @@ public sealed interface ProviderType<P extends DataProvider>
 
         private final ResourceLocation providerName;
         private final Function<ProviderContext, P> providerFactory;
-        private final List<Consumer<P>> listeners = Lists.newLinkedList();
-        private final Multimap<ResourceKey<?>, BiConsumer<P, ? extends RegistryContext<?, ?>>> registryListeners = MultimapBuilder.hashKeys().linkedListValues().build();
+        private final List<ProviderListener<P>> listeners = Lists.newLinkedList();
+        private final Multimap<ResourceKey<?>, ProviderRegistryListener<P, ?, ?>> registryListeners = MultimapBuilder.hashKeys().linkedListValues().build();
         private final Collection<ProviderType<?>> parents;
 
         private ProviderTypeImpl(ResourceLocation providerName, Function<ProviderContext, P> providerFactory, ProviderType<?>... parents)
@@ -89,25 +91,25 @@ public sealed interface ProviderType<P extends DataProvider>
         }
 
         @Override
-        public void addListener(Consumer<P> listener)
+        public void addListener(ProviderListener<P> listener)
         {
             listeners.add(listener);
         }
 
         @Override
-        public <T, R extends T> void addMiscListener(ResourceKey<T> registryKey, BiConsumer<P, RegistryContext<T, R>> listener)
+        public <T, R extends T> void addMiscListener(ResourceKey<T> registryKey, ProviderRegistryListener<P, T, R> listener)
         {
-            addListener(provider -> listener.accept(provider, buildRegistryContext(registryKey)));
+            addListener((provider, lookup) -> listener.accept(provider, lookup, buildRegistryContext(registryKey)));
         }
 
         @Override
-        public <T, R extends T> void addListener(ResourceKey<T> registryKey, BiConsumer<P, RegistryContext<T, R>> listener)
+        public <T, R extends T> void addListener(ResourceKey<T> registryKey, ProviderRegistryListener<P, T, R> listener)
         {
             registryListeners.put(registryKey, listener);
         }
 
         @Override
-        public <T, R extends T> void setListener(ResourceKey<T> registryKey, BiConsumer<P, RegistryContext<T, R>> listener)
+        public <T, R extends T> void setListener(ResourceKey<T> registryKey, ProviderRegistryListener<P, T, R> listener)
         {
             clearListener(registryKey);
             addListener(registryKey, listener);
@@ -126,10 +128,10 @@ public sealed interface ProviderType<P extends DataProvider>
         }
 
         @Override
-        public void provide(P provider)
+        public void provide(P provider, ProviderLookup lookup)
         {
-            listeners.forEach(listener -> listener.accept(provider));
-            registryListeners.keys().forEach(registryKey -> provide(registryKey, provider));
+            listeners.forEach(listener -> listener.accept(provider, lookup));
+            registryListeners.keys().forEach(registryKey -> provide(registryKey, provider, lookup));
         }
 
         @SuppressWarnings("unchecked")
@@ -147,10 +149,10 @@ public sealed interface ProviderType<P extends DataProvider>
         }
 
         @SuppressWarnings("unchecked")
-        private <T, R extends T> void provide(ResourceKey<T> registryKey, P provider)
+        private <T, R extends T> void provide(ResourceKey<T> registryKey, P provider, ProviderLookup lookup)
         {
             var registryContext = this.<T, R>buildRegistryContext(registryKey);
-            registryListeners.get(registryKey).forEach(listener -> ((BiConsumer<P, RegistryContext<T, R>>) listener).accept(provider, registryContext));
+            registryListeners.get(registryKey).forEach(listener -> ((ProviderRegistryListener<P, T, R>) listener).accept(provider, lookup, registryContext));
         }
 
         @Override

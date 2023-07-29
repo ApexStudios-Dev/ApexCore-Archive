@@ -8,9 +8,9 @@ import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.lib.registry.Registrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryEntry;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderRegistryListener;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -149,7 +149,7 @@ public sealed interface Builder<P, T, R extends T, E extends RegistryEntry<R>, B
      * @return This builder instance.
      * @param <D> Provider type.
      */
-    <D extends DataProvider> B addProvider(ProviderType<D> providerType, BiConsumer<D, ProviderType.RegistryContext<T, R>> listener);
+    <D extends DataProvider> B addProvider(ProviderType<D> providerType, ProviderRegistryListener<D, T, R> listener);
 
     /**
      * Registers misc listener to be invoked during resource generation for given provider.
@@ -161,7 +161,7 @@ public sealed interface Builder<P, T, R extends T, E extends RegistryEntry<R>, B
      * @return This builder instance.
      * @param <D> Provider type.
      */
-    <D extends DataProvider> B addMiscProvider(ProviderType<D> providerType, BiConsumer<D, ProviderType.RegistryContext<T, R>> listener);
+    <D extends DataProvider> B addMiscProvider(ProviderType<D> providerType, ProviderRegistryListener<D, T, R> listener);
 
     /**
      * Registers listener to be invoked during resource generation for given provider.
@@ -173,7 +173,7 @@ public sealed interface Builder<P, T, R extends T, E extends RegistryEntry<R>, B
      * @return This builder instance.
      * @param <D> Provider type.
      */
-    <D extends DataProvider> B setProvider(ProviderType<D> providerType, BiConsumer<D, ProviderType.RegistryContext<T, R>> listener);
+    <D extends DataProvider> B setProvider(ProviderType<D> providerType, ProviderRegistryListener<D, T, R> listener);
 
     /**
      * Clears all previously registered listeners for given provider.

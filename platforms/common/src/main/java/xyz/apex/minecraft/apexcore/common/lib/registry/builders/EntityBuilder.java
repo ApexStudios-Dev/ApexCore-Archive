@@ -14,10 +14,10 @@ import xyz.apex.minecraft.apexcore.common.lib.hook.EntityHooks;
 import xyz.apex.minecraft.apexcore.common.lib.hook.RegistryHooks;
 import xyz.apex.minecraft.apexcore.common.lib.hook.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.EntityEntry;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderRegistryListener;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
 
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -221,7 +221,7 @@ public final class EntityBuilder<P, T extends Entity, M extends BuilderManager<M
 
     public EntityBuilder<P, T, M> tag(TagKey<EntityType<?>>... tags)
     {
-        return tag((provider, context) -> {
+        return tag((provider, lookup, context) -> {
             for(var tag : tags)
             {
                 provider.tag(tag).addElement(context.registryName());
@@ -229,7 +229,7 @@ public final class EntityBuilder<P, T extends Entity, M extends BuilderManager<M
         });
     }
 
-    public EntityBuilder<P, T, M> tag(BiConsumer<TagsProvider<EntityType<?>>, ProviderType.RegistryContext<EntityType<?>, EntityType<T>>> listener)
+    public EntityBuilder<P, T, M> tag(ProviderRegistryListener<TagsProvider<EntityType<?>>, EntityType<?>, EntityType<T>> listener)
     {
         return addProvider(TagsProvider.ENTITY_TYPE, listener);
     }

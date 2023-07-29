@@ -12,11 +12,11 @@ import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.hook.ColorHandlerHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.ItemEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.ItemFactory;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderRegistryListener;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
 
-import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -200,7 +200,7 @@ public final class ItemBuilder<P, T extends Item, M extends BuilderManager<M>> e
 
     // TODO: Resource Gen providers [ recipe, lang, model ]
 
-    public ItemBuilder<P, T, M> model(BiConsumer<ModelProvider, ProviderType.RegistryContext<Item, T>> consumer)
+    public ItemBuilder<P, T, M> model(ProviderRegistryListener<ModelProvider, Item, T> consumer)
     {
         return setProvider(ModelProvider.PROVIDER_TYPE, consumer);
     }
@@ -212,7 +212,7 @@ public final class ItemBuilder<P, T extends Item, M extends BuilderManager<M>> e
 
     public ItemBuilder<P, T, M> defaultModel()
     {
-        return model((provider, context) -> provider.generated(
+        return model((provider, lookup, context) -> provider.generated(
                 context.registryName().withPrefix("item/"),
                 context.registryName().withPrefix("item/")
         ));
@@ -220,7 +220,7 @@ public final class ItemBuilder<P, T extends Item, M extends BuilderManager<M>> e
 
     public ItemBuilder<P, T, M> defaultBlockItemModel()
     {
-        return model((provider, context) -> provider.withParent(
+        return model((provider, lookup, context) -> provider.withParent(
                 context.registryName().withPrefix("item/"),
                 context.registryName().withPrefix("block/")
         ));
@@ -228,7 +228,7 @@ public final class ItemBuilder<P, T extends Item, M extends BuilderManager<M>> e
 
     public ItemBuilder<P, T, M> tag(TagKey<Item>... tags)
     {
-        return tag((provider, context) -> {
+        return tag((provider, lookup, context) -> {
             for(var tag : tags)
             {
                 provider.tag(tag).addElement(context.registryName());
@@ -236,7 +236,7 @@ public final class ItemBuilder<P, T extends Item, M extends BuilderManager<M>> e
         });
     }
 
-    public ItemBuilder<P, T, M> tag(BiConsumer<TagsProvider<Item>, ProviderType.RegistryContext<Item, T>> listener)
+    public ItemBuilder<P, T, M> tag(ProviderRegistryListener<TagsProvider<Item>, Item, T> listener)
     {
         return addProvider(TagsProvider.ITEM, listener);
     }

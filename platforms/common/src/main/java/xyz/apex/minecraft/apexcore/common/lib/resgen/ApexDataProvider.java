@@ -1,6 +1,7 @@
 package xyz.apex.minecraft.apexcore.common.lib.resgen;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.CachedOutput;
@@ -9,20 +10,29 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public final class ApexDataProvider implements DataProvider
+public final class ApexDataProvider implements DataProvider, ProviderLookup
 {
     private final ProviderType.ProviderContext context;
     private final Set<ProviderType<?>> generated = Sets.newHashSet();
+    private final Map<ProviderType<?>, DataProvider> providerMap = Maps.newHashMap();
 
     private ApexDataProvider(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries, String ownerId)
     {
         context = new ProviderType.ProviderContext(packOutput, registries, ownerId);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <P extends DataProvider> P lookup(ProviderType<P> providerType)
+    {
+        return (P) providerMap.computeIfAbsent(providerType, p -> p.create(context));
     }
 
     @Override
@@ -46,8 +56,8 @@ public final class ApexDataProvider implements DataProvider
         var futures = Lists.<CompletableFuture<?>>newLinkedList();
         providerType.parents().stream().map(parent -> provide(parent, cache)).forEach(futures::add);
 
-        var provider = providerType.create(context);
-        providerType.provide(provider);
+        var provider = lookup(providerType);
+        providerType.provide(provider, this);
         futures.addLast(provider.run(cache)); // run this provider last
         ApexCore.LOGGER.debug("Executing Provider: '{}'", providerType.providerName());
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));

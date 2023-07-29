@@ -13,13 +13,13 @@ import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.hook.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.BlockEntityEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockEntityFactory;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderRegistryListener;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 /**
@@ -90,7 +90,7 @@ public final class BlockEntityBuilder<P, T extends BlockEntity, M extends Builde
 
     public BlockEntityBuilder<P, T, M> tag(TagKey<BlockEntityType<?>>... tags)
     {
-        return tag((provider, context) -> {
+        return tag((provider, lookup, context) -> {
             for(var tag : tags)
             {
                 provider.tag(tag).addElement(context.registryName());
@@ -98,7 +98,7 @@ public final class BlockEntityBuilder<P, T extends BlockEntity, M extends Builde
         });
     }
 
-    public BlockEntityBuilder<P, T, M> tag(BiConsumer<TagsProvider<BlockEntityType<?>>, ProviderType.RegistryContext<BlockEntityType<?>, BlockEntityType<T>>> listener)
+    public BlockEntityBuilder<P, T, M> tag(ProviderRegistryListener<TagsProvider<BlockEntityType<?>>, BlockEntityType<?>, BlockEntityType<T>> listener)
     {
         return addProvider(TagsProvider.BLOCK_ENTITY_TYPE, listener);
     }
