@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.common.core;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,6 +17,7 @@ import xyz.apex.minecraft.apexcore.common.lib.modloader.ModLoader;
 import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockTypes;
 import xyz.apex.minecraft.apexcore.common.lib.network.NetworkManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
 
 @ApiStatus.Internal
 @ApiStatus.NonExtendable
@@ -52,8 +54,23 @@ public interface ApexCore
         ApexCoreTests.register();
         RegistrarManager.register(ID);
 
+        registerGenerators();
+
         // tell listeners that ApexCore has been initialized
         Services.stream(ApexCoreLoaded.class).forEach(ApexCoreLoaded::onApexCoreLoaded);
+    }
+
+    private void registerGenerators()
+    {
+        var descriptionKey = "pack.%s.description".formatted(ID);
+
+        ProviderTypes.LANGUAGES.addListener((provider, lookup) -> provider
+                .enUS()
+                    .add(descriptionKey, "ApexCore")
+                .end()
+        );
+
+        ProviderTypes.registerDefaultMcMetaGenerator(Component.translatable(descriptionKey));
     }
 
     PhysicalSide physicalSide();

@@ -69,9 +69,9 @@ public final class LanguageProvider implements DataProvider
     {
         var json = new JsonObject();
 
-        for(var key : getKeys(region))
+        for(var key : getKeys(region, Sets.newHashSet()))
         {
-            var value = getTranslation(region, key);
+            var value = getTranslation(region, key, Sets.newHashSet());
 
             if(value != null && !value.isBlank())
                 json.addProperty(key, value);
@@ -80,10 +80,11 @@ public final class LanguageProvider implements DataProvider
         return json.size() == 0 ? JsonNull.INSTANCE : json;
     }
 
-    private Set<String> getKeys(String region)
+    private Set<String> getKeys(String region, Set<String> visitedRegions)
     {
         var keys = Sets.<String>newHashSet();
         var builder = regions.get(region);
+        visitedRegions.add(region);
 
         if(builder != null)
             keys.addAll(builder.keys());
@@ -91,15 +92,16 @@ public final class LanguageProvider implements DataProvider
         var sourceRegions = copyMap.get(region);
 
         if(!sourceRegions.isEmpty())
-            sourceRegions.stream().map(sourceRegion -> getKeys(region)).forEach(keys::addAll);
+            sourceRegions.stream().filter(visitedRegions::add).map(sourceRegion -> getKeys(sourceRegion, visitedRegions)).forEach(keys::addAll);
 
         return keys;
     }
 
     @Nullable
-    private String getTranslation(String region, String key)
+    private String getTranslation(String region, String key, Set<String> visitedRegions)
     {
         var builder = regions.get(region);
+        visitedRegions.add(region);
 
         if(builder != null)
         {
@@ -115,10 +117,13 @@ public final class LanguageProvider implements DataProvider
         {
             for(var sourceRegion : sourceRegions)
             {
-                var value = getTranslation(sourceRegion, key);
+                if(visitedRegions.add(sourceRegion))
+                {
+                    var value = getTranslation(sourceRegion, key, visitedRegions);
 
-                if(value != null && !value.isBlank())
-                    return value;
+                    if(value != null && !value.isBlank())
+                        return value;
+                }
             }
         }
 

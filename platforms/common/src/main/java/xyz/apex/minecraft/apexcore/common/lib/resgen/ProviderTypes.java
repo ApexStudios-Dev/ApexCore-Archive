@@ -1,5 +1,9 @@
 package xyz.apex.minecraft.apexcore.common.lib.resgen;
 
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.metadata.PackMetadataGenerator;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
@@ -18,10 +22,14 @@ import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.lang.LanguageProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.metadata.ExtendedPackMetadataSection;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.state.BlockStateProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
+
+import java.util.function.Function;
 
 @ApiStatus.NonExtendable
 public interface ProviderTypes
@@ -30,6 +38,7 @@ public interface ProviderTypes
     ProviderType<BlockStateProvider> BLOCK_STATES = BlockStateProvider.PROVIDER_TYPE;
     ProviderType<ModelProvider> MODELS = ModelProvider.PROVIDER_TYPE;
     ProviderType<LanguageProvider> LANGUAGES = LanguageProvider.PROVIDER_TYPE;
+    ProviderType<PackMetadataGenerator> METADATA = register(new ResourceLocation(ApexCore.ID, "meta_data"), context -> new PackMetadataGenerator(context.packOutput()), LANGUAGES);
 
     // Server
     ProviderType<RecipeProvider> RECIPES = RecipeProvider.PROVIDER_TYPE;
@@ -56,5 +65,15 @@ public interface ProviderTypes
     @ApiStatus.Internal
     static void bootstrap()
     {
+    }
+
+    static <P extends DataProvider> ProviderType<P> register(ResourceLocation providerName, Function<ProviderType.ProviderContext, P> providerFactory, ProviderType<?>... parents)
+    {
+        return ProviderType.register(providerName, providerFactory, parents);
+    }
+
+    static void registerDefaultMcMetaGenerator(Component description)
+    {
+        METADATA.addListener((provider, lookup) -> provider.add(ExtendedPackMetadataSection.TYPE, ExtendedPackMetadataSection.detected(description)));
     }
 }
