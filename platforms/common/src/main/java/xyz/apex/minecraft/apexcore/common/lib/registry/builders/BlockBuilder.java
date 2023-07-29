@@ -25,8 +25,7 @@ import xyz.apex.minecraft.apexcore.common.lib.registry.entries.BlockEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockEntityFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockFactory;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.*;
-import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelProvider;
-import xyz.apex.minecraft.apexcore.common.lib.resgen.state.BlockStateProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.state.BlockStateGenerator;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.state.MultiVariantBuilder;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.state.Variant;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
@@ -625,31 +624,26 @@ public final class BlockBuilder<P, T extends Block, M extends BuilderManager<M>>
 
     public BlockBuilder<P, T, M> tag(ProviderRegistryListener<TagsProvider<Block>, Block, T> listener)
     {
-        return addProvider(TagsProvider.BLOCK, listener);
+        return addProvider(ProviderTypes.BLOCK_TAGS, listener);
     }
 
     public BlockBuilder<P, T, M> noTags()
     {
-        return clearProvider(TagsProvider.BLOCK);
+        return clearProvider(ProviderTypes.BLOCK_TAGS);
     }
 
-    public BlockBuilder<P, T, M> blockStateVariant(BiFunction<ProviderLookup, ProviderType.RegistryContext<Block, T>, MultiVariantBuilder> function)
+    public BlockBuilder<P, T, M> blockState(BiFunction<ProviderLookup, ProviderType.RegistryContext<Block, T>, BlockStateGenerator> function)
     {
-        return setProvider(BlockStateProvider.PROVIDER_TYPE, (provider, lookup, context) -> provider.add(function.apply(lookup, context)));
-    }
-
-    public BlockBuilder<P, T, M> blockStateMultiPart(BiFunction<ProviderLookup, ProviderType.RegistryContext<Block, T>, MultiVariantBuilder> function)
-    {
-        return setProvider(BlockStateProvider.PROVIDER_TYPE, (provider, lookup, context) -> provider.add(function.apply(lookup, context)));
+        return setProvider(ProviderTypes.BLOCK_STATES, (provider, lookup, context) -> provider.add(function.apply(lookup, context)));
     }
 
     public BlockBuilder<P, T, M> defaultBlockState()
     {
-        return blockStateVariant((lookup, context) -> {
+        return blockState((lookup, context) -> {
             var assetPath = context.registryName().withPrefix("block/");
 
             var blockModel = lookup
-                    .lookup(ModelProvider.PROVIDER_TYPE)
+                    .lookup(ProviderTypes.MODELS)
                     .withParent(assetPath, "block/cube_all")
                     .texture("all", assetPath);
 
@@ -659,22 +653,22 @@ public final class BlockBuilder<P, T extends Block, M extends BuilderManager<M>>
 
     public BlockBuilder<P, T, M> recipe(ProviderRegistryListener<RecipeProvider, Block, T> listener)
     {
-        return setProvider(RecipeProvider.PROVIDER_TYPE, listener);
+        return setProvider(ProviderTypes.RECIPES, listener);
     }
 
     public BlockBuilder<P, T, M> noRecipe()
     {
-        return clearProvider(RecipeProvider.PROVIDER_TYPE);
+        return clearProvider(ProviderTypes.RECIPES);
     }
 
     public BlockBuilder<P, T, M> advancement(ProviderRegistryListener<AdvancementProvider, Block, T> listener)
     {
-        return setProvider(AdvancementProvider.PROVIDER_TYPE, listener);
+        return setProvider(ProviderTypes.ADVANCEMENTS, listener);
     }
 
     public BlockBuilder<P, T, M> noAdvancement()
     {
-        return clearProvider(AdvancementProvider.PROVIDER_TYPE);
+        return clearProvider(ProviderTypes.ADVANCEMENTS);
     }
 
     @Override

@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.hook.RegistryHooks;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -45,13 +46,13 @@ import java.util.stream.Collectors;
 public final class TagsProvider<T> implements DataProvider
 {
     public static final ProviderType<TagsProvider<Block>> BLOCK = register(new ResourceLocation(ApexCore.ID, "tags/block"), Registries.BLOCK, block -> block.builtInRegistryHolder().key());
-    public static final ProviderType<TagsProvider<Fluid>> FLUID = register(new ResourceLocation(ApexCore.ID, "tags/fluid"), Registries.FLUID, fluid -> fluid.builtInRegistryHolder().key(), BLOCK);
-    public static final ProviderType<TagsProvider<Item>> ITEM = register(new ResourceLocation(ApexCore.ID, "tags/item"), Registries.ITEM, item -> item.builtInRegistryHolder().key(), BLOCK);
-    public static final ProviderType<TagsProvider<Enchantment>> ENCHANTMENT = register(new ResourceLocation(ApexCore.ID, "tags/enchantment"), Registries.ENCHANTMENT, ITEM);
-    public static final ProviderType<TagsProvider<EntityType<?>>> ENTITY_TYPE = register(new ResourceLocation(ApexCore.ID, "tags/entity_type"), Registries.ENTITY_TYPE, entityType -> entityType.builtInRegistryHolder().key(), ITEM);
-    public static final ProviderType<TagsProvider<BlockEntityType<?>>> BLOCK_ENTITY_TYPE = register(new ResourceLocation(ApexCore.ID, "tags/block_entity_type"), Registries.BLOCK_ENTITY_TYPE, BLOCK);
+    public static final ProviderType<TagsProvider<Fluid>> FLUID = register(new ResourceLocation(ApexCore.ID, "tags/fluid"), Registries.FLUID, fluid -> fluid.builtInRegistryHolder().key(), ProviderTypes.BLOCK_TAGS);
+    public static final ProviderType<TagsProvider<Item>> ITEM = register(new ResourceLocation(ApexCore.ID, "tags/item"), Registries.ITEM, item -> item.builtInRegistryHolder().key(), ProviderTypes.BLOCK_TAGS);
+    public static final ProviderType<TagsProvider<Enchantment>> ENCHANTMENT = register(new ResourceLocation(ApexCore.ID, "tags/enchantment"), Registries.ENCHANTMENT, ProviderTypes.ITEM_TAGS);
+    public static final ProviderType<TagsProvider<EntityType<?>>> ENTITY_TYPE = register(new ResourceLocation(ApexCore.ID, "tags/entity_type"), Registries.ENTITY_TYPE, entityType -> entityType.builtInRegistryHolder().key(), ProviderTypes.ITEM_TAGS);
+    public static final ProviderType<TagsProvider<BlockEntityType<?>>> BLOCK_ENTITY_TYPE = register(new ResourceLocation(ApexCore.ID, "tags/block_entity_type"), Registries.BLOCK_ENTITY_TYPE, ProviderTypes.BLOCK_TAGS);
     public static final ProviderType<TagsProvider<PaintingVariant>> PAINTING_VARIANT = register(new ResourceLocation(ApexCore.ID, "tags/painting_variant"), Registries.PAINTING_VARIANT);
-    public static final ProviderType<TagsProvider<PoiType>> POINT_OF_INTEREST_TYPE = register(new ResourceLocation(ApexCore.ID, "tags/point_of_interest_type"), Registries.POINT_OF_INTEREST_TYPE, BLOCK);
+    public static final ProviderType<TagsProvider<PoiType>> POINT_OF_INTEREST_TYPE = register(new ResourceLocation(ApexCore.ID, "tags/point_of_interest_type"), Registries.POINT_OF_INTEREST_TYPE, ProviderTypes.BLOCK_TAGS);
     public static final ProviderType<TagsProvider<Biome>> BIOME = register(new ResourceLocation(ApexCore.ID, "tags/biome"), Registries.BIOME);
     public static final ProviderType<TagsProvider<BannerPattern>> BANNER_PATTERN = register(new ResourceLocation(ApexCore.ID, "tags/banner_pattern"), Registries.BANNER_PATTERN);
     public static final ProviderType<TagsProvider<CatVariant>> CAT_VARIANT = register(new ResourceLocation(ApexCore.ID, "tags/cat_variant"), Registries.CAT_VARIANT);

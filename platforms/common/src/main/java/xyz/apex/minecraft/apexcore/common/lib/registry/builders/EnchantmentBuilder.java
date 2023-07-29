@@ -9,6 +9,7 @@ import xyz.apex.minecraft.apexcore.common.lib.registry.entries.EnchantmentEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.EnchantmentFactory;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderRegistryListener;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
 
 import java.util.Collections;
@@ -88,12 +89,12 @@ public final class EnchantmentBuilder<P, T extends Enchantment, M extends Builde
 
     public EnchantmentBuilder<P, T, M> tag(ProviderRegistryListener<TagsProvider<Enchantment>, Enchantment, T> listener)
     {
-        return addProvider(TagsProvider.ENCHANTMENT, listener);
+        return addProvider(ProviderTypes.ENCHANTMENT_TAGS, listener);
     }
 
     public EnchantmentBuilder<P, T, M> noTags()
     {
-        return clearProvider(TagsProvider.ENCHANTMENT);
+        return clearProvider(ProviderTypes.ENCHANTMENT_TAGS);
     }
 
     @Override

@@ -16,6 +16,7 @@ import xyz.apex.minecraft.apexcore.common.lib.hook.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.EntityEntry;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderRegistryListener;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
 
 import java.util.function.Function;
@@ -231,12 +232,12 @@ public final class EntityBuilder<P, T extends Entity, M extends BuilderManager<M
 
     public EntityBuilder<P, T, M> tag(ProviderRegistryListener<TagsProvider<EntityType<?>>, EntityType<?>, EntityType<T>> listener)
     {
-        return addProvider(TagsProvider.ENTITY_TYPE, listener);
+        return addProvider(ProviderTypes.ENTITY_TYPE_TAGS, listener);
     }
 
     public EntityBuilder<P, T, M> noTags()
     {
-        return clearProvider(TagsProvider.ENTITY_TYPE);
+        return clearProvider(ProviderTypes.ENTITY_TYPE_TAGS);
     }
 
     @Override

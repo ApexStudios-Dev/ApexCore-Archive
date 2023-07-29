@@ -15,6 +15,7 @@ import xyz.apex.minecraft.apexcore.common.lib.registry.entries.BlockEntityEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockEntityFactory;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderRegistryListener;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
 
 import java.util.Collections;
@@ -100,12 +101,12 @@ public final class BlockEntityBuilder<P, T extends BlockEntity, M extends Builde
 
     public BlockEntityBuilder<P, T, M> tag(ProviderRegistryListener<TagsProvider<BlockEntityType<?>>, BlockEntityType<?>, BlockEntityType<T>> listener)
     {
-        return addProvider(TagsProvider.BLOCK_ENTITY_TYPE, listener);
+        return addProvider(ProviderTypes.BLOCK_ENTITY_TYPE_TAGS, listener);
     }
 
     public BlockEntityBuilder<P, T, M> noTags()
     {
-        return clearProvider(TagsProvider.BLOCK_ENTITY_TYPE);
+        return clearProvider(ProviderTypes.BLOCK_ENTITY_TYPE_TAGS);
     }
 
     @Override

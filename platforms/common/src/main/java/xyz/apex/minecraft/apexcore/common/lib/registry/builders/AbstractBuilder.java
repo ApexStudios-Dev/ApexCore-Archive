@@ -13,6 +13,7 @@ import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderRegistryListener;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.lang.LanguageBuilder;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.lang.LanguageProvider;
 
@@ -208,7 +209,7 @@ public abstract non-sealed class AbstractBuilder<P, T, R extends T, E extends Re
     public final B lang(String region, BiFunction<LanguageBuilder, ProviderType.RegistryContext<T, R>, String> valueProvider)
     {
         return setProvider(
-                LanguageProvider.PROVIDER_TYPE,
+                ProviderTypes.LANGUAGES,
                 (provider, lookup, context) -> {
                     var builder = provider.region(region);
                     builder.add(
@@ -221,12 +222,12 @@ public abstract non-sealed class AbstractBuilder<P, T, R extends T, E extends Re
 
     public final B noLang()
     {
-        return clearProvider(LanguageProvider.PROVIDER_TYPE);
+        return clearProvider(ProviderTypes.LANGUAGES);
     }
 
     public final B addMiscLang(ProviderRegistryListener<LanguageProvider, T, R> listener)
     {
-        return addMiscProvider(LanguageProvider.PROVIDER_TYPE, listener);
+        return addMiscProvider(ProviderTypes.LANGUAGES, listener);
     }
 
     public final B addMiscLang(String region, BiConsumer<LanguageBuilder, ProviderType.RegistryContext<T, R>> listener)

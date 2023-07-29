@@ -7,7 +7,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
-import xyz.apex.minecraft.apexcore.common.lib.resgen.state.BlockStateProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 
 public final class ModelProvider implements DataProvider, Models
 {
-    public static final ProviderType<ModelProvider> PROVIDER_TYPE = ProviderType.register(new ResourceLocation(ApexCore.ID, "models"), ModelProvider::new, BlockStateProvider.PROVIDER_TYPE);
+    public static final ProviderType<ModelProvider> PROVIDER_TYPE = ProviderType.register(new ResourceLocation(ApexCore.ID, "models"), ModelProvider::new, ProviderTypes.BLOCK_STATES);
 
     private final ProviderType.ProviderContext context;
     private final Map<ResourceLocation, ModelBuilder> models = Maps.newHashMap();

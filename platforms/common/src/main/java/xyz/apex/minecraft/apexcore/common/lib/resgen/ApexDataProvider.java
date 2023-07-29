@@ -79,6 +79,7 @@ public final class ApexDataProvider implements DataProvider, ProviderLookup
     // must be called from DataGeneration entry points per mod
     public static void register(String ownerId, Consumer<BiFunction<PackOutput, CompletableFuture<HolderLookup.Provider>, DataProvider>> providerRegistrar)
     {
+        ProviderTypes.bootstrap();
         providerRegistrar.accept((packOutput, registries) -> new ApexDataProvider(packOutput, registries, ownerId));
     }
 }
