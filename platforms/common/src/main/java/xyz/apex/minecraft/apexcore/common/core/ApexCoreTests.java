@@ -2,7 +2,11 @@ package xyz.apex.minecraft.apexcore.common.core;
 
 import joptsimple.internal.Strings;
 import net.minecraft.core.BlockPos;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -59,6 +63,17 @@ public final class ApexCoreTests
                                  .noLootTable()
                                  .simpleItem()
                                  .tag(BlockTags.CLIMBABLE)
+                                 .recipe((provider, lookup, context) -> ShapedRecipeBuilder
+                                         .shaped(RecipeCategory.MISC, context.get())
+                                         .define('D', ItemTags.DIRT)
+                                         .define('d', Items.DIAMOND)
+                                         .pattern("DDD")
+                                         .pattern("DdD")
+                                         .pattern("DDD")
+                                         .unlockedBy("has_dirt", provider.has(ItemTags.DIRT))
+                                         .unlockedBy("has_diamond", provider.has(Items.DIAMOND))
+                                         .save(provider::add)
+                                 )
 
                                  .<DummyBlockEntity>blockEntity(DummyBlockEntity::new)
                                     .addListener(DUMMY_BLOCK_ENTITY::set)

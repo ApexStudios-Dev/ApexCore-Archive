@@ -24,9 +24,7 @@ import xyz.apex.minecraft.apexcore.common.lib.hook.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.BlockEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockEntityFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.BlockFactory;
-import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderLookup;
-import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderRegistryListener;
-import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.*;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.state.BlockStateProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.state.MultiVariantBuilder;
@@ -120,9 +118,12 @@ public final class BlockBuilder<P, T extends Block, M extends BuilderManager<M>>
      */
     public <I extends Item> ItemBuilder<BlockBuilder<P, T, M>, I, M> item(BiFunction<T, Item.Properties, I> blockItemFactory)
     {
-        return builderManager.item(self(), getRegistrationName(), properties -> blockItemFactory.apply(asSupplier().get(), properties))
-                             .defaultBlockItemModel()
-                             .noLang()
+        return builderManager
+                .item(self(), getRegistrationName(), properties -> blockItemFactory.apply(asSupplier().get(), properties))
+                .defaultBlockItemModel()
+                .noLang()
+                .noRecipe()
+                .noAdvancement()
         ;
     }
 
@@ -602,7 +603,7 @@ public final class BlockBuilder<P, T extends Block, M extends BuilderManager<M>>
         return properties(BlockBehaviour.Properties::replaceable);
     }
 
-    // TODO: Resource Gen providers [ loot table, recipe ]
+    // TODO: Resource Gen providers [ loot table ]
 
     @Override
     public BlockBuilder<P, T, M> requiredFeatures(FeatureFlag... requiredFeatures)
@@ -654,6 +655,26 @@ public final class BlockBuilder<P, T extends Block, M extends BuilderManager<M>>
 
             return MultiVariantBuilder.builder(context.value(), Variant.variant().model(blockModel));
         });
+    }
+
+    public BlockBuilder<P, T, M> recipe(ProviderRegistryListener<RecipeProvider, Block, T> listener)
+    {
+        return setProvider(RecipeProvider.PROVIDER_TYPE, listener);
+    }
+
+    public BlockBuilder<P, T, M> noRecipe()
+    {
+        return clearProvider(RecipeProvider.PROVIDER_TYPE);
+    }
+
+    public BlockBuilder<P, T, M> advancement(ProviderRegistryListener<AdvancementProvider, Block, T> listener)
+    {
+        return setProvider(AdvancementProvider.PROVIDER_TYPE, listener);
+    }
+
+    public BlockBuilder<P, T, M> noAdvancement()
+    {
+        return clearProvider(AdvancementProvider.PROVIDER_TYPE);
     }
 
     @Override

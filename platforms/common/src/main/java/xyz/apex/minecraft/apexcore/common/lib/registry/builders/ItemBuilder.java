@@ -12,8 +12,10 @@ import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.hook.ColorHandlerHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entries.ItemEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factories.ItemFactory;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.AdvancementProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderRegistryListener;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.RecipeProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
 
@@ -198,8 +200,6 @@ public final class ItemBuilder<P, T extends Item, M extends BuilderManager<M>> e
         return properties(properties -> properties.requiredFeatures(requiredFeatures));
     }
 
-    // TODO: Resource Gen providers [ recipe, lang, model ]
-
     public ItemBuilder<P, T, M> model(ProviderRegistryListener<ModelProvider, Item, T> consumer)
     {
         return setProvider(ModelProvider.PROVIDER_TYPE, consumer);
@@ -244,6 +244,26 @@ public final class ItemBuilder<P, T extends Item, M extends BuilderManager<M>> e
     public ItemBuilder<P, T, M> noTags()
     {
         return clearProvider(TagsProvider.ITEM);
+    }
+
+    public ItemBuilder<P, T, M> recipe(ProviderRegistryListener<RecipeProvider, Item, T> listener)
+    {
+        return setProvider(RecipeProvider.PROVIDER_TYPE, listener);
+    }
+
+    public ItemBuilder<P, T, M> noRecipe()
+    {
+        return clearProvider(RecipeProvider.PROVIDER_TYPE);
+    }
+
+    public ItemBuilder<P, T, M> advancement(ProviderRegistryListener<AdvancementProvider, Item, T> listener)
+    {
+        return setProvider(AdvancementProvider.PROVIDER_TYPE, listener);
+    }
+
+    public ItemBuilder<P, T, M> noAdvancement()
+    {
+        return clearProvider(AdvancementProvider.PROVIDER_TYPE);
     }
 
     @Override
