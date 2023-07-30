@@ -1,6 +1,7 @@
 package xyz.apex.minecraft.apexcore.common.core;
 
 import joptsimple.internal.Strings;
+import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Marker;
@@ -36,7 +37,25 @@ public final class ApexCoreTests
 
         var registrar = Registrar.create(ApexCore.ID);
 
-        var testItem = registrar.object("test_item").item().register();
+        var testItem = registrar
+                .object("test_item")
+                .item()
+                .defaultModel()
+                .model((provider, lookup, entry) -> provider.generated(
+                        entry.getRegistryName().withPrefix("item/"),
+                        new ResourceLocation("item/diamond")
+                ))
+        .register();
+
+        var testBlock = registrar
+                .object("test_block")
+                .block()
+                .defaultBlockState((provider, lookup, entry) -> provider.withParent(
+                        entry.getRegistryName().withPrefix("block/"),
+                        "block/cube_all"
+                ).texture("all", new ResourceLocation("block/debug")))
+                .defaultItem()
+        .register();
 
         registrar.register();
     }

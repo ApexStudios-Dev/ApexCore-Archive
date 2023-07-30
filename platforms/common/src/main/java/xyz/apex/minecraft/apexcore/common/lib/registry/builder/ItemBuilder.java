@@ -2,6 +2,7 @@ package xyz.apex.minecraft.apexcore.common.lib.registry.builder;
 
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.flag.FeatureFlag;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
@@ -9,14 +10,22 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.hook.ColorHandlerHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
+import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryProviderListener;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.ItemEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.ItemFactory;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.AdvancementProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.RecipeProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 /**
  * Item Builder implementation.
@@ -41,13 +50,17 @@ public final class ItemBuilder<O extends AbstractRegistrar<O>, T extends Item, P
         super(registrar, parent, Registries.ITEM, registrationName);
 
         this.itemFactory = itemFactory;
+
+        defaultModel();
     }
 
     @Override
     protected void onRegister(T entry)
     {
-        if(colorHandler != null)
-            ColorHandlerHooks.get().registerItemHandler(this::getEntry, colorHandler);
+        PhysicalSide.CLIENT.runWhenOn(() -> () -> {
+            if(colorHandler != null)
+                ColorHandlerHooks.get().registerItemHandler(this::getEntry, colorHandler);
+        });
     }
 
     /**
@@ -162,6 +175,130 @@ public final class ItemBuilder<O extends AbstractRegistrar<O>, T extends Item, P
         return properties(Item.Properties::fireResistant);
     }
 
+    /**
+     * Set the Model generator for this Item.
+     *
+     * @param listener Generator listener.
+     * @return This Builder.
+     */
+    public ItemBuilder<O, T, P> model(RegistryProviderListener<ModelProvider, T, ItemEntry<T>> listener)
+    {
+        return setProvider(ProviderTypes.MODELS, listener);
+    }
+
+    /**
+     * Clears the currently registered Model generator.
+     *
+     * @return This Builder.
+     */
+    public ItemBuilder<O, T, P> noModel()
+    {
+        return clearProvider(ProviderTypes.MODELS);
+    }
+
+    /**
+     * Set the default Model generator for this Item.
+     *
+     * @return This Builder.
+     */
+    public ItemBuilder<O, T, P> defaultModel()
+    {
+        return model((provider, lookup, entry) -> {
+            var resourcePath = entry.getRegistryName().withPrefix("item/");
+            provider.generated(resourcePath, resourcePath);
+        });
+    }
+
+    /**
+     * Set the default BlockItem Model generator for this Item.
+     *
+     * @return This Builder.
+     */
+    public ItemBuilder<O, T, P> defaultBlockItemModel()
+    {
+        return model((provider, lookup, entry) -> {
+            var registryName = entry.getRegistryName();
+            provider.withParent(
+                    registryName.withPrefix("item/"),
+                    registryName.withPrefix("block/")
+            );
+        });
+    }
+
+    /**
+     * Resister a set of Tags for this Item.
+     *
+     * @param tags Tags to be set.
+     * @return This Builder.
+     */
+    public ItemBuilder<O, T, P> tag(TagKey<Item>... tags)
+    {
+        return tag((provider, lookup, entry) -> Stream.of(tags).map(provider::tag).forEach(tag -> tag.addElement(entry.value())));
+    }
+
+    /**
+     * Set the Tag generator for this Item.
+     *
+     * @param listener Generator listener.
+     * @return This Builder.
+     */
+    public ItemBuilder<O, T, P> tag(RegistryProviderListener<TagsProvider<Item>, T, ItemEntry<T>> listener)
+    {
+        return setProvider(ProviderTypes.ITEM_TAGS, listener);
+    }
+
+    /**
+     * Clears the currently registered Tag generator.
+     *
+     * @return This Builder.
+     */
+    public ItemBuilder<O, T, P> noTags()
+    {
+        return clearProvider(ProviderTypes.ITEM_TAGS);
+    }
+
+    /**
+     * Set the Recipe generator for this Item.
+     *
+     * @param listener Generator listener.
+     * @return This Builder.
+     */
+    public ItemBuilder<O, T, P> recipe(RegistryProviderListener<RecipeProvider, T, ItemEntry<T>> listener)
+    {
+        return setProvider(ProviderTypes.RECIPES, listener);
+    }
+
+    /**
+     * Clears the currently registered Recipe generator.
+     *
+     * @return This Builder.
+     */
+    public ItemBuilder<O, T, P> noRecipe()
+    {
+        return clearProvider(ProviderTypes.RECIPES);
+    }
+
+    /**
+     * Set the Advancement generator for this Item.
+     *
+     * @param listener Generator listener.
+     * @return This Builder.
+     */
+    public ItemBuilder<O, T, P> advancement(RegistryProviderListener<AdvancementProvider, T, ItemEntry<T>> listener)
+    {
+        return setProvider(ProviderTypes.ADVANCEMENTS, listener);
+    }
+
+    /**
+     * Clears the currently registered Advancement generator.
+     *
+     * @return This Builder.
+     */
+    public ItemBuilder<O, T, P> noAdvancement()
+    {
+        return clearProvider(ProviderTypes.ADVANCEMENTS);
+    }
+
     @Override
     public ItemBuilder<O, T, P> requiredFeatures(FeatureFlag... requiredFeatures)
     {
@@ -178,5 +315,11 @@ public final class ItemBuilder<O extends AbstractRegistrar<O>, T extends Item, P
     protected T createEntry()
     {
         return itemFactory.create(propertiesModifier.apply(initialProperties.get()));
+    }
+
+    @Override
+    protected String getDescriptionId(ItemEntry<T> entry)
+    {
+        return entry.value().getDescriptionId();
     }
 }

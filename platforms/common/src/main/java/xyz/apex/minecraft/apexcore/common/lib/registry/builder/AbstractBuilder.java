@@ -3,12 +3,19 @@ package xyz.apex.minecraft.apexcore.common.lib.registry.builder;
 import com.google.common.base.Suppliers;
 import com.google.errorprone.annotations.DoNotCall;
 import net.minecraft.core.Registry;
+import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
+import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryProviderListener;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.RegistryEntry;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.lang.LanguageBuilder;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.lang.LanguageProvider;
 
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -40,6 +47,7 @@ public abstract class AbstractBuilder<O extends AbstractRegistrar<O>, P, T, R ex
         this.registryType = registryType;
         registryKey = (ResourceKey<R>) ResourceKey.create(registryType, new ResourceLocation(registrar.getOwnerId(), registrationName));
 
+        defaultLangGB().defaultLangUS();
         onRegister(this::onRegister);
     }
 
@@ -55,6 +63,9 @@ public abstract class AbstractBuilder<O extends AbstractRegistrar<O>, P, T, R ex
     @ApiStatus.Internal
     @DoNotCall
     protected abstract R createEntry();
+
+    @ApiStatus.Internal
+    protected abstract String getDescriptionId(E entry);
 
     @Override
     public final O registrar()
@@ -145,6 +156,82 @@ public abstract class AbstractBuilder<O extends AbstractRegistrar<O>, P, T, R ex
             else
                 registrar.addRegisterListener(dependencyType, () -> listener.accept(entry));
         });
+    }
+
+    @Override
+    public final <D extends DataProvider> B setProvider(ProviderType<D> providerType, RegistryProviderListener<D, R, E> listener)
+    {
+        registrar.setResourceGenerator(providerType, registryType, registrationName(), listener);
+        return self();
+    }
+
+    @Override
+    public final <D extends DataProvider> B clearProvider(ProviderType<D> providerType)
+    {
+        return setProvider(providerType, (provider, lookup, entry) -> { });
+    }
+
+    /**
+     * Registers default English-US translation provider.
+     *
+     * @return This Builder.
+     */
+    public final B defaultLangUS()
+    {
+        return lang("en_us", (provider, entry) -> LanguageProvider.toEnglishName(entry.getRegistryName()));
+    }
+
+    /**
+     * Registers default English-GB translation provider.
+     *
+     * @return This Builder.
+     */
+    public final B defaultLangGB()
+    {
+        return lang("en_gb", (provider, entry) -> LanguageProvider.toEnglishName(entry.getRegistryName()));
+    }
+
+    /**
+     * Set a region specific translation for this Entry.
+     *
+     * @param region Region to register translation for.
+     * @param value Translation to register.
+     * @return This Builder.
+     */
+    public final B lang(String region, String value)
+    {
+        return lang(region, (provider, entry) -> value);
+    }
+
+    /**
+     * Set a region specific translation for this Entry.
+     *
+     * @param region Region to register translation for.
+     * @param valueProvider Translation to register.
+     * @return This Builder.
+     */
+    public final B lang(String region, BiFunction<LanguageBuilder, E, String> valueProvider)
+    {
+        return setProvider(
+                ProviderTypes.LANGUAGES,
+                (provider, lookup, entry) -> {
+                    var builder = provider.region(region);
+                    provider.region(region).add(
+                            getDescriptionId(entry),
+                            valueProvider.apply(builder, entry)
+                    );
+                }
+        );
+    }
+
+    /**
+     * Mark this entry as not generating any Translations.
+     *
+     * @return This Builder.
+     */
+    public final B noLang()
+    {
+        return clearProvider(ProviderTypes.LANGUAGES);
     }
 
     @Override

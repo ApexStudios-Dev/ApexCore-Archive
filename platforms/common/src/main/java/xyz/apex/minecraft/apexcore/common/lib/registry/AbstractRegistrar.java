@@ -3,9 +3,11 @@ package xyz.apex.minecraft.apexcore.common.lib.registry;
 import com.google.common.collect.*;
 import com.google.errorprone.annotations.DoNotCall;
 import net.minecraft.core.Registry;
+import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Marker;
@@ -13,9 +15,13 @@ import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
+import xyz.apex.minecraft.apexcore.common.lib.registry.builder.BlockBuilder;
 import xyz.apex.minecraft.apexcore.common.lib.registry.builder.ItemBuilder;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.RegistryEntry;
+import xyz.apex.minecraft.apexcore.common.lib.registry.factory.BlockFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.ItemFactory;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderLookup;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -43,6 +49,8 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     private final Multimap<Pair<ResourceKey<? extends Registry<?>>, String>, Consumer<?>> registerListeners = HashMultimap.create();
     private final Multimap<ResourceKey<? extends Registry<?>>, Runnable> afterRegisterListeners = HashMultimap.create();
     private final Set<ResourceKey<? extends Registry<?>>> completedRegistrations = Sets.newHashSet();
+    private final Table<ProviderType<?>, Pair<ResourceKey<? extends Registry<?>>, String>, RegistryProviderListener<? extends DataProvider, ?, ? extends RegistryEntry<?>>> resourceGens = HashBasedTable.create();
+    private final Set<ProviderType<?>> registeredProviderTypes = Sets.newHashSet();
     @Nullable private String currentName = null;
     private boolean skipErrors = false;
 
@@ -215,6 +223,53 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
         return completedRegistrations.contains(registryType);
     }
 
+    /**
+     * Register a listener to be invoked during resource generation for RegistryEntry of matching RegistryType and Name.
+     *
+     * @param providerType Type of Resource Provider to register listener for.
+     * @param registryType Type of Registry for RegistryEntry.
+     * @param registrationName Registration name of RegistryEntry to register listener for.
+     * @param listener Listener to be invoked.
+     * @return This Builder.
+     * @param <P> Type of Provider.
+     * @param <T> Type of Registry.
+     * @param <R> Type of Entry.
+     */
+    public final <P extends DataProvider, T, R extends T> O setResourceGenerator(ProviderType<P> providerType, ResourceKey<? extends Registry<T>> registryType, String registrationName, RegistryProviderListener<P, R, ? extends RegistryEntry<?>> listener)
+    {
+        if(registeredProviderTypes.add(providerType))
+            providerType.addListener((provider, lookup) -> provide(providerType, provider, lookup));
+
+        resourceGens.put(providerType, Pair.of(registryType, registrationName), listener);
+        return self;
+    }
+
+    @SuppressWarnings("rawtypes")
+    private <P extends DataProvider> void provide(ProviderType<P> providerType, P provider, ProviderLookup lookup)
+    {
+        resourceGens.row(providerType).forEach((pair, listener) -> {
+            var registryType = pair.getKey();
+            var registrationName = pair.getValue();
+
+            ApexCore.LOGGER.debug(MARKER, "Generating resources of type {} for entry {} [{}]", providerType.providerName(), registrationName, registryType.location());
+
+            try
+            {
+                var registryEntry = get((ResourceKey) registryType, registrationName);
+                ((RegistryProviderListener) listener).accept(provider, lookup, registryEntry);
+            }
+            catch(Exception e)
+            {
+                var msg = ApexCore.LOGGER.getMessageFactory().newMessage("Unexpected error while running resource generator of type {} for entry {} [{}]", providerType.providerName(), registrationName, registryType.location());
+
+                if(skipErrors)
+                    ApexCore.LOGGER.error(MARKER, msg, e);
+                else
+                    throw new RuntimeException(msg.getFormattedMessage(), e);
+            }
+        });
+    }
+
     public final <T extends Item, P> ItemBuilder<O, T, P> item(P parent, String registrationName, ItemFactory<T> itemFactory)
     {
         return new ItemBuilder<>(self, parent, registrationName, itemFactory);
@@ -253,6 +308,46 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     public final ItemBuilder<O, Item, O> item()
     {
         return item(self, currentName(), Item::new);
+    }
+
+    public final <T extends Block, P> BlockBuilder<O, T, P> block(P parent, String registrationName, BlockFactory<T> blockFactory)
+    {
+        return new BlockBuilder<>(self, parent, registrationName, blockFactory);
+    }
+
+    public final <T extends Block, P> BlockBuilder<O, T, P> block(P parent, BlockFactory<T> blockFactory)
+    {
+        return block(parent, currentName(), blockFactory);
+    }
+
+    public final <T extends Block> BlockBuilder<O, T, O> block(String registrationName, BlockFactory<T> blockFactory)
+    {
+        return block(self, registrationName, blockFactory);
+    }
+
+    public final <T extends Block> BlockBuilder<O, T, O> block(BlockFactory<T> blockFactory)
+    {
+        return block(self, currentName(), blockFactory);
+    }
+
+    public final <P> BlockBuilder<O, Block, P> block(P parent, String registrationName)
+    {
+        return block(parent, registrationName, Block::new);
+    }
+
+    public final <P> BlockBuilder<O, Block, P> block(P parent)
+    {
+        return block(parent, currentName(), Block::new);
+    }
+
+    public final BlockBuilder<O, Block, O> block(String registrationName)
+    {
+        return block(self, registrationName, Block::new);
+    }
+
+    public final BlockBuilder<O, Block, O> block()
+    {
+        return block(self, currentName(), Block::new);
     }
 
     private <T, R extends T> Registration<T, R> registration(ResourceKey<? extends Registry<T>> registryType, String registrationName)
