@@ -16,6 +16,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.registry.builder.BlockBuilder;
+import xyz.apex.minecraft.apexcore.common.lib.registry.builder.CreativeModeTabBuilder;
 import xyz.apex.minecraft.apexcore.common.lib.registry.builder.ItemBuilder;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.BlockFactory;
@@ -348,6 +349,26 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     public final BlockBuilder<O, Block, O> block()
     {
         return block(self, currentName(), Block::new);
+    }
+
+    public final <P> CreativeModeTabBuilder<O, P> creativeModeTab(P parent, String registrationName)
+    {
+        return new CreativeModeTabBuilder<>(self, parent, registrationName);
+    }
+
+    public final <P> CreativeModeTabBuilder<O, P> creativeModeTab(P parent)
+    {
+        return creativeModeTab(parent, currentName());
+    }
+
+    public final CreativeModeTabBuilder<O, O> creativeModeTab(String registrationName)
+    {
+        return creativeModeTab(self, registrationName);
+    }
+
+    public final CreativeModeTabBuilder<O, O> creativeModeTab()
+    {
+        return creativeModeTab(self, currentName());
     }
 
     private <T, R extends T> Registration<T, R> registration(ResourceKey<? extends Registry<T>> registryType, String registrationName)

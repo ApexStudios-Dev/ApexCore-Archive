@@ -57,6 +57,16 @@ public final class ApexCoreTests
                 .defaultItem()
         .register();
 
+        var creativeModeTab = registrar
+                .creativeModeTab("test")
+                .lang("en_us", "ApexCore - Test Elements")
+                .icon(testBlock::asStack)
+                .displayItems((parameters, output) -> {
+                    output.accept(testItem);
+                    output.accept(testBlock);
+                })
+        .register();
+
         registrar.register();
     }
 }
