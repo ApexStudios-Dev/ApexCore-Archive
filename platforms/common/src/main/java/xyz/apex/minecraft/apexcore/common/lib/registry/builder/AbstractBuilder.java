@@ -12,6 +12,16 @@ import xyz.apex.minecraft.apexcore.common.lib.registry.entry.RegistryEntry;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+/**
+ * Base implementation for all Builders, to be extended by all further implementations.
+ *
+ * @param <O> Type of Registrar.
+ * @param <P> Type of Parent.
+ * @param <T> Type of Registry.
+ * @param <R> Type of Entry.
+ * @param <B> Type of Builder.
+ * @param <E> Type of RegistryEntry.
+ */
 @SuppressWarnings("unchecked")
 public abstract class AbstractBuilder<O extends AbstractRegistrar<O>, P, T, R extends T, B extends AbstractBuilder<O, P, T, R, B, E>, E extends RegistryEntry<R>> implements Builder<O, P, T, R, B, E>
 {
@@ -120,20 +130,20 @@ public abstract class AbstractBuilder<O extends AbstractRegistrar<O>, P, T, R ex
     }
 
     @Override
-    public final B onRegister(Consumer<R> callback)
+    public final B onRegister(Consumer<R> listener)
     {
-        registrar.addRegisterListener(registryType, registrationName(), callback);
+        registrar.addRegisterListener(registryType, registrationName(), listener);
         return self;
     }
 
     @Override
-    public final <OR> B onRegisterAfter(ResourceKey<? extends Registry<OR>> dependencyType, Consumer<R> callback)
+    public final <OR> B onRegisterAfter(ResourceKey<? extends Registry<OR>> dependencyType, Consumer<R> listener)
     {
         return onRegister(entry -> {
             if(registrar.isRegistered(dependencyType))
-                callback.accept(entry);
+                listener.accept(entry);
             else
-                registrar.addRegisterListener(dependencyType, () -> callback.accept(entry));
+                registrar.addRegisterListener(dependencyType, () -> listener.accept(entry));
         });
     }
 

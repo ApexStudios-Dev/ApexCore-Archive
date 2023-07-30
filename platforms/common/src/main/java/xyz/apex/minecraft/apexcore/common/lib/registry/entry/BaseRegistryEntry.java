@@ -16,6 +16,11 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+/**
+ * Base RegistryEntry implementation, to be extended by all further implementations.
+ *
+ * @param <T> Type of Entry.
+ */
 public class BaseRegistryEntry<T> implements RegistryEntry<T>
 {
     protected final AbstractRegistrar<?> registrar;

@@ -23,6 +23,13 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+/**
+ * Registrar used to register custom entries to the game.
+ * <p>
+ * Note: {@link #register()} <b>MUST</b> be invoked manually after all entries have been registered.
+ *
+ * @param <O> Type of Registrar.
+ */
 @SuppressWarnings("unchecked")
 public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
 {
@@ -39,11 +46,17 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     @Nullable private String currentName = null;
     private boolean skipErrors = false;
 
+    @ApiStatus.Internal
     protected AbstractRegistrar(String ownerId)
     {
         this.ownerId = ownerId;
     }
 
+    /**
+     * Registers this registrar and all of its entries.
+     * <p>
+     * <b>MUST</b> be invoked manually after all entries have been registered.
+     */
     public final void register()
     {
         Validate.isTrue(!registered, "Duplicate Registrar [{}] registration", ownerId);
@@ -51,16 +64,30 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
         registered = true;
     }
 
+    /**
+     * @return Owning mod id.
+     */
     public final String getOwnerId()
     {
         return ownerId;
     }
 
+    /**
+     * @return Registration name for current object being registered.
+     */
     public final String currentName()
     {
         return Objects.requireNonNull(currentName, "Current name not set");
     }
 
+    /**
+     * Enabling skipping of registry entries that error during registration.
+     * <p>
+     * <strong>Should only be used for debugging!</strong> {@code skipErrors(true)} will do nothing in production environments.
+     *
+     * @param skipErrors {@code true} to skip errors during registration.
+     * @return This Registrar.
+     */
     public final O skipErrors(boolean skipErrors)
     {
         // TODO
@@ -73,32 +100,83 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
         return self;
     }
 
+    /**
+     * Enabling skipping of registry entries that error during registration.
+     * <p>
+     * <strong>Should only be used for debugging!</strong> {@code skipErrors(true)} will do nothing in production environments.
+     *
+     * @return This Registrar.
+     */
     public final O skipErrors()
     {
         return skipErrors(true);
     }
 
+    /**
+     * Begin a new object, this is typically used at the entry point of a new builder chain.
+     * The given name will be used until this method is called again.
+     * This makes it simple to create multiple entries with the same name, as is often the case with Blocks/Items/BlockEntities and Items/Entities.
+     *
+     * @param registrationName The name to use for future registrations.
+     * @return This Registrar.
+     */
     public final O object(String registrationName)
     {
         currentName = registrationName;
         return self;
     }
 
+    /**
+     * Returns previously created entry, of the current name (from the last invocation of {@link #object(String)}).
+     *
+     * @param registryType Type of Registry.
+     * @return Previously created entry.
+     * @param <T> Type of Registry.
+     * @param <R> Type of Entry.
+     */
     public final <T, R extends T> RegistryEntry<R> get(ResourceKey<? extends Registry<T>> registryType)
     {
         return get(registryType, currentName());
     }
 
+    /**
+     * Returns previously created entry.
+     *
+     * @param registryType Type of Registry.
+     * @param registrationName Registration name for Entry.
+     * @return Previously created entry.
+     * @param <T> Type of Registry.
+     * @param <R> Type of Entry.
+     */
     public final <T, R extends T> RegistryEntry<R> get(ResourceKey<? extends Registry<T>> registryType, String registrationName)
     {
         return this.<T, R>registration(registryType, registrationName).registryEntry;
     }
 
+    /**
+     * Returns a collection of all entries registries for the given Registry type.
+     *
+     * @param registryType Type of Registry.
+     * @return Collection of all entries.
+     * @param <T> Type of Registry.
+     */
     public final <T> Collection<RegistryEntry<T>> getAll(ResourceKey<? extends Registry<T>> registryType)
     {
         return registrations.row(registryType).values().stream().map(registration -> (RegistryEntry<T>) registration.registryEntry).toList();
     }
 
+    /**
+     * Adds a listener to be invoked when a certain entry has been registered.
+     * <p>
+     * This will be invoked <i>immediately</i> following registration, before further entries are registered.
+     *
+     * @param registryType Type of Registry.
+     * @param registrationName Registration name of Entry.
+     * @param listener Listener to be invoked.
+     * @return This Registrar.
+     * @param <T> Type of Registry.
+     * @param <R> Type of Entry.
+     */
     public final <T, R extends T> O addRegisterListener(ResourceKey<? extends Registry<T>> registryType, String registrationName, Consumer<R> listener)
     {
         var registration = this.<T, R>registrationUnchecked(registryType, registrationName);
@@ -111,12 +189,27 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
         return self;
     }
 
+    /**
+     * Adds a listener to be invoked when a certain Registry has fully completed registration, i.e. all objects of that type have been registered.
+     *
+     * @param registryType Type of Registry.
+     * @param listener Listener to be invoked.
+     * @return This Registrar.
+     * @param <T> Type of Registry.
+     */
     public final <T> O addRegisterListener(ResourceKey<? extends Registry<T>> registryType, Runnable listener)
     {
         afterRegisterListeners.put(registryType, listener);
         return self;
     }
 
+    /**
+     * Return {@code true} if certain Registry has completed registration.
+     *
+     * @param registryType Type of Registry.
+     * @return {@code true} if Registry has completed registration.
+     * @param <T> Type of Registry.
+     */
     public final <T> boolean isRegistered(ResourceKey<? extends Registry<T>> registryType)
     {
         return completedRegistrations.contains(registryType);

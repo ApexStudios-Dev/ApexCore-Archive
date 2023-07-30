@@ -14,11 +14,11 @@ import java.util.function.Supplier;
 @ApiStatus.Internal
 final class Registration<T, R extends T>
 {
-    final ResourceKey<? extends Registry<T>> registryType;
+    private final ResourceKey<? extends Registry<T>> registryType;
     final ResourceLocation registryName;
-    final Supplier<R> entryFactory;
+    private final Supplier<R> entryFactory;
     final RegistryEntry<R> registryEntry;
-    final List<Consumer<R>> listeners = Lists.newArrayList();
+    private final List<Consumer<R>> listeners = Lists.newArrayList();
 
     Registration(ResourceKey<? extends Registry<T>> registryType, ResourceLocation registryName, Supplier<R> entryFactory, Supplier<? extends RegistryEntry<R>> registryEntryFactory)
     {
