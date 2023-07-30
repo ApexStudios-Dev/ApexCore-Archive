@@ -12,11 +12,13 @@ import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.types.Block
 import xyz.apex.minecraft.apexcore.common.lib.component.block.types.BlockComponentTypes;
 import xyz.apex.minecraft.apexcore.common.lib.event.EventType;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.EntityEvents;
-import xyz.apex.minecraft.apexcore.common.lib.hook.*;
+import xyz.apex.minecraft.apexcore.common.lib.hook.CreativeModeTabHooks;
+import xyz.apex.minecraft.apexcore.common.lib.hook.EntityHooks;
+import xyz.apex.minecraft.apexcore.common.lib.hook.GameRuleHooks;
+import xyz.apex.minecraft.apexcore.common.lib.hook.MenuHooks;
 import xyz.apex.minecraft.apexcore.common.lib.modloader.ModLoader;
 import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockTypes;
 import xyz.apex.minecraft.apexcore.common.lib.network.NetworkManager;
-import xyz.apex.minecraft.apexcore.common.lib.registry.RegistrarManager;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
 
 @ApiStatus.Internal
@@ -33,7 +35,6 @@ public interface ApexCore
     EntityHooks ENTITY_HOOKS = Services.singleton(EntityHooks.class);
     GameRuleHooks GAME_RULE_HOOKS = Services.singleton(GameRuleHooks.class);
     MenuHooks MENU_HOOKS = Services.singleton(MenuHooks.class);
-    RegistryHooks REGISTRY_HOOKS = Services.singleton(RegistryHooks.class);
 
     @MustBeInvokedByOverriders
     default void bootstrap()
@@ -52,7 +53,6 @@ public interface ApexCore
         MultiBlockTypes.bootstrap();
 
         ApexCoreTests.register();
-        RegistrarManager.register(ID);
 
         registerGenerators();
 

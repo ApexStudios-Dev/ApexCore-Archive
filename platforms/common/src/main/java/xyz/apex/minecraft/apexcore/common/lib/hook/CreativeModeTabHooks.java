@@ -8,7 +8,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
-import xyz.apex.minecraft.apexcore.common.lib.registry.builders.CreativeModeTabBuilder;
 
 import java.util.function.Consumer;
 

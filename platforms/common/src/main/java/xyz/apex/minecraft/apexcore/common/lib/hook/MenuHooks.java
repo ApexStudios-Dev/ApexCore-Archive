@@ -10,7 +10,6 @@ import net.minecraft.world.inventory.MenuType;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.PlatformOnly;
-import xyz.apex.minecraft.apexcore.common.lib.registry.entries.MenuEntry;
 
 import java.util.function.Consumer;
 
