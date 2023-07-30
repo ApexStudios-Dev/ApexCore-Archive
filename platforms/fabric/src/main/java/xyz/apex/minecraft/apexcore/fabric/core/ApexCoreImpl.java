@@ -8,6 +8,10 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
@@ -16,10 +20,14 @@ import xyz.apex.minecraft.apexcore.common.lib.event.types.PlayerEvents;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.ServerEvents;
 import xyz.apex.minecraft.apexcore.common.lib.event.types.TickEvents;
 import xyz.apex.minecraft.apexcore.common.lib.network.NetworkManager;
+import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
+import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryHelper;
 import xyz.apex.minecraft.apexcore.fabric.lib.network.NetworkManagerImpl;
 
+import java.util.function.Supplier;
+
 @ApiStatus.Internal
-public final class ApexCoreImpl implements ApexCore
+public final class ApexCoreImpl implements ApexCore, RegistryHelper
 {
     private final PhysicalSide physicalSide = switch(FabricLoader.getInstance().getEnvironmentType()) {
         case CLIENT -> PhysicalSide.CLIENT;
@@ -70,5 +78,21 @@ public final class ApexCoreImpl implements ApexCore
     public NetworkManager createNetworkManager(String ownerId)
     {
         return NetworkManagerImpl.getOrCreate(ownerId);
+    }
+
+    @Override
+    public void register(AbstractRegistrar<?> registrar)
+    {
+        var registryTypes = BuiltInRegistries.REGISTRY.registryKeySet();
+        registryTypes.forEach(registryType -> registrar.onRegisterPre(registryType, this));
+        registryTypes.forEach(registrar::onRegisterPost);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @Override
+    public <T, R extends T> void register(ResourceKey<? extends Registry<T>> registryType, ResourceLocation registryName, Supplier<R> entryFactory)
+    {
+        var registry = (Registry<T>) BuiltInRegistries.REGISTRY.getOrThrow((ResourceKey) registryType);
+        Registry.registerForHolder(registry, registryName, entryFactory.get());
     }
 }

@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.ApiStatus;
+import xyz.apex.minecraft.apexcore.common.lib.registry.Registrar;
 
 import java.util.stream.Stream;
 
@@ -32,5 +33,11 @@ public final class ApexCoreTests
         ApexCore.LOGGER.warn(MARKER, header);
         Stream.of(messages).map(str -> StringUtils.center(str, maxLen, ' ')).forEach(str -> ApexCore.LOGGER.warn(MARKER, "* {} *", str));
         ApexCore.LOGGER.warn(MARKER, header);
+
+        var registrar = Registrar.create(ApexCore.ID);
+
+        var testItem = registrar.object("test_item").item().register();
+
+        registrar.register();
     }
 }

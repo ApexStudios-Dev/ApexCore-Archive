@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.common.core;
 
+import com.google.errorprone.annotations.DoNotCall;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import org.apache.logging.log4j.LogManager;
@@ -19,6 +20,7 @@ import xyz.apex.minecraft.apexcore.common.lib.hook.MenuHooks;
 import xyz.apex.minecraft.apexcore.common.lib.modloader.ModLoader;
 import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockTypes;
 import xyz.apex.minecraft.apexcore.common.lib.network.NetworkManager;
+import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
 
 @ApiStatus.Internal
@@ -76,4 +78,8 @@ public interface ApexCore
     PhysicalSide physicalSide();
 
     NetworkManager createNetworkManager(String ownerId);
+
+    @DoNotCall
+    @ApiStatus.Internal
+    void register(AbstractRegistrar<?> registrar);
 }
