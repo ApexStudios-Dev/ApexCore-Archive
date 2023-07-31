@@ -3,6 +3,11 @@ package xyz.apex.minecraft.apexcore.neoforge.core;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SpawnEggItem;
+import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -71,5 +76,11 @@ public final class ApexCoreImpl implements ApexCore
 
             modBus.addListener(EventPriority.LOWEST, false, RegisterEvent.class, event -> registrar.onRegisterPost(event.getRegistryKey()));
         });
+    }
+
+    @Override
+    public SpawnEggItem createSpawnEgg(Supplier<? extends EntityType<? extends Mob>> entityType, int backgroundColor, int highlightColor, Item.Properties properties)
+    {
+        return new ForgeSpawnEggItem(entityType, backgroundColor, highlightColor, properties);
     }
 }

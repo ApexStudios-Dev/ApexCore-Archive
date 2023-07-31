@@ -12,6 +12,10 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SpawnEggItem;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
@@ -94,5 +98,11 @@ public final class ApexCoreImpl implements ApexCore, RegistryHelper
     {
         var registry = (Registry<T>) BuiltInRegistries.REGISTRY.getOrThrow((ResourceKey) registryType);
         Registry.registerForHolder(registry, registryName, entryFactory.get());
+    }
+
+    @Override
+    public SpawnEggItem createSpawnEgg(Supplier<? extends EntityType<? extends Mob>> entityType, int backgroundColor, int highlightColor, Item.Properties properties)
+    {
+        return new SpawnEggItem(entityType.get(), backgroundColor, highlightColor, properties);
     }
 }

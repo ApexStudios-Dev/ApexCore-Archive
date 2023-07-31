@@ -6,6 +6,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
@@ -18,19 +20,18 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.enchantment.SimpleEnchantment;
-import xyz.apex.minecraft.apexcore.common.lib.registry.builder.BlockBuilder;
-import xyz.apex.minecraft.apexcore.common.lib.registry.builder.CreativeModeTabBuilder;
-import xyz.apex.minecraft.apexcore.common.lib.registry.builder.EnchantmentBuilder;
-import xyz.apex.minecraft.apexcore.common.lib.registry.builder.ItemBuilder;
+import xyz.apex.minecraft.apexcore.common.lib.registry.builder.*;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.BlockFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.EnchantmentFactory;
+import xyz.apex.minecraft.apexcore.common.lib.registry.factory.EntityFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.ItemFactory;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderLookup;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -165,6 +166,34 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     public final <T, R extends T> RegistryEntry<R> get(ResourceKey<? extends Registry<T>> registryType, String registrationName)
     {
         return this.<T, R>registration(registryType, registrationName).registryEntry;
+    }
+
+    /**
+     * Returns previously created entry, of the current name (from the last invocation of {@link #object(String)}).
+     *
+     * @param registryType Type of Registry.
+     * @return Previously created entry.
+     * @param <T> Type of Registry.
+     * @param <R> Type of Entry.
+     */
+    public final <T, R extends T> Optional<RegistryEntry<R>> getOptional(ResourceKey<? extends Registry<T>> registryType)
+    {
+        return getOptional(registryType, currentName());
+    }
+
+    /**
+     * Returns previously created entry.
+     *
+     * @param registryType Type of Registry.
+     * @param registrationName Registration name for Entry.
+     * @return Previously created entry.
+     * @param <T> Type of Registry.
+     * @param <R> Type of Entry.
+     */
+    public final <T, R extends T> Optional<RegistryEntry<R>> getOptional(ResourceKey<? extends Registry<T>> registryType, String registrationName)
+    {
+        var registration = this.<T, R>registrationUnchecked(registryType, registrationName);
+        return registration == null ? Optional.empty() : Optional.of(registration.registryEntry);
     }
 
     /**
@@ -414,6 +443,26 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     public final EnchantmentBuilder<O, SimpleEnchantment, O> enchantment(EnchantmentCategory enchantmentCategory)
     {
         return enchantment(self, currentName(), enchantmentCategory, SimpleEnchantment::new);
+    }
+
+    public final <T extends Entity, P> EntityTypeBuilder<O, T, P> entityType(P parent, String registrationName, MobCategory mobCategory, EntityFactory<T> entityFactory)
+    {
+        return new EntityTypeBuilder<>(self, parent, registrationName, mobCategory, entityFactory);
+    }
+
+    public final <T extends Entity, P> EntityTypeBuilder<O, T, P> entityType(P parent, MobCategory mobCategory, EntityFactory<T> entityFactory)
+    {
+        return entityType(parent, currentName(), mobCategory, entityFactory);
+    }
+
+    public final <T extends Entity> EntityTypeBuilder<O, T, O> entityType(String registrationName, MobCategory mobCategory, EntityFactory<T> entityFactory)
+    {
+        return entityType(self, registrationName, mobCategory, entityFactory);
+    }
+
+    public final <T extends Entity> EntityTypeBuilder<O, T, O> entityType(MobCategory mobCategory, EntityFactory<T> entityFactory)
+    {
+        return entityType(self, currentName(), mobCategory, entityFactory);
     }
 
     private <T, R extends T> Registration<T, R> registration(ResourceKey<? extends Registry<T>> registryType, String registrationName)

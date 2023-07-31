@@ -95,7 +95,8 @@ public final class EnchantmentBuilder<O extends AbstractRegistrar<O>, T extends 
      * @param tags Tags to be set.
      * @return This Builder.
      */
-    public EnchantmentBuilder<O, T, P> tag(TagKey<Enchantment>... tags)
+    @SafeVarargs
+    public final EnchantmentBuilder<O, T, P> tag(TagKey<Enchantment>... tags)
     {
         return tag((provider, lookup, entry) -> Stream.of(tags).map(provider::tag).forEach(tag -> tag.addElement(entry.value())));
     }

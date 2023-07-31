@@ -632,7 +632,8 @@ public final class BlockBuilder<O extends AbstractRegistrar<O>, T extends Block,
      * @param tags Tags to be set.
      * @return This Builder.
      */
-    public BlockBuilder<O, T, P> tag(TagKey<Block>... tags)
+    @SafeVarargs
+    public final BlockBuilder<O, T, P> tag(TagKey<Block>... tags)
     {
         return tag((provider, lookup, entry) -> Stream.of(tags).map(provider::tag).forEach(tag -> tag.addElement(entry.value())));
     }

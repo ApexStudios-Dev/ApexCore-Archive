@@ -3,6 +3,10 @@ package xyz.apex.minecraft.apexcore.common.core;
 import com.google.errorprone.annotations.DoNotCall;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SpawnEggItem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
@@ -22,6 +26,8 @@ import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockTypes;
 import xyz.apex.minecraft.apexcore.common.lib.network.NetworkManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
+
+import java.util.function.Supplier;
 
 @ApiStatus.Internal
 @ApiStatus.NonExtendable
@@ -82,4 +88,7 @@ public interface ApexCore
     @DoNotCall
     @ApiStatus.Internal
     void register(AbstractRegistrar<?> registrar);
+
+    @ApiStatus.Internal
+    SpawnEggItem createSpawnEgg(Supplier<? extends EntityType<? extends Mob>> entityType, int backgroundColor, int highlightColor, Item.Properties properties);
 }

@@ -231,7 +231,8 @@ public final class ItemBuilder<O extends AbstractRegistrar<O>, T extends Item, P
      * @param tags Tags to be set.
      * @return This Builder.
      */
-    public ItemBuilder<O, T, P> tag(TagKey<Item>... tags)
+    @SafeVarargs
+    public final ItemBuilder<O, T, P> tag(TagKey<Item>... tags)
     {
         return tag((provider, lookup, entry) -> Stream.of(tags).map(provider::tag).forEach(tag -> tag.addElement(entry.value())));
     }
