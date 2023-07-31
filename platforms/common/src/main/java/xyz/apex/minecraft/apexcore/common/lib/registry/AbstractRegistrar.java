@@ -305,6 +305,29 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
         });
     }
 
+    // region: Simple
+    public final <T, R extends T, P> SimpleBuilder<O, T, R, P> simple(P parent, ResourceKey<? extends Registry<T>> registryType, String registrationName, Supplier<R> entryFactory)
+    {
+        return new SimpleBuilder<>(self, parent, registryType, registrationName, entryFactory);
+    }
+
+    public final <T, R extends T, P> SimpleBuilder<O, T, R, P> simple(P parent, ResourceKey<? extends Registry<T>> registryType, Supplier<R> entryFactory)
+    {
+        return simple(parent, registryType, currentName(), entryFactory);
+    }
+
+    public final <T, R extends T> SimpleBuilder<O, T, R, O> simple(ResourceKey<? extends Registry<T>> registryType, String registrationName, Supplier<R> entryFactory)
+    {
+        return simple(self, registryType, registrationName, entryFactory);
+    }
+
+    public final <T, R extends T> SimpleBuilder<O, T, R, O> simple(ResourceKey<? extends Registry<T>> registryType, Supplier<R> entryFactory)
+    {
+        return simple(self, registryType, currentName(), entryFactory);
+    }
+    // endregion
+
+    // region: Items
     public final <T extends Item, P> ItemBuilder<O, T, P> item(P parent, String registrationName, ItemFactory<T> itemFactory)
     {
         return new ItemBuilder<>(self, parent, registrationName, itemFactory);
@@ -344,7 +367,9 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     {
         return item(self, currentName(), Item::new);
     }
+    // endregion
 
+    // region: Blocks
     public final <T extends Block, P> BlockBuilder<O, T, P> block(P parent, String registrationName, BlockFactory<T> blockFactory)
     {
         return new BlockBuilder<>(self, parent, registrationName, blockFactory);
@@ -384,7 +409,9 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     {
         return block(self, currentName(), Block::new);
     }
+    // endregion
 
+    // region: CreativeModeTabs
     public final <P> CreativeModeTabBuilder<O, P> creativeModeTab(P parent, String registrationName)
     {
         return new CreativeModeTabBuilder<>(self, parent, registrationName);
@@ -404,7 +431,9 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     {
         return creativeModeTab(self, currentName());
     }
+    // endregion
 
+    // region: Enchantments
     public final <T extends Enchantment, P> EnchantmentBuilder<O, T, P> enchantment(P parent, String registrationName, EnchantmentCategory enchantmentCategory, EnchantmentFactory<T> enchantmentFactory)
     {
         return new EnchantmentBuilder<>(self, parent, registrationName, enchantmentCategory, enchantmentFactory);
@@ -444,7 +473,9 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     {
         return enchantment(self, currentName(), enchantmentCategory, SimpleEnchantment::new);
     }
+    // endregion
 
+    // region: EntityTypes
     public final <T extends Entity, P> EntityTypeBuilder<O, T, P> entityType(P parent, String registrationName, MobCategory mobCategory, EntityFactory<T> entityFactory)
     {
         return new EntityTypeBuilder<>(self, parent, registrationName, mobCategory, entityFactory);
@@ -464,7 +495,9 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     {
         return entityType(self, currentName(), mobCategory, entityFactory);
     }
+    // endregion
 
+    // region: Internal
     private <T, R extends T> Registration<T, R> registration(ResourceKey<? extends Registry<T>> registryType, String registrationName)
     {
         var registration = this.<T, R>registrationUnchecked(registryType, registrationName);
@@ -542,6 +575,7 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
         listeners.clear();
         completedRegistrations.add(registryType);
     }
+    // endregion
 
     @SuppressWarnings("SuspiciousMethodCalls")
     @ApiStatus.Internal
