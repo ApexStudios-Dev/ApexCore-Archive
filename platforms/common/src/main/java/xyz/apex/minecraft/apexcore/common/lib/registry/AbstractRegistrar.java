@@ -7,6 +7,8 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.level.block.Block;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
@@ -15,11 +17,14 @@ import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
+import xyz.apex.minecraft.apexcore.common.lib.enchantment.SimpleEnchantment;
 import xyz.apex.minecraft.apexcore.common.lib.registry.builder.BlockBuilder;
 import xyz.apex.minecraft.apexcore.common.lib.registry.builder.CreativeModeTabBuilder;
+import xyz.apex.minecraft.apexcore.common.lib.registry.builder.EnchantmentBuilder;
 import xyz.apex.minecraft.apexcore.common.lib.registry.builder.ItemBuilder;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.BlockFactory;
+import xyz.apex.minecraft.apexcore.common.lib.registry.factory.EnchantmentFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.ItemFactory;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderLookup;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
@@ -369,6 +374,46 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     public final CreativeModeTabBuilder<O, O> creativeModeTab()
     {
         return creativeModeTab(self, currentName());
+    }
+
+    public final <T extends Enchantment, P> EnchantmentBuilder<O, T, P> enchantment(P parent, String registrationName, EnchantmentCategory enchantmentCategory, EnchantmentFactory<T> enchantmentFactory)
+    {
+        return new EnchantmentBuilder<>(self, parent, registrationName, enchantmentCategory, enchantmentFactory);
+    }
+
+    public final <T extends Enchantment, P> EnchantmentBuilder<O, T, P> enchantment(P parent, EnchantmentCategory enchantmentCategory, EnchantmentFactory<T> enchantmentFactory)
+    {
+        return enchantment(parent, currentName(), enchantmentCategory, enchantmentFactory);
+    }
+
+    public final <T extends Enchantment> EnchantmentBuilder<O, T, O> enchantment(String registrationName, EnchantmentCategory enchantmentCategory, EnchantmentFactory<T> enchantmentFactory)
+    {
+        return enchantment(self, registrationName, enchantmentCategory, enchantmentFactory);
+    }
+
+    public final <T extends Enchantment> EnchantmentBuilder<O, T, O> enchantment(EnchantmentCategory enchantmentCategory, EnchantmentFactory<T> enchantmentFactory)
+    {
+        return enchantment(self, currentName(), enchantmentCategory, enchantmentFactory);
+    }
+
+    public final <P> EnchantmentBuilder<O, SimpleEnchantment, P> enchantment(P parent, String registrationName, EnchantmentCategory enchantmentCategory)
+    {
+        return enchantment(parent, registrationName, enchantmentCategory, SimpleEnchantment::new);
+    }
+
+    public final <P> EnchantmentBuilder<O, SimpleEnchantment, P> enchantment(P parent, EnchantmentCategory enchantmentCategory)
+    {
+        return enchantment(parent, currentName(), enchantmentCategory, SimpleEnchantment::new);
+    }
+
+    public final EnchantmentBuilder<O, SimpleEnchantment, O> enchantment(String registrationName, EnchantmentCategory enchantmentCategory)
+    {
+        return enchantment(self, registrationName, enchantmentCategory, SimpleEnchantment::new);
+    }
+
+    public final EnchantmentBuilder<O, SimpleEnchantment, O> enchantment(EnchantmentCategory enchantmentCategory)
+    {
+        return enchantment(self, currentName(), enchantmentCategory, SimpleEnchantment::new);
     }
 
     private <T, R extends T> Registration<T, R> registration(ResourceKey<? extends Registry<T>> registryType, String registrationName)

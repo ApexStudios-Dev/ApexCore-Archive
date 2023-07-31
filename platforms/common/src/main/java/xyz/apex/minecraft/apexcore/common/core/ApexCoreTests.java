@@ -2,6 +2,8 @@ package xyz.apex.minecraft.apexcore.common.core;
 
 import joptsimple.internal.Strings;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Marker;
@@ -57,6 +59,12 @@ public final class ApexCoreTests
                 .defaultItem()
         .register();
 
+        var testEnchantment = registrar
+                .object("test_enchantment")
+                .enchantment(EnchantmentCategory.DIGGER)
+                .equipmentSlots(EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND)
+        .register();
+
         var creativeModeTab = registrar
                 .creativeModeTab("test")
                 .lang("en_us", "ApexCore - Test Elements")
@@ -64,6 +72,7 @@ public final class ApexCoreTests
                 .displayItems((parameters, output) -> {
                     output.accept(testItem);
                     output.accept(testBlock);
+                    output.accept(testEnchantment.asStack(1));
                 })
         .register();
 
