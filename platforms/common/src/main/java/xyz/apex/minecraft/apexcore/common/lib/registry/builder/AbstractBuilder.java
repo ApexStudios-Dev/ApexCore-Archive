@@ -1,6 +1,7 @@
 package xyz.apex.minecraft.apexcore.common.lib.registry.builder;
 
 import com.google.common.base.Suppliers;
+import com.google.common.collect.Maps;
 import com.google.errorprone.annotations.DoNotCall;
 import net.minecraft.core.Registry;
 import net.minecraft.data.DataProvider;
@@ -10,11 +11,17 @@ import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryProviderListener;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.RegistryEntry;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderLookup;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.lang.LanguageBuilder;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.lang.LanguageProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.loot.LootTableProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.loot.LootTableSubProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.loot.LootType;
 
+import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -39,6 +46,7 @@ public abstract class AbstractBuilder<O extends AbstractRegistrar<O>, P, T, R ex
     protected final B self = (B) this;
 
     private final Supplier<R> entrySupplier = Suppliers.memoize(this::getEntry);
+    private final Map<LootType<?>, BiConsumer<? extends LootTableSubProvider, E>> lootProviders = Maps.newHashMap();
 
     protected AbstractBuilder(O registrar, P parent, ResourceKey<? extends Registry<T>> registryType, String registrationName)
     {
@@ -47,6 +55,7 @@ public abstract class AbstractBuilder<O extends AbstractRegistrar<O>, P, T, R ex
         this.registryType = registryType;
         registryKey = (ResourceKey<R>) ResourceKey.create(registryType, new ResourceLocation(registrar.getOwnerId(), registrationName));
 
+        ProviderTypes.LOOT_TABLES.addListener((provider, lookup) -> generateLoot(provider, lookup, get()));
         defaultLangGB().defaultLangUS();
         onRegister(this::onRegister);
     }
@@ -169,6 +178,43 @@ public abstract class AbstractBuilder<O extends AbstractRegistrar<O>, P, T, R ex
     public final <D extends DataProvider> B clearProvider(ProviderType<D> providerType)
     {
         return setProvider(providerType, (provider, lookup, entry) -> { });
+    }
+
+    /**
+     * Set the LootTable generator for this Block.
+     *
+     * @param listener Generator listener.
+     * @return This Builder.
+     */
+    public final <L extends LootTableSubProvider> B setLootTableProvider(LootType<L> lootType, BiConsumer<L, E> listener)
+    {
+        lootProviders.put(lootType, listener);
+        return self;
+    }
+
+    /**
+     * Clears the currently registered LootTable generator.
+     *
+     * @return This Builder.
+     */
+    public final <L extends LootTableSubProvider> B clearLootTableProvider(LootType<L> lootType)
+    {
+        lootProviders.remove(lootType);
+        return self;
+    }
+
+    private void generateLoot(LootTableProvider provider, ProviderLookup lookup, E entry)
+    {
+        // split into new function, cause we need the generic type
+        lootProviders.keySet().forEach(lootType -> generateLoot(provider, lootType, entry));
+    }
+
+    private <L extends LootTableSubProvider> void generateLoot(LootTableProvider provider, LootType<L> lootType, E entry)
+    {
+        var lootProvider = lootProviders.get(lootType);
+
+        if(lootProvider != null)
+            ((BiConsumer<L, E>) lootProvider).accept(provider.subProvider(lootType), entry);
     }
 
     /**

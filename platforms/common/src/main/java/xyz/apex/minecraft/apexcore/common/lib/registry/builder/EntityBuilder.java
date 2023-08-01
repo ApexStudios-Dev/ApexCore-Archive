@@ -25,8 +25,12 @@ import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryProviderListener;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.EntityEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.EntityFactory;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.loot.EntityLootProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.loot.LootTableSubProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.loot.LootTypes;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
 
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -57,6 +61,8 @@ public final class EntityBuilder<O extends AbstractRegistrar<O>, T extends Entit
 
         this.entityFactory = entityFactory;
         this.category = category;
+
+        defaultLootTable();
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -280,6 +286,37 @@ public final class EntityBuilder<O extends AbstractRegistrar<O>, T extends Entit
     public EntityBuilder<O, T, P> noTags()
     {
         return clearProvider(ProviderTypes.ENTITY_TYPE_TAGS);
+    }
+
+    /**
+     * Set the LootTable generator for this Entity.
+     *
+     * @param listener Generator listener.
+     * @return This Builder.
+     */
+    public EntityBuilder<O, T, P> lootTable(BiConsumer<EntityLootProvider, EntityEntry<T>> listener)
+    {
+        return setLootTableProvider(LootTypes.ENTITIES, listener);
+    }
+
+    /**
+     * Set the Default LootTable generator for this Entity.
+     *
+     * @return This Builder.
+     */
+    public EntityBuilder<O, T, P> defaultLootTable()
+    {
+        return lootTable((provider, entry) -> provider.add(entry.value(), LootTableSubProvider.noDrop()));
+    }
+
+    /**
+     * Clears the currently registered LootTable generator.
+     *
+     * @return This Builder.
+     */
+    public EntityBuilder<O, T, P> clearLootTable()
+    {
+        return clearLootTableProvider(LootTypes.ENTITIES);
     }
 
     @Override

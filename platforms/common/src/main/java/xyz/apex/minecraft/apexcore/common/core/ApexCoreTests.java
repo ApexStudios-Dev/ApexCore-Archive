@@ -33,6 +33,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.level.BlockGetter;
@@ -43,6 +44,16 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.LootingEnchantFunction;
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.functions.SmeltItemFunction;
+import net.minecraft.world.level.storage.loot.predicates.LootItemEntityPropertyCondition;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.BooleanUtils;
@@ -58,6 +69,8 @@ import xyz.apex.minecraft.apexcore.common.lib.registry.entry.MenuEntry;
 
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
+import static xyz.apex.minecraft.apexcore.common.lib.resgen.loot.EntityLootProvider.ENTITY_ON_FIRE;
 
 @ApiStatus.Internal
 public final class ApexCoreTests
@@ -126,6 +139,22 @@ public final class ApexCoreTests
                 .clientTrackingRange(10)
                 .tag(EntityTypeTags.DISMOUNTS_UNDERWATER)
                 .spawnPlacement(SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Animal::checkAnimalSpawnRules)
+                .lootTable((provider, entry) -> provider.add(entry.value(), LootTable
+                        .lootTable()
+                        .withPool(LootPool
+                                .lootPool()
+                                .setRolls(ConstantValue.exactly(1F))
+                                .add(LootItem
+                                        .lootTableItem(Items.PORKCHOP)
+                                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1F, 3F)))
+                                        .apply(SmeltItemFunction
+                                                .smelted()
+                                                .when(LootItemEntityPropertyCondition.hasProperties(LootContext.EntityTarget.THIS, ENTITY_ON_FIRE))
+                                        )
+                                        .apply(LootingEnchantFunction.lootingMultiplier(UniformGenerator.between(0F, 1F)))
+                                )
+                        )
+                ))
         .register();
 
         var testBlockWithEntity = registrar

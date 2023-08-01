@@ -34,6 +34,8 @@ import xyz.apex.minecraft.apexcore.common.lib.resgen.AdvancementProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderLookup;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.RecipeProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.loot.BlockLootProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.loot.LootTypes;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelFile;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.state.BlockStateGenerator;
@@ -69,7 +71,7 @@ public final class BlockBuilder<O extends AbstractRegistrar<O>, T extends Block,
 
         this.blockFactory = blockFactory;
 
-        defaultBlockState();
+        defaultBlockState().defaultLootTable();
     }
 
     @Override
@@ -384,23 +386,27 @@ public final class BlockBuilder<O extends AbstractRegistrar<O>, T extends Block,
 
     /**
      * Mark this Block as having no LootTable.
+     * <p>
+     * Also clears the currently registered LootTable generator.
      *
      * @return This Builder.
      */
     public BlockBuilder<O, T, P> noLootTable()
     {
-        return properties(BlockBehaviour.Properties::noLootTable);
+        return properties(BlockBehaviour.Properties::noLootTable).clearLootTable();
     }
 
     /**
      * Mark this Block as using the LootTable of another Block.
+     * <p>
+     * Also clears the currently registered LootTable generator.
      *
      * @param block Block to inherit LootTable from.
      * @return This Builder.
      */
     public BlockBuilder<O, T, P> dropsLike(Supplier<Block> block)
     {
-        return properties(properties -> properties.dropsLike(block.get()));
+        return properties(properties -> properties.dropsLike(block.get())).clearLootTable();
     }
 
     /**
@@ -610,8 +616,6 @@ public final class BlockBuilder<O extends AbstractRegistrar<O>, T extends Block,
         return properties(properties -> properties.requiredFeatures(requiredFeatures));
     }
 
-    // TODO: Resource Gen providers [ loot table ]
-
     /**
      * Set the BlockState generator for this Block.
      *
@@ -725,6 +729,37 @@ public final class BlockBuilder<O extends AbstractRegistrar<O>, T extends Block,
     public BlockBuilder<O, T, P> noAdvancement()
     {
         return clearProvider(ProviderTypes.ADVANCEMENTS);
+    }
+
+    /**
+     * Set the LootTable generator for this Block.
+     *
+     * @param listener Generator listener.
+     * @return This Builder.
+     */
+    public BlockBuilder<O, T, P> lootTable(BiConsumer<BlockLootProvider, BlockEntry<T>> listener)
+    {
+        return setLootTableProvider(LootTypes.BLOCKS, listener);
+    }
+
+    /**
+     * Set the Default LootTable generator for this Block.
+     *
+     * @return This Builder.
+     */
+    public BlockBuilder<O, T, P> defaultLootTable()
+    {
+        return lootTable((provider, entry) -> provider.dropSelf(entry.value()));
+    }
+
+    /**
+     * Clears the currently registered LootTable generator.
+     *
+     * @return This Builder.
+     */
+    public BlockBuilder<O, T, P> clearLootTable()
+    {
+        return clearLootTableProvider(LootTypes.BLOCKS);
     }
 
     @Override
