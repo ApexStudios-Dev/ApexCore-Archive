@@ -12,6 +12,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Marker;
@@ -22,10 +23,7 @@ import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.enchantment.SimpleEnchantment;
 import xyz.apex.minecraft.apexcore.common.lib.registry.builder.*;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.RegistryEntry;
-import xyz.apex.minecraft.apexcore.common.lib.registry.factory.BlockFactory;
-import xyz.apex.minecraft.apexcore.common.lib.registry.factory.EnchantmentFactory;
-import xyz.apex.minecraft.apexcore.common.lib.registry.factory.EntityFactory;
-import xyz.apex.minecraft.apexcore.common.lib.registry.factory.ItemFactory;
+import xyz.apex.minecraft.apexcore.common.lib.registry.factory.*;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderLookup;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 
@@ -408,6 +406,28 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     public final BlockBuilder<O, Block, O> block()
     {
         return block(self, currentName(), Block::new);
+    }
+    // endregion
+
+    // region: BlockEntities
+    public final <T extends BlockEntity, P> BlockEntityBuilder<O, T, P> blockEntity(P parent, String registrationName, BlockEntityFactory<T> blockEntityFactory)
+    {
+        return new BlockEntityBuilder<>(self, parent, registrationName, blockEntityFactory);
+    }
+
+    public final <T extends BlockEntity, P> BlockEntityBuilder<O, T, P> blockEntity(P parent, BlockEntityFactory<T> blockEntityFactory)
+    {
+        return blockEntity(parent, currentName(), blockEntityFactory);
+    }
+
+    public final <T extends BlockEntity> BlockEntityBuilder<O, T, O> blockEntity(String registrationName, BlockEntityFactory<T> blockEntityFactory)
+    {
+        return blockEntity(self, registrationName, blockEntityFactory);
+    }
+
+    public final <T extends BlockEntity> BlockEntityBuilder<O, T, O> blockEntity(BlockEntityFactory<T> blockEntityFactory)
+    {
+        return blockEntity(self, currentName(), blockEntityFactory);
     }
     // endregion
 

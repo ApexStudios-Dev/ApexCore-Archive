@@ -6,6 +6,7 @@ import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -23,6 +24,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
@@ -33,7 +38,9 @@ import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.registry.Registrar;
+import xyz.apex.minecraft.apexcore.common.lib.registry.entry.BlockEntityEntry;
 
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @ApiStatus.Internal
@@ -100,6 +107,18 @@ public final class ApexCoreTests
                 .spawnPlacement(SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Animal::checkAnimalSpawnRules)
         .register();
 
+        var testBlockWithEntity = registrar
+                .object("test_block_with_entity")
+                .block(properties -> new TestBlockWithEntity(properties, () -> BlockEntityEntry.cast(registrar.get(Registries.BLOCK_ENTITY_TYPE, "test_block_with_entity"))))
+                .copyInitialPropertiesFrom(testBlock::value)
+                .defaultBlockState((provider, lookup, entry) -> provider.withParent(
+                        entry.getRegistryName().withPrefix("block/"),
+                        "block/cube_all"
+                ).texture("all", new ResourceLocation("block/debug2")))
+                .defaultItem()
+                .defaultBlockEntity(TestBlockEntity::new)
+        .register();
+
         var creativeModeTab = registrar
                 .creativeModeTab("test")
                 .lang("en_us", "ApexCore - Test Elements")
@@ -109,6 +128,7 @@ public final class ApexCoreTests
                     output.accept(testBlock);
                     output.accept(testEnchantment.asStack(1));
                     output.accept(testEntity);
+                    output.accept(testBlockWithEntity);
                 })
         .register();
 
@@ -201,6 +221,39 @@ public final class ApexCoreTests
         public ResourceLocation getTextureLocation(TestEntity entity)
         {
             return TEXTURE;
+        }
+    }
+
+    private static final class TestBlockWithEntity extends BaseEntityBlock
+    {
+        private final Supplier<BlockEntityEntry<TestBlockEntity>> blockEntityType;
+
+        private TestBlockWithEntity(Properties properties, Supplier<BlockEntityEntry<TestBlockEntity>> blockEntityType)
+        {
+            super(properties);
+
+            this.blockEntityType = blockEntityType;
+        }
+
+        @Override
+        public RenderShape getRenderShape(BlockState blockState)
+        {
+            return RenderShape.MODEL;
+        }
+
+        @Nullable
+        @Override
+        public BlockEntity newBlockEntity(BlockPos pos, BlockState blockState)
+        {
+            return blockEntityType.get().create(pos, blockState);
+        }
+    }
+
+    private static final class TestBlockEntity extends BlockEntity
+    {
+        private TestBlockEntity(BlockEntityType<? extends TestBlockEntity> blockEntityType, BlockPos pos, BlockState blockState)
+        {
+            super(blockEntityType, pos, blockState);
         }
     }
 }

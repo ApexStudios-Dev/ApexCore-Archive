@@ -11,6 +11,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -26,6 +27,7 @@ import xyz.apex.minecraft.apexcore.common.lib.hook.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryProviderListener;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.BlockEntry;
+import xyz.apex.minecraft.apexcore.common.lib.registry.factory.BlockEntityFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.BlockFactory;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.BlockItemFactory;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.AdvancementProvider;
@@ -103,6 +105,30 @@ public final class BlockBuilder<O extends AbstractRegistrar<O>, T extends Block,
     {
         this.renderType = renderType;
         return this;
+    }
+
+    /**
+     * Returns new Builder constructing BlockEntity bound to this Block.
+     *
+     * @param blockEntityFactory Factory used to construct the BlockEntity.
+     * @return New Builder constructing BlockEntity bound to this Block.
+     * @param <B> Type of BlockEntity.
+     */
+    public <B extends BlockEntity> BlockEntityBuilder<O, B, BlockBuilder<O, T, P>> blockEntity(BlockEntityFactory<B> blockEntityFactory)
+    {
+        return registrar.blockEntity(self, registrationName(), blockEntityFactory).validBlock(asSupplier());
+    }
+
+    /**
+     * Constructs and registers new default BlockEntity bound to this Block.
+     *
+     * @param blockEntityFactory Factory used to construct the BlockEntity.
+     * @return This Builder.
+     * @param <B> Type of BlockEntity.
+     */
+    public <B extends BlockEntity> BlockBuilder<O, T, P> defaultBlockEntity(BlockEntityFactory<B> blockEntityFactory)
+    {
+        return blockEntity(blockEntityFactory).build();
     }
 
     /**
