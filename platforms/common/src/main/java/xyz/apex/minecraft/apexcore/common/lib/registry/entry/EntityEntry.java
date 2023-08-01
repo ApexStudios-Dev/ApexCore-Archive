@@ -24,10 +24,10 @@ import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public final class EntityTypeEntry<T extends Entity> extends BaseRegistryEntry<EntityType<T>> implements FeaturedEntry<EntityType<T>>, EntityTypeTest<Entity, T>, ItemLike
+public final class EntityEntry<T extends Entity> extends BaseRegistryEntry<EntityType<T>> implements FeaturedEntry<EntityType<T>>, EntityTypeTest<Entity, T>, ItemLike
 {
     @ApiStatus.Internal
-    public EntityTypeEntry(AbstractRegistrar<?> registrar, ResourceKey<EntityType<T>> registryKey)
+    public EntityEntry(AbstractRegistrar<?> registrar, ResourceKey<EntityType<T>> registryKey)
     {
         super(registrar, registryKey);
     }
@@ -121,8 +121,8 @@ public final class EntityTypeEntry<T extends Entity> extends BaseRegistryEntry<E
         return value().getBaseClass();
     }
 
-    public static <T extends Entity> EntityTypeEntry<T> cast(RegistryEntry<?> registryEntry)
+    public static <T extends Entity> EntityEntry<T> cast(RegistryEntry<?> registryEntry)
     {
-        return RegistryEntry.cast(EntityTypeEntry.class, registryEntry);
+        return RegistryEntry.cast(EntityEntry.class, registryEntry);
     }
 }

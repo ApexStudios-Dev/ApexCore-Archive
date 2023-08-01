@@ -495,25 +495,25 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     }
     // endregion
 
-    // region: EntityTypes
-    public final <T extends Entity, P> EntityTypeBuilder<O, T, P> entityType(P parent, String registrationName, MobCategory mobCategory, EntityFactory<T> entityFactory)
+    // region: Entities
+    public final <T extends Entity, P> EntityBuilder<O, T, P> entity(P parent, String registrationName, MobCategory mobCategory, EntityFactory<T> entityFactory)
     {
-        return new EntityTypeBuilder<>(self, parent, registrationName, mobCategory, entityFactory);
+        return new EntityBuilder<>(self, parent, registrationName, mobCategory, entityFactory);
     }
 
-    public final <T extends Entity, P> EntityTypeBuilder<O, T, P> entityType(P parent, MobCategory mobCategory, EntityFactory<T> entityFactory)
+    public final <T extends Entity, P> EntityBuilder<O, T, P> entity(P parent, MobCategory mobCategory, EntityFactory<T> entityFactory)
     {
-        return entityType(parent, currentName(), mobCategory, entityFactory);
+        return entity(parent, currentName(), mobCategory, entityFactory);
     }
 
-    public final <T extends Entity> EntityTypeBuilder<O, T, O> entityType(String registrationName, MobCategory mobCategory, EntityFactory<T> entityFactory)
+    public final <T extends Entity> EntityBuilder<O, T, O> entity(String registrationName, MobCategory mobCategory, EntityFactory<T> entityFactory)
     {
-        return entityType(self, registrationName, mobCategory, entityFactory);
+        return entity(self, registrationName, mobCategory, entityFactory);
     }
 
-    public final <T extends Entity> EntityTypeBuilder<O, T, O> entityType(MobCategory mobCategory, EntityFactory<T> entityFactory)
+    public final <T extends Entity> EntityBuilder<O, T, O> entity(MobCategory mobCategory, EntityFactory<T> entityFactory)
     {
-        return entityType(self, currentName(), mobCategory, entityFactory);
+        return entity(self, currentName(), mobCategory, entityFactory);
     }
     // endregion
 

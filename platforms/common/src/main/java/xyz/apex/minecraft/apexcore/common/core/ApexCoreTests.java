@@ -97,7 +97,7 @@ public final class ApexCoreTests
 
         var testEntity = registrar
                 .object("test_entity")
-                .entityType(MobCategory.CREATURE, TestEntity::new)
+                .entity(MobCategory.CREATURE, TestEntity::new)
                 .attributes(TestEntity::attributes)
                 .renderer(() -> () -> TestEntityRenderer::new)
                 .defaultSpawnEgg(0xF2D7D5, 0xFFC300)

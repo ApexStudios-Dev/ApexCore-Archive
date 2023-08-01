@@ -22,7 +22,7 @@ import xyz.apex.minecraft.apexcore.common.lib.hook.EntityHooks;
 import xyz.apex.minecraft.apexcore.common.lib.hook.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryProviderListener;
-import xyz.apex.minecraft.apexcore.common.lib.registry.entry.EntityTypeEntry;
+import xyz.apex.minecraft.apexcore.common.lib.registry.entry.EntityEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.EntityFactory;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
@@ -41,7 +41,7 @@ import java.util.stream.Stream;
  * @param <T> Type of Entity [Entry].
  * @param <P> Type of Parent.
  */
-public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends Entity, P> extends AbstractBuilder<O, P, EntityType<?>, EntityType<T>, EntityTypeBuilder<O, T, P>, EntityTypeEntry<T>> implements FeaturedBuilder<O, P, EntityType<?>, EntityType<T>, EntityTypeBuilder<O, T, P>, EntityTypeEntry<T>>
+public final class EntityBuilder<O extends AbstractRegistrar<O>, T extends Entity, P> extends AbstractBuilder<O, P, EntityType<?>, EntityType<T>, EntityBuilder<O, T, P>, EntityEntry<T>> implements FeaturedBuilder<O, P, EntityType<?>, EntityType<T>, EntityBuilder<O, T, P>, EntityEntry<T>>
 {
     private final EntityFactory<T> entityFactory;
     private final MobCategory category;
@@ -51,7 +51,7 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
     @Nullable private Supplier<Supplier<EntityRendererProvider<T>>> renderer = null;
 
     @ApiStatus.Internal
-    public EntityTypeBuilder(O registrar, P parent, String registrationName, MobCategory category, EntityFactory<T> entityFactory)
+    public EntityBuilder(O registrar, P parent, String registrationName, MobCategory category, EntityFactory<T> entityFactory)
     {
         super(registrar, parent, Registries.ENTITY_TYPE, registrationName);
 
@@ -82,7 +82,7 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
      * @param spawnPredicate Spawn placement predicate.
      * @return This Builder.
      */
-    public EntityTypeBuilder<O, T, P> spawnPlacement(SpawnPlacements.Type spawnPlacementType, Heightmap.Types heightMapType, SpawnPredicate<T> spawnPredicate)
+    public EntityBuilder<O, T, P> spawnPlacement(SpawnPlacements.Type spawnPlacementType, Heightmap.Types heightMapType, SpawnPredicate<T> spawnPredicate)
     {
         spawnPlacementData = Triple.of(spawnPlacementType, heightMapType, spawnPredicate);
         return this;
@@ -96,7 +96,7 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
      * @param attributes Attributes to be registered.
      * @return This Builder.
      */
-    public EntityTypeBuilder<O, T, P> attributes(Supplier<AttributeSupplier.Builder> attributes)
+    public EntityBuilder<O, T, P> attributes(Supplier<AttributeSupplier.Builder> attributes)
     {
         this.attributes = attributes;
         return this;
@@ -112,7 +112,7 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
      * @return New Builder constructing SpawnEgg Item bound to this Entity.
      */
     @SuppressWarnings("unchecked")
-    public ItemBuilder<O, SpawnEggItem, EntityTypeBuilder<O, T, P>> spawnEgg(int backgroundColor, int highlightColor)
+    public ItemBuilder<O, SpawnEggItem, EntityBuilder<O, T, P>> spawnEgg(int backgroundColor, int highlightColor)
     {
         return registrar.item(this, "%s_spawn_egg".formatted(registrationName()), properties -> ApexCore.INSTANCE.createSpawnEgg(() -> (EntityType<? extends Mob>) getEntry(), backgroundColor, highlightColor, properties))
                         .model((provider, lookup, entry) -> provider.withParent(
@@ -130,7 +130,7 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
      * @param highlightColor Highlight color of spawn egg item model.
      * @return This Builder
      */
-    public EntityTypeBuilder<O, T, P> defaultSpawnEgg(int backgroundColor, int highlightColor)
+    public EntityBuilder<O, T, P> defaultSpawnEgg(int backgroundColor, int highlightColor)
     {
         return spawnEgg(backgroundColor, highlightColor).build();
     }
@@ -141,7 +141,7 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
      * @param renderer Renderer to be registered.
      * @return This Builder
      */
-    public EntityTypeBuilder<O, T, P> renderer(Supplier<Supplier<EntityRendererProvider<T>>> renderer)
+    public EntityBuilder<O, T, P> renderer(Supplier<Supplier<EntityRendererProvider<T>>> renderer)
     {
         this.renderer = renderer;
         return this;
@@ -153,7 +153,7 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
      * @param propertiesModifier Modifier used to modify the Entity properties.
      * @return This Builder.
      */
-    public EntityTypeBuilder<O, T, P> properties(UnaryOperator<EntityType.Builder<T>> propertiesModifier)
+    public EntityBuilder<O, T, P> properties(UnaryOperator<EntityType.Builder<T>> propertiesModifier)
     {
         this.propertiesModifier = this.propertiesModifier.andThen(propertiesModifier);
         return this;
@@ -164,7 +164,7 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
      *
      * @return This Builder.
      */
-    public EntityTypeBuilder<O, T, P> sized(float width, float height)
+    public EntityBuilder<O, T, P> sized(float width, float height)
     {
         return properties(properties -> properties.sized(width, height));
     }
@@ -174,7 +174,7 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
      *
      * @return This Builder.
      */
-    public EntityTypeBuilder<O, T, P> noSummon()
+    public EntityBuilder<O, T, P> noSummon()
     {
         return properties(EntityType.Builder::noSummon);
     }
@@ -184,7 +184,7 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
      *
      * @return This Builder.
      */
-    public EntityTypeBuilder<O, T, P> noSave()
+    public EntityBuilder<O, T, P> noSave()
     {
         return properties(EntityType.Builder::noSave);
     }
@@ -194,7 +194,7 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
      *
      * @return This Builder.
      */
-    public EntityTypeBuilder<O, T, P> fireImmune()
+    public EntityBuilder<O, T, P> fireImmune()
     {
         return properties(EntityType.Builder::fireImmune);
     }
@@ -205,7 +205,7 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
      * @return This Builder.
      */
     @SafeVarargs
-    public final EntityTypeBuilder<O, T, P> immuneTo(Supplier<Block>... blocks)
+    public final EntityBuilder<O, T, P> immuneTo(Supplier<Block>... blocks)
     {
         return properties(properties -> {
             var resolvedBlocks = Stream.of(blocks).map(Supplier::get).toArray(Block[]::new);
@@ -218,7 +218,7 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
      *
      * @return This Builder.
      */
-    public EntityTypeBuilder<O, T, P> canSpawnFarFromPlayer()
+    public EntityBuilder<O, T, P> canSpawnFarFromPlayer()
     {
         return properties(EntityType.Builder::canSpawnFarFromPlayer);
     }
@@ -228,7 +228,7 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
      *
      * @return This Builder.
      */
-    public EntityTypeBuilder<O, T, P> clientTrackingRange(int clientTrackingRange)
+    public EntityBuilder<O, T, P> clientTrackingRange(int clientTrackingRange)
     {
         return properties(properties -> properties.clientTrackingRange(clientTrackingRange));
     }
@@ -238,13 +238,13 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
      *
      * @return This Builder.
      */
-    public EntityTypeBuilder<O, T, P> updateInterval(int updateInterval)
+    public EntityBuilder<O, T, P> updateInterval(int updateInterval)
     {
         return properties(properties -> properties.updateInterval(updateInterval));
     }
 
     @Override
-    public EntityTypeBuilder<O, T, P> requiredFeatures(FeatureFlag... requiredFeatures)
+    public EntityBuilder<O, T, P> requiredFeatures(FeatureFlag... requiredFeatures)
     {
         return properties(properties -> properties.requiredFeatures(requiredFeatures));
     }
@@ -256,7 +256,7 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
      * @return This Builder.
      */
     @SafeVarargs
-    public final EntityTypeBuilder<O, T, P> tag(TagKey<EntityType<?>>... tags)
+    public final EntityBuilder<O, T, P> tag(TagKey<EntityType<?>>... tags)
     {
         return tag((provider, lookup, entry) -> Stream.of(tags).map(provider::tag).forEach(tag -> tag.addElement(entry.value())));
     }
@@ -267,7 +267,7 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
      * @param listener Generator listener.
      * @return This Builder.
      */
-    public EntityTypeBuilder<O, T, P> tag(RegistryProviderListener<TagsProvider<EntityType<?>>, EntityType<T>, EntityTypeEntry<T>> listener)
+    public EntityBuilder<O, T, P> tag(RegistryProviderListener<TagsProvider<EntityType<?>>, EntityType<T>, EntityEntry<T>> listener)
     {
         return setProvider(ProviderTypes.ENTITY_TYPE_TAGS, listener);
     }
@@ -277,15 +277,15 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
      *
      * @return This Builder.
      */
-    public EntityTypeBuilder<O, T, P> noTags()
+    public EntityBuilder<O, T, P> noTags()
     {
         return clearProvider(ProviderTypes.ENTITY_TYPE_TAGS);
     }
 
     @Override
-    protected EntityTypeEntry<T> createRegistryEntry()
+    protected EntityEntry<T> createRegistryEntry()
     {
-        return new EntityTypeEntry<>(registrar, registryKey);
+        return new EntityEntry<>(registrar, registryKey);
     }
 
     @Override
@@ -295,7 +295,7 @@ public final class EntityTypeBuilder<O extends AbstractRegistrar<O>, T extends E
     }
 
     @Override
-    protected String getDescriptionId(EntityTypeEntry<T> entry)
+    protected String getDescriptionId(EntityEntry<T> entry)
     {
         return entry.value().getDescriptionId();
     }
