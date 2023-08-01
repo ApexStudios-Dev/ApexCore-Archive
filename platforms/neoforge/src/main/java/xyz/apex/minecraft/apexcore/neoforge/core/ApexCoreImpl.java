@@ -5,9 +5,12 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraftforge.common.ForgeSpawnEggItem;
+import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -20,6 +23,7 @@ import xyz.apex.minecraft.apexcore.common.lib.event.types.EntityEvents;
 import xyz.apex.minecraft.apexcore.common.lib.network.NetworkManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryHelper;
+import xyz.apex.minecraft.apexcore.common.lib.registry.factory.MenuFactory;
 import xyz.apex.minecraft.apexcore.neoforge.lib.EventBuses;
 import xyz.apex.minecraft.apexcore.neoforge.lib.network.NetworkManagerImpl;
 
@@ -82,5 +86,11 @@ public final class ApexCoreImpl implements ApexCore
     public SpawnEggItem createSpawnEgg(Supplier<? extends EntityType<? extends Mob>> entityType, int backgroundColor, int highlightColor, Item.Properties properties)
     {
         return new ForgeSpawnEggItem(entityType, backgroundColor, highlightColor, properties);
+    }
+
+    @Override
+    public <T extends AbstractContainerMenu> MenuType<T> createMenuType(MenuFactory<T> menuFactory, Supplier<MenuType<T>> selfSupplier)
+    {
+        return IForgeMenuType.create((syncId, inventory, buffer) -> menuFactory.create(selfSupplier.get(), syncId, inventory, buffer));
     }
 }

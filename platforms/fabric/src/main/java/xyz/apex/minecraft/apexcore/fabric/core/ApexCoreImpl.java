@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -14,6 +15,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
 import org.jetbrains.annotations.ApiStatus;
@@ -26,6 +29,7 @@ import xyz.apex.minecraft.apexcore.common.lib.event.types.TickEvents;
 import xyz.apex.minecraft.apexcore.common.lib.network.NetworkManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryHelper;
+import xyz.apex.minecraft.apexcore.common.lib.registry.factory.MenuFactory;
 import xyz.apex.minecraft.apexcore.fabric.lib.network.NetworkManagerImpl;
 
 import java.util.function.Supplier;
@@ -104,5 +108,11 @@ public final class ApexCoreImpl implements ApexCore, RegistryHelper
     public SpawnEggItem createSpawnEgg(Supplier<? extends EntityType<? extends Mob>> entityType, int backgroundColor, int highlightColor, Item.Properties properties)
     {
         return new SpawnEggItem(entityType.get(), backgroundColor, highlightColor, properties);
+    }
+
+    @Override
+    public <T extends AbstractContainerMenu> MenuType<T> createMenuType(MenuFactory<T> menuFactory, Supplier<MenuType<T>> selfSupplier)
+    {
+        return new ExtendedScreenHandlerType<>((syncId, inventory, buffer) -> menuFactory.create(selfSupplier.get(), syncId, inventory, buffer));
     }
 }

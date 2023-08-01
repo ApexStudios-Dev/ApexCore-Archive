@@ -1,28 +1,41 @@
 package xyz.apex.minecraft.apexcore.common.core;
 
 import joptsimple.internal.Strings;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.model.PigModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.*;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuConstructor;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -30,6 +43,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,8 +51,10 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.lib.hook.MenuHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.Registrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.BlockEntityEntry;
+import xyz.apex.minecraft.apexcore.common.lib.registry.entry.MenuEntry;
 
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -95,6 +111,11 @@ public final class ApexCoreTests
                 .equipmentSlots(EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND)
         .register();
 
+        var testMenu = registrar
+                .object("test_menu")
+                .menu(TestMenu::new, () -> () -> TestMenuScreen::new)
+        .register();
+
         var testEntity = registrar
                 .object("test_entity")
                 .entity(MobCategory.CREATURE, TestEntity::new)
@@ -116,7 +137,7 @@ public final class ApexCoreTests
                         "block/cube_all"
                 ).texture("all", new ResourceLocation("block/debug2")))
                 .defaultItem()
-                .defaultBlockEntity(TestBlockEntity::new)
+                .<TestBlockEntity>defaultBlockEntity((blockEntityType, pos, blockState) -> new TestBlockEntity(blockEntityType, pos, blockState, testMenu))
         .register();
 
         var creativeModeTab = registrar
@@ -236,6 +257,44 @@ public final class ApexCoreTests
         }
 
         @Override
+        public InteractionResult use(BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
+        {
+            var menuProvider = createMenuProvider(level, pos);
+
+            if(menuProvider == null)
+                return InteractionResult.PASS;
+
+            if(player instanceof ServerPlayer sPlayer)
+            {
+                MenuHooks.get().openMenu(sPlayer, menuProvider, buffer -> buffer.writeBlockPos(pos));
+                return InteractionResult.SUCCESS;
+            }
+
+            return InteractionResult.PASS;
+        }
+
+        @Nullable
+        private MenuProvider createMenuProvider(BlockGetter level, BlockPos pos)
+        {
+            var blockEntity = blockEntityType.get().getBlockEntity(level, pos);
+            return blockEntity == null ? null : blockEntity.createMenuProvider();
+        }
+
+        @Nullable
+        @Override
+        public MenuProvider getMenuProvider(BlockState blockState, Level level, BlockPos pos)
+        {
+            return createMenuProvider(level, pos);
+        }
+
+        @Override
+        public void setPlacedBy(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack)
+        {
+            if(stack.hasCustomHoverName())
+                blockEntityType.get().getBlockEntityOptional(level, pos).ifPresent(blockEntity -> blockEntity.setCustomName(stack.getHoverName()));
+        }
+
+        @Override
         public RenderShape getRenderShape(BlockState blockState)
         {
             return RenderShape.MODEL;
@@ -249,11 +308,134 @@ public final class ApexCoreTests
         }
     }
 
-    private static final class TestBlockEntity extends BlockEntity
+    private static final class TestBlockEntity extends BlockEntity implements Nameable, MenuConstructor
     {
-        private TestBlockEntity(BlockEntityType<? extends TestBlockEntity> blockEntityType, BlockPos pos, BlockState blockState)
+        private final MenuEntry<TestMenu> menuEntry;
+        @Nullable private Component customName = null;
+
+        private TestBlockEntity(BlockEntityType<? extends TestBlockEntity> blockEntityType, BlockPos pos, BlockState blockState, MenuEntry<TestMenu> menuEntry)
         {
             super(blockEntityType, pos, blockState);
+
+            this.menuEntry = menuEntry;
+        }
+
+        public void setCustomName(Component customName)
+        {
+            this.customName = customName;
+            setChanged();
+        }
+
+        public MenuProvider createMenuProvider()
+        {
+            return MenuHooks.get().createMenuProvider(new SimpleMenuProvider(this, getDisplayName()), buffer -> buffer.writeBlockPos(worldPosition));
+        }
+
+        @Override
+        public void load(CompoundTag tag)
+        {
+            customName = null;
+
+            if(tag.contains("CustomName", Tag.TAG_STRING))
+                customName = Component.Serializer.fromJson(tag.getString("CustomName"));
+        }
+
+        @Override
+        protected void saveAdditional(CompoundTag tag)
+        {
+            if(customName != null)
+                tag.putString("CustomName", Component.Serializer.toJson(customName));
+        }
+
+        @Override
+        public boolean hasCustomName()
+        {
+            return customName != null;
+        }
+
+        @Nullable
+        @Override
+        public Component getCustomName()
+        {
+            return customName;
+        }
+
+        @Override
+        public Component getName()
+        {
+            return getBlockState().getBlock().getName();
+        }
+
+        @Override
+        public Component getDisplayName()
+        {
+            return customName == null ? getName() : getCustomName();
+        }
+
+        @Override
+        public AbstractContainerMenu createMenu(int syncId, Inventory inventory, Player player)
+        {
+            return new TestMenu(menuEntry.value(), syncId);
+        }
+    }
+
+    private static final class TestMenu extends AbstractContainerMenu
+    {
+        private TestMenu(MenuType<? extends TestMenu> menuType, int syncId)
+        {
+            super(menuType, syncId);
+        }
+
+        private TestMenu(MenuType<? extends TestMenu> menuType, int syncId, Inventory inventory, FriendlyByteBuf buffer)
+        {
+            this(menuType, syncId);
+        }
+
+        @Override
+        public ItemStack quickMoveStack(Player player, int slotIndex)
+        {
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public boolean stillValid(Player player)
+        {
+            return player.isAlive();
+        }
+    }
+
+    private static final class TestMenuScreen extends AbstractContainerScreen<TestMenu>
+    {
+        private static final ResourceLocation TEXTURE = new ResourceLocation("textures/gui/demo_background.png");
+
+        private TestMenuScreen(TestMenu menu, Inventory inventory, Component title)
+        {
+            super(menu, inventory, title);
+        }
+
+        @Override
+        protected void init()
+        {
+            imageWidth = 248;
+            imageHeight = 166;
+
+            super.init();
+
+            titleLabelX = (imageWidth - font.width(title)) / 2;
+        }
+
+        @Override
+        public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
+        {
+            renderBackground(graphics);
+            super.render(graphics, mouseX, mouseY, partialTick);
+            renderTooltip(graphics, mouseX, mouseY);
+        }
+
+        @Override
+        protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY)
+        {
+            graphics.blit(TEXTURE, (width - imageWidth) / 2, (height - imageHeight) / 2, 0, 0, imageWidth, imageHeight);
         }
     }
 }

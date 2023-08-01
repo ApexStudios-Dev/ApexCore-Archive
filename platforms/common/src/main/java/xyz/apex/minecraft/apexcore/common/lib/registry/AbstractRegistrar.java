@@ -2,12 +2,15 @@ package xyz.apex.minecraft.apexcore.common.lib.registry;
 
 import com.google.common.collect.*;
 import com.google.errorprone.annotations.DoNotCall;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.core.Registry;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
@@ -514,6 +517,28 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     public final <T extends Entity> EntityBuilder<O, T, O> entity(MobCategory mobCategory, EntityFactory<T> entityFactory)
     {
         return entity(self, currentName(), mobCategory, entityFactory);
+    }
+    // endregion
+
+    // region: Menus
+    public final <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>, P> MenuBuilder<O, M, S, P> menu(P parent, String registrationName, MenuFactory<M> menuFactory, Supplier<Supplier<ScreenFactory<M, S>>> screenFactory)
+    {
+        return new MenuBuilder<>(self, parent, registrationName, menuFactory, screenFactory);
+    }
+
+    public final <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>, P> MenuBuilder<O, M, S, P> menu(P parent, MenuFactory<M> menuFactory, Supplier<Supplier<ScreenFactory<M, S>>> screenFactory)
+    {
+        return menu(parent, currentName(), menuFactory, screenFactory);
+    }
+
+    public final <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>> MenuBuilder<O, M, S, O> menu(String registrationName, MenuFactory<M> menuFactory, Supplier<Supplier<ScreenFactory<M, S>>> screenFactory)
+    {
+        return menu(self, registrationName, menuFactory, screenFactory);
+    }
+
+    public final <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>> MenuBuilder<O, M, S, O> menu(MenuFactory<M> menuFactory, Supplier<Supplier<ScreenFactory<M, S>>> screenFactory)
+    {
+        return menu(self, currentName(), menuFactory, screenFactory);
     }
     // endregion
 
