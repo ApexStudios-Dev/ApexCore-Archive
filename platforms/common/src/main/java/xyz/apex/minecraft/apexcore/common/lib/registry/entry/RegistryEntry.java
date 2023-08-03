@@ -5,10 +5,12 @@ import com.mojang.datafixers.util.Either;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderOwner;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
 
 import java.util.Optional;
@@ -162,7 +164,7 @@ public interface RegistryEntry<T> extends Holder<T>, Supplier<T>
     @ApiStatus.NonExtendable
     @ApiStatus.Internal
     @DoNotCall
-    void bind();
+    void bind(boolean throwOnMissingRegistry);
 
     @SuppressWarnings("unchecked")
     static <E extends RegistryEntry<?>> E cast(Class<? super E> clazz, RegistryEntry<?> registryEntry)
@@ -171,5 +173,12 @@ public interface RegistryEntry<T> extends Holder<T>, Supplier<T>
             return (E) registryEntry;
 
         throw new IllegalArgumentException("Could not convert RegistryEntry: expecting %s, found %s".formatted(clazz, registryEntry.getClass()));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nullable
+    static <T> Registry<T> getRegistry(ResourceKey<T> registryKey)
+    {
+        return (Registry<T>) BuiltInRegistries.REGISTRY.get(registryKey.registry());
     }
 }

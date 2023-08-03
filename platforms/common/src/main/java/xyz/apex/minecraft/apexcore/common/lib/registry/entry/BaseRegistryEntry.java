@@ -4,7 +4,6 @@ import com.mojang.datafixers.util.Either;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderOwner;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -12,6 +11,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -33,7 +33,7 @@ public class BaseRegistryEntry<T> implements RegistryEntry<T>
     {
         this.registrar = registrar;
         this.registryKey = registryKey;
-        bind();
+        bind(false);
     }
 
     @Override
@@ -42,21 +42,11 @@ public class BaseRegistryEntry<T> implements RegistryEntry<T>
         return registrar;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public final Registry<T> getRegistry()
     {
-        if(registry == null)
-        {
-            var registry = BuiltInRegistries.REGISTRY.get(registryKey.registry());
-
-            if(registry == null)
-                throw new IllegalStateException("Registry not present for %s: %s".formatted(registryKey, registryKey.registry()));
-
-            this.registry = (Registry<T>) registry;
-        }
-
-        return registry;
+        bind(true);
+        return Objects.requireNonNull(registry);
     }
 
     @Override
@@ -80,12 +70,8 @@ public class BaseRegistryEntry<T> implements RegistryEntry<T>
     @Override
     public final T value()
     {
-        bind();
-
-        if(delegate == null)
-            throw new IllegalStateException("Trying to access unbound value: %s".formatted(registryKey));
-
-        return delegate.value();
+        bind(true);
+        return Objects.requireNonNull(delegate, "Trying to access unbound value: %s".formatted(registryKey)).value();
     }
 
     @Override
@@ -97,7 +83,7 @@ public class BaseRegistryEntry<T> implements RegistryEntry<T>
     @Override
     public final boolean isPresent()
     {
-        bind();
+        bind(false);
         return delegate != null;
     }
 
@@ -190,11 +176,16 @@ public class BaseRegistryEntry<T> implements RegistryEntry<T>
     }
 
     @Override
-    public final void bind()
+    public final void bind(boolean throwOnMissingRegistry)
     {
         if(delegate != null)
             return;
 
-        getRegistry().getHolder(registryKey).ifPresent(holder -> delegate = holder);
+        registry = RegistryEntry.getRegistry(registryKey);
+
+        if(registry != null)
+            delegate = registry.getHolder(registryKey).orElse(null);
+        else if(throwOnMissingRegistry)
+            throw new IllegalStateException("Registry is not present for %s: %s".formatted(registryKey.location(), registryKey.registry()));
     }
 }

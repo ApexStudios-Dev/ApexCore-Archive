@@ -31,7 +31,7 @@ final class Registration<T, R extends T>
     void register(RegistryHelper helper)
     {
         helper.register(registryType, registryName, entryFactory);
-        registryEntry.bind();
+        registryEntry.bind(true);
         listeners.forEach(listener -> listener.accept(registryEntry.get()));
         listeners.clear();
     }
