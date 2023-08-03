@@ -24,6 +24,8 @@ import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.lang.LanguageProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.loot.LootTableProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.loot.LootTypes;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.metadata.ExtendedPackMetadataSection;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.state.BlockStateProvider;
@@ -43,6 +45,7 @@ public interface ProviderTypes
     // Server
     ProviderType<RecipeProvider> RECIPES = RecipeProvider.PROVIDER_TYPE;
     ProviderType<AdvancementProvider> ADVANCEMENTS = AdvancementProvider.PROVIDER_TYPE;
+    ProviderType<LootTableProvider> LOOT_TABLES = LootTableProvider.PROVIDER_TYPE;
 
     ProviderType<TagsProvider<Block>> BLOCK_TAGS = TagsProvider.BLOCK;
     ProviderType<TagsProvider<Fluid>> FLUID_TAGS = TagsProvider.FLUID;
@@ -65,6 +68,7 @@ public interface ProviderTypes
     @ApiStatus.Internal
     static void bootstrap()
     {
+        LootTypes.bootstrap();
     }
 
     static <P extends DataProvider> ProviderType<P> register(ResourceLocation providerName, Function<ProviderType.ProviderContext, P> providerFactory, ProviderType<?>... parents)

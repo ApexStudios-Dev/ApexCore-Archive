@@ -1,7 +1,6 @@
 package xyz.apex.minecraft.apexcore.fabric.lib.hook;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -9,7 +8,6 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.lib.hook.MenuHooks;
 
@@ -19,19 +17,13 @@ import java.util.function.Consumer;
 public final class MenuHooksImpl implements MenuHooks
 {
     @Override
-    public <T extends AbstractContainerMenu> void openMenu(ServerPlayer player, Component displayName, ClientMenuConstructor<T> clientMenuConstructor, Consumer<FriendlyByteBuf> extraData)
+    public void openMenu(ServerPlayer player, MenuProvider menuProvider, Consumer<FriendlyByteBuf> extraData)
     {
-        player.openMenu(createMenuProvider(displayName, clientMenuConstructor, extraData));
+        player.openMenu(createMenuProvider(menuProvider, extraData));
     }
 
     @Override
-    public <T extends AbstractContainerMenu> MenuType<T> create(NetworkMenuConstructor<T> networkMenuConstructor)
-    {
-        return new ExtendedScreenHandlerType<>(networkMenuConstructor::create);
-    }
-
-    @Override
-    public <T extends AbstractContainerMenu> MenuProvider createMenuProvider(Component displayName, ClientMenuConstructor<T> clientMenuConstructor, Consumer<FriendlyByteBuf> extraData)
+    public MenuProvider createMenuProvider(MenuProvider menuProvider, Consumer<FriendlyByteBuf> extraData)
     {
         return new ExtendedScreenHandlerFactory()
         {
@@ -44,13 +36,13 @@ public final class MenuHooksImpl implements MenuHooks
             @Override
             public Component getDisplayName()
             {
-                return displayName;
+                return menuProvider.getDisplayName();
             }
 
             @Override
-            public AbstractContainerMenu createMenu(int windowId, Inventory playerInventory, Player player)
+            public AbstractContainerMenu createMenu(int syncId, Inventory inventory, Player player)
             {
-                return clientMenuConstructor.create(windowId, playerInventory);
+                return menuProvider.createMenu(syncId, inventory, player);
             }
         };
     }

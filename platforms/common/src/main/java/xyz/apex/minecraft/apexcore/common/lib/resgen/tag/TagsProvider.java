@@ -4,6 +4,7 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.Maps;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
@@ -32,7 +33,6 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
-import xyz.apex.minecraft.apexcore.common.lib.hook.RegistryHooks;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 
 import java.util.Map;
@@ -68,13 +68,14 @@ public final class TagsProvider<T> implements DataProvider
     @Nullable private final Function<T, ResourceKey<T>> intrinsicKeyExtractor;
     private final Supplier<Registry<T>> registry;
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private TagsProvider(ProviderType.ProviderContext context, ResourceKey<? extends Registry<T>> registryType, @Nullable Function<T, ResourceKey<T>> intrinsicKeyExtractor)
     {
         this.context = context;
         this.registryType = registryType;
         this.intrinsicKeyExtractor = intrinsicKeyExtractor;
 
-        registry = Suppliers.memoize(() -> RegistryHooks.findVanillaRegistry(registryType).orElseThrow());
+        registry = Suppliers.memoize(() -> BuiltInRegistries.REGISTRY.getOrThrow((ResourceKey) registryType));
     }
 
     public TagBuilder<T> tag(TagKey<T> tag)
