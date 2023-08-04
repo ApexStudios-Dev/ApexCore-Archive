@@ -1,7 +1,8 @@
 package xyz.apex.minecraft.apexcore.common.lib.resgen;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import com.google.errorprone.annotations.DoNotCall;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataProvider;
@@ -20,13 +21,13 @@ public sealed interface ProviderType<P extends DataProvider>
 {
     ResourceLocation providerName();
 
-    void addListener(ProviderListener<P> listener);
+    void addListener(String ownerId, ProviderListener<P> listener);
 
-    boolean hasListeners();
+    boolean hasListeners(String ownerId);
 
     @ApiStatus.Internal
     @DoNotCall
-    void provide(P provider, ProviderLookup lookup);
+    void provide(String ownerId, P provider, ProviderLookup lookup);
 
     @ApiStatus.Internal
     @DoNotCall
@@ -56,7 +57,7 @@ public sealed interface ProviderType<P extends DataProvider>
 
         private final ResourceLocation providerName;
         private final Function<ProviderContext, P> providerFactory;
-        private final List<ProviderListener<P>> listeners = Lists.newLinkedList();
+        private final Multimap<String, ProviderListener<P>> listeners = MultimapBuilder.hashKeys().linkedListValues().build();
         private final Collection<ProviderType<?>> parents;
 
         private ProviderTypeImpl(ResourceLocation providerName, Function<ProviderContext, P> providerFactory, ProviderType<?>... parents)
@@ -73,21 +74,21 @@ public sealed interface ProviderType<P extends DataProvider>
         }
 
         @Override
-        public void addListener(ProviderListener<P> listener)
+        public void addListener(String ownerId, ProviderListener<P> listener)
         {
-            listeners.add(listener);
+            listeners.put(ownerId, listener);
         }
 
         @Override
-        public boolean hasListeners()
+        public boolean hasListeners(String ownerId)
         {
-            return !listeners.isEmpty();
+            return !listeners.get(ownerId).isEmpty();
         }
 
         @Override
-        public void provide(P provider, ProviderLookup lookup)
+        public void provide(String ownerId, P provider, ProviderLookup lookup)
         {
-            listeners.forEach(listener -> listener.accept(provider, lookup));
+            listeners.get(ownerId).forEach(listener -> listener.accept(provider, lookup));
         }
 
         @Override

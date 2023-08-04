@@ -75,13 +75,13 @@ public interface ApexCore
     {
         var descriptionKey = "pack.%s.description".formatted(ID);
 
-        ProviderTypes.LANGUAGES.addListener((provider, lookup) -> provider
+        ProviderTypes.LANGUAGES.addListener(ID, (provider, lookup) -> provider
                 .enUS()
                     .add(descriptionKey, "ApexCore")
                 .end()
         );
 
-        ProviderTypes.registerDefaultMcMetaGenerator(Component.translatable(descriptionKey));
+        ProviderTypes.registerDefaultMcMetaGenerator(ID, Component.translatable(descriptionKey));
     }
 
     PhysicalSide physicalSide();

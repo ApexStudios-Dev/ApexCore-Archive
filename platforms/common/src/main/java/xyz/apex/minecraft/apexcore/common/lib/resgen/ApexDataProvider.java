@@ -48,8 +48,10 @@ public final class ApexDataProvider implements DataProvider, ProviderLookup
 
     private <P extends DataProvider> CompletableFuture<?> provide(ProviderType<P> providerType, CachedOutput cache)
     {
+        var ownerId = context.ownerId();
+
         // has this provider already generated or have no listeners
-        if(!generated.add(providerType) || !providerType.hasListeners())
+        if(!generated.add(providerType) || !providerType.hasListeners(ownerId))
             return CompletableFuture.completedFuture(null);
 
         // linked list to ensure all parents run first
@@ -57,7 +59,7 @@ public final class ApexDataProvider implements DataProvider, ProviderLookup
         providerType.parents().stream().map(parent -> provide(parent, cache)).forEach(futures::add);
 
         var provider = lookup(providerType);
-        providerType.provide(provider, this);
+        providerType.provide(ownerId, provider, this);
         futures.addLast(provider.run(cache)); // run this provider last
         ApexCore.LOGGER.debug("Executing Provider: '{}'", providerType.providerName());
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
@@ -69,7 +71,7 @@ public final class ApexDataProvider implements DataProvider, ProviderLookup
         return "DataProvider for %s".formatted(ProviderType
                 .providerTypes()
                 .stream()
-                .filter(ProviderType::hasListeners)
+                .filter(providerType -> providerType.hasListeners(context.ownerId()))
                 .map(ProviderType::providerName)
                 .map(ResourceLocation::toString)
                 .collect(Collectors.joining(", ", "[", "]"))

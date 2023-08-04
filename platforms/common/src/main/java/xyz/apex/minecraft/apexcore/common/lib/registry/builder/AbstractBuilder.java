@@ -55,7 +55,7 @@ public abstract class AbstractBuilder<O extends AbstractRegistrar<O>, P, T, R ex
         this.registryType = registryType;
         registryKey = (ResourceKey<R>) ResourceKey.create(registryType, new ResourceLocation(registrar.getOwnerId(), registrationName));
 
-        ProviderTypes.LOOT_TABLES.addListener((provider, lookup) -> generateLoot(provider, lookup, get()));
+        ProviderTypes.LOOT_TABLES.addListener(registrar.getOwnerId(), (provider, lookup) -> generateLoot(provider, lookup, get()));
         defaultLangGB().defaultLangUS();
         onRegister(this::onRegister);
     }

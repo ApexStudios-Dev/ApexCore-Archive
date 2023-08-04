@@ -76,8 +76,8 @@ public interface ProviderTypes
         return ProviderType.register(providerName, providerFactory, parents);
     }
 
-    static void registerDefaultMcMetaGenerator(Component description)
+    static void registerDefaultMcMetaGenerator(String ownerId, Component description)
     {
-        METADATA.addListener((provider, lookup) -> provider.add(ExtendedPackMetadataSection.TYPE, ExtendedPackMetadataSection.detected(description)));
+        METADATA.addListener(ownerId, (provider, lookup) -> provider.add(ExtendedPackMetadataSection.TYPE, ExtendedPackMetadataSection.detected(description)));
     }
 }

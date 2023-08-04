@@ -37,6 +37,11 @@ loom {
             vmArg "-Dfabric-api.datagen.output-dir=${project(':common').file('src/generated/resources')}"
             vmArg "-Dfabric-api.datagen.modid=${MOD_ID}"
         }
+
+        dataTest {
+            inherit runs.data
+            property "${MOD_ID}.test_elements.enabled", 'true'
+        }
     }
 }
 

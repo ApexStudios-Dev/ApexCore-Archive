@@ -65,6 +65,8 @@ minecraft {
             args '--output', project(':common').file('src/generated/resources')
             args '--existing', project(':common').file('src/main/resources/')
             args '--existing', file('src/main/resources/')
+
+            property "${MOD_ID}.test_elements.enabled", 'false'
         }
     }
 }

@@ -274,7 +274,7 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     public final <P extends DataProvider, T, R extends T> O setResourceGenerator(ProviderType<P> providerType, ResourceKey<? extends Registry<T>> registryType, String registrationName, RegistryProviderListener<P, R, ? extends RegistryEntry<?>> listener)
     {
         if(registeredProviderTypes.add(providerType))
-            providerType.addListener((provider, lookup) -> provide(providerType, provider, lookup));
+            providerType.addListener(ownerId, (provider, lookup) -> provide(providerType, provider, lookup));
 
         resourceGens.put(providerType, Pair.of(registryType, registrationName), listener);
         return self;
