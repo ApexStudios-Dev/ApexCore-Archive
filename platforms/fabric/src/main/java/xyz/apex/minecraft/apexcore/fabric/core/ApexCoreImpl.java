@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -32,6 +33,8 @@ import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryHelper;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.MenuFactory;
 import xyz.apex.minecraft.apexcore.fabric.lib.network.NetworkManagerImpl;
 
+import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 @ApiStatus.Internal
@@ -41,6 +44,13 @@ public final class ApexCoreImpl implements ApexCore, RegistryHelper
         case CLIENT -> PhysicalSide.CLIENT;
         case SERVER -> PhysicalSide.DEDICATED_SERVER;
     };
+
+    private final List<ResourceKey<? extends Registry<?>>> registryOrder = List.of(
+            Registries.ENTITY_TYPE,
+            Registries.FLUID,
+            Registries.BLOCK,
+            Registries.ITEM
+    );
 
     @Override
     public void bootstrap()
@@ -91,8 +101,11 @@ public final class ApexCoreImpl implements ApexCore, RegistryHelper
     @Override
     public void register(AbstractRegistrar<?> registrar)
     {
-        var registryTypes = BuiltInRegistries.REGISTRY.registryKeySet();
+        var registryTypes = BuiltInRegistries.REGISTRY.registryKeySet().stream().filter(Predicate.not(registryOrder::contains)).toList();
+
+        registryOrder.forEach(registryType -> registrar.onRegisterPre(registryType, this));
         registryTypes.forEach(registryType -> registrar.onRegisterPre(registryType, this));
+        registryOrder.forEach(registrar::onRegisterPost);
         registryTypes.forEach(registrar::onRegisterPost);
     }
 
