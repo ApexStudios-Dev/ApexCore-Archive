@@ -13,4 +13,9 @@ public final class MenuEntry<T extends AbstractContainerMenu> extends BaseRegist
     {
         super(registrar, registryKey);
     }
+
+    public static <T extends AbstractContainerMenu> MenuEntry<T> cast(RegistryEntry<?> registryEntry)
+    {
+        return RegistryEntry.cast(MenuEntry.class, registryEntry);
+    }
 }
