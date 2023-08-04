@@ -25,6 +25,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.lib.helper.InteractionResultHelper;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -161,7 +162,7 @@ public non-sealed class BaseBlockComponent implements BlockComponent
     @Override
     public InteractionResult use(BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
     {
-        return InteractionResult.PASS;
+        return InteractionResultHelper.BlockUse.noActionTaken();
     }
 
     @Nullable

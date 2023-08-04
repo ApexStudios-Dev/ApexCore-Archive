@@ -30,6 +30,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.BlockEntityComponentHolder;
 import xyz.apex.minecraft.apexcore.common.lib.helper.BlockHelper;
+import xyz.apex.minecraft.apexcore.common.lib.helper.InteractionResultHelper;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -259,7 +260,7 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
                 return result;
         }
 
-        return InteractionResult.PASS;
+        return InteractionResultHelper.BlockUse.noActionTaken();
     }
 
     @Override

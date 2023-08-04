@@ -62,6 +62,7 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.lib.helper.InteractionResultHelper;
 import xyz.apex.minecraft.apexcore.common.lib.hook.MenuHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.Registrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.BlockEntityEntry;
@@ -291,15 +292,12 @@ public final class ApexCoreTests
             var menuProvider = createMenuProvider(level, pos);
 
             if(menuProvider == null)
-                return InteractionResult.PASS;
+                return InteractionResultHelper.BlockUse.noActionTaken();
 
             if(player instanceof ServerPlayer sPlayer)
-            {
                 MenuHooks.get().openMenu(sPlayer, menuProvider, buffer -> buffer.writeBlockPos(pos));
-                return InteractionResult.SUCCESS;
-            }
 
-            return InteractionResult.PASS;
+            return InteractionResultHelper.BlockUse.succeedAndSwingArmBothSides(level.isClientSide);
         }
 
         @Nullable

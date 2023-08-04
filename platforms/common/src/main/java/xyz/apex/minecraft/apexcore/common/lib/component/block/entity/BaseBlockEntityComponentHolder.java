@@ -33,6 +33,7 @@ import xyz.apex.minecraft.apexcore.common.lib.block.entity.BaseBlockEntity;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.types.BlockEntityComponentTypes;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.types.InventoryBlockEntityComponent;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.types.NameableBlockEntityComponent;
+import xyz.apex.minecraft.apexcore.common.lib.helper.InteractionResultHelper;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -232,7 +233,7 @@ public non-sealed class BaseBlockEntityComponentHolder extends BaseBlockEntity i
                 return result;
         }
 
-        return InteractionResult.PASS;
+        return InteractionResultHelper.BlockUse.noActionTaken();
     }
 
     @Override
