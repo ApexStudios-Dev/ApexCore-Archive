@@ -1,8 +1,13 @@
 package xyz.apex.minecraft.apexcore.neoforge.lib.hook;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.lib.hook.MenuHooks;
@@ -13,14 +18,16 @@ import java.util.function.Consumer;
 public final class MenuHooksImpl implements MenuHooks
 {
     @Override
-    public void openMenu(ServerPlayer player, MenuProvider menuProvider, Consumer<FriendlyByteBuf> extraData)
+    public InteractionResult openMenu(Player player, Component title, MenuConstructor menuConstructor, Consumer<FriendlyByteBuf> extraData)
     {
-        NetworkHooks.openScreen(player, menuProvider, extraData);
+        if(player instanceof ServerPlayer sPlayer)
+            NetworkHooks.openScreen(sPlayer, createMenuProvider(title, menuConstructor, extraData), extraData);
+        return InteractionResult.sidedSuccess(player.level().isClientSide);
     }
 
     @Override
-    public MenuProvider createMenuProvider(MenuProvider menuProvider, Consumer<FriendlyByteBuf> extraData)
+    public MenuProvider createMenuProvider(Component title, MenuConstructor menuConstructor, Consumer<FriendlyByteBuf> extraData)
     {
-        return menuProvider;
+        return new SimpleMenuProvider(menuConstructor, title);
     }
 }

@@ -15,12 +15,14 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.*;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.Nameable;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -36,7 +38,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -289,29 +290,17 @@ public final class ApexCoreTests
         @Override
         public InteractionResult use(BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
         {
-            var menuProvider = createMenuProvider(level, pos);
-
-            if(menuProvider == null)
-                return InteractionResultHelper.BlockUse.noActionTaken();
-
-            if(player instanceof ServerPlayer sPlayer)
-                MenuHooks.get().openMenu(sPlayer, menuProvider, buffer -> buffer.writeBlockPos(pos));
-
-            return InteractionResultHelper.BlockUse.succeedAndSwingArmBothSides(level.isClientSide);
-        }
-
-        @Nullable
-        private MenuProvider createMenuProvider(BlockGetter level, BlockPos pos)
-        {
-            var blockEntity = blockEntityType.get().getBlockEntity(level, pos);
-            return blockEntity == null ? null : blockEntity.createMenuProvider();
+            if(level.getBlockEntity(pos) instanceof TestBlockEntity blockEntity)
+                return MenuHooks.get().openMenu(player, blockEntity.getDisplayName(), blockEntity, buffer -> buffer.writeBlockPos(pos));
+            return InteractionResultHelper.BlockUse.noActionTaken();
         }
 
         @Nullable
         @Override
         public MenuProvider getMenuProvider(BlockState blockState, Level level, BlockPos pos)
         {
-            return createMenuProvider(level, pos);
+            var blockEntity = blockEntityType.get().getBlockEntity(level, pos);
+            return blockEntity == null ? null : blockEntity.createMenuProvider();
         }
 
         @Override
@@ -355,7 +344,7 @@ public final class ApexCoreTests
 
         public MenuProvider createMenuProvider()
         {
-            return MenuHooks.get().createMenuProvider(new SimpleMenuProvider(this, getDisplayName()), buffer -> buffer.writeBlockPos(worldPosition));
+            return MenuHooks.get().createMenuProvider(getDisplayName(), this, buffer -> buffer.writeBlockPos(worldPosition));
         }
 
         @Override
