@@ -11,6 +11,7 @@ import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
+import xyz.apex.minecraft.apexcore.common.lib.client.renderer.ItemStackRenderer;
 import xyz.apex.minecraft.apexcore.common.lib.hook.ColorHandlerHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryProviderListener;
@@ -43,6 +44,7 @@ public final class ItemBuilder<O extends AbstractRegistrar<O>, T extends Item, P
     private Function<Item.Properties, Item.Properties> propertiesModifier = Function.identity();
 
     @Nullable private Supplier<Supplier<ItemColor>> colorHandler = null;
+    @Nullable private Supplier<Supplier<ItemStackRenderer>> itemStackRenderer = null;
 
     @ApiStatus.Internal
     public ItemBuilder(O registrar, P parent, String registrationName, ItemFactory<T> itemFactory)
@@ -60,7 +62,21 @@ public final class ItemBuilder<O extends AbstractRegistrar<O>, T extends Item, P
         PhysicalSide.CLIENT.runWhenOn(() -> () -> {
             if(colorHandler != null)
                 ColorHandlerHooks.get().registerItemHandler(this::getEntry, colorHandler);
+            if(itemStackRenderer != null)
+                ItemStackRenderer.register(entry, itemStackRenderer.get());
         });
+    }
+
+    /**
+     * Registers a ItemStack renderer for this Item.
+     *
+     * @param itemStackRenderer ItemStack renderer to be registered.
+     * @return This Builder.
+     */
+    public ItemBuilder<O, T, P> renderer(Supplier<Supplier<ItemStackRenderer>> itemStackRenderer)
+    {
+        this.itemStackRenderer = itemStackRenderer;
+        return this;
     }
 
     /**

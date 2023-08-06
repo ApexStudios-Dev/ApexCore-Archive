@@ -1,10 +1,13 @@
 package xyz.apex.minecraft.apexcore.common.core;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import joptsimple.internal.Strings;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.model.PigModel;
 import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.core.BlockPos;
@@ -34,6 +37,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -63,6 +67,7 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import xyz.apex.minecraft.apexcore.common.lib.client.renderer.ItemStackRenderer;
 import xyz.apex.minecraft.apexcore.common.lib.helper.InteractionResultHelper;
 import xyz.apex.minecraft.apexcore.common.lib.hook.MenuHooks;
 import xyz.apex.minecraft.apexcore.common.lib.registry.Registrar;
@@ -104,10 +109,11 @@ public final class ApexCoreTests
                 .object("test_item")
                 .item()
                 .defaultModel()
-                .model((provider, lookup, entry) -> provider.generated(
+                .model((provider, lookup, entry) -> provider.withParent(
                         entry.getRegistryName().withPrefix("item/"),
-                        new ResourceLocation("item/diamond")
+                        provider.existingModel(new ResourceLocation("builtin/entity"))
                 ))
+                .renderer(() -> TestItemStackRenderer::new)
         .register();
 
         var testBlock = registrar
@@ -185,6 +191,18 @@ public final class ApexCoreTests
         .register();
 
         registrar.register();
+    }
+
+    private static final class TestItemStackRenderer implements ItemStackRenderer
+    {
+        @Override
+        public void render(ItemStack stack, ItemDisplayContext displayContext, PoseStack pose, MultiBufferSource buffer, int packedLight, int packedOverlay)
+        {
+            var renderer = Minecraft.getInstance().getItemRenderer();
+            var model = renderer.getItemModelShaper().getItemModel(Items.BARRIER);
+            model = model == null ? renderer.getItemModelShaper().getModelManager().getMissingModel() : model;
+            renderer.render(stack, displayContext, false, pose, buffer, packedLight, packedOverlay, model);
+        }
     }
 
     private static final class TestEntity extends Animal
