@@ -24,6 +24,7 @@ import xyz.apex.minecraft.apexcore.common.lib.network.NetworkManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryHelper;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.MenuFactory;
+import xyz.apex.minecraft.apexcore.neoforge.lib.EventBusHelper;
 import xyz.apex.minecraft.apexcore.neoforge.lib.EventBuses;
 import xyz.apex.minecraft.apexcore.neoforge.lib.network.NetworkManagerImpl;
 
@@ -70,7 +71,7 @@ public final class ApexCoreImpl implements ApexCore
         // we could make use of `ModEvents` but that does not currently support priorities,
         // so we register a listener to be invoked when the matching IEventBus is registered
         EventBuses.addListener(registrar.getOwnerId(), modBus -> {
-            modBus.addListener(EventPriority.NORMAL, false, RegisterEvent.class, event -> registrar.onRegisterPre(event.getRegistryKey(), new RegistryHelper() {
+            EventBusHelper.addListener(modBus, RegisterEvent.class, event -> registrar.onRegisterPre(event.getRegistryKey(), new RegistryHelper() {
                 @Override
                 public <T, R extends T> void register(ResourceKey<? extends Registry<T>> registryType, ResourceLocation registryName, Supplier<R> entryFactory)
                 {
@@ -78,7 +79,7 @@ public final class ApexCoreImpl implements ApexCore
                 }
             }));
 
-            modBus.addListener(EventPriority.LOWEST, false, RegisterEvent.class, event -> registrar.onRegisterPost(event.getRegistryKey()));
+            EventBusHelper.addListener(modBus, EventPriority.LOWEST, RegisterEvent.class, event -> registrar.onRegisterPost(event.getRegistryKey()));
         });
     }
 

@@ -11,6 +11,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
+import xyz.apex.minecraft.apexcore.neoforge.lib.EventBusHelper;
 import xyz.apex.minecraft.apexcore.neoforge.lib.EventBuses;
 
 import java.util.Map;
@@ -43,7 +44,7 @@ public final class ModEvents
 
         EventBuses.addListener(ownerId, modBus -> {
             if(!registeredEvents.add(eventType)) return;
-            modBus.addListener(EventPriority.HIGH, false, eventType, this::onEvent);
+            EventBusHelper.addListener(modBus, EventPriority.HIGH, eventType, this::onEvent);
         });
     }
 

@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -70,7 +69,7 @@ public final class EventBuses
 
     private static void registerForInternal(String ownerId, IEventBus eventBus)
     {
-        eventBus.addListener(EventPriority.HIGHEST, false, GatherDataEvent.class, event -> ApexDataProvider.register(
+        EventBusHelper.addListener(eventBus, GatherDataEvent.class, event -> ApexDataProvider.register(
                 ownerId,
                 func -> {
                     var generator = event.getGenerator();
