@@ -1,12 +1,12 @@
 package xyz.apex.minecraft.apexcore.common.lib.resgen.state;
 
+import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import org.apache.commons.compress.utils.Lists;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.JsonHelper;
 
 import java.util.List;

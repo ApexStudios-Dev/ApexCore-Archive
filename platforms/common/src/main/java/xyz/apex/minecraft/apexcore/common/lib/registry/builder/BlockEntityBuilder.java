@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.common.lib.registry.builder;
 
+import com.google.common.collect.Lists;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.registries.Registries;
@@ -7,7 +8,6 @@ import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
