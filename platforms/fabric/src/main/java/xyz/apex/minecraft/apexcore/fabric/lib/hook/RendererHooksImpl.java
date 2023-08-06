@@ -1,7 +1,10 @@
 package xyz.apex.minecraft.apexcore.fabric.lib.hook;
 
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
@@ -50,5 +53,11 @@ public final class RendererHooksImpl implements RendererHooks
     {
         Validate.isTrue(PhysicalSide.isRunningOn(PhysicalSide.CLIENT));
         EntityRendererRegistry.register(entityType.get(), entityRendererProvider.get().get());
+    }
+
+    @Override
+    public void registerModelLayerDefinition(ModelLayerLocation layerLocation, Supplier<LayerDefinition> layerDefinition)
+    {
+        EntityModelLayerRegistry.registerModelLayer(layerLocation, layerDefinition::get);
     }
 }

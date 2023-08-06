@@ -6,6 +6,7 @@ import net.minecraftforge.client.event.*;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.GameShuttingDownEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.jetbrains.annotations.ApiStatus;
@@ -97,5 +98,7 @@ public final class ApexCoreClientImpl implements ApexCoreClient
             if(LevelRendererEvents.BLOCK_HIGHLIGHT.post().handle(event.getLevelRenderer(), event.getPoseStack(), event.getMultiBufferSource(), event.getPartialTick(), event.getCamera()))
                 event.setCanceled(true);
         });
+
+        EventBusHelper.addListener(MinecraftForge.EVENT_BUS, ItemTooltipEvent.class, event -> ClientEvents.TOOLTIP.post().handle(event.getItemStack(), event.getFlags(), event.getToolTip()));
     }
 }

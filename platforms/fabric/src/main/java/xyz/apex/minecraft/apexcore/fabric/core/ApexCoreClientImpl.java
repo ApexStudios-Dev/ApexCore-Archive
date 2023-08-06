@@ -2,6 +2,7 @@ package xyz.apex.minecraft.apexcore.fabric.core;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
@@ -86,5 +87,7 @@ public final class ApexCoreClientImpl implements ApexCoreClient
             // invert because fabric wants invert of what forge wants
             return !canceled;
         });
+
+        ItemTooltipCallback.EVENT.register((stack, flag, tooltips) -> ClientEvents.TOOLTIP.post().handle(stack, flag, tooltips));
     }
 }

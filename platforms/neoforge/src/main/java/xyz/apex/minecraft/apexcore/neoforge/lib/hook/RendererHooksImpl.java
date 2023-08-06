@@ -1,5 +1,7 @@
 package xyz.apex.minecraft.apexcore.neoforge.lib.hook;
 
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -52,5 +54,12 @@ public final class RendererHooksImpl implements RendererHooks
     {
         Validate.isTrue(PhysicalSide.isRunningOn(PhysicalSide.CLIENT));
         ModEvents.active().addListener(EntityRenderersEvent.RegisterRenderers.class, event -> event.registerEntityRenderer(entityType.get(), entityRendererProvider.get().get()));
+    }
+
+    @Override
+    public void registerModelLayerDefinition(ModelLayerLocation layerLocation, Supplier<LayerDefinition> layerDefinition)
+    {
+        Validate.isTrue(PhysicalSide.isRunningOn(PhysicalSide.CLIENT));
+        ModEvents.active().addListener(EntityRenderersEvent.RegisterLayerDefinitions.class, event -> event.registerLayerDefinition(layerLocation, layerDefinition));
     }
 }

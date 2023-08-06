@@ -1,5 +1,7 @@
 package xyz.apex.minecraft.apexcore.common.lib.hook;
 
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -56,6 +58,14 @@ public interface RendererHooks
      * @param <T>                    Entity type.
      */
     <T extends Entity> void registerEntityRenderer(Supplier<? extends EntityType<T>> entityType, Supplier<Supplier<EntityRendererProvider<T>>> entityRendererProvider);
+
+    /**
+     * Registers a layer definition.
+     *
+     * @param layerLocation Layer definition location.
+     * @param layerDefinition Layer definition to register.
+     */
+    void registerModelLayerDefinition(ModelLayerLocation layerLocation, Supplier<LayerDefinition> layerDefinition);
 
     /**
      * @return Global instance.
