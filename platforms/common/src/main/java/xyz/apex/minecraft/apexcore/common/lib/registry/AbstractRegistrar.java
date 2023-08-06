@@ -2,16 +2,22 @@ package xyz.apex.minecraft.apexcore.common.lib.registry;
 
 import com.google.common.collect.*;
 import com.google.errorprone.annotations.DoNotCall;
+import com.google.gson.JsonObject;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataProvider;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.level.block.Block;
@@ -25,6 +31,8 @@ import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.enchantment.SimpleEnchantment;
 import xyz.apex.minecraft.apexcore.common.lib.registry.builder.*;
+import xyz.apex.minecraft.apexcore.common.lib.registry.entry.MenuEntry;
+import xyz.apex.minecraft.apexcore.common.lib.registry.entry.RecipeEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.RegistryEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.*;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderLookup;
@@ -34,6 +42,8 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -521,24 +531,74 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     // endregion
 
     // region: Menus
-    public final <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>, P> MenuBuilder<O, M, S, P> menu(P parent, String registrationName, MenuFactory<M> menuFactory, Supplier<Supplier<ScreenFactory<M, S>>> screenFactory)
+    public final <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>> MenuEntry<M> menu(String registrationName, MenuFactory<M> menuFactory, Supplier<Supplier<ScreenFactory<M, S>>> screenFactory)
     {
-        return new MenuBuilder<>(self, parent, registrationName, menuFactory, screenFactory);
+        return new MenuBuilder<>(self, self, registrationName, menuFactory, screenFactory).register();
     }
 
-    public final <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>, P> MenuBuilder<O, M, S, P> menu(P parent, MenuFactory<M> menuFactory, Supplier<Supplier<ScreenFactory<M, S>>> screenFactory)
+    public final <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>> MenuEntry<M> menu(MenuFactory<M> menuFactory, Supplier<Supplier<ScreenFactory<M, S>>> screenFactory)
     {
-        return menu(parent, currentName(), menuFactory, screenFactory);
+        return menu(currentName(), menuFactory, screenFactory);
+    }
+    // endregion
+
+    // region: Recipes
+    public final <T extends Recipe<?>, S extends RecipeSerializer<T>, P> SimpleBuilder<O, RecipeSerializer<?>, S, P> recipeSerializer(P parent, String registrationName, Supplier<S> recipeSerializerFactory)
+    {
+        return new SimpleBuilder<>(self, parent, Registries.RECIPE_SERIALIZER, registrationName, recipeSerializerFactory);
     }
 
-    public final <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>> MenuBuilder<O, M, S, O> menu(String registrationName, MenuFactory<M> menuFactory, Supplier<Supplier<ScreenFactory<M, S>>> screenFactory)
+    public final <T extends Recipe<?>, S extends RecipeSerializer<T>, P> SimpleBuilder<O, RecipeSerializer<?>, S, P> recipeSerializer(P parent, Supplier<S> recipeSerializerFactory)
     {
-        return menu(self, registrationName, menuFactory, screenFactory);
+        return recipeSerializer(parent, currentName(), recipeSerializerFactory);
     }
 
-    public final <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>> MenuBuilder<O, M, S, O> menu(MenuFactory<M> menuFactory, Supplier<Supplier<ScreenFactory<M, S>>> screenFactory)
+    public final <T extends Recipe<?>, S extends RecipeSerializer<T>> SimpleBuilder<O, RecipeSerializer<?>, S, O> recipeSerializer(String registrationName, Supplier<S> recipeSerializerFactory)
     {
-        return menu(self, currentName(), menuFactory, screenFactory);
+        return recipeSerializer(self, registrationName, recipeSerializerFactory);
+    }
+
+    public final <T extends Recipe<?>, S extends RecipeSerializer<T>> SimpleBuilder<O, RecipeSerializer<?>, S, O> recipeSerializer(Supplier<S> recipeSerializerFactory)
+    {
+        return recipeSerializer(self, currentName(), recipeSerializerFactory);
+    }
+
+    public final <T extends Recipe<?>, P> SimpleBuilder<O, RecipeType<?>, RecipeType<T>, P> recipeType(P parent, String registrationName)
+    {
+        return new SimpleBuilder<>(self, parent, Registries.RECIPE_TYPE, registrationName, () -> new RecipeType<T>() {
+            private final String identifier = "%s:%s".formatted(ownerId, registrationName);
+
+            @Override
+            public String toString()
+            {
+                return identifier;
+            }
+        });
+    }
+
+    public final <T extends Recipe<?>, P> SimpleBuilder<O, RecipeType<?>, RecipeType<T>, P> recipeType(P parent)
+    {
+        return recipeType(parent, currentName());
+    }
+
+    public final <T extends Recipe<?>> SimpleBuilder<O, RecipeType<?>, RecipeType<T>, O> recipeType(String registrationName)
+    {
+        return recipeType(self, registrationName);
+    }
+
+    public final <T extends Recipe<?>> SimpleBuilder<O, RecipeType<?>, RecipeType<T>, O> recipeType()
+    {
+        return recipeType(self, currentName());
+    }
+
+    public final <T extends Recipe<?>> RecipeEntry<T> recipe(String registrationName, BiFunction<ResourceLocation, JsonObject, T> fromJson, BiFunction<ResourceLocation, FriendlyByteBuf, T> fromNetwork, BiConsumer<FriendlyByteBuf, T> toNetwork)
+    {
+        return new RecipeBuilder<>(self, self, registrationName, fromJson, fromNetwork, toNetwork).register();
+    }
+
+    public final <T extends Recipe<?>> RecipeEntry<T> recipe(BiFunction<ResourceLocation, JsonObject, T> fromJson, BiFunction<ResourceLocation, FriendlyByteBuf, T> fromNetwork, BiConsumer<FriendlyByteBuf, T> toNetwork)
+    {
+        return recipe(currentName(), fromJson, fromNetwork, toNetwork);
     }
     // endregion
 

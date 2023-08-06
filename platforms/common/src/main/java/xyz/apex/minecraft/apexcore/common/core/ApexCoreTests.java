@@ -132,10 +132,7 @@ public final class ApexCoreTests
                 .equipmentSlots(EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND)
         .register();
 
-        var testMenu = registrar
-                .object("test_menu")
-                .menu(TestMenu::new, () -> () -> TestMenuScreen::new)
-        .register();
+        var testMenu = registrar.menu("test_menu", TestMenu::new, () -> () -> TestMenuScreen::new);
 
         var testEntity = registrar
                 .object("test_entity")
