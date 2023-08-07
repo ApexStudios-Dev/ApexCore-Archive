@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
 
@@ -15,13 +16,12 @@ import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
 @SideOnly(PhysicalSide.CLIENT)
 public class SimpleContainerMenuScreen<T extends AbstractContainerMenu> extends AbstractContainerScreen<T>
 {
-    protected final ResourceLocation backgroundTexture;
+    public static final ResourceLocation SPRITE_BACKGROUND = new ResourceLocation(ApexCore.ID, "container/generic/background");
+    public static final ResourceLocation SPRITE_SLOT = new ResourceLocation(ApexCore.ID, "container/generic/slot");
 
-    public SimpleContainerMenuScreen(T menu, Inventory playerInventory, Component displayName, ResourceLocation backgroundTexture)
+    public SimpleContainerMenuScreen(T menu, Inventory playerInventory, Component displayName)
     {
         super(menu, playerInventory, displayName);
-
-        this.backgroundTexture = backgroundTexture;
     }
 
     protected void renderFg(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
@@ -31,14 +31,17 @@ public class SimpleContainerMenuScreen<T extends AbstractContainerMenu> extends 
     @Override
     protected void init()
     {
+        imageWidth = 176;
+        imageHeight = 166;
+
         super.init();
+
         titleLabelX = (imageWidth - font.width(title)) / 2;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
     {
-        renderBackground(guiGraphics, mouseX, mouseY, partialTick);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderFg(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
@@ -47,8 +50,6 @@ public class SimpleContainerMenuScreen<T extends AbstractContainerMenu> extends 
     @Override
     protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY)
     {
-        var x = (width - imageWidth) / 2;
-        var y = (height - imageHeight) / 2;
-        graphics.blit(backgroundTexture, x, y, 0, 0, imageWidth, imageHeight);
+        graphics.blitSprite(SPRITE_BACKGROUND, (width - imageWidth) / 2, (height - imageHeight) / 2, imageWidth, imageHeight);
     }
 }

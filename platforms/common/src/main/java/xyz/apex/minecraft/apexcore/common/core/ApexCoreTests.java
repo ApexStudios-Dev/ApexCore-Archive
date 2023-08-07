@@ -3,8 +3,6 @@ package xyz.apex.minecraft.apexcore.common.core;
 import com.mojang.blaze3d.vertex.PoseStack;
 import joptsimple.internal.Strings;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.model.PigModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -22,10 +20,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.Nameable;
+import net.minecraft.world.*;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -70,6 +65,9 @@ import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.client.renderer.ItemStackRenderer;
 import xyz.apex.minecraft.apexcore.common.lib.helper.InteractionResultHelper;
 import xyz.apex.minecraft.apexcore.common.lib.hook.MenuHooks;
+import xyz.apex.minecraft.apexcore.common.lib.menu.EnhancedSlot;
+import xyz.apex.minecraft.apexcore.common.lib.menu.SimpleContainerMenu;
+import xyz.apex.minecraft.apexcore.common.lib.menu.SimpleContainerMenuScreen;
 import xyz.apex.minecraft.apexcore.common.lib.registry.Registrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.BlockEntityEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.MenuEntry;
@@ -132,7 +130,7 @@ public final class ApexCoreTests
                 .equipmentSlots(EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND)
         .register();
 
-        var testMenu = registrar.menu("test_menu", TestMenu::new, () -> () -> TestMenuScreen::new);
+        var testMenu = registrar.<TestMenu, SimpleContainerMenuScreen<TestMenu>>menu("test_menu", TestMenu::new, () -> () -> SimpleContainerMenuScreen::new);
 
         var testEntity = registrar
                 .object("test_entity")
@@ -406,67 +404,28 @@ public final class ApexCoreTests
         @Override
         public AbstractContainerMenu createMenu(int syncId, Inventory inventory, Player player)
         {
-            return new TestMenu(menuEntry.value(), syncId);
+            return new TestMenu(menuEntry.value(), syncId, inventory);
         }
     }
 
-    private static final class TestMenu extends AbstractContainerMenu
+    private static final class TestMenu extends SimpleContainerMenu
     {
-        private TestMenu(MenuType<? extends TestMenu> menuType, int syncId)
+        private TestMenu(MenuType<? extends TestMenu> menuType, int syncId, Inventory inventory)
         {
-            super(menuType, syncId);
+            super(menuType, syncId, inventory, new SimpleContainer(ItemStack.EMPTY));
         }
 
         private TestMenu(MenuType<? extends TestMenu> menuType, int syncId, Inventory inventory, FriendlyByteBuf buffer)
         {
-            this(menuType, syncId);
+            this(menuType, syncId, inventory);
         }
 
         @Override
-        public ItemStack quickMoveStack(Player player, int slotIndex)
+        protected void bindSlots(Inventory playerInventory)
         {
-            return ItemStack.EMPTY;
-        }
+            addSlot(new EnhancedSlot(container, 0, 80, 37));
 
-        @Override
-        public boolean stillValid(Player player)
-        {
-            return player.isAlive();
-        }
-    }
-
-    private static final class TestMenuScreen extends AbstractContainerScreen<TestMenu>
-    {
-        private static final ResourceLocation TEXTURE = new ResourceLocation("textures/gui/demo_background.png");
-
-        private TestMenuScreen(TestMenu menu, Inventory inventory, Component title)
-        {
-            super(menu, inventory, title);
-        }
-
-        @Override
-        protected void init()
-        {
-            imageWidth = 248;
-            imageHeight = 166;
-
-            super.init();
-
-            titleLabelX = (imageWidth - font.width(title)) / 2;
-        }
-
-        @Override
-        public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
-        {
-            renderBackground(graphics, mouseX, mouseY, partialTick);
-            super.render(graphics, mouseX, mouseY, partialTick);
-            renderTooltip(graphics, mouseX, mouseY);
-        }
-
-        @Override
-        protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY)
-        {
-            graphics.blit(TEXTURE, (width - imageWidth) / 2, (height - imageHeight) / 2, 0, 0, imageWidth, imageHeight);
+            bindPlayerInventory(playerInventory, 8, 84, this::addSlot);
         }
     }
 }
