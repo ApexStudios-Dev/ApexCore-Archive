@@ -1,3 +1,5 @@
+// TODO: See how forge handles this, when they update
+/*
 package xyz.apex.minecraft.apexcore.common.lib.resgen.metadata;
 
 import com.google.gson.JsonObject;
@@ -104,3 +106,4 @@ public final class ExtendedPackMetadataSection extends PackMetadataSection
         }
     }
 }
+*/

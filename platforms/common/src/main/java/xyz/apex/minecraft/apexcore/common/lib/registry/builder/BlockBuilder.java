@@ -580,13 +580,13 @@ public final class BlockBuilder<O extends AbstractRegistrar<O>, T extends Block,
     }
 
     /**
-     * Mark this Block as not spawning any particles when being harvested.
+     * Mark this Block as not spawning any terrain particles when being harvested.
      *
      * @return This Builder.
      */
-    public BlockBuilder<O, T, P> noParticlesOnBreak()
+    public BlockBuilder<O, T, P> noTerrainParticles()
     {
-        return properties(BlockBehaviour.Properties::noParticlesOnBreak);
+        return properties(BlockBehaviour.Properties::noTerrainParticles);
     }
 
     /**

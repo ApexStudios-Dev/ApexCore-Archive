@@ -2,6 +2,7 @@ package xyz.apex.minecraft.apexcore.common.lib.component.block.types;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -80,7 +81,7 @@ public final class FluidLoggedBlockComponent extends BaseBlockComponent implemen
     }
 
     @Override
-    public boolean canPlaceLiquid(BlockGetter level, BlockPos pos, BlockState blockState, Fluid fluid)
+    public boolean canPlaceLiquid(@Nullable Player player, BlockGetter level, BlockPos pos, BlockState blockState, Fluid fluid)
     {
         if(!isFor(fluid))
             return false;
@@ -110,7 +111,7 @@ public final class FluidLoggedBlockComponent extends BaseBlockComponent implemen
     }
 
     @Override
-    public ItemStack pickupBlock(LevelAccessor level, BlockPos pos, BlockState blockState)
+    public ItemStack pickupBlock(@Nullable Player player, LevelAccessor level, BlockPos pos, BlockState blockState)
     {
         if(!blockState.getValue(property))
             return ItemStack.EMPTY;

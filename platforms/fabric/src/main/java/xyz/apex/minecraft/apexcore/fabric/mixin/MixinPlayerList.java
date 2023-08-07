@@ -19,7 +19,7 @@ public class MixinPlayerList
             method = "placeNewPlayer",
             at = @At("TAIL")
     )
-    private void ApexCore$placeNewPlayer(Connection connection, ServerPlayer player, CallbackInfo ci)
+    private void ApexCore$placeNewPlayer(Connection connection, ServerPlayer player, int latency, CallbackInfo ci)
     {
         PlayerEvents.LOGGED_IN.post().handle(player);
     }

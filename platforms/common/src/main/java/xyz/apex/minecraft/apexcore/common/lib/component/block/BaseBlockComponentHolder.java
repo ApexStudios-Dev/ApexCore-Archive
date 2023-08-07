@@ -443,13 +443,13 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
     }
 
     @Override
-    public final ItemStack pickupBlock(LevelAccessor level, BlockPos pos, BlockState blockState)
+    public final ItemStack pickupBlock(@Nullable Player player, LevelAccessor level, BlockPos pos, BlockState blockState)
     {
         for(var component : getComponents())
         {
             if(component instanceof BucketPickup pickup)
             {
-                var bucket = pickup.pickupBlock(level, pos, blockState);
+                var bucket = pickup.pickupBlock(player, level, pos, blockState);
 
                 if(!bucket.isEmpty())
                     return bucket;
@@ -477,11 +477,11 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
     }
 
     @Override
-    public final boolean canPlaceLiquid(BlockGetter level, BlockPos pos, BlockState blockState, Fluid fluid)
+    public final boolean canPlaceLiquid(@Nullable Player player, BlockGetter level, BlockPos pos, BlockState blockState, Fluid fluid)
     {
         for(var component : getComponents())
         {
-            if(component instanceof LiquidBlockContainer container && container.canPlaceLiquid(level, pos, blockState, fluid))
+            if(component instanceof LiquidBlockContainer container && container.canPlaceLiquid(player, level, pos, blockState, fluid))
                 return true;
         }
 

@@ -1,9 +1,12 @@
 package xyz.apex.minecraft.apexcore.common.lib.resgen;
 
+import net.minecraft.DetectedVersion;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.metadata.PackMetadataGenerator;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
@@ -26,11 +29,11 @@ import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.lang.LanguageProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.loot.LootTableProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.loot.LootTypes;
-import xyz.apex.minecraft.apexcore.common.lib.resgen.metadata.ExtendedPackMetadataSection;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.state.BlockStateProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 @ApiStatus.NonExtendable
@@ -78,6 +81,10 @@ public interface ProviderTypes
 
     static void registerDefaultMcMetaGenerator(String ownerId, Component description)
     {
-        METADATA.addListener(ownerId, (provider, lookup) -> provider.add(ExtendedPackMetadataSection.TYPE, ExtendedPackMetadataSection.detected(description)));
+        METADATA.addListener(ownerId, (provider, lookup) -> provider.add(PackMetadataSection.TYPE, new PackMetadataSection(
+                description,
+                DetectedVersion.BUILT_IN.getPackVersion(PackType.CLIENT_RESOURCES),
+                Optional.empty()
+        )));
     }
 }
