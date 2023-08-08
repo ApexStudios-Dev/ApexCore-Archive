@@ -1,13 +1,19 @@
+#!/usr/bin/env groovy
+
 pipeline {
     agent any
-
     stages {
+        stage('Clean') {
+            steps {
+                echo 'Cleaning Project'
+                sh 'chmod +x gradlew'
+                sh './gradlew clean'
+            }
+        }
         stage('Build') {
             steps {
-                script {
-                    sh 'chmod +X ./gradlew'
-                    sh './gradlew clean build --no-daemon'
-                }
+                echo 'Building'
+                sh './gradlew build'
             }
         }
     }
