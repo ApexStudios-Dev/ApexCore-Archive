@@ -5,6 +5,10 @@ plugins {
     id 'fabric-loom' version '1.2-SNAPSHOT' apply false
 
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1'
+
+    id 'com.palantir.git-version' version '1.0.0' apply false
+    id 'me.modmuss50.mod-publish-plugin' version '0.3.0' apply false
+    id 'net.neoforged.gradleutils' version '2.+' apply false
 }
 
 allprojects {
@@ -137,6 +141,151 @@ subprojects {
         excludeDirs += [
                 file('run')
         ]
+    }
+}
+
+apply plugin: 'com.palantir.git-version'
+apply plugin: 'net.neoforged.gradleutils'
+
+afterEvaluate {
+    tasks.setupTeamCityProject.enabled = false
+    tasks.findByName('configureTeamCity')??.enabled = false
+}
+
+def repo = versionDetails()
+
+tasks.register('generateChangelogTxt', net.minecraftforge.gradleutils.tasks.GenerateChangelogTask) {
+    outputFile = file('changelogs/changelog.txt')
+    startingTag = "${repo.lastTag}"
+}
+
+tasks.register('generateChangelogMd', net.minecraftforge.gradleutils.tasks.GenerateChangelogTask) {
+    buildMarkdown = true
+    outputFile = file('changelogs/changelog.md')
+    startingTag = "${repo.lastTag}"
+}
+
+tasks.register('generateChangelogs') {
+    dependsOn generateChangelogTxt, generateChangelogMd
+}
+
+tasks.register('sendDiscordChangelog') {
+    doLast {
+        if(System.getenv('DISCORD_CHANGELOG_WEBHOOK_URL') != null) {
+            // cause using emojis from different discord guilds
+            // is a nitro feature and webhooks dont have nitro
+            def emojis = [
+                // ApexStudios
+                /*'modrinth': '<:modrinth:1087664953235869696>',
+                'curseforge': '<:curseforge:1087664975121752085>',
+                'minecraft': '<:minecraft:1087669093974421544>',
+                'minecraftforge': '<:forge:1087669091487195205>',
+                'neoforge': '<:neoforge:1138457156757241918>',
+                'fabric': '<:fabric:1107901914923925585>',
+                'github': '<:github:1087671203642216521>'
+                */
+
+                // Test Server
+                'modrinth': '<:modrinth:1087665302067740722>',
+                'curseforge': '<:curseforge:1087665287186366504>',
+                'minecraft': '<:minecraft:1087667250565226536>',
+                'minecraftforge': '<:forge:1087667248371605524>',
+                'neoforge': '<:neoforge:1138456184618242189>',
+                'fabric': '<:fabric:1138459723314769950>',
+                'github': '<:github:1087671103360614400>'
+            ]
+
+            def fields = [
+                [
+                    name: "${emojis['minecraft']} Minecraft",
+                    value: "[${MINECRAFT_VERSION}](https://minecraft.net/)",
+                    inline: true
+                ]
+            ]
+
+            if(findProject(':fabric') != null) {
+                fields.add([
+                    name: "${emojis['fabric']} Fabric",
+                    value: "[${FABRIC_API_VERSION}](https://fabricmc.net/use/installer/)",
+                    inline: true
+                ])
+            }
+
+            if(findProject(':neoforge') != null) {
+                fields.add([
+                    name: "${emojis['neoforge']} NeoForge",
+                    value: "[${NEOFORGE_VERSION}](https://neoforged.net/)",
+                    inline: true
+                ])
+            }
+
+            // Uncomment if we ever decide to support MCF
+            /*if(findProject(':forge') != null) {
+                fields.add([
+                    name: "${emojis['minecraftforge']} MinecraftForge",
+                    value: "[${NEOFORGE_VERSION}](https://files.minecraftforge.net/net/minecraftforge/forge/index_${MINECRAFT_VERSION}.html)",
+                    inline: true
+                ])
+            }*/
+
+            def body = [
+                username: 'ApexStudios',
+                avatar_url: 'https://raw.githubusercontent.com/ApexStudios-Dev/.github/master/assets/apexstudios/Logo.png',
+                embeds: [
+                    [
+                        title: "**${MOD_NAME}** updated to **_v${MOD_VERSION}_**!",
+                        description: "[For full changelog see here](https://updates.apexstudios.dev/${MOD_ID}/${MOD_VERSION}+${MINECRAFT_VERSION})\n\n**Download**: [${emojis['modrinth']} **_Modrinth_**](https://modrinth.com/mod/${MOD_MODRINTH_SLUG}) | [${emojis['curseforge']} **_Curseforge_**](https://www.curseforge.com/minecraft/mc-mods/${MOD_CUSRSEFORGE_SLUG})",
+                        url: "https://updates.apexstudios.dev/${MOD_ID}/${MOD_VERSION}+${MINECRAFT_VERSION}",
+                        color: "${Integer.decode(MOD_COLOR)}",
+                        footer: [
+                            text: 'ApexStudios',
+                            icon_url: 'https://raw.githubusercontent.com/ApexStudios-Dev/.github/master/assets/apexstudios/Logo.png',
+                        ],
+                        author: [
+                            name: "${MOD_NAME}",
+                            url: "https://updates.apexstudios.dev/${MOD_ID}/${MOD_VERSION}+${MINECRAFT_VERSION}",
+                            icon_url: "https://raw.githubusercontent.com/ApexStudios-Dev/.github/master/assets/minecraft/${MOD_ID}_logo.png"
+                        ],
+                        fields: fields
+                    ]
+                ]
+            ]
+
+            HttpURLConnection req = new URL(System.getenv('DISCORD_CHANGELOG_WEBHOOK_URL')).openConnection()
+            req.setRequestMethod('POST')
+            req.setRequestProperty('Content-Type', 'application/json; charset=UTF-8')
+            req.setDoOutput(true)
+            req.getOutputStream().write(groovy.json.JsonOutput.toJson(body).getBytes('UTF-8'))
+            // read the response, without this, webhook wont actually be sent
+            // we should maybe, perhaps, handle any errors that could occur, or at least log them
+            println "[Discord-Changelog] Received response: ${req.responseMessage} (${req.responseCode})"
+        } else {
+            println '[Discord-Changelog] Missing required "DISCORD_CHANGELOG_WEBHOOK_URL" Environment Variable!!!'
+        }
+    }
+}
+
+tasks.register('publishChangelogFile') {
+    dependsOn tasks.generateChangelogs
+
+    doLast {
+        if(System.getenv('APEXSTUDIOS_CHANGELOG_SERVER_KEY') != null) {
+            def changelogLines = file('changelogs/changelog.txt').text.split('\n').drop(1).join('\n')
+            def url = "https://updates.apexstudios.dev/${MOD_ID}/${MOD_VERSION}+${MINECRAFT_VERSION}"
+            println "[Changelog-Server] Publishing changelog to: ${url}"
+
+            HttpURLConnection req = new URL(url).openConnection()
+            req.setRequestMethod('PUT')
+            req.setRequestProperty('Content-Type', 'text/plain; charset=UTF-8')
+            req.setRequestProperty('X-Api-Key', System.getenv('APEXSTUDIOS_CHANGELOG_SERVER_KEY'))
+            req.setDoOutput(true)
+            req.getOutputStream().write(changelogLines.getBytes('UTF-8'))
+            // read the response, without this, webhook wont actually be sent
+            // we should maybe, perhaps, handle any errors that could occur, or at least log them
+            println "[Changelog-Server] Received response: ${req.responseMessage} (${req.responseCode})"
+        } else {
+            println '[Changelog-Server] Missing required "APEXSTUDIOS_CHANGELOG_SERVER_KEY" Environment Variable!!!'
+        }
     }
 }
 
