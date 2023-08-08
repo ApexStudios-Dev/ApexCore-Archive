@@ -6,6 +6,12 @@ pipeline {
         jdk 'Java 17'
     }
     stages {
+        stage('Setup Repo') {
+            steps {
+                echo 'Setting up local repo'
+                sh 'git fetch --prune --tags'
+            }
+        }
         stage('Clean') {
             steps {
                 echo 'Cleaning Project'
@@ -30,6 +36,9 @@ pipeline {
                 branch '**//* master'
             } */
             steps {
+                echo 'Generating changelog files'
+                sh './gradlew generateChangelogs'
+
                 withCredentials([string(credentialsId: 'changelog_server_key', variable: 'APEXSTUDIOS_CHANGELOG_SERVER_KEY')]) {
                     echo 'Uploading Changelog'
                     sh './gradlew publishChangelogFile'
