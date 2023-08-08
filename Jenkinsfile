@@ -39,6 +39,9 @@ pipeline {
                 echo 'Generating changelog files'
                 sh './gradlew generateChangelogs'
 
+                echo 'Compiling jars'
+                sh './gradlew collectJars'
+
                 withCredentials([string(credentialsId: 'changelog_server_key', variable: 'APEXSTUDIOS_CHANGELOG_SERVER_KEY')]) {
                     echo 'Uploading Changelog'
                     sh './gradlew publishChangelogFile'
