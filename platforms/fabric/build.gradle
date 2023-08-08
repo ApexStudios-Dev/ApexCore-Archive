@@ -31,7 +31,7 @@ loom {
         }
 
         data {
-            client()
+            server()
             ideConfigGenerated true
             vmArg '-Dfabric-api.datagen'
             vmArg "-Dfabric-api.datagen.output-dir=${project(':common').file('src/generated/resources')}"
