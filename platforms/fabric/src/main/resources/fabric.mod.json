@@ -71,7 +71,7 @@
     },
     "accessWidener": "apexcore.accesswidener",
     "depends": {
-        "minecraft": "~${MINECRAFT_VERSION}",
+        "minecraft": "${MINECRAFT_FABRIC_VERSION_RANGE}",
         "java": ">=${JAVA_VERSION}",
         "fabric": "*"
     },
