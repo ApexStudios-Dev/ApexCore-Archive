@@ -123,14 +123,14 @@ subprojects {
         }
 
         repositories {
-            if(System.getenv('MAVEN_PASSWORD') != null) {
+            if(providers.environmentVariable('MAVEN_PASSWORD').isPresent()) {
                 maven {
                     name 'Covers1624-Maven'
                     url 'https://nexus.covers1624.net/repository/apex-releases/'
 
                     credentials {
                         username 'apex'
-                        password System.getenv('MAVEN_PASSWORD')
+                        password providers.environmentVariable('MAVEN_PASSWORD').get()
                     }
                 }
             }
@@ -171,7 +171,7 @@ tasks.register('generateChangelogs') {
 
 tasks.register('sendDiscordChangelog') {
     doLast {
-        if(System.getenv('DISCORD_CHANGELOG_WEBHOOK_URL') != null) {
+        if(providers.environmentVariable('DISCORD_CHANGELOG_WEBHOOK_URL').isPresent()) {
             // cause using emojis from different discord guilds
             // is a nitro feature and webhooks dont have nitro
             def emojis = [
@@ -251,7 +251,7 @@ tasks.register('sendDiscordChangelog') {
                 ]
             ]
 
-            HttpURLConnection req = new URL(System.getenv('DISCORD_CHANGELOG_WEBHOOK_URL')).openConnection()
+            HttpURLConnection req = new URL(providers.environmentVariable('DISCORD_CHANGELOG_WEBHOOK_URL').get()).openConnection()
             req.setRequestMethod('POST')
             req.setRequestProperty('Content-Type', 'application/json; charset=UTF-8')
             req.setDoOutput(true)
@@ -269,7 +269,7 @@ tasks.register('publishChangelogFile') {
     dependsOn tasks.generateChangelogs
 
     doLast {
-        if(System.getenv('APEXSTUDIOS_CHANGELOG_SERVER_KEY') != null) {
+        if(providers.environmentVariable('APEXSTUDIOS_CHANGELOG_SERVER_KEY').isPresent()) {
             def changelogLines = file('changelogs/changelog.txt').text.split('\n').drop(1).join('\n')
             def url = "https://updates.apexstudios.dev/${MOD_ID}/${MOD_VERSION}+${MINECRAFT_VERSION}"
             println "[Changelog-Server] Publishing changelog to: ${url}"
@@ -277,7 +277,7 @@ tasks.register('publishChangelogFile') {
             HttpURLConnection req = new URL(url).openConnection()
             req.setRequestMethod('PUT')
             req.setRequestProperty('Content-Type', 'text/plain; charset=UTF-8')
-            req.setRequestProperty('X-Api-Key', System.getenv('APEXSTUDIOS_CHANGELOG_SERVER_KEY'))
+            req.setRequestProperty('X-Api-Key', providers.environmentVariable('APEXSTUDIOS_CHANGELOG_SERVER_KEY').get())
             req.setDoOutput(true)
             req.getOutputStream().write(changelogLines.getBytes('UTF-8'))
             // read the response, without this, webhook wont actually be sent
