@@ -35,19 +35,25 @@ subprojects {
         mavenLocal()
         maven { url 'https://maven.covers1624.net/' }
 
-        exclusiveContent {
-            forRepository { maven { url 'https://maven.parchmentmc.org' } }
-            filter { includeGroupByRegex 'org\\.parchmentmc.*' }
+        maven {
+            url 'https://maven.parchmentmc.org'
+            content {
+                includeGroupByRegex 'org\\.parchmentmc.*'
+            }
         }
 
-        exclusiveContent {
-            forRepository { maven { url 'https://www.cursemaven.com' } }
-            filter { includeGroup 'curse.maven' }
+        maven {
+            url 'https://www.cursemaven.com'
+            content {
+                includeGroup 'curse.maven'
+            }
         }
 
-        exclusiveContent {
-            forRepository { maven { url 'https://api.modrinth.com/maven' } }
-            filter { includeGroup 'maven.modrinth' }
+        maven {
+            url 'https://api.modrinth.com/maven'
+            content {
+                includeGroup 'maven.modrinth'
+            }
         }
     }
 
