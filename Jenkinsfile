@@ -17,9 +17,7 @@ pipeline {
             steps {
                 echo 'Generating Resources'
                 sh './gradlew fabric:runData'
-            }
 
-            steps {
                 echo 'Building'
                 sh './gradlew build'
             }
