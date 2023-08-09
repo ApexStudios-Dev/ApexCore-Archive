@@ -6,7 +6,6 @@ plugins {
 
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1'
 
-    id 'com.palantir.git-version' version '1.0.0' apply false
     id 'me.modmuss50.mod-publish-plugin' version '0.3.3' apply false
     id 'net.neoforged.gradleutils' version '2.+' apply false
 }
@@ -16,6 +15,9 @@ allprojects {
         into rootProject.file('jars')
     }
 }
+
+// register so that can be referenced in subProjects { }
+tasks.register('generateChangelogs')
 
 subprojects {
     apply plugin: 'java-library'
@@ -66,6 +68,8 @@ subprojects {
     }
 
     processResources {
+        dependsOn rootProject.tasks.generateChangelogs
+
         project.properties.each {
             inputs.property "${it.key}", "${it.value}"
         }
@@ -73,6 +77,10 @@ subprojects {
         filesMatching([ '*.mixins.json', 'pack.mcmeta', 'META-INF/mods.toml', 'fabric.mod.json' ]) {
             expand project.properties
         }
+
+        from rootProject.file('changelogs/changelog.md')
+        from rootProject.file('LICENSE')
+        from rootProject.file('README.MD')
     }
 
     java {
@@ -144,7 +152,6 @@ subprojects {
     }
 }
 
-apply plugin: 'com.palantir.git-version'
 apply plugin: 'net.neoforged.gradleutils'
 
 afterEvaluate {
@@ -152,22 +159,18 @@ afterEvaluate {
     tasks.findByName('configureTeamCity')??.enabled = false
 }
 
-def repo = versionDetails()
-
 tasks.register('generateChangelogTxt', net.minecraftforge.gradleutils.tasks.GenerateChangelogTask) {
     outputFile = file('changelogs/changelog.txt')
-    startingTag = "${repo.lastTag}"
+    startingTag = "${MOD_VERSION_TAG}"
 }
 
 tasks.register('generateChangelogMd', net.minecraftforge.gradleutils.tasks.GenerateChangelogTask) {
     buildMarkdown = true
     outputFile = file('changelogs/changelog.md')
-    startingTag = "${repo.lastTag}"
+    startingTag = "${MOD_VERSION_TAG}"
 }
 
-tasks.register('generateChangelogs') {
-    dependsOn generateChangelogTxt, generateChangelogMd
-}
+generateChangelogs.dependsOn generateChangelogTxt, generateChangelogMd
 
 tasks.register('sendDiscordChangelog') {
     doLast {

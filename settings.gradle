@@ -56,4 +56,4 @@ includePlatform 'common'
 // includePlatform 'neoforge'
 includePlatform 'fabric'
 
-rootProject.name = "${MOD_NAME}-${MINECRAFT_VERSION}"
+rootProject.name = "${MOD_NAME}"
