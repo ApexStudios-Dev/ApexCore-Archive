@@ -32,9 +32,9 @@ pipeline {
             }
         }
         stage('Publish') {
-            /* when {
-                branch '**//* master'
-            } */
+            when {
+                branch '**/master'
+            }
             steps {
                 echo 'Generating changelog files'
                 sh './gradlew generateChangelogs'
