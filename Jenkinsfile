@@ -27,8 +27,14 @@ pipeline {
                 // echo 'Generating Resources (NeoForge)'
                 // sh './gradlew neoforge:runData'
 
+                echo 'Generating changelog files'
+                sh './gradlew generateChangelogs'
+
                 echo 'Building'
                 sh './gradlew build'
+
+                echo 'Compiling jars'
+                sh './gradlew collectJars'
             }
         }
         stage('Publish') {
@@ -36,12 +42,6 @@ pipeline {
                 branch '**/master'
             }
             steps {
-                echo 'Generating changelog files'
-                sh './gradlew generateChangelogs'
-
-                echo 'Compiling jars'
-                sh './gradlew collectJars'
-
                 withCredentials([string(credentialsId: 'changelog_server_key', variable: 'APEXSTUDIOS_CHANGELOG_SERVER_KEY')]) {
                     echo 'Uploading Changelog'
                     sh './gradlew publishChangelogFile'
@@ -65,7 +65,10 @@ pipeline {
                     echo 'Notifying Discord'
                     sh './gradlew sendDiscordChangelog'
                 }
-
+            }
+        }
+        stage('Finalization') {
+            steps {
                 echo 'Archiving Jars'
                 archiveArtifacts artifacts: 'jars/*.jar', fingerprint: true, followSymlinks: false, onlyIfSuccessful: true
             }
