@@ -15,7 +15,7 @@ pipeline {
         stage('Clean') {
             steps {
                 echo 'Cleaning Project'
-                sh 'rmdir -rf ./jars'
+                sh 'rm -rf ./jars'
                 sh 'chmod +x gradlew'
                 sh './gradlew clean'
             }
