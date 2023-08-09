@@ -22,7 +22,6 @@ import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderType;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -118,15 +117,16 @@ public final class LootTableProvider extends net.minecraft.data.loot.LootTablePr
 
         return CompletableFuture.allOf(lootTables.entrySet().stream().map(entry -> DataProvider.saveStable(
                 cache,
-                LootDataType.TABLE.parser().toJsonTree(entry.getValue()),
+                LootTable.CODEC,
+                entry.getValue(),
                 pathProvider.json(entry.getKey())
         )).toArray(CompletableFuture[]::new));
     }
 
     public static <T extends LootTableSubProvider> LootType<T> registerLootType(LootContextParamSet paramSet, Function<LootTableProvider, T> subProviderFactory)
     {
-        var lootType = new LootTypeImpl<>(paramSet, subProviderFactory);
-        var lootTypeId = Objects.requireNonNull(LootContextParamSets.getKey(paramSet));
+        var lootTypeId = LootContextParamSets.REGISTRY.inverse().get(paramSet);
+        var lootType = new LootTypeImpl<>(paramSet, lootTypeId, subProviderFactory);
 
         if(LOOT_TYPES.put(lootTypeId, lootType) != null)
             throw new IllegalStateException("Duplicate LootType registration: %s".formatted(lootTypeId));
@@ -137,18 +137,20 @@ public final class LootTableProvider extends net.minecraft.data.loot.LootTablePr
     static final class LootTypeImpl<T extends LootTableSubProvider> implements LootType<T>
     {
         private final LootContextParamSet paramSet;
+        private final ResourceLocation lootTypeName;
         private final Function<LootTableProvider, T> subProviderFactory;
 
-        private LootTypeImpl(LootContextParamSet paramSet, Function<LootTableProvider, T> subProviderFactory)
+        private LootTypeImpl(LootContextParamSet paramSet, ResourceLocation lootTypeName, Function<LootTableProvider, T> subProviderFactory)
         {
             this.paramSet = paramSet;
+            this.lootTypeName = lootTypeName;
             this.subProviderFactory = subProviderFactory;
         }
 
         @Override
         public ResourceLocation lootTypeName()
         {
-            return Objects.requireNonNull(LootContextParamSets.getKey(paramSet));
+            return lootTypeName;
         }
 
         @Override

@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public final class EntityLootProvider implements LootTableSubProvider
 {
-    public static final EntityPredicate.Builder ENTITY_ON_FIRE = EntityPredicate.Builder.entity().flags(EntityFlagsPredicate.Builder.flags().setOnFire(true).build());
+    public static final EntityPredicate.Builder ENTITY_ON_FIRE = EntityPredicate.Builder.entity().flags(EntityFlagsPredicate.Builder.flags().setOnFire(true));
     private static final Set<EntityType<?>> SPECIAL_LOOT_TABLE_TYPES = Set.of(EntityType.PLAYER, EntityType.ARMOR_STAND, EntityType.IRON_GOLEM, EntityType.SNOW_GOLEM, EntityType.VILLAGER);
 
     private final Map<EntityType<?>, Map<ResourceLocation, LootTable.Builder>> lootTables = Maps.newHashMap();

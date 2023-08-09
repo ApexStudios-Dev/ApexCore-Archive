@@ -15,7 +15,9 @@ import net.minecraft.world.level.block.Block;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 public final class RecipeProvider implements DataProvider
 {
@@ -37,32 +39,37 @@ public final class RecipeProvider implements DataProvider
 
     public EnterBlockTrigger.TriggerInstance insideOf(Block block, StatePropertiesPredicate statePropertiesPredicate)
     {
-        return new EnterBlockTrigger.TriggerInstance(ContextAwarePredicate.ANY, block, statePropertiesPredicate);
+        return new EnterBlockTrigger.TriggerInstance(Optional.empty(), block, Optional.of(statePropertiesPredicate));
     }
 
     public EnterBlockTrigger.TriggerInstance insideOf(Block block)
     {
-        return insideOf(block, StatePropertiesPredicate.ANY);
+        return EnterBlockTrigger.TriggerInstance.entersBlock(block);
+    }
+
+    public InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate.Builder... builders)
+    {
+        return inventoryTrigger(Stream.of(builders).map(ItemPredicate.Builder::build).flatMap(Optional::stream).toArray(ItemPredicate[]::new));
     }
 
     public InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate... predicates)
     {
-        return new InventoryChangeTrigger.TriggerInstance(ContextAwarePredicate.ANY, MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, predicates);
+        return new InventoryChangeTrigger.TriggerInstance(Optional.empty(), MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, List.of(predicates));
     }
 
     public InventoryChangeTrigger.TriggerInstance has(MinMaxBounds.Ints count, ItemLike item)
     {
-        return inventoryTrigger(ItemPredicate.Builder.item().of(item).withCount(count).build());
+        return inventoryTrigger(ItemPredicate.Builder.item().of(item).withCount(count));
     }
 
     public InventoryChangeTrigger.TriggerInstance has(ItemLike item)
     {
-        return inventoryTrigger(ItemPredicate.Builder.item().of(item).build());
+        return inventoryTrigger(ItemPredicate.Builder.item().of(item));
     }
 
     public InventoryChangeTrigger.TriggerInstance has(TagKey<Item> tag)
     {
-        return inventoryTrigger(ItemPredicate.Builder.item().of(tag).build());
+        return inventoryTrigger(ItemPredicate.Builder.item().of(tag));
     }
 
     @Override

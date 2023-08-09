@@ -4,7 +4,6 @@ import com.google.common.collect.Maps;
 import net.minecraft.Util;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.stats.StatType;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
@@ -89,11 +88,6 @@ public final class LanguageBuilder
         return add(key.getDescriptionId(), value);
     }
 
-    public LanguageBuilder add(StatType<?> key, String value)
-    {
-        return add(key.getTranslationKey(), value);
-    }
-
     public LanguageBuilder add(MobEffect key, String value)
     {
         return add(key.getDescriptionId(), value);
@@ -167,12 +161,6 @@ public final class LanguageBuilder
     public String get(Attribute key)
     {
         return get(key.getDescriptionId());
-    }
-
-    @Nullable
-    public String get(StatType<?> key)
-    {
-        return get(key.getTranslationKey());
     }
 
     @Nullable
