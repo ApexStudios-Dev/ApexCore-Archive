@@ -57,11 +57,11 @@ pipeline {
 
                 withCredentials([string(credentialsId: 'covers1624_maven_password', variable: 'MAVEN_PASSWORD')]) {
                     echo 'Publishing to Maven'
-                    // sh './gradlew publish'
+                    sh './gradlew publish'
                 }
 
-                withCredentials([string(credentialsId: 'discord_changelog_webhook_test', variable: 'DISCORD_CHANGELOG_WEBHOOK_URL')]) {
-                // withCredentials([string(credentialsId: 'discord_changelog_webhook_url', variable: 'MAVEN_PASSWORD')]) {
+                // withCredentials([string(credentialsId: 'discord_changelog_webhook_test', variable: 'DISCORD_CHANGELOG_WEBHOOK_URL')]) {
+                withCredentials([string(credentialsId: 'discord_changelog_webhook_url', variable: 'MAVEN_PASSWORD')]) {
                     echo 'Notifying Discord'
                     sh './gradlew sendDiscordChangelog'
                 }
