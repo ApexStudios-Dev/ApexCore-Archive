@@ -27,6 +27,6 @@ issueTrackerURL="https://discord.apexstudios.dev/"
 [[dependencies."${MOD_ID}"]]
 	modId="minecraft"
 	mandatory=true
-	versionRange="${MINECRAFT_VERSION_RANGE}"
+	versionRange="${MINECRAFT_NEOFORGE_VERSION_RANGE}"
 	ordering="AFTER"
 	side="BOTH"
