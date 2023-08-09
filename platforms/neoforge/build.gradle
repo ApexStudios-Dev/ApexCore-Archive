@@ -149,11 +149,11 @@ publishing {
 
 publishMods {
     file = remapJar.archiveFile
-    changelog = rootProject.file('build/changelog.md').exists() ? rootProject.file('build/changelog.md').getText('UTF-8') : ''
+    changelog = rootProject.file('changelogs/changelog.md').exists() ? rootProject.file('changelogs/changelog.md').getText('UTF-8') : ''
     type = me.modmuss50.mpp.ReleaseType.ALPHA
     maxRetries = 5
-    version = "${MOD_VERSION}"
-    displayName = "[NeoForge] ${MOD_NAME} - ${MOD_VERSION}+${MINECRAFT_VERSION}"
+    version = "${MOD_FULL_VERSION}"
+    displayName = "[NeoForge] ${MOD_NAME} - ${MOD_FULL_VERSION}+${MINECRAFT_VERSION}"
     modLoaders.add('neoforge')
     additionalFiles.from(remapSourcesJar.archiveFile)
     dryRun = !providers.environmentVariable('MODRINTH_TOKEN').isPresent() || !providers.environmentVariable('CURSEFORGE_TOKEN').isPresent()

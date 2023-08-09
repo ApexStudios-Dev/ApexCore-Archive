@@ -6,8 +6,16 @@ plugins {
 
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1'
 
+    id 'com.palantir.git-version' version '1.0.0' apply false
     id 'me.modmuss50.mod-publish-plugin' version '0.3.3' apply false
     id 'net.neoforged.gradleutils' version '2.+' apply false
+}
+
+apply plugin: 'com.palantir.git-version'
+def repo = versionDetails()
+
+project.ext {
+    MOD_FULL_VERSION = "${MOD_VERSION}.${repo.commitDistance}"
 }
 
 allprojects {
@@ -25,7 +33,7 @@ subprojects {
     apply plugin: 'maven-publish'
 
     group = "${MOD_GROUP}"
-    version = "${MOD_VERSION}+${MINECRAFT_VERSION}"
+    version = "${MOD_FULL_VERSION}+${MINECRAFT_VERSION}"
     archivesBaseName = "${MOD_ID}-${project.name}"
 
     sourceSets {
@@ -236,9 +244,9 @@ tasks.register('sendDiscordChangelog') {
                 avatar_url: 'https://raw.githubusercontent.com/ApexStudios-Dev/.github/master/assets/apexstudios/Logo.png',
                 embeds: [
                     [
-                        title: "**${MOD_NAME}** updated to **_v${MOD_VERSION}_**!",
-                        description: "[For full changelog see here](https://updates.apexstudios.dev/${MOD_ID}/${MOD_VERSION}+${MINECRAFT_VERSION})\n\n**Download**: [${emojis['modrinth']} **_Modrinth_**](https://modrinth.com/mod/${MOD_MODRINTH_SLUG}) | [${emojis['curseforge']} **_Curseforge_**](https://www.curseforge.com/minecraft/mc-mods/${MOD_CUSRSEFORGE_SLUG})",
-                        url: "https://updates.apexstudios.dev/${MOD_ID}/${MOD_VERSION}+${MINECRAFT_VERSION}",
+                        title: "**${MOD_NAME}** updated to **_v${MOD_FULL_VERSION}_**!",
+                        description: "[For full changelog see here](https://updates.apexstudios.dev/${MOD_ID}/${MOD_FULL_VERSION}+${MINECRAFT_VERSION})\n\n**Download**: [${emojis['modrinth']} **_Modrinth_**](https://modrinth.com/mod/${MOD_MODRINTH_SLUG}) | [${emojis['curseforge']} **_Curseforge_**](https://www.curseforge.com/minecraft/mc-mods/${MOD_CUSRSEFORGE_SLUG})",
+                        url: "https://updates.apexstudios.dev/${MOD_ID}/${MOD_FULL_VERSION}+${MINECRAFT_VERSION}",
                         color: "${Integer.decode(MOD_COLOR)}",
                         footer: [
                             text: 'ApexStudios',
@@ -246,7 +254,7 @@ tasks.register('sendDiscordChangelog') {
                         ],
                         author: [
                             name: "${MOD_NAME}",
-                            url: "https://updates.apexstudios.dev/${MOD_ID}/${MOD_VERSION}+${MINECRAFT_VERSION}",
+                            url: "https://updates.apexstudios.dev/${MOD_ID}/${MOD_FULL_VERSION}+${MINECRAFT_VERSION}",
                             icon_url: "https://raw.githubusercontent.com/ApexStudios-Dev/.github/master/assets/minecraft/${MOD_ID}_logo.png"
                         ],
                         fields: fields
@@ -274,7 +282,7 @@ tasks.register('publishChangelogFile') {
     doLast {
         if(providers.environmentVariable('APEXSTUDIOS_CHANGELOG_SERVER_KEY').isPresent()) {
             def changelogLines = file('changelogs/changelog.txt').text.split('\n').drop(1).join('\n')
-            def url = "https://updates.apexstudios.dev/${MOD_ID}/${MOD_VERSION}+${MINECRAFT_VERSION}"
+            def url = "https://updates.apexstudios.dev/${MOD_ID}/${MOD_FULL_VERSION}+${MINECRAFT_VERSION}"
             println "[Changelog-Server] Publishing changelog to: ${url}"
 
             HttpURLConnection req = new URL(url).openConnection()
