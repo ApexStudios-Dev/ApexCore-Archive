@@ -39,8 +39,13 @@ pipeline {
             }
         }
         stage('Publish') {
+            // only publish if running on origin master branches
+            // and on a tagged build
             when {
-                branch '**/master'
+                allOf {
+                    branch 'origin/**/master'
+                    buildingTag()
+                }
             }
             steps {
                 withCredentials([string(credentialsId: 'changelog_server_key', variable: 'APEXSTUDIOS_CHANGELOG_SERVER_KEY')]) {
