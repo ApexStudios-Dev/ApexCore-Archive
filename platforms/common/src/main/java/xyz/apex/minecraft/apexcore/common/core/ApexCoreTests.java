@@ -9,7 +9,9 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.models.model.ModelLocationUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -43,6 +45,7 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -63,6 +66,9 @@ import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.client.renderer.ItemStackRenderer;
+import xyz.apex.minecraft.apexcore.common.lib.component.block.BaseBlockComponentHolder;
+import xyz.apex.minecraft.apexcore.common.lib.component.block.BlockComponentRegistrar;
+import xyz.apex.minecraft.apexcore.common.lib.component.block.types.BlockComponentTypes;
 import xyz.apex.minecraft.apexcore.common.lib.helper.InteractionResultHelper;
 import xyz.apex.minecraft.apexcore.common.lib.hook.MenuHooks;
 import xyz.apex.minecraft.apexcore.common.lib.menu.EnhancedSlot;
@@ -71,6 +77,10 @@ import xyz.apex.minecraft.apexcore.common.lib.menu.SimpleContainerMenuScreen;
 import xyz.apex.minecraft.apexcore.common.lib.registry.Registrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.BlockEntityEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.MenuEntry;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.state.MultiVariantBuilder;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.state.PropertyDispatch;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.state.Variant;
 
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -172,6 +182,50 @@ public final class ApexCoreTests
                 .<TestBlockEntity>defaultBlockEntity((blockEntityType, pos, blockState) -> new TestBlockEntity(blockEntityType, pos, blockState, testMenu))
         .register();
 
+        var testHorizontalBlock = registrar
+                .object("test_horizontal_block")
+                .block(TestHorizontalBlock::new)
+                .copyInitialPropertiesFrom(testBlock::value)
+                .blockState((lookup, entry) -> MultiVariantBuilder
+                        .builder(entry.value(), Variant
+                                .variant()
+                                .model(lookup
+                                        .lookup(ProviderTypes.MODELS)
+                                        .withParent(ModelLocationUtils.getModelLocation(entry.value()), "block/cube")
+                                        .texture("particle", "#bottom")
+                                        .texture("down", "#bottom")
+                                        .texture("up", "#top")
+                                        .texture("down", "#bottom")
+                                        .texture("north", "#front")
+                                        .texture("east", "#side")
+                                        .texture("south", "#side")
+                                        .texture("west", "#side")
+                                        .texture("side", "block/stone")
+                                        .texture("front", "block/diamond_ore")
+                                        .texture("top", "block/dirt")
+                                        .texture("bottom", "block/oak_planks")
+                                )
+                        )
+                        .with(PropertyDispatch
+                                .property(BlockStateProperties.HORIZONTAL_FACING)
+                                .select(Direction.EAST, Variant
+                                        .variant()
+                                        .yRot(Variant.Rotation.R90)
+                                )
+                                .select(Direction.SOUTH, Variant
+                                        .variant()
+                                        .yRot(Variant.Rotation.R180)
+                                )
+                                .select(Direction.WEST, Variant
+                                        .variant()
+                                        .yRot(Variant.Rotation.R270)
+                                )
+                                .select(Direction.NORTH, Variant.variant())
+                        )
+                )
+                .defaultItem()
+        .register();
+
         var creativeModeTab = registrar
                 .creativeModeTab("test")
                 .lang("en_us", "ApexCore - Test Elements")
@@ -182,6 +236,7 @@ public final class ApexCoreTests
                     output.accept(testEnchantment.asStack(1));
                     output.accept(testEntity);
                     output.accept(testBlockWithEntity);
+                    output.accept(testHorizontalBlock);
                 })
         .register();
 
@@ -426,6 +481,20 @@ public final class ApexCoreTests
             addSlot(new EnhancedSlot(container, 0, 80, 37));
 
             bindPlayerInventory(playerInventory, 8, 84, this::addSlot);
+        }
+    }
+
+    private static final class TestHorizontalBlock extends BaseBlockComponentHolder
+    {
+        private TestHorizontalBlock(Properties properties)
+        {
+            super(properties);
+        }
+
+        @Override
+        protected void registerComponents(BlockComponentRegistrar registrar)
+        {
+            registrar.register(BlockComponentTypes.HORIZONTAL_FACING);
         }
     }
 }

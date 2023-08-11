@@ -79,7 +79,7 @@ public final class MultiVariantBuilder implements BlockStateGenerator
     private static List<Variant> merge(List<Variant> left, List<Variant> right)
     {
         var builder = ImmutableList.<Variant>builder();
-        left.forEach(lVar -> right.forEach(rVar -> Variant.merge(lVar, rVar)));
+        left.forEach(lVar -> right.forEach(rVar -> builder.add(Variant.merge(lVar, rVar))));
         return builder.build();
     }
 
