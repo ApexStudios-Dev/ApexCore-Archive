@@ -37,7 +37,7 @@ public final class RecipeBuilder<O extends AbstractRegistrar<O>, T extends Recip
         this.fromNetwork = fromNetwork;
         this.toNetwork = toNetwork;
 
-        registrar.simple(Registries.RECIPE_TYPE, registrationName(), this);
+        registrar.simple(Registries.RECIPE_TYPE, registrationName(), this).register();
     }
 
     @Override
