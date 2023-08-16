@@ -7,8 +7,7 @@ import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockComponent;
 @ApiStatus.NonExtendable
 public interface BlockComponentTypes
 {
-    BlockComponentType<FluidLoggedBlockComponent> WATERLOGGED = FluidLoggedBlockComponent.WATER;
-    BlockComponentType<FluidLoggedBlockComponent> LAVALOGGED = FluidLoggedBlockComponent.LAVA;
+    BlockComponentType<WaterLoggedBlockComponent> WATERLOGGED = WaterLoggedBlockComponent.COMPONENT_TYPE;
     BlockComponentType<HorizontalFacingBlockComponent> HORIZONTAL_FACING = HorizontalFacingBlockComponent.COMPONENT_TYPE;
     BlockComponentType<MultiBlockComponent> MULTI_BLOCK = MultiBlockComponent.COMPONENT_TYPE;
 

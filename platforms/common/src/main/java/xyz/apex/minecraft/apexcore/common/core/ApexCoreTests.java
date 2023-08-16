@@ -39,13 +39,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.block.state.properties.StairsShape;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -59,6 +64,8 @@ import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Marker;
@@ -226,6 +233,16 @@ public final class ApexCoreTests
                 .defaultItem()
         .register();
 
+        var testFluidLoggingBlock = registrar
+                .object("test_fluid_logging_block")
+                .block(TestFluidLoggingBlock::new)
+                .defaultBlockState((provider, lookup, entry) -> provider.withParent(
+                        entry.getRegistryName().withPrefix("block/"),
+                        "block/oak_stairs"
+                ))
+                .defaultItem()
+        .register();
+
         var creativeModeTab = registrar
                 .creativeModeTab("test")
                 .lang("en_us", "ApexCore - Test Elements")
@@ -237,6 +254,7 @@ public final class ApexCoreTests
                     output.accept(testEntity);
                     output.accept(testBlockWithEntity);
                     output.accept(testHorizontalBlock);
+                    output.accept(testFluidLoggingBlock);
                 })
         .register();
 
@@ -495,6 +513,32 @@ public final class ApexCoreTests
         protected void registerComponents(BlockComponentRegistrar registrar)
         {
             registrar.register(BlockComponentTypes.HORIZONTAL_FACING);
+        }
+    }
+
+    private static final class TestFluidLoggingBlock extends BaseBlockComponentHolder
+    {
+        private TestFluidLoggingBlock(Properties properties)
+        {
+            super(properties);
+        }
+
+        @Override
+        protected void registerComponents(BlockComponentRegistrar registrar)
+        {
+            registrar.register(BlockComponentTypes.WATERLOGGED);
+        }
+
+        @Override
+        public VoxelShape getShape(BlockState blockState, BlockGetter level, BlockPos pos, CollisionContext context)
+        {
+            return Blocks.OAK_STAIRS
+                    .defaultBlockState()
+                    .setValue(StairBlock.FACING, Direction.EAST)
+                    .setValue(StairBlock.HALF, Half.BOTTOM)
+                    .setValue(StairBlock.WATERLOGGED, blockState.getValue(BlockStateProperties.WATERLOGGED))
+                    .setValue(StairBlock.SHAPE, StairsShape.STRAIGHT)
+                    .getShape(level, pos, context);
         }
     }
 }
