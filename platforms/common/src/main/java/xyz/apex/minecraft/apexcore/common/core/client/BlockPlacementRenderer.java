@@ -146,6 +146,7 @@ public final class BlockPlacementRenderer
         pose.translate(-camPosition.x, -camPosition.y, -camPosition.z);
 
         var rendered = false;
+        var canBePlaced = canBePlaced(placeContext, renderPos, blockState);
 
         // render for every block in the multi block
         // TODO: maybe extract this out into some form of registry, to allow other mods to register their own placement visualizers and override the default rendering
@@ -166,7 +167,7 @@ public final class BlockPlacementRenderer
                         continue;
 
                     var worldPosition = MultiBlockComponent.worldPosition(multiBlockType, renderPos, newBlockState);
-                    renderBlock(client, pose, buffer, stack, newBlockState, worldPosition, placeContext);
+                    renderBlock(client, pose, buffer, stack, newBlockState, worldPosition, canBePlaced);
                     rendered = true;
                 }
             }
@@ -174,16 +175,40 @@ public final class BlockPlacementRenderer
 
         // render single block, if multi block did not render
         if(!rendered)
-            renderBlock(client, pose, buffer, stack, blockState, renderPos, placeContext);
+            renderBlock(client, pose, buffer, stack, blockState, renderPos, canBePlaced);
 
         pose.popPose();
     }
 
-    @SuppressWarnings("DataFlowIssue")
-    private void renderBlock(Minecraft client, PoseStack pose, MultiBufferSource buffer, ItemStack stack, BlockState blockState, BlockPos pos, BlockPlaceContext context)
+    private boolean canBePlaced(BlockPlaceContext context, BlockPos pos, BlockState blockState)
     {
-        var canBePlaced = MultiBlockComponent.canPlaceAt(context, pos, blockState);
+        if(blockState.getBlock() instanceof BlockComponentHolder componentHolder)
+        {
+            var multiBlockComponent = componentHolder.getComponent(BlockComponentTypes.MULTI_BLOCK);
 
+            if(multiBlockComponent != null)
+            {
+                var multiBlockType = multiBlockComponent.getMultiBlockType();
+
+                for(var i = 0; i < multiBlockType.size(); i++)
+                {
+                    var newBlockState = MultiBlockComponent.setIndex(multiBlockType, blockState, i);
+                    var worldPosition = MultiBlockComponent.worldPosition(multiBlockType, pos, newBlockState);
+
+                    if(!MultiBlockComponent.canPlaceAt(context, worldPosition, newBlockState))
+                        return false;
+                }
+
+                return true;
+            }
+        }
+
+        return MultiBlockComponent.canPlaceAt(context, pos, blockState);
+    }
+
+    @SuppressWarnings("DataFlowIssue")
+    private void renderBlock(Minecraft client, PoseStack pose, MultiBufferSource buffer, ItemStack stack, BlockState blockState, BlockPos pos, boolean canBePlaced)
+    {
         // translate to correct render position
         var blockOffset = blockState.getOffset(client.level, pos);
         pose.pushPose();

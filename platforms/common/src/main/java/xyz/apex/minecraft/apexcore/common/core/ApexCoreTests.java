@@ -81,6 +81,7 @@ import xyz.apex.minecraft.apexcore.common.lib.hook.MenuHooks;
 import xyz.apex.minecraft.apexcore.common.lib.menu.EnhancedSlot;
 import xyz.apex.minecraft.apexcore.common.lib.menu.SimpleContainerMenu;
 import xyz.apex.minecraft.apexcore.common.lib.menu.SimpleContainerMenuScreen;
+import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockType;
 import xyz.apex.minecraft.apexcore.common.lib.registry.Registrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.BlockEntityEntry;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.MenuEntry;
@@ -243,6 +244,17 @@ public final class ApexCoreTests
                 .defaultItem()
         .register();
 
+        var testMultiBlock = registrar
+                .object("test_mulit_block")
+                .block(TestMultiBlock::new)
+                .defaultBlockState((provider, lookup, entry) -> provider.withParent(
+                        entry.getRegistryName().withPrefix("block/"),
+                        "block/cube_all"
+                ).texture("all", new ResourceLocation("block/debug2")))
+                .tag(ApexTags.Blocks.PLACEMENT_VISUALIZER)
+                .defaultItem()
+        .register();
+
         var creativeModeTab = registrar
                 .creativeModeTab("test")
                 .lang("en_us", "ApexCore - Test Elements")
@@ -255,6 +267,7 @@ public final class ApexCoreTests
                     output.accept(testBlockWithEntity);
                     output.accept(testHorizontalBlock);
                     output.accept(testFluidLoggingBlock);
+                    output.accept(testMultiBlock);
                 })
         .register();
 
@@ -539,6 +552,20 @@ public final class ApexCoreTests
                     .setValue(StairBlock.WATERLOGGED, blockState.getValue(BlockStateProperties.WATERLOGGED))
                     .setValue(StairBlock.SHAPE, StairsShape.STRAIGHT)
                     .getShape(level, pos, context);
+        }
+    }
+
+    private static final class TestMultiBlock extends BaseBlockComponentHolder
+    {
+        private TestMultiBlock(Properties properties)
+        {
+            super(properties);
+        }
+
+        @Override
+        protected void registerComponents(BlockComponentRegistrar registrar)
+        {
+            registrar.register(BlockComponentTypes.MULTI_BLOCK, component -> component.setMultiBlockType(MultiBlockType.builder().with("X", "X").build()));
         }
     }
 }
