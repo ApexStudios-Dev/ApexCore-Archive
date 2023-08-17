@@ -118,9 +118,6 @@ public final class BlockPlacementRenderer
             stack = client.player.getItemInHand(hand);
         }
 
-        if(stack.isEmpty())
-            return;
-
         // ensure item has an associated block
         if(stack.isEmpty() || !(stack.getItem() instanceof BlockItem item))
             return;
@@ -159,14 +156,18 @@ public final class BlockPlacementRenderer
 
             if(component != null)
             {
-                rendered = true;
                 var multiBlockType = component.getMultiBlockType();
 
                 for(var i = 0; i < multiBlockType.size(); i++)
                 {
                     var newBlockState = MultiBlockComponent.setIndex(multiBlockType, blockState, i);
+
+                    if(newBlockState.getRenderShape() != RenderShape.MODEL)
+                        continue;
+
                     var worldPosition = MultiBlockComponent.worldPosition(multiBlockType, renderPos, newBlockState);
                     renderBlock(client, pose, buffer, stack, newBlockState, worldPosition, placeContext);
+                    rendered = true;
                 }
             }
         }
