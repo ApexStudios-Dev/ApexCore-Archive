@@ -15,9 +15,12 @@ public final class MultiBlockType
     private static final Int2ObjectMap<IntegerProperty> BLOCK_STATE_PROPERTIES = new Int2ObjectOpenHashMap<>();
 
     private final List<BlockPos> localPositions;
+    private final boolean renderAtOriginOnly;
 
-    private MultiBlockType(List<String[]> pattern)
+    private MultiBlockType(List<String[]> pattern, boolean renderAtOriginOnly)
     {
+        this.renderAtOriginOnly = renderAtOriginOnly;
+
         var positions = Sets.<BlockPos>newHashSet();
 
         for(var y = 0; y < pattern.size(); y++)
@@ -39,6 +42,11 @@ public final class MultiBlockType
         }
 
         localPositions = ImmutableList.copyOf(positions);
+    }
+
+    public boolean renderAtOriginOnly()
+    {
+        return renderAtOriginOnly;
     }
 
     public List<BlockPos> getLocalPositions()
@@ -69,6 +77,7 @@ public final class MultiBlockType
     public static final class Builder
     {
         private final List<String[]> pattern = Lists.newArrayList();
+        private boolean renderAtOriginOnly = false;
 
         private Builder()
         {
@@ -80,9 +89,15 @@ public final class MultiBlockType
             return this;
         }
 
+        public Builder renderAtOriginOnly()
+        {
+            renderAtOriginOnly = true;
+            return this;
+        }
+
         public MultiBlockType build()
         {
-            return new MultiBlockType(pattern);
+            return new MultiBlockType(pattern, renderAtOriginOnly);
         }
     }
 }
