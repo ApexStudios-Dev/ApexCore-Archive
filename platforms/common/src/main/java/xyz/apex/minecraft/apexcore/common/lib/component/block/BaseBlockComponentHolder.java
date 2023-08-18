@@ -11,6 +11,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -29,8 +30,10 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.BlockEntityComponentHolder;
+import xyz.apex.minecraft.apexcore.common.lib.component.block.types.BlockComponentTypes;
 import xyz.apex.minecraft.apexcore.common.lib.helper.BlockHelper;
 import xyz.apex.minecraft.apexcore.common.lib.helper.InteractionResultHelper;
+import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockComponent;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -428,8 +431,33 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
 
     @Nullable
     @Override
+    public final MenuProvider getMenuProvider(BlockState blockState, Level level, BlockPos pos)
+    {
+        for(var component : getComponents())
+        {
+            var menuProvider = component.getMenuProvider(blockState, level, pos);
+
+            if(menuProvider != null)
+                return menuProvider;
+        }
+
+        return super.getMenuProvider(blockState, level, pos);
+    }
+
+    @Nullable
+    @Override
     public final BlockEntity newBlockEntity(BlockPos pos, BlockState blockState)
     {
+        var multiBlockComponent = getComponent(BlockComponentTypes.MULTI_BLOCK);
+
+        if(multiBlockComponent != null)
+        {
+            var multiBlockType = multiBlockComponent.getMultiBlockType();
+
+            if(MultiBlockComponent.getIndex(multiBlockType, blockState) != 0)
+                return null;
+        }
+
         var blockEntityType = getBlockEntityType();
         var blockEntity = blockEntityType == null ? null : blockEntityType.create(pos, blockState);
 

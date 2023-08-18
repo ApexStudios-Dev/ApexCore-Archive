@@ -8,6 +8,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
@@ -19,12 +20,14 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.BaseBlockComponent;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.BlockComponentHolder;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.BlockComponentType;
 
 import java.util.Objects;
+import java.util.function.BiFunction;
 
 public final class MultiBlockComponent extends BaseBlockComponent
 {
@@ -197,6 +200,28 @@ public final class MultiBlockComponent extends BaseBlockComponent
             case EAST -> Rotation.CLOCKWISE_90;
             case WEST -> Rotation.COUNTERCLOCKWISE_90;
         });
+    }
+
+    @UnknownNullability("Nullable when 'mapper' returns null")
+    public static <T> T asRoot(BlockGetter level, MultiBlockType multiBlockType, BlockPos worldPosition, BlockState blockState, BiFunction<BlockPos, BlockState, T> mapper)
+    {
+        var rootPos = rootPosition(multiBlockType, worldPosition, blockState);
+        var rootBlockState = level.getBlockState(rootPos);
+        return mapper.apply(rootPos, rootBlockState);
+    }
+
+    @UnknownNullability("Nullable when 'mapper' returns null")
+    public static <T> T asRoot(BlockGetter level, BlockPos worldPosition, BlockState blockState, BiFunction<BlockPos, BlockState, T> mapper)
+    {
+        if(!(blockState.getBlock() instanceof BlockComponentHolder holder))
+            return mapper.apply(worldPosition, blockState);
+
+        var multiBlockComponent = holder.getComponent(COMPONENT_TYPE);
+
+        if(multiBlockComponent == null)
+            return mapper.apply(worldPosition, blockState);
+
+        return asRoot(level, multiBlockComponent.getMultiBlockType(), worldPosition, blockState, mapper);
     }
 
     // TODO: Move somewhere more common

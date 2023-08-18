@@ -74,6 +74,9 @@ import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.client.renderer.ItemStackRenderer;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.BaseBlockComponentHolder;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.BlockComponentRegistrar;
+import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.BaseBlockEntityComponentHolder;
+import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.BlockEntityComponentRegistrar;
+import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.types.BlockEntityComponentTypes;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.types.BlockComponentTypes;
 import xyz.apex.minecraft.apexcore.common.lib.helper.InteractionResultHelper;
 import xyz.apex.minecraft.apexcore.common.lib.hook.MenuHooks;
@@ -89,6 +92,7 @@ import xyz.apex.minecraft.apexcore.common.lib.resgen.state.MultiVariantBuilder;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.state.PropertyDispatch;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.state.Variant;
 
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -213,12 +217,18 @@ public final class ApexCoreTests
                 .defaultItem()
         .register();
 
+        var testMultiBlockMenuType = registrar.<TestMultiBlockMenu, SimpleContainerMenuScreen<TestMultiBlockMenu>>menu("test_multi_block", TestMultiBlockMenu::forNetwork, () -> () -> SimpleContainerMenuScreen::new);
+        var testMultiBlockEntityType = new AtomicReference<BlockEntityType<TestMultiBlockEntity>>();
+
         var testMultiBlock = registrar
-                .object("test_mulit_block")
-                .block(TestMultiBlock::new)
+                .object("test_multi_block")
+                .block(properties -> new TestMultiBlock(properties, testMultiBlockEntityType::get))
                 .defaultBlockState((provider, lookup, entry) -> provider.cubeAll(entry.value(), "block/debug2"))
                 .tag(ApexTags.Blocks.PLACEMENT_VISUALIZER)
                 .defaultItem()
+                .<TestMultiBlockEntity>blockEntity((blockEntityType, pos, blockState) -> new TestMultiBlockEntity(blockEntityType, pos, blockState, testMultiBlockMenuType))
+                    .onRegister(testMultiBlockEntityType::set)
+                .build()
         .register();
 
         var creativeModeTab = registrar
@@ -523,15 +533,73 @@ public final class ApexCoreTests
 
     private static final class TestMultiBlock extends BaseBlockComponentHolder
     {
-        private TestMultiBlock(Properties properties)
+        private final Supplier<BlockEntityType<TestMultiBlockEntity>> blockEntityType;
+
+        private TestMultiBlock(Properties properties, Supplier<BlockEntityType<TestMultiBlockEntity>> blockEntityType)
         {
             super(properties);
+
+            this.blockEntityType = blockEntityType;
         }
 
         @Override
         protected void registerComponents(BlockComponentRegistrar registrar)
         {
+            registrar.register(BlockComponentTypes.WATERLOGGED);
+            registrar.register(BlockComponentTypes.HORIZONTAL_FACING);
             registrar.register(BlockComponentTypes.MULTI_BLOCK, component -> component.setMultiBlockType(MultiBlockType.builder().with("X", "X").build()));
+            registrar.register(BlockComponentTypes.MENU_PROVIDER);
+        }
+
+        @Override
+        protected BlockEntityType<?> getBlockEntityType()
+        {
+            return blockEntityType.get();
+        }
+    }
+
+    private static final class TestMultiBlockEntity extends BaseBlockEntityComponentHolder
+    {
+        private final Supplier<MenuType<TestMultiBlockMenu>> menuType;
+
+        public TestMultiBlockEntity(BlockEntityType<? extends TestMultiBlockEntity> blockEntityType, BlockPos pos, BlockState blockState, Supplier<MenuType<TestMultiBlockMenu>> menuType)
+        {
+            super(blockEntityType, pos, blockState);
+
+            this.menuType = menuType;
+        }
+
+        @Override
+        protected void registerComponents(BlockEntityComponentRegistrar registrar)
+        {
+            registrar.register(BlockEntityComponentTypes.INVENTORY, component -> component.setSlotCount(3 * 5));
+            registrar.register(BlockEntityComponentTypes.NAMEABLE);
+        }
+
+        @Override
+        protected AbstractContainerMenu createMenu(int syncId, Inventory playerInventory)
+        {
+            return new TestMultiBlockMenu(menuType.get(), syncId, playerInventory, getRequiredComponent(BlockEntityComponentTypes.INVENTORY));
+        }
+    }
+
+    private static final class TestMultiBlockMenu extends SimpleContainerMenu
+    {
+        private TestMultiBlockMenu(MenuType<? extends SimpleContainerMenu> menuType, int windowId, Inventory playerInventory, Container container)
+        {
+            super(menuType, windowId, playerInventory, container);
+        }
+
+        @Override
+        protected void bindSlots(Inventory playerInventory)
+        {
+            bindContainer(container, 3, 5, 44, 18, this::addSlot);
+            bindPlayerInventory(playerInventory, 8, 84, this::addSlot);
+        }
+
+        private static TestMultiBlockMenu forNetwork(MenuType<? extends TestMultiBlockMenu> menuType, int syncId, Inventory inventory, FriendlyByteBuf buffer)
+        {
+            return new TestMultiBlockMenu(menuType, syncId, inventory, new SimpleContainer(3 * 5));
         }
     }
 }

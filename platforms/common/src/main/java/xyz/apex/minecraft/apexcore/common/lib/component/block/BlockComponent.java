@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -142,5 +143,10 @@ public sealed interface BlockComponent permits BaseBlockComponent
     @DoNotCall
     @ForOverride
     int getSignal(BlockState blockState, BlockGetter level, BlockPos pos, Direction direction);
+
+    @DoNotCall
+    @ForOverride
+    @Nullable
+    MenuProvider getMenuProvider(BlockState blockState, Level level, BlockPos pos);
     // endregion
 }

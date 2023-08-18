@@ -10,6 +10,7 @@ public interface BlockComponentTypes
     BlockComponentType<WaterLoggedBlockComponent> WATERLOGGED = WaterLoggedBlockComponent.COMPONENT_TYPE;
     BlockComponentType<HorizontalFacingBlockComponent> HORIZONTAL_FACING = HorizontalFacingBlockComponent.COMPONENT_TYPE;
     BlockComponentType<MultiBlockComponent> MULTI_BLOCK = MultiBlockComponent.COMPONENT_TYPE;
+    BlockComponentType<MenuProviderBlockComponent> MENU_PROVIDER = MenuProviderBlockComponent.COMPONENT_TYPE;
 
     @ApiStatus.Internal
     static void bootstrap()
