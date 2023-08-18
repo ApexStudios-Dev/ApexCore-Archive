@@ -11,7 +11,6 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.models.model.ModelLocationUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -125,20 +124,14 @@ public final class ApexCoreTests
                 .object("test_item")
                 .item()
                 .defaultModel()
-                .model((provider, lookup, entry) -> provider.withParent(
-                        entry.getRegistryName().withPrefix("item/"),
-                        provider.existingModel(new ResourceLocation("builtin/entity"))
-                ))
+                .model((provider, lookup, entry) -> provider.entity(entry.value()))
                 .renderer(() -> TestItemStackRenderer::new)
         .register();
 
         var testBlock = registrar
                 .object("test_block")
                 .block()
-                .defaultBlockState((provider, lookup, entry) -> provider.withParent(
-                        entry.getRegistryName().withPrefix("block/"),
-                        "block/cube_all"
-                ).texture("all", new ResourceLocation("block/debug")))
+                .defaultBlockState((provider, lookup, entry) -> provider.cubeAll(entry.value(), "block/debug"))
                 .defaultItem()
         .register();
 
@@ -182,10 +175,7 @@ public final class ApexCoreTests
                 .object("test_block_with_entity")
                 .block(properties -> new TestBlockWithEntity(properties, () -> BlockEntityEntry.cast(registrar.get(Registries.BLOCK_ENTITY_TYPE, "test_block_with_entity"))))
                 .copyInitialPropertiesFrom(testBlock::value)
-                .defaultBlockState((provider, lookup, entry) -> provider.withParent(
-                        entry.getRegistryName().withPrefix("block/"),
-                        "block/cube_all"
-                ).texture("all", new ResourceLocation("block/debug2")))
+                .defaultBlockState((provider, lookup, entry) -> provider.cubeAll(entry.value(), "block/debug2"))
                 .defaultItem()
                 .<TestBlockEntity>defaultBlockEntity((blockEntityType, pos, blockState) -> new TestBlockEntity(blockEntityType, pos, blockState, testMenu))
         .register();
@@ -197,37 +187,19 @@ public final class ApexCoreTests
                 .blockState((lookup, entry) -> MultiVariantBuilder
                         .builder(entry.value(), Variant
                                 .variant()
-                                .model(lookup
-                                        .lookup(ProviderTypes.MODELS)
-                                        .withParent(ModelLocationUtils.getModelLocation(entry.value()), "block/cube")
-                                        .texture("particle", "#bottom")
-                                        .texture("down", "#bottom")
-                                        .texture("up", "#top")
-                                        .texture("down", "#bottom")
-                                        .texture("north", "#front")
-                                        .texture("east", "#side")
-                                        .texture("south", "#side")
-                                        .texture("west", "#side")
-                                        .texture("side", "block/stone")
-                                        .texture("front", "block/diamond_ore")
-                                        .texture("top", "block/dirt")
-                                        .texture("bottom", "block/oak_planks")
-                                )
+                                .model(lookup.lookup(ProviderTypes.MODELS).orientableWithBottom(
+                                        entry.value(),
+                                        "block/diamond_ore",
+                                        "block/stone",
+                                        "block/dirt",
+                                        "block/oak_planks"
+                                ))
                         )
                         .with(PropertyDispatch
                                 .property(BlockStateProperties.HORIZONTAL_FACING)
-                                .select(Direction.EAST, Variant
-                                        .variant()
-                                        .yRot(Variant.Rotation.R90)
-                                )
-                                .select(Direction.SOUTH, Variant
-                                        .variant()
-                                        .yRot(Variant.Rotation.R180)
-                                )
-                                .select(Direction.WEST, Variant
-                                        .variant()
-                                        .yRot(Variant.Rotation.R270)
-                                )
+                                .select(Direction.EAST, Variant.variant().yRot(Variant.Rotation.R90))
+                                .select(Direction.SOUTH, Variant.variant().yRot(Variant.Rotation.R180))
+                                .select(Direction.WEST, Variant.variant().yRot(Variant.Rotation.R270))
                                 .select(Direction.NORTH, Variant.variant())
                         )
                 )
@@ -237,20 +209,14 @@ public final class ApexCoreTests
         var testFluidLoggingBlock = registrar
                 .object("test_fluid_logging_block")
                 .block(TestFluidLoggingBlock::new)
-                .defaultBlockState((provider, lookup, entry) -> provider.withParent(
-                        entry.getRegistryName().withPrefix("block/"),
-                        "block/oak_stairs"
-                ))
+                .defaultBlockState((provider, lookup, entry) -> provider.withParent(entry.value(), "block/oak_stairs"))
                 .defaultItem()
         .register();
 
         var testMultiBlock = registrar
                 .object("test_mulit_block")
                 .block(TestMultiBlock::new)
-                .defaultBlockState((provider, lookup, entry) -> provider.withParent(
-                        entry.getRegistryName().withPrefix("block/"),
-                        "block/cube_all"
-                ).texture("all", new ResourceLocation("block/debug2")))
+                .defaultBlockState((provider, lookup, entry) -> provider.cubeAll(entry.value(), "block/debug2"))
                 .tag(ApexTags.Blocks.PLACEMENT_VISUALIZER)
                 .defaultItem()
         .register();

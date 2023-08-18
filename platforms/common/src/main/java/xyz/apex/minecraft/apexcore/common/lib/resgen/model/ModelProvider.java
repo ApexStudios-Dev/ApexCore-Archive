@@ -51,9 +51,9 @@ public final class ModelProvider implements DataProvider, Models
         );
     }
 
-    private Path compileModelPath(ModelFile model)
+    private Path compileModelPath(ModelBuilder model)
     {
-        var modelPath = model.getModelPath();
+        var modelPath = model.modelPath();
         return context.packOutput()
                       .getOutputFolder(PackOutput.Target.RESOURCE_PACK)
                      .resolve(modelPath.getNamespace())

@@ -36,7 +36,7 @@ import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.RecipeProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.loot.BlockLootProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.loot.LootTypes;
-import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelFile;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelBuilder;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.state.BlockStateGenerator;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.state.MultiVariantBuilder;
@@ -633,7 +633,7 @@ public final class BlockBuilder<O extends AbstractRegistrar<O>, T extends Block,
      * @param modelFactory Factory used to lookup desired Block Model.
      * @return This Builder.
      */
-    public BlockBuilder<O, T, P> defaultBlockState(TriFunction<ModelProvider, ProviderLookup, BlockEntry<T>, ModelFile> modelFactory)
+    public BlockBuilder<O, T, P> defaultBlockState(TriFunction<ModelProvider, ProviderLookup, BlockEntry<T>, ModelBuilder> modelFactory)
     {
         return blockState((lookup, entry) -> MultiVariantBuilder
                 .builder(

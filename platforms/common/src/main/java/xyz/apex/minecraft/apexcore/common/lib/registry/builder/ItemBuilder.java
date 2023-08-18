@@ -219,10 +219,7 @@ public final class ItemBuilder<O extends AbstractRegistrar<O>, T extends Item, P
      */
     public ItemBuilder<O, T, P> defaultModel()
     {
-        return model((provider, lookup, entry) -> {
-            var resourcePath = entry.getRegistryName().withPrefix("item/");
-            provider.generated(resourcePath, resourcePath);
-        });
+        return model((provider, lookup, entry) -> provider.generated(entry.value()));
     }
 
     /**
@@ -232,13 +229,7 @@ public final class ItemBuilder<O extends AbstractRegistrar<O>, T extends Item, P
      */
     public ItemBuilder<O, T, P> defaultBlockItemModel()
     {
-        return model((provider, lookup, entry) -> {
-            var registryName = entry.getRegistryName();
-            provider.withParent(
-                    registryName.withPrefix("item/"),
-                    registryName.withPrefix("block/")
-            );
-        });
+        return model((provider, lookup, entry) -> provider.blockItem(entry.value()));
     }
 
     /**

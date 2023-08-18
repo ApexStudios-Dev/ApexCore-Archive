@@ -3,7 +3,6 @@ package xyz.apex.minecraft.apexcore.common.lib.registry.builder;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.*;
@@ -121,10 +120,7 @@ public final class EntityBuilder<O extends AbstractRegistrar<O>, T extends Entit
     public ItemBuilder<O, SpawnEggItem, EntityBuilder<O, T, P>> spawnEgg(int backgroundColor, int highlightColor)
     {
         return registrar.item(this, "%s_spawn_egg".formatted(registrationName()), properties -> ApexCore.INSTANCE.createSpawnEgg(() -> (EntityType<? extends Mob>) getEntry(), backgroundColor, highlightColor, properties))
-                        .model((provider, lookup, entry) -> provider.withParent(
-                                entry.getRegistryName().withPrefix("item/"),
-                                new ResourceLocation("item/template_spawn_egg")
-                        ));
+                        .model((provider, lookup, entry) -> provider.spawnEgg(entry.value()));
     }
 
     /**

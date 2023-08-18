@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.JsonHelper;
-import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelFile;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelBuilder;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public final class Variant
 {
     private Rotation xRot = Rotation.R0;
     private Rotation yRot = Rotation.R0;
-    @Nullable private ModelFile model = null;
+    @Nullable private ResourceLocation modelPath = null;
     private boolean uvlock = false;
     private int weight = 0;
 
@@ -24,7 +24,7 @@ public final class Variant
     {
         xRot = other.xRot;
         yRot = other.yRot;
-        model = other.model == null ? null : new ModelFile(other.model.getModelPath());
+        modelPath = other.modelPath;
         uvlock = other.uvlock;
         weight = other.weight;
         return this;
@@ -36,8 +36,8 @@ public final class Variant
             xRot = other.xRot;
         if(yRot == Rotation.R0 && other.yRot != Rotation.R0)
             yRot = other.yRot;
-        if(model == null && other.model != null)
-            model = new ModelFile(other.model.getModelPath());
+        if(modelPath == null && other.modelPath != null)
+            modelPath = other.modelPath;
         if(!uvlock && other.uvlock)
             uvlock = other.uvlock;
         if(weight == 0 && other.weight > 0)
@@ -65,18 +65,18 @@ public final class Variant
 
     public Variant model(ResourceLocation modelPath)
     {
-        return model(new ModelFile(modelPath));
+        this.modelPath = modelPath;
+        return this;
     }
 
     public Variant model(String modelPath)
     {
-        return model(new ModelFile(modelPath));
+        return model(new ResourceLocation(modelPath));
     }
 
-    public Variant model(ModelFile model)
+    public Variant model(ModelBuilder model)
     {
-        this.model = model;
-        return this;
+        return model(model.modelPath());
     }
 
     public Variant uvlock(boolean uvlock)
@@ -104,8 +104,8 @@ public final class Variant
             json.addProperty("x", xRot.rotation);
         if(yRot != Rotation.R0)
             json.addProperty("y", yRot.rotation);
-        if(model != null)
-            json.addProperty("model", model.getModelPath().toString());
+        if(modelPath != null)
+            json.addProperty("model", modelPath.toString());
         if(uvlock)
             json.addProperty("uvlock", uvlock);
         if(weight > 0)

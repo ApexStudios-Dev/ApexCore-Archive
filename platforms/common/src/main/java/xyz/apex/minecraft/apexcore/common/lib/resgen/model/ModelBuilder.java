@@ -21,37 +21,38 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public final class ModelBuilder extends ModelFile
+public final class ModelBuilder
 {
-    @Nullable private ModelFile parent = null;
+    @Nullable private ResourceLocation parent = null;
     @Nullable private BlockModel.GuiLight guiLight;
     private final Map<String, String> textures = Maps.newLinkedHashMap();
     private final Map<ItemDisplayContext, TransformBuilder> transformsMap = Maps.newEnumMap(ItemDisplayContext.class);
     private final List<OverrideBuilder> overrides = Lists.newLinkedList();
     private final List<ElementBuilder> elements = Lists.newLinkedList();
     private boolean ambientOcclusion = true;
+    private final ResourceLocation modelPath;
     @Nullable @PlatformOnly(PlatformOnly.FORGE) private ResourceLocation renderType = null;
 
     @ApiStatus.Internal
-    ModelBuilder(ResourceLocation location)
+    ModelBuilder(ResourceLocation modelPath)
     {
-        super(location);
+        this.modelPath = modelPath;
     }
 
-    public ModelBuilder parent(ResourceLocation modelPath)
+    public ResourceLocation modelPath()
     {
-        return parent(new ModelFile(modelPath));
+        return modelPath;
     }
 
-    public ModelBuilder parent(String modelPath)
-    {
-        return parent(new ModelFile(modelPath));
-    }
-
-    public ModelBuilder parent(ModelFile parent)
+    public ModelBuilder parent(ResourceLocation parent)
     {
         this.parent = parent;
         return this;
+    }
+
+    public ModelBuilder parent(String parent)
+    {
+        return parent(new ResourceLocation(parent));
     }
 
     public ModelBuilder texture(String textureSlot, String texture)
@@ -172,7 +173,7 @@ public final class ModelBuilder extends ModelFile
     BlockModel toVanilla()
     {
         return new BlockModel(
-                parent == null ? null : parent.getModelPath(),
+                parent,
                 toVanillaElements(),
                 toVanillaTextureMap(),
                 ambientOcclusion,
@@ -189,7 +190,7 @@ public final class ModelBuilder extends ModelFile
         var json = new JsonObject();
 
         if(parent != null)
-            json.addProperty("parent", parent.getModelPath().toString());
+            json.addProperty("parent", parent.toString());
         if(!ambientOcclusion)
             json.addProperty("ambientocclusion", ambientOcclusion);
         // TODO: We should maybe AT the 'name' field to be accessible, and use that instead

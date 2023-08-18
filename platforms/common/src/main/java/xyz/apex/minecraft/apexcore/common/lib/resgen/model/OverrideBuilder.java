@@ -13,7 +13,7 @@ import xyz.apex.minecraft.apexcore.common.lib.resgen.JsonHelper;
 public final class OverrideBuilder
 {
     private final ModelBuilder parent;
-    @Nullable private ModelFile model = null;
+    @Nullable private ResourceLocation modelPath = null;
     private final Object2FloatMap<ResourceLocation> properties = new Object2FloatOpenHashMap<>();
 
     @ApiStatus.Internal
@@ -24,18 +24,18 @@ public final class OverrideBuilder
 
     public OverrideBuilder model(ResourceLocation modelPath)
     {
-        return model(new ModelFile(modelPath));
+        this.modelPath = modelPath;
+        return this;
     }
 
     public OverrideBuilder model(String modelPath)
     {
-        return model(new ModelFile(modelPath));
+        return model(new ResourceLocation(modelPath));
     }
 
-    public OverrideBuilder model(ModelFile model)
+    public OverrideBuilder model(ModelBuilder model)
     {
-        this.model = model;
-        return this;
+        return model(model.modelPath());
     }
 
     public OverrideBuilder property(ResourceLocation propertyName, float propertyValue)
@@ -52,10 +52,10 @@ public final class OverrideBuilder
     @ApiStatus.Internal
     ItemOverride toVanilla()
     {
-        Validate.notNull(model);
+        Validate.notNull(modelPath);
 
         return new ItemOverride(
-                model.getModelPath(),
+                modelPath,
                 properties.object2FloatEntrySet()
                           .stream()
                           .map(entry -> new ItemOverride.Predicate(entry.getKey(), entry.getFloatValue()))
@@ -66,9 +66,9 @@ public final class OverrideBuilder
     @ApiStatus.Internal
     JsonObject toJson()
     {
-        Validate.notNull(model);
+        Validate.notNull(modelPath);
         var json = new JsonObject();
-        json.addProperty("model", model.getModelPath().toString());
+        json.addProperty("model", modelPath.toString());
 
         if(!properties.isEmpty())
         {
