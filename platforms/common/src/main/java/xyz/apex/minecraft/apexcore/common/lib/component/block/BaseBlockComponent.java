@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.Fluid;
@@ -91,6 +92,19 @@ public non-sealed class BaseBlockComponent implements BlockComponent
     public final Block getGameObject()
     {
         return componentHolder.getGameObject();
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity getBlockEntity(BlockGetter level, BlockPos pos, BlockState blockState)
+    {
+        return componentHolder.getBlockEntity(level, pos, blockState);
+    }
+
+    @Override
+    public final <T extends BlockEntity> T getBlockEntity(BlockEntityType<T> blockEntityType, BlockGetter level, BlockPos pos, BlockState blockState)
+    {
+        return componentHolder.getBlockEntity(blockEntityType, level, pos, blockState);
     }
 
     @Override

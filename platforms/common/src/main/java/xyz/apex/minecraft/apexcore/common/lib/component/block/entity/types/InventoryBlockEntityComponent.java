@@ -2,16 +2,14 @@ package xyz.apex.minecraft.apexcore.common.lib.component.block.entity.types;
 
 import com.google.errorprone.annotations.DoNotCall;
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.Containers;
-import net.minecraft.world.LockCode;
+import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
@@ -30,7 +28,7 @@ import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.BaseBlockEn
 import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.BlockEntityComponentHolder;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.BlockEntityComponentType;
 
-public class InventoryBlockEntityComponent extends BaseBlockEntityComponent implements Container
+public class InventoryBlockEntityComponent extends BaseBlockEntityComponent implements WorldlyContainer
 {
     public static final BlockEntityComponentType<InventoryBlockEntityComponent> COMPONENT_TYPE = BlockEntityComponentType.register(ApexCore.ID, "inventory", InventoryBlockEntityComponent::new);
 
@@ -130,7 +128,7 @@ public class InventoryBlockEntityComponent extends BaseBlockEntityComponent impl
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack)
     {
-        return componentHolder.canPlaceItem(slot, stack);
+        return componentHolder.canPlaceItem(slot, stack, null);
     }
 
     @DoNotCall
@@ -138,7 +136,7 @@ public class InventoryBlockEntityComponent extends BaseBlockEntityComponent impl
     @Override
     public boolean canTakeItem(Container container, int slot, ItemStack stack)
     {
-        return componentHolder.canTakeItem(container, slot, stack);
+        return componentHolder.canTakeItem(slot, stack, null);
     }
 
     @DoNotCall
@@ -274,5 +272,29 @@ public class InventoryBlockEntityComponent extends BaseBlockEntityComponent impl
     public int getAnalogOutputSignal(Level level)
     {
         return AbstractContainerMenu.getRedstoneSignalFromContainer(this);
+    }
+
+    @DoNotCall
+    @Deprecated
+    @Override
+    public int[] getSlotsForFace(Direction side)
+    {
+        return componentHolder.getSlotsForFace(side);
+    }
+
+    @DoNotCall
+    @Deprecated
+    @Override
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side)
+    {
+        return componentHolder.canPlaceItem(slot, stack, side);
+    }
+
+    @DoNotCall
+    @Deprecated
+    @Override
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side)
+    {
+        return componentHolder.canTakeItem(slot, stack, side);
     }
 }

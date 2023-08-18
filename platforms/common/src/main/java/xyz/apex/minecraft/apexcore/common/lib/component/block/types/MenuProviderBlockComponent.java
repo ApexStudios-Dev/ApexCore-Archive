@@ -55,12 +55,12 @@ public final class MenuProviderBlockComponent extends BaseBlockComponent
     @Nullable
     public MenuConstructor getMenuConstructor(BlockGetter level, BlockPos pos, BlockState blockState)
     {
-        return MultiBlockComponent.asRoot(level, pos, blockState, (rootPos, rootBlockState) -> level.getBlockEntity(rootPos) instanceof MenuConstructor constructor ? constructor : menuConstructor);
+        return getBlockEntity(level, pos, blockState) instanceof MenuConstructor constructor ? constructor : menuConstructor;
     }
 
     public Component getMenuTitle(BlockGetter level, BlockPos pos, BlockState blockState)
     {
-        return MultiBlockComponent.asRoot(level, pos, blockState, (rootPos, rootBlockState) -> level.getBlockEntity(rootPos) instanceof Nameable nameable ? nameable.getName() : getGameObject().getName());
+        return getBlockEntity(level, pos, blockState) instanceof Nameable nameable ? nameable.getName() : getGameObject().getName();
     }
 
     @Override

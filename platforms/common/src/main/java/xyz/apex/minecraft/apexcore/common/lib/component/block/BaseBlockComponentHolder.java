@@ -12,6 +12,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -153,6 +154,20 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
     {
         return this;
     }
+
+    @Nullable
+    public final BlockEntity getBlockEntity(BlockGetter level, BlockPos pos, BlockState blockState)
+    {
+        var blockEntityType = getBlockEntityType();
+        return blockEntityType == null ? null : getBlockEntity(blockEntityType, level, pos, blockState);
+    }
+
+    @Nullable
+    @Override
+    public final <T extends BlockEntity> T getBlockEntity(BlockEntityType<T> blockEntityType, BlockGetter level, BlockPos pos, BlockState blockState)
+    {
+        return MultiBlockComponent.asRoot(level, pos, blockState, (rootPos, rootBlockState) -> blockEntityType.getBlockEntity(level, rootPos));
+    }
     // endregion
 
     // region: Events
@@ -188,7 +203,7 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
     {
         super.setPlacedBy(level, pos, blockState, placer, stack);
 
-        if(level.getBlockEntity(pos) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
+        if(getBlockEntity(level, pos, blockState) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
             blockEntityComponentHolder.setPlacedBy(level, placer, stack);
 
         getComponents().forEach(component -> component.setPlacedBy(level, pos, blockState, placer, stack));
@@ -197,7 +212,7 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
     @Override
     public void playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player)
     {
-        if(level.getBlockEntity(pos) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
+        if(getBlockEntity(level, pos, blockState) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
             blockEntityComponentHolder.playerWillDestroy(level, player);
 
         getComponents().forEach(component -> component.playerWillDestroy(level, pos, blockState, player));
@@ -230,14 +245,14 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
         super.onPlace(blockState, level, pos, oldBlockState, isMoving);
         getComponents().forEach(component -> component.onPlace(blockState, level, pos, oldBlockState, isMoving));
 
-        if(level.getBlockEntity(pos) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
+        if(getBlockEntity(level, pos, blockState) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
             blockEntityComponentHolder.onPlace(level, oldBlockState);
     }
 
     @Override
     public void onRemove(BlockState blockState, Level level, BlockPos pos, BlockState newBlockState, boolean isMoving)
     {
-        if(level.getBlockEntity(pos) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
+        if(getBlockEntity(level, pos, blockState) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
             blockEntityComponentHolder.onRemove(level, newBlockState);
 
         getComponents().forEach(component -> component.onRemove(blockState, level, pos, newBlockState, isMoving));
@@ -247,7 +262,7 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
     @Override
     public InteractionResult use(BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
     {
-        if(level.getBlockEntity(pos) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
+        if(getBlockEntity(level, pos, blockState) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
         {
             var result = blockEntityComponentHolder.use(level, player, hand, hit);
 
@@ -360,6 +375,11 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
     @Override
     public final <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType)
     {
+        var multiBlockComponent = getComponent(BlockComponentTypes.MULTI_BLOCK);
+
+        if(multiBlockComponent != null && MultiBlockComponent.getIndex(multiBlockComponent.getMultiBlockType(), blockState) != 0)
+            return null;
+
         return blockEntityType == getBlockEntityType() ? getTicker(level, blockState) : null;
     }
 
@@ -388,7 +408,7 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
     @Override
     public int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos)
     {
-        if(level.getBlockEntity(pos) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
+        if(getBlockEntity(level, pos, blockState) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
         {
             var analogOutputSignal = blockEntityComponentHolder.getAnalogOutputSignal(level);
 
@@ -410,7 +430,7 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
     @Override
     public int getSignal(BlockState blockState, BlockGetter level, BlockPos pos, Direction direction)
     {
-        if(level.getBlockEntity(pos) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
+        if(getBlockEntity(level, pos, blockState) instanceof BlockEntityComponentHolder blockEntityComponentHolder)
         {
             var analogOutputSignal = blockEntityComponentHolder.getSignal(level, direction);
 
@@ -526,6 +546,12 @@ public non-sealed class BaseBlockComponentHolder extends BaseEntityBlock impleme
         }
 
         return false;
+    }
+
+    @Override
+    public final WorldlyContainer getContainer(BlockState blockState, LevelAccessor level, BlockPos pos)
+    {
+        return getBlockEntity(level, pos, blockState) instanceof WorldlyContainer container ? container : null;
     }
     // endregion
 }

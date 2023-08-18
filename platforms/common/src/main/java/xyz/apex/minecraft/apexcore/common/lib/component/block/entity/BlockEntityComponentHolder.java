@@ -31,7 +31,7 @@ import java.util.function.Predicate;
 // - Nameable -> NameableBlockEntityComponent
 // - Container -> InventoryBlockEntityComponent
 // - MenuProvider
-public sealed interface BlockEntityComponentHolder extends Nameable, Container, MenuProvider permits BaseBlockEntityComponentHolder
+public sealed interface BlockEntityComponentHolder extends Nameable, WorldlyContainer, MenuProvider permits BaseBlockEntityComponentHolder
 {
     // region: Components
     @Nullable
@@ -114,6 +114,10 @@ public sealed interface BlockEntityComponentHolder extends Nameable, Container, 
     // endregion
 
     // region: Container
+    boolean canPlaceItem(int slot, ItemStack stack, @Nullable Direction side);
+
+    boolean canTakeItem(int slot, ItemStack stack, @Nullable Direction side);
+
     @Override
     int getMaxStackSize();
 
@@ -123,9 +127,11 @@ public sealed interface BlockEntityComponentHolder extends Nameable, Container, 
     @Override
     void stopOpen(Player player);
 
+    @Deprecated
     @Override
     boolean canPlaceItem(int slot, ItemStack stack);
 
+    @Deprecated
     @Override
     boolean canTakeItem(Container container, int slot, ItemStack stack);
 
@@ -168,6 +174,19 @@ public sealed interface BlockEntityComponentHolder extends Nameable, Container, 
     @Deprecated
     @Override
     boolean stillValid(Player player);
+    // endregion
+
+    // region: WorldlyContainer
+    @Override
+    int[] getSlotsForFace(Direction side);
+
+    @Deprecated
+    @Override
+    boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side);
+
+    @Deprecated
+    @Override
+    boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side);
     // endregion
 
     // region: Clearable

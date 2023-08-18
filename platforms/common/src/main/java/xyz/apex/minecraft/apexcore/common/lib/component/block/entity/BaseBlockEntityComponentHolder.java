@@ -316,6 +316,18 @@ public non-sealed class BaseBlockEntityComponentHolder extends BaseBlockEntity i
 
     // region: Container
     @Override
+    public boolean canPlaceItem(int slot, ItemStack stack, @Nullable Direction side)
+    {
+        return true;
+    }
+
+    @Override
+    public boolean canTakeItem(int slot, ItemStack stack, @Nullable Direction side)
+    {
+        return true;
+    }
+
+    @Override
     public int getMaxStackSize()
     {
         return Container.LARGE_MAX_STACK_SIZE;
@@ -331,16 +343,18 @@ public non-sealed class BaseBlockEntityComponentHolder extends BaseBlockEntity i
     {
     }
 
+    @Deprecated
     @Override
-    public boolean canPlaceItem(int slot, ItemStack stack)
+    public final boolean canPlaceItem(int slot, ItemStack stack)
     {
-        return true;
+        return canPlaceItem(slot, stack, null);
     }
 
+    @Deprecated
     @Override
-    public boolean canTakeItem(Container container, int slot, ItemStack stack)
+    public final boolean canTakeItem(Container container, int slot, ItemStack stack)
     {
-        return true;
+        return canTakeItem(slot, stack, null);
     }
 
     @Deprecated
@@ -411,6 +425,28 @@ public non-sealed class BaseBlockEntityComponentHolder extends BaseBlockEntity i
     public final boolean stillValid(Player player)
     {
         return findComponent(BlockEntityComponentTypes.INVENTORY).map(inventory -> inventory.stillValid(player)).orElse(false);
+    }
+    // endregion
+
+    // region: WorldlyContainer
+    @Override
+    public int[] getSlotsForFace(Direction side)
+    {
+        return new int[0];
+    }
+
+    @Deprecated
+    @Override
+    public final boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side)
+    {
+        return canPlaceItem(slot, stack, side);
+    }
+
+    @Deprecated
+    @Override
+    public final boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side)
+    {
+        return canTakeItem(slot, stack, side);
     }
     // endregion
 
