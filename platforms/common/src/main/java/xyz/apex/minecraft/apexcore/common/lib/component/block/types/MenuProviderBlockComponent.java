@@ -7,7 +7,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.Nameable;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -28,7 +30,7 @@ public final class MenuProviderBlockComponent extends BaseBlockComponent
 {
     public static final BlockComponentType<MenuProviderBlockComponent> COMPONENT_TYPE = BlockComponentType.register(ApexCore.ID, "menu_provider", MenuProviderBlockComponent::new);
 
-    @Nullable private MenuConstructor menuConstructor;
+    @Nullable private ExtendedMenuConstructor menuConstructor = null;
     private ExtraDataWriter extraData = (level, pos, blockState, buffer) -> { };
 
     private MenuProviderBlockComponent(BlockComponentHolder componentHolder)
@@ -36,7 +38,7 @@ public final class MenuProviderBlockComponent extends BaseBlockComponent
         super(componentHolder);
     }
 
-    public MenuProviderBlockComponent withMenuConstructor(MenuConstructor menuConstructor)
+    public MenuProviderBlockComponent withMenuConstructor(ExtendedMenuConstructor menuConstructor)
     {
         Validate.isTrue(!isRegistered(), "Can only set MenuConstructor during registration!");
 
@@ -55,7 +57,10 @@ public final class MenuProviderBlockComponent extends BaseBlockComponent
     @Nullable
     public MenuConstructor getMenuConstructor(BlockGetter level, BlockPos pos, BlockState blockState)
     {
-        return getBlockEntity(level, pos, blockState) instanceof MenuConstructor constructor ? constructor : menuConstructor;
+        if(menuConstructor != null)
+            return (syncId, inventory, player) -> menuConstructor.createMenu(syncId, inventory, level, pos);
+
+        return getBlockEntity(level, pos, blockState) instanceof MenuConstructor constructor ? constructor : null;
     }
 
     public Component getMenuTitle(BlockGetter level, BlockPos pos, BlockState blockState)
@@ -107,5 +112,12 @@ public final class MenuProviderBlockComponent extends BaseBlockComponent
     public interface ExtraDataWriter
     {
         void write(LevelReader level, BlockPos pos, BlockState blockState, FriendlyByteBuf buffer);
+    }
+
+    @FunctionalInterface
+    public interface ExtendedMenuConstructor
+    {
+        @Nullable
+        AbstractContainerMenu createMenu(int syncId, Inventory inventory, BlockGetter level, BlockPos pos);
     }
 }
