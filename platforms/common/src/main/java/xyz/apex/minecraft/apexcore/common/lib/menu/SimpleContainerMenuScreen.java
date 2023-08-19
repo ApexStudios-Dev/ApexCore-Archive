@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
@@ -19,37 +20,84 @@ public class SimpleContainerMenuScreen<T extends AbstractContainerMenu> extends 
     public static final ResourceLocation SPRITE_BACKGROUND = new ResourceLocation(ApexCore.ID, "container/generic/background");
     public static final ResourceLocation SPRITE_SLOT = new ResourceLocation(ApexCore.ID, "container/generic/slot");
 
-    public SimpleContainerMenuScreen(T menu, Inventory playerInventory, Component displayName)
+    public SimpleContainerMenuScreen(T menu, Inventory inventory, Component title)
     {
-        super(menu, playerInventory, displayName);
-    }
+        super(menu, inventory, title);
 
-    protected void renderFg(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
-    {
+        imageWidth = 0;
+        imageHeight = 0;
     }
 
     @Override
     protected void init()
     {
-        imageWidth = 176;
-        imageHeight = 166;
+        detectFrameSize();
+    }
 
-        super.init();
+    public final void detectFrameSize()
+    {
+        var frameWidth = 0;
+        var frameHeight = 0;
 
-        titleLabelX = (imageWidth - font.width(title)) / 2;
+        for(var slot : menu.slots)
+        {
+            frameWidth = Math.max(frameWidth, slot.x);
+            frameHeight = Math.max(frameHeight, slot.y);
+        }
+
+        frameWidth += SimpleContainerMenu.SLOT_SIZE + 9;
+        frameHeight += SimpleContainerMenu.SLOT_SIZE + 6;
+
+        setFrameSize(frameWidth, frameHeight);
+    }
+
+    public final void setFrameSize(int frameWidth, int frameHeight)
+    {
+        imageWidth = frameWidth;
+        imageHeight = frameHeight;
+
+        leftPos = (width - imageWidth) / 2;
+        topPos = (height - imageHeight) / 2;
+
+        titleLabelX = SimpleContainerMenu.SLOT_BORDER_OFFSET;
+        titleLabelY = 6;
+
+        var playerInventory = minecraft.player.getInventory();
+
+        // slot 9 should always exist
+        // top left slot of player inventory
+        var slot = menu.getSlot(menu.findSlot(playerInventory, 9).orElseThrow());
+        inventoryLabelX = slot.x;
+        inventoryLabelY = slot.y - 2 - (SimpleContainerMenu.SLOT_SIZE / 2);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
     {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        renderFg(guiGraphics, mouseX, mouseY, partialTick);
-        renderTooltip(guiGraphics, mouseX, mouseY);
+        super.render(graphics, mouseX, mouseY, partialTick);
+        renderTooltip(graphics, mouseX, mouseY);
     }
 
     @Override
     protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY)
     {
-        graphics.blitSprite(SPRITE_BACKGROUND, (width - imageWidth) / 2, (height - imageHeight) / 2, imageWidth, imageHeight);
+        renderFrameBackground(graphics);
+    }
+
+    @Override
+    public void renderSlot(GuiGraphics graphics, Slot slot)
+    {
+        super.renderSlot(graphics, slot);
+        renderSlotBackground(graphics, slot);
+    }
+
+    protected void renderFrameBackground(GuiGraphics graphics)
+    {
+        graphics.blitSprite(SPRITE_BACKGROUND, leftPos, topPos, imageWidth, imageHeight);
+    }
+
+    protected void renderSlotBackground(GuiGraphics graphics, Slot slot)
+    {
+        graphics.blitSprite(SPRITE_SLOT, slot.x - 1, slot.y - 1, SimpleContainerMenu.SLOT_SIZE, SimpleContainerMenu.SLOT_SIZE);
     }
 }

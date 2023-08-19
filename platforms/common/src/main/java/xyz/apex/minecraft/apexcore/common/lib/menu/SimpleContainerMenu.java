@@ -15,6 +15,9 @@ import java.util.function.Consumer;
  */
 public abstract class SimpleContainerMenu extends AbstractContainerMenu
 {
+    public static final int SLOT_SIZE = 18;
+    public static final int SLOT_BORDER_OFFSET = 8;
+
     protected final Container container;
 
     public SimpleContainerMenu(MenuType<? extends SimpleContainerMenu> menuType, int windowId, Inventory playerInventory, Container container)
@@ -74,48 +77,34 @@ public abstract class SimpleContainerMenu extends AbstractContainerMenu
         container.stopOpen(player);
     }
 
-    /**
-     * Binds container slots to menu.
-     *
-     * @param container Container to be bound.
-     * @param rows      Number of rows in container.
-     * @param cols      Number of cols in container.
-     * @param xStart    X start pos.
-     * @param yStart    Y start pos.
-     * @param addSlot   Consumer used to bind slots.
-     */
     public static void bindContainer(Container container, int rows, int cols, int xStart, int yStart, Consumer<Slot> addSlot)
     {
-        for(var j = 0; j < rows; j++)
+        bindContainer(container, 0, rows, cols, xStart, yStart, addSlot);
+    }
+
+    public static void bindContainer(Container container, int initialSlotIndex, int rows, int cols, int xStart, int yStart, Consumer<Slot> addSlot)
+    {
+        for(var i = 0; i < rows; i++)
         {
-            for(var k = 0; k < cols; k++)
+            for(var j = 0; j < cols; j++)
             {
-                addSlot.accept(new EnhancedSlot(container, k + j * cols, xStart + k * 18, yStart + j * 18));
+                addSlot.accept(new EnhancedSlot(container, initialSlotIndex + (j + i * cols), xStart + j * SLOT_SIZE, yStart + i * SLOT_SIZE));
             }
         }
     }
 
-    /**
-     * Binds player inventory slots to menu.
-     *
-     * @param playerInventory Player inventory to be bound.
-     * @param xStart          X start pos.
-     * @param yStart          Y start pos.
-     * @param addSlot         Consumer used to bind slots.
-     */
+    public static void bindPlayerInventory(Inventory playerInventory, Consumer<Slot> addSlot)
+    {
+        bindPlayerInventory(playerInventory, SLOT_BORDER_OFFSET, 84, addSlot);
+    }
+
     public static void bindPlayerInventory(Inventory playerInventory, int xStart, int yStart, Consumer<Slot> addSlot)
     {
-        for(var i = 0; i < 3; i++)
-        {
-            for(var j = 0; j < 9; j++)
-            {
-                addSlot.accept(new EnhancedSlot(playerInventory, j + i * 9 + 9, xStart + j * 18, yStart + i * 18));
-            }
-        }
+        bindContainer(playerInventory, 9, 3, 9, xStart, yStart, addSlot);
 
         for(var i = 0; i < 9; i++)
         {
-            addSlot.accept(new EnhancedSlot(playerInventory, i, xStart + i * 18, yStart + 58));
+            addSlot.accept(new EnhancedSlot(playerInventory, i, xStart + i * SLOT_SIZE, yStart + 58));
         }
     }
 }

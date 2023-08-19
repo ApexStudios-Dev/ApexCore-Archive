@@ -7,7 +7,6 @@
         "MixinEntity"
     ],
     "client": [
-        "client.MixinAbstractContainerScreen",
         "client.MixinBlockEntityWithoutLevelRenderer"
     ],
     "server": [],

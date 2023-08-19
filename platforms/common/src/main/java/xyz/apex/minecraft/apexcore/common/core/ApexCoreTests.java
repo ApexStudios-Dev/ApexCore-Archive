@@ -486,8 +486,7 @@ public final class ApexCoreTests
         protected void bindSlots(Inventory playerInventory)
         {
             addSlot(new EnhancedSlot(container, 0, 80, 37));
-
-            bindPlayerInventory(playerInventory, 8, 84, this::addSlot);
+            bindPlayerInventory(playerInventory, this::addSlot);
         }
     }
 
@@ -604,7 +603,7 @@ public final class ApexCoreTests
         protected void bindSlots(Inventory playerInventory)
         {
             bindContainer(container, 3, 5, 44, 18, this::addSlot);
-            bindPlayerInventory(playerInventory, 8, 84, this::addSlot);
+            bindPlayerInventory(playerInventory, this::addSlot);
         }
 
         private static TestMultiBlockMenu forNetwork(MenuType<? extends TestMultiBlockMenu> menuType, int syncId, Inventory inventory, FriendlyByteBuf buffer)
