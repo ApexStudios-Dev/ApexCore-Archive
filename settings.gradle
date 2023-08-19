@@ -50,6 +50,9 @@ plugins {
 def includePlatform = { platform ->
 	include platform
 	project(":${platform}").projectDir = file("platforms/${platform}")
+
+	include "testmod-${platform}"
+	project(":testmod-${platform}").projectDir = file("testmod/${platform}")
 }
 
 includePlatform 'common'

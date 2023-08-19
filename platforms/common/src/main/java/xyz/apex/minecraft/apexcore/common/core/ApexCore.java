@@ -63,8 +63,6 @@ public interface ApexCore
         BlockEntityComponentTypes.bootstrap();
         MultiBlockTypes.bootstrap();
 
-        ApexCoreTests.register();
-
         registerGenerators();
 
         // tell listeners that ApexCore has been initialized

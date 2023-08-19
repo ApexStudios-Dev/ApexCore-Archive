@@ -43,6 +43,8 @@ subprojects {
             java.srcDirs = [ ]
             resources.srcDirs = [ ]
         }
+
+        generated
     }
 
     repositories {
@@ -129,41 +131,43 @@ subprojects {
         archives sourcesJar
     }
 
-    publishing {
-        publications {
-            release(MavenPublication) {
-                groupId = "${project.group}"
-                artifactId = "${project.archivesBaseName}"
-                version = "${project.version}"
-            }
-
-            snapshot(MavenPublication) {
-                groupId = "${project.group}"
-                artifactId = "${project.archivesBaseName}"
-                version = "${MOD_VERSION}-SNAPSHOT"
-            }
-        }
-
-        repositories {
-            if(providers.environmentVariable('MAVEN_PASSWORD').isPresent()) {
-                maven {
-                    name 'snapshots'
-                    url 'https://nexus.covers1624.net/repository/apex-snapshots/'
-
-                    credentials {
-                        username 'apex'
-                        password providers.environmentVariable('MAVEN_PASSWORD').get()
-                    }
+    if(!project.name.startsWithIgnoreCase('testmod')) {
+        publishing {
+            publications {
+                release(MavenPublication) {
+                    groupId = "${project.group}"
+                    artifactId = "${project.archivesBaseName}"
+                    version = "${project.version}"
                 }
 
-                if(MOD_RELEASE_TYPE.equalsIgnoreCase('RELEASE')) {
+                snapshot(MavenPublication) {
+                    groupId = "${project.group}"
+                    artifactId = "${project.archivesBaseName}"
+                    version = "${MOD_VERSION}-SNAPSHOT"
+                }
+            }
+
+            repositories {
+                if(providers.environmentVariable('MAVEN_PASSWORD').isPresent()) {
                     maven {
-                        name 'releases'
-                        url 'https://nexus.covers1624.net/repository/apex-releases/'
+                        name 'snapshots'
+                        url 'https://nexus.covers1624.net/repository/apex-snapshots/'
 
                         credentials {
                             username 'apex'
                             password providers.environmentVariable('MAVEN_PASSWORD').get()
+                        }
+                    }
+
+                    if(MOD_RELEASE_TYPE.equalsIgnoreCase('RELEASE')) {
+                        maven {
+                            name 'releases'
+                            url 'https://nexus.covers1624.net/repository/apex-releases/'
+
+                            credentials {
+                                username 'apex'
+                                password providers.environmentVariable('MAVEN_PASSWORD').get()
+                            }
                         }
                     }
                 }
@@ -323,4 +327,14 @@ idea.module {
             file('.gradle'),
             file('gradle')
     ]
+
+    [ 'fabric', 'neoforge' ].forEach {
+        if(findProject(":${it}") == null) {
+            excludeDirs += [ file("platforms/${it}") ]
+        }
+
+        if(findProject(":testmod-${it}") == null) {
+            excludeDirs += [ file("testmod/${it}") ]
+        }
+    }
 }
