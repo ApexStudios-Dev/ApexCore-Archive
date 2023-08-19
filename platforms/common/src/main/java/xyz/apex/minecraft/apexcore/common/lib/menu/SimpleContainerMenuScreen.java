@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.common.lib.menu;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -82,18 +83,28 @@ public class SimpleContainerMenuScreen<T extends AbstractContainerMenu> extends 
     protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY)
     {
         renderFrameBackground(graphics);
-    }
-
-    @Override
-    public void renderSlot(GuiGraphics graphics, Slot slot)
-    {
-        super.renderSlot(graphics, slot);
-        renderSlotBackground(graphics, slot);
+        renderSlotBackgrounds(graphics);
     }
 
     protected void renderFrameBackground(GuiGraphics graphics)
     {
         graphics.blitSprite(SPRITE_BACKGROUND, leftPos, topPos, imageWidth, imageHeight);
+    }
+
+    protected void renderSlotBackgrounds(GuiGraphics graphics)
+    {
+        RenderSystem.disableDepthTest();
+        graphics.pose().pushPose();
+        graphics.pose().translate(leftPos, topPos, 0D);
+
+        for(var slot : menu.slots)
+        {
+            if(slot.isActive())
+                renderSlotBackground(graphics, slot);
+        }
+
+        graphics.pose().popPose();
+        RenderSystem.enableDepthTest();
     }
 
     protected void renderSlotBackground(GuiGraphics graphics, Slot slot)
