@@ -1,5 +1,9 @@
 package xyz.apex.minecraft.apexcore.common.lib.event.types;
 
+import com.mojang.brigadier.CommandDispatcher;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.ApiStatus;
 import xyz.apex.minecraft.apexcore.common.lib.event.Event;
@@ -12,6 +16,7 @@ public interface ServerEvents
     EventType<Started> STARTED = EventType.create(listeners -> server -> listeners.forEach(listener -> listener.handle(server)));
     EventType<Stopping> STOPPING = EventType.create(listeners -> server -> listeners.forEach(listener -> listener.handle(server)));
     EventType<Stopped> STOPPED = EventType.create(listeners -> server -> listeners.forEach(listener -> listener.handle(server)));
+    EventType<RegisterCommands> REGISTER_COMMANDS = EventType.create(listeners -> (dispatcher, environment, context) -> listeners.forEach(listener -> listener.handle(dispatcher, environment, context)));
 
     @ApiStatus.Internal
     static void bootstrap()
@@ -44,5 +49,12 @@ public interface ServerEvents
     interface Stopped extends Event
     {
         void handle(MinecraftServer server);
+    }
+
+    @FunctionalInterface
+    @ApiStatus.NonExtendable
+    interface RegisterCommands extends Event
+    {
+        void handle(CommandDispatcher<CommandSourceStack> dispatcher, Commands.CommandSelection environment, CommandBuildContext context);
     }
 }

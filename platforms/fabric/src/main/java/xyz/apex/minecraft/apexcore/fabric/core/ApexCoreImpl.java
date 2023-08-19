@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.fabric.core;
 
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -84,6 +85,8 @@ public final class ApexCoreImpl implements ApexCore, RegistryHelper
         ServerLifecycleEvents.SERVER_STARTED.register(server -> ServerEvents.STARTED.post().handle(server));
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> ServerEvents.STOPPING.post().handle(server));
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> ServerEvents.STOPPED.post().handle(server));
+
+        CommandRegistrationCallback.EVENT.register((dispatcher, context, environment) -> ServerEvents.REGISTER_COMMANDS.post().handle(dispatcher, environment, context));
     }
 
     @Override
