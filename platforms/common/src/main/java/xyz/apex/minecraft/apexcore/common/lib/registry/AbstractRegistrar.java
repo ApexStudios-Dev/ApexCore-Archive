@@ -6,6 +6,8 @@ import com.google.gson.JsonObject;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.core.Registry;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataProvider;
 import net.minecraft.network.FriendlyByteBuf;
@@ -599,6 +601,28 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     public final <T extends Recipe<?>> RecipeEntry<T> recipe(BiFunction<ResourceLocation, JsonObject, T> fromJson, BiFunction<ResourceLocation, FriendlyByteBuf, T> fromNetwork, BiConsumer<FriendlyByteBuf, T> toNetwork)
     {
         return recipe(currentName(), fromJson, fromNetwork, toNetwork);
+    }
+    // endregion
+
+    // region: Particles
+    public final <S extends ParticleOptions, T extends ParticleType<S>, P> ParticleBuilder<O, S, T, P> particle(P parent, String registrationName, Supplier<T> particleTypeSupplier)
+    {
+        return new ParticleBuilder<>(self, parent, registrationName, particleTypeSupplier);
+    }
+
+    public final <S extends ParticleOptions, T extends ParticleType<S>, P> ParticleBuilder<O, S, T, P> particle(P parent, Supplier<T> particleTypeSupplier)
+    {
+        return particle(parent, currentName(), particleTypeSupplier);
+    }
+
+    public final <S extends ParticleOptions, T extends ParticleType<S>> ParticleBuilder<O, S, T, O> particle(String registrationName, Supplier<T> particleTypeSupplier)
+    {
+        return particle(self, registrationName, particleTypeSupplier);
+    }
+
+    public final <S extends ParticleOptions, T extends ParticleType<S>> ParticleBuilder<O, S, T, O> particle(Supplier<T> particleTypeSupplier)
+    {
+        return particle(self, currentName(), particleTypeSupplier);
     }
     // endregion
 

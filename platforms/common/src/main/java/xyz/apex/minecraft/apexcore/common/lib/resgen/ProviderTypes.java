@@ -30,6 +30,7 @@ import xyz.apex.minecraft.apexcore.common.lib.resgen.lang.LanguageProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.loot.LootTableProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.loot.LootTypes;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelProvider;
+import xyz.apex.minecraft.apexcore.common.lib.resgen.particle.ParticleDefinitionProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.state.BlockStateProvider;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.tag.TagsProvider;
 
@@ -44,6 +45,7 @@ public interface ProviderTypes
     ProviderType<ModelProvider> MODELS = ModelProvider.PROVIDER_TYPE;
     ProviderType<LanguageProvider> LANGUAGES = LanguageProvider.PROVIDER_TYPE;
     ProviderType<PackMetadataGenerator> METADATA = register(new ResourceLocation(ApexCore.ID, "meta_data"), context -> new PackMetadataGenerator(context.packOutput()), LANGUAGES);
+    ProviderType<ParticleDefinitionProvider> PARTICLES = ParticleDefinitionProvider.PROVIDER_TYPE;
 
     // Server
     ProviderType<RecipeProvider> RECIPES = RecipeProvider.PROVIDER_TYPE;

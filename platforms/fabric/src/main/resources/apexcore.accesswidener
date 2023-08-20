@@ -3,6 +3,9 @@ accessWidener v2 named
 # LootTableProvider
 accessible field net/minecraft/world/level/storage/loot/parameters/LootContextParamSets REGISTRY Lcom/google/common/collect/BiMap;
 
+# Particles
+accessible method net/minecraft/core/particles/SimpleParticleType <init> (Z)V
+
 # Creative Mode Tab registration & modification
 # While these are AW'd by fabric, we need to AW them in common
 transitive-accessible class net/minecraft/world/item/CreativeModeTab$ItemDisplayBuilder

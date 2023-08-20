@@ -1,7 +1,9 @@
 package xyz.apex.minecraft.testmod.common;
 
 import joptsimple.internal.Strings;
+import net.minecraft.client.particle.FlameParticle;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.EntityTypeTags;
@@ -175,6 +177,16 @@ public interface TestMod
 
     BlockEntityEntry<TestMultiBlockEntity> TEST_MULTI_BLOCK_ENTITY = BlockEntityEntry.cast(REGISTRAR.get(Registries.BLOCK_ENTITY_TYPE));
     MenuEntry<TestMultiBlockMenu> TEST_MULTI_BLOCK_MENU = REGISTRAR.<TestMultiBlockMenu, SimpleContainerMenuScreen<TestMultiBlockMenu>>menu(TestMultiBlockMenu::forNetwork, () -> () -> SimpleContainerMenuScreen::new);
+
+    RegistryEntry<SimpleParticleType> TEST_PARTICLE = REGISTRAR
+            .object("test_particle")
+            .particle(() -> new SimpleParticleType(true))
+            .spriteSetFactory(() -> () -> FlameParticle.Provider::new)
+            .definition((provider, lookup, entry) -> provider
+                    .particle(entry.value())
+                    .texture(entry.value())
+            )
+    .register();
 
     RegistryEntry<CreativeModeTab> CREATIVE_MODE_TAB = REGISTRAR
             .creativeModeTab("test")
