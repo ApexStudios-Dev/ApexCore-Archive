@@ -4,16 +4,14 @@ import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -99,66 +97,27 @@ public final class MultiBlockComponent extends BaseBlockComponent
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack)
     {
-        var multiBlockType = getMultiBlockType();
+        place(level, pos, blockState, placer, stack, false);
+    }
 
-        if(getIndex(multiBlockType, blockState) != 0)
-            return;
-
-        var blockType = getGameObject();
-
-        for(var i = 0; i < multiBlockType.size(); i++)
-        {
-            var newBlockState = setIndex(multiBlockType, blockState, i);
-            var worldPosition = worldPosition(multiBlockType, pos, newBlockState);
-
-            if(worldPosition.equals(pos))
-                continue;
-
-            if(!level.getBlockState(worldPosition).is(blockType))
-                level.destroyBlock(worldPosition, true, placer);
-
-            var soundType = newBlockState.getSoundType();
-            level.setBlockAndUpdate(worldPosition, newBlockState);
-
-            if(placer instanceof ServerPlayer sPlayer)
-                CriteriaTriggers.PLACED_BLOCK.trigger(sPlayer, worldPosition, stack);
-
-            // level.playSound(placer, worldPosition, soundType.getPlaceSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1F) / 2F, soundType.getPitch() * .8F);
-            level.gameEvent(GameEvent.BLOCK_PLACE, worldPosition, GameEvent.Context.of(placer, newBlockState));
-        }
+    @Override
+    public void onPlace(BlockState blockState, Level level, BlockPos pos, BlockState oldBlockState, boolean isMoving)
+    {
+        if(!oldBlockState.is(blockState.getBlock()))
+            place(level, pos, blockState, null, ItemStack.EMPTY, false);
     }
 
     @Override
     public void playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player)
     {
-        var multiBlockType = getMultiBlockType();
-        var blockType = getGameObject();
-        var root = rootPosition(multiBlockType, pos, blockState);
-
-        for(var i = 0; i < multiBlockType.size(); i++)
-        {
-            var worldPosition = worldPosition(multiBlockType, root, setIndex(multiBlockType, blockState, i));
-
-            if(worldPosition.equals(pos))
-                continue;
-
-            if(level.getBlockState(worldPosition).is(blockType))
-                destroyBlock(level, worldPosition, player);
-        }
-
-        if(!root.equals(pos) && level.getBlockState(root).is(blockType))
-            destroyBlock(level, root, player);
+        destroy(level, pos, blockState, player);
     }
 
-    private void destroyBlock(Level level, BlockPos pos, @Nullable LivingEntity destroyer)
+    @Override
+    public void onRemove(BlockState blockState, Level level, BlockPos pos, BlockState newBlockState, boolean isMoving)
     {
-        var blockState = level.getBlockState(pos);
-
-        if(level.removeBlock(pos, false))
-        {
-            level.addDestroyBlockEffect(pos, blockState);
-            level.gameEvent(GameEvent.BLOCK_DESTROY, pos, GameEvent.Context.of(destroyer, blockState));
-        }
+        if(!newBlockState.is(blockState.getBlock()))
+            destroy(level, pos, blockState, null);
     }
 
     public static int getIndex(MultiBlockType multiBlockType, BlockState blockState)
@@ -222,6 +181,116 @@ public final class MultiBlockComponent extends BaseBlockComponent
             return mapper.apply(worldPosition, blockState);
 
         return asRoot(level, multiBlockComponent.getMultiBlockType(), worldPosition, blockState, mapper);
+    }
+
+    public static void place(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack, boolean playSounds)
+    {
+        if(!(blockState.getBlock() instanceof BlockComponentHolder componentHolder))
+            return;
+
+        var multiBlockComponent = componentHolder.getComponent(COMPONENT_TYPE);
+
+        if(multiBlockComponent == null)
+            return;
+
+        var multiBlockType = multiBlockComponent.getMultiBlockType();
+
+        if(getIndex(multiBlockType, blockState) != 0)
+            return;
+
+        var blockType = componentHolder.getGameObject();
+
+        for(var i = 0; i < multiBlockType.size(); i++)
+        {
+            var newBlockState = setIndex(multiBlockType, blockState, i);
+            var worldPosition = worldPosition(multiBlockType, pos, newBlockState);
+
+            if(worldPosition.equals(pos))
+                continue;
+
+            if(!level.getBlockState(worldPosition).is(blockType))
+                level.destroyBlock(worldPosition, true, placer);
+
+            // level.setBlockAndUpdate(worldPosition, newBlockState);
+            level.setBlock(worldPosition, newBlockState, Block.UPDATE_ALL);
+
+            if(placer instanceof ServerPlayer sPlayer)
+                CriteriaTriggers.PLACED_BLOCK.trigger(sPlayer, worldPosition, stack);
+
+            level.gameEvent(GameEvent.BLOCK_PLACE, worldPosition, GameEvent.Context.of(placer, newBlockState));
+
+            if(playSounds)
+            {
+                var soundType = newBlockState.getSoundType();
+                level.playSound(placer instanceof Player plr ? plr : null, worldPosition, soundType.getPlaceSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1F) / 2F, soundType.getPitch() * .8F);
+            }
+        }
+    }
+
+    public static void destroy(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity destroyer)
+    {
+        if(!(blockState.getBlock() instanceof BlockComponentHolder componentHolder))
+            return;
+
+        var multiBlockComponent = componentHolder.getComponent(COMPONENT_TYPE);
+
+        if(multiBlockComponent == null)
+            return;
+
+        var multiBlockType = multiBlockComponent.getMultiBlockType();
+        var blockType = componentHolder.getGameObject();
+        var root = rootPosition(multiBlockType, pos, blockState);
+
+        for(var i = 0; i < multiBlockType.size(); i++)
+        {
+            var worldPosition = worldPosition(multiBlockType, root, setIndex(multiBlockType, blockState, i));
+
+            if(worldPosition.equals(pos))
+                continue;
+
+            if(level.getBlockState(worldPosition).is(blockType))
+                destroyBlock(level, worldPosition, false, destroyer);
+        }
+
+        if(!root.equals(pos) && level.getBlockState(root).is(blockType))
+            destroyBlock(level, root, false, destroyer);
+    }
+
+    private static boolean destroyBlock(Level level, BlockPos pos, boolean dropBlock, @Nullable LivingEntity destroyer)
+    {
+        // custom destroy block method
+        // to stop playing the block
+        // breaking sound for every block in multi block
+        var blockState = level.getBlockState(pos);
+
+        if(blockState.isAir())
+            return false;
+
+        var fluidState = level.getFluidState(pos);
+
+        if(!(blockState.getBlock() instanceof BaseFireBlock))
+        {
+            // LevelEvent.PARTICLES_DESTROY_BLOCK - places destroy sound and break fx
+            // but we want just the fx
+            // level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(blockState));
+            level.addDestroyBlockEffect(pos, blockState);
+        }
+
+        if(dropBlock)
+        {
+            var blockEntity = blockState.hasBlockEntity() ? level.getBlockEntity(pos) : null;
+            Block.dropResources(blockState, level, pos, blockEntity, destroyer, ItemStack.EMPTY);
+        }
+
+        var changed = level.setBlock(pos, fluidState.createLegacyBlock(), Block.UPDATE_ALL);
+
+        if(changed)
+        {
+            //level.addDestroyBlockEffect(pos, blockState);
+            level.gameEvent(GameEvent.BLOCK_DESTROY, pos, GameEvent.Context.of(destroyer, blockState));
+        }
+
+        return changed;
     }
 
     // TODO: Move somewhere more common
