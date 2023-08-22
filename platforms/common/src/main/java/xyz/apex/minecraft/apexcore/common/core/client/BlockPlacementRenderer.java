@@ -122,13 +122,14 @@ public final class BlockPlacementRenderer
         if(stack.isEmpty() || !(stack.getItem() instanceof BlockItem item))
             return;
 
+        final var stackFinal = stack;
         var block = item.getBlock();
 
         // only render for blocks marked with our tag
         if(!block.builtInRegistryHolder().is(ApexTags.Blocks.PLACEMENT_VISUALIZER))
             return;
 
-        var placeContext = new BlockPlaceContext(client.player, hand, stack, result);
+        var placeContext = new BlockPlaceContext(client.player, hand, stackFinal, result);
 
         // lookup correct position to render at
         var renderPos = getRenderPos(block, placeContext);
@@ -145,65 +146,51 @@ public final class BlockPlacementRenderer
         var camPosition = camera.getPosition();
         pose.translate(-camPosition.x, -camPosition.y, -camPosition.z);
 
-        var rendered = false;
         var canBePlaced = canBePlaced(placeContext, renderPos, blockState);
 
         // render for every block in the multi block
         // TODO: maybe extract this out into some form of registry, to allow other mods to register their own placement visualizers and override the default rendering
         //  also move multiblocks to use said registry system rather than hard wired here
-        if(block instanceof BlockComponentHolder componentHolder)
-        {
-            var component = componentHolder.getComponent(BlockComponentTypes.MULTI_BLOCK);
+        BlockComponentHolder.runAsComponent(blockState, BlockComponentTypes.MULTI_BLOCK, component -> {
+            var rendered = false;
+            var multiBlockType = component.getMultiBlockType();
 
-            if(component != null)
+            for(var i = 0; i < multiBlockType.size(); i++)
             {
-                var multiBlockType = component.getMultiBlockType();
+                var newBlockState = MultiBlockComponent.setIndex(multiBlockType, blockState, i);
 
-                for(var i = 0; i < multiBlockType.size(); i++)
-                {
-                    var newBlockState = MultiBlockComponent.setIndex(multiBlockType, blockState, i);
+                if(newBlockState.getRenderShape() != RenderShape.MODEL)
+                    continue;
 
-                    if(newBlockState.getRenderShape() != RenderShape.MODEL)
-                        continue;
-
-                    var worldPosition = MultiBlockComponent.worldPosition(multiBlockType, renderPos, newBlockState);
-                    renderBlock(client, pose, buffer, stack, newBlockState, worldPosition, canBePlaced);
-                    rendered = true;
-                }
+                var worldPosition = MultiBlockComponent.worldPosition(multiBlockType, renderPos, newBlockState);
+                renderBlock(client, pose, buffer, stackFinal, newBlockState, worldPosition, canBePlaced);
             }
-        }
 
-        // render single block, if multi block did not render
-        if(!rendered)
-            renderBlock(client, pose, buffer, stack, blockState, renderPos, canBePlaced);
+            // render single block, if multi block did not render
+            if(!rendered)
+                renderBlock(client, pose, buffer, stackFinal, blockState, renderPos, canBePlaced);
+
+        }, () -> renderBlock(client, pose, buffer, stackFinal, blockState, renderPos, canBePlaced));
 
         pose.popPose();
     }
 
     private boolean canBePlaced(BlockPlaceContext context, BlockPos pos, BlockState blockState)
     {
-        if(blockState.getBlock() instanceof BlockComponentHolder componentHolder)
-        {
-            var multiBlockComponent = componentHolder.getComponent(BlockComponentTypes.MULTI_BLOCK);
+        return BlockComponentHolder.mapAsComponent(blockState, MultiBlockComponent.COMPONENT_TYPE, component -> {
+            var multiBlockType = component.getMultiBlockType();
 
-            if(multiBlockComponent != null)
+            for(var i = 0; i < multiBlockType.size(); i++)
             {
-                var multiBlockType = multiBlockComponent.getMultiBlockType();
+                var newBlockState = MultiBlockComponent.setIndex(multiBlockType, blockState, i);
+                var worldPosition = MultiBlockComponent.worldPosition(multiBlockType, pos, newBlockState);
 
-                for(var i = 0; i < multiBlockType.size(); i++)
-                {
-                    var newBlockState = MultiBlockComponent.setIndex(multiBlockType, blockState, i);
-                    var worldPosition = MultiBlockComponent.worldPosition(multiBlockType, pos, newBlockState);
-
-                    if(!MultiBlockComponent.canPlaceAt(context, worldPosition, newBlockState))
-                        return false;
-                }
-
-                return true;
+                if(!MultiBlockComponent.canPlaceAt(context, worldPosition, newBlockState))
+                    return false;
             }
-        }
 
-        return MultiBlockComponent.canPlaceAt(context, pos, blockState);
+            return true;
+        }).orElseGet(() -> MultiBlockComponent.canPlaceAt(context, pos, blockState));
     }
 
     @SuppressWarnings("DataFlowIssue")
@@ -283,15 +270,8 @@ public final class BlockPlacementRenderer
         if(blockState == null)
             blockState = block.defaultBlockState();
 
-        if(block instanceof BlockComponentHolder componentHolder)
-        {
-            var component = componentHolder.getComponent(BlockComponentTypes.MULTI_BLOCK);
-
-            if(component != null)
-                blockState = MultiBlockComponent.setIndex(component.getMultiBlockType(), blockState, 0);
-        }
-
-        return blockState;
+        final var blockStateFinal = blockState;
+        return BlockComponentHolder.mapAsComponent(block, BlockComponentTypes.MULTI_BLOCK, component -> MultiBlockComponent.setIndex(component.getMultiBlockType(), blockStateFinal, 0)).orElse(blockStateFinal);
     }
 
     private BlockPos getRenderPos(Block block, BlockPlaceContext context)

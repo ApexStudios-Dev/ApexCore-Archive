@@ -172,88 +172,68 @@ public final class MultiBlockComponent extends BaseBlockComponent
     @UnknownNullability("Nullable when 'mapper' returns null")
     public static <T> T asRoot(BlockGetter level, BlockPos worldPosition, BlockState blockState, BiFunction<BlockPos, BlockState, T> mapper)
     {
-        if(!(blockState.getBlock() instanceof BlockComponentHolder holder))
-            return mapper.apply(worldPosition, blockState);
-
-        var multiBlockComponent = holder.getComponent(COMPONENT_TYPE);
-
-        if(multiBlockComponent == null)
-            return mapper.apply(worldPosition, blockState);
-
-        return asRoot(level, multiBlockComponent.getMultiBlockType(), worldPosition, blockState, mapper);
+        return BlockComponentHolder.mapAsComponent(blockState, COMPONENT_TYPE, component -> asRoot(level, component.getMultiBlockType(), worldPosition, blockState, mapper)).orElseGet(() -> mapper.apply(worldPosition, blockState));
     }
 
     public static void place(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity placer, ItemStack stack, boolean playSounds)
     {
-        if(!(blockState.getBlock() instanceof BlockComponentHolder componentHolder))
-            return;
+        BlockComponentHolder.runAsComponent(blockState, COMPONENT_TYPE, component -> {
+            var multiBlockType = component.getMultiBlockType();
 
-        var multiBlockComponent = componentHolder.getComponent(COMPONENT_TYPE);
+            if(getIndex(multiBlockType, blockState) != 0)
+                return;
 
-        if(multiBlockComponent == null)
-            return;
+            var blockType = component.getGameObject();
 
-        var multiBlockType = multiBlockComponent.getMultiBlockType();
-
-        if(getIndex(multiBlockType, blockState) != 0)
-            return;
-
-        var blockType = componentHolder.getGameObject();
-
-        for(var i = 0; i < multiBlockType.size(); i++)
-        {
-            var newBlockState = setIndex(multiBlockType, blockState, i);
-            var worldPosition = worldPosition(multiBlockType, pos, newBlockState);
-
-            if(worldPosition.equals(pos))
-                continue;
-
-            if(!level.getBlockState(worldPosition).is(blockType))
-                level.destroyBlock(worldPosition, true, placer);
-
-            // level.setBlockAndUpdate(worldPosition, newBlockState);
-            level.setBlock(worldPosition, newBlockState, Block.UPDATE_ALL);
-
-            if(placer instanceof ServerPlayer sPlayer)
-                CriteriaTriggers.PLACED_BLOCK.trigger(sPlayer, worldPosition, stack);
-
-            level.gameEvent(GameEvent.BLOCK_PLACE, worldPosition, GameEvent.Context.of(placer, newBlockState));
-
-            if(playSounds)
+            for(var i = 0; i < multiBlockType.size(); i++)
             {
-                var soundType = newBlockState.getSoundType();
-                level.playSound(placer instanceof Player plr ? plr : null, worldPosition, soundType.getPlaceSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1F) / 2F, soundType.getPitch() * .8F);
+                var newBlockState = setIndex(multiBlockType, blockState, i);
+                var worldPosition = worldPosition(multiBlockType, pos, newBlockState);
+
+                if(worldPosition.equals(pos))
+                    continue;
+
+                if(!level.getBlockState(worldPosition).is(blockType))
+                    level.destroyBlock(worldPosition, true, placer);
+
+                // level.setBlockAndUpdate(worldPosition, newBlockState);
+                level.setBlock(worldPosition, newBlockState, Block.UPDATE_ALL);
+
+                if(placer instanceof ServerPlayer sPlayer)
+                    CriteriaTriggers.PLACED_BLOCK.trigger(sPlayer, worldPosition, stack);
+
+                level.gameEvent(GameEvent.BLOCK_PLACE, worldPosition, GameEvent.Context.of(placer, newBlockState));
+
+                if(playSounds)
+                {
+                    var soundType = newBlockState.getSoundType();
+                    level.playSound(placer instanceof Player plr ? plr : null, worldPosition, soundType.getPlaceSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1F) / 2F, soundType.getPitch() * .8F);
+                }
             }
-        }
+        });
     }
 
     public static void destroy(Level level, BlockPos pos, BlockState blockState, @Nullable LivingEntity destroyer)
     {
-        if(!(blockState.getBlock() instanceof BlockComponentHolder componentHolder))
-            return;
+        BlockComponentHolder.runAsComponent(blockState, COMPONENT_TYPE, component -> {
+            var multiBlockType = component.getMultiBlockType();
+            var blockType = component.getGameObject();
+            var root = rootPosition(multiBlockType, pos, blockState);
 
-        var multiBlockComponent = componentHolder.getComponent(COMPONENT_TYPE);
+            for(var i = 0; i < multiBlockType.size(); i++)
+            {
+                var worldPosition = worldPosition(multiBlockType, root, setIndex(multiBlockType, blockState, i));
 
-        if(multiBlockComponent == null)
-            return;
+                if(worldPosition.equals(pos))
+                    continue;
 
-        var multiBlockType = multiBlockComponent.getMultiBlockType();
-        var blockType = componentHolder.getGameObject();
-        var root = rootPosition(multiBlockType, pos, blockState);
+                if(level.getBlockState(worldPosition).is(blockType))
+                    destroyBlock(level, worldPosition, false, destroyer);
+            }
 
-        for(var i = 0; i < multiBlockType.size(); i++)
-        {
-            var worldPosition = worldPosition(multiBlockType, root, setIndex(multiBlockType, blockState, i));
-
-            if(worldPosition.equals(pos))
-                continue;
-
-            if(level.getBlockState(worldPosition).is(blockType))
-                destroyBlock(level, worldPosition, false, destroyer);
-        }
-
-        if(!root.equals(pos) && level.getBlockState(root).is(blockType))
-            destroyBlock(level, root, false, destroyer);
+            if(!root.equals(pos) && level.getBlockState(root).is(blockType))
+                destroyBlock(level, root, false, destroyer);
+        });
     }
 
     private static boolean destroyBlock(Level level, BlockPos pos, boolean dropBlock, @Nullable LivingEntity destroyer)

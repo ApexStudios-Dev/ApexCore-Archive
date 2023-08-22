@@ -1,5 +1,6 @@
 package xyz.apex.minecraft.apexcore.common.lib.component.block.entity;
 
+import com.google.common.util.concurrent.Runnables;
 import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.annotations.ForOverride;
 import net.minecraft.core.Direction;
@@ -21,6 +22,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 // note although we extend the following interfaces
@@ -200,4 +203,41 @@ public sealed interface BlockEntityComponentHolder extends Nameable, WorldlyCont
     @Override
     AbstractContainerMenu createMenu(int windowId, Inventory playerInventory, Player player);
     // endregion
+
+    static <T extends BlockEntityComponent, R> Optional<R> mapAsComponent(BlockEntity blockEntity, BlockEntityComponentType<T> componentType, Function<T, R> mapper)
+    {
+        if(!(blockEntity instanceof BlockEntityComponentHolder componentHolder))
+            return Optional.empty();
+
+        var component = componentHolder.getComponent(componentType);
+
+        if(component == null)
+            return Optional.empty();
+
+        return Optional.ofNullable(mapper.apply(component));
+    }
+
+    static <T extends BlockEntityComponent> void runAsComponent(BlockEntity blockEntity, BlockEntityComponentType<T> componentType, Consumer<T> consumer, Runnable runnable)
+    {
+        if(!(blockEntity instanceof BlockEntityComponentHolder componentHolder))
+        {
+            runnable.run();
+            return;
+        }
+
+        var component = componentHolder.getComponent(componentType);
+
+        if(component == null)
+        {
+            runnable.run();
+            return;
+        }
+
+        consumer.accept(component);
+    }
+
+    static <T extends BlockEntityComponent> void runAsComponent(BlockEntity blockEntity, BlockEntityComponentType<T> componentType, Consumer<T> consumer)
+    {
+        runAsComponent(blockEntity, componentType, consumer, Runnables.doNothing());
+    }
 }
