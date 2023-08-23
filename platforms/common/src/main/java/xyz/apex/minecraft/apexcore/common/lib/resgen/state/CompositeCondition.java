@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import org.apache.commons.lang3.ArrayUtils;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.JsonHelper;
 
 import java.util.List;
@@ -15,10 +16,10 @@ public final class CompositeCondition implements Condition
     private final Operation operation;
     private final List<Condition> conditions;
 
-    CompositeCondition(Operation operation, Condition... conditions)
+    CompositeCondition(Operation operation, Condition first, Condition... others)
     {
         this.operation = operation;
-        this.conditions = List.of(conditions);
+        this.conditions = List.of(ArrayUtils.addFirst(others, first));
     }
 
     @Override

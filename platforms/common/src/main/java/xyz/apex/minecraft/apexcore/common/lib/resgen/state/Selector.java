@@ -1,8 +1,8 @@
 package xyz.apex.minecraft.apexcore.common.lib.resgen.state;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import net.minecraft.world.level.block.state.properties.Property;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -16,6 +16,11 @@ public final class Selector
     private static final Comparator<Property.Value<?>> COMPARE_BY_NAME = Comparator.comparing(value -> value.property().getName());
 
     private final List<Property.Value<?>> values;
+
+    private Selector(Property.Value<?> first, Property.Value<?>... others)
+    {
+        values = List.of(ArrayUtils.addFirst(others, first));
+    }
 
     private Selector(Collection<Property.Value<?>> values)
     {
@@ -73,8 +78,8 @@ public final class Selector
         return EMPTY;
     }
 
-    public static Selector of(Property.Value<?>... values)
+    public static Selector of(Property.Value<?> first, Property.Value<?>... others)
     {
-        return new Selector(ImmutableList.copyOf(values));
+        return new Selector(first, others);
     }
 }

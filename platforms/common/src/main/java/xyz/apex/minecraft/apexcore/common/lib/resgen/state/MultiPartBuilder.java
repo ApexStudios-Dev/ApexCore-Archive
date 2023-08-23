@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import org.apache.commons.lang3.ArrayUtils;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.JsonHelper;
 
 import java.util.List;
@@ -33,9 +34,9 @@ public final class MultiPartBuilder implements BlockStateGenerator
         return this;
     }
 
-    public MultiPartBuilder with(Variant... variants)
+    public MultiPartBuilder with(Variant first, Variant... others)
     {
-        entries.add(new Entry(variants));
+        entries.add(new Entry(first, others));
         return this;
     }
 
@@ -45,9 +46,9 @@ public final class MultiPartBuilder implements BlockStateGenerator
         return this;
     }
 
-    public MultiPartBuilder with(Condition condition, Variant... variants)
+    public MultiPartBuilder with(Condition condition, Variant first, Variant... others)
     {
-        entries.add(new ConditionalEntry(condition, variants));
+        entries.add(new ConditionalEntry(condition, first, others));
         return this;
     }
 
@@ -73,9 +74,9 @@ public final class MultiPartBuilder implements BlockStateGenerator
     {
         private final List<Variant> variants;
 
-        protected Entry(Variant... variants)
+        protected Entry(Variant first, Variant... others)
         {
-            this.variants = List.of(variants);
+            variants = List.of(ArrayUtils.addFirst(others, first));
         }
 
         protected void validate(StateDefinition<Block, BlockState> stateDefinition)
@@ -94,9 +95,9 @@ public final class MultiPartBuilder implements BlockStateGenerator
     {
         private final Condition condition;
 
-        private ConditionalEntry(Condition condition, Variant... variants)
+        private ConditionalEntry(Condition condition, Variant first, Variant... others)
         {
-            super(variants);
+            super(first, others);
 
             this.condition = condition;
         }

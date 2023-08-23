@@ -3,6 +3,7 @@ package xyz.apex.minecraft.apexcore.common.lib.resgen.state;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.minecraft.world.level.block.state.properties.Property;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.function.TriFunction;
 
 import java.util.List;
@@ -87,9 +88,9 @@ public abstract class PropertyDispatch<P extends PropertyDispatch<P>>
             return select(value, List.of(variant));
         }
 
-        public C1<P1> select(P1 value, Variant... variants)
+        public C1<P1> select(P1 value, Variant first, Variant... others)
         {
-            return select(value, List.of(variants));
+            return select(value, List.of(ArrayUtils.addFirst(others, first)));
         }
 
         public C1<P1> select(P1 value, List<Variant> variants)
@@ -132,9 +133,9 @@ public abstract class PropertyDispatch<P extends PropertyDispatch<P>>
             return select(value1, value2, List.of(variant));
         }
 
-        public C2<P1, P2> select(P1 value1, P2 value2, Variant... variants)
+        public C2<P1, P2> select(P1 value1, P2 value2, Variant first, Variant... others)
         {
-            return select(value1, value2, List.of(variants));
+            return select(value1, value2, List.of(ArrayUtils.addFirst(others, first)));
         }
 
         public C2<P1, P2> select(P1 value1, P2 value2, List<Variant> variants)
@@ -194,9 +195,9 @@ public abstract class PropertyDispatch<P extends PropertyDispatch<P>>
             return select(value1, value2, value3, List.of(variant));
         }
 
-        public C3<P1, P2, P3> select(P1 value1, P2 value2, P3 value3, Variant... variants)
+        public C3<P1, P2, P3> select(P1 value1, P2 value2, P3 value3, Variant first, Variant... others)
         {
-            return select(value1, value2, value3, List.of(variants));
+            return select(value1, value2, value3, List.of(ArrayUtils.addFirst(others, first)));
         }
 
         public C3<P1, P2, P3> select(P1 value1, P2 value2, P3 value3, List<Variant> variants)
@@ -261,9 +262,9 @@ public abstract class PropertyDispatch<P extends PropertyDispatch<P>>
             return select(value1, value2, value3, value4, List.of(variant));
         }
 
-        public C4<P1, P2, P3, P4> select(P1 value1, P2 value2, P3 value3, P4 value4, Variant... variants)
+        public C4<P1, P2, P3, P4> select(P1 value1, P2 value2, P3 value3, P4 value4, Variant first, Variant... others)
         {
-            return select(value1, value2, value3, value4, List.of(variants));
+            return select(value1, value2, value3, value4, List.of(ArrayUtils.addFirst(others, first)));
         }
 
         public C4<P1, P2, P3, P4> select(P1 value1, P2 value2, P3 value3, P4 value4, List<Variant> variants)
@@ -337,9 +338,9 @@ public abstract class PropertyDispatch<P extends PropertyDispatch<P>>
             return select(value1, value2, value3, value4, value5, List.of(variant));
         }
 
-        public C5<P1, P2, P3, P4, P5> select(P1 value1, P2 value2, P3 value3, P4 value4, P5 value5, Variant... variants)
+        public C5<P1, P2, P3, P4, P5> select(P1 value1, P2 value2, P3 value3, P4 value4, P5 value5, Variant first, Variant... others)
         {
-            return select(value1, value2, value3, value4, value5, List.of(variants));
+            return select(value1, value2, value3, value4, value5, List.of(ArrayUtils.addFirst(others, first)));
         }
 
         public C5<P1, P2, P3, P4, P5> select(P1 value1, P2 value2, P3 value3, P4 value4, P5 value5, List<Variant> variants)

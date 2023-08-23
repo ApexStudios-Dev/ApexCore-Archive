@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.JsonHelper;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.model.ModelBuilder;
@@ -59,6 +60,21 @@ public final class Variant
     }
 
     public Variant rotation(Rotation xRot, Rotation yRot)
+    {
+        return xRot(xRot).yRot(yRot);
+    }
+
+    public Variant xRot(int xRot)
+    {
+        return xRot(Rotation.valueOf(xRot));
+    }
+
+    public Variant yRot(int yRot)
+    {
+        return yRot(Rotation.valueOf(yRot));
+    }
+
+    public Variant rotation(int xRot, int yRot)
     {
         return xRot(xRot).yRot(yRot);
     }
@@ -151,6 +167,16 @@ public final class Variant
         Rotation(int rotation)
         {
             this.rotation = rotation;
+        }
+
+        public static Rotation valueOf(int rotation)
+        {
+            return switch(Mth.positiveModulo(rotation, 360)) {
+                default -> R0;
+                case 90 -> R90;
+                case 180 -> R180;
+                case 270 -> R270;
+            };
         }
     }
 }

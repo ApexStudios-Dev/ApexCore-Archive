@@ -8,6 +8,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.Property;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.JsonHelper;
 
@@ -22,10 +23,10 @@ public final class MultiVariantBuilder implements BlockStateGenerator
     private final Set<Property<?>> properties = Sets.newHashSet();
     private final List<PropertyDispatch<?>> propertySets = Lists.newArrayList();
 
-    private MultiVariantBuilder(Block block, Variant... variants)
+    private MultiVariantBuilder(Block block, Variant first, Variant... others)
     {
         this.block = block;
-        this.variants = List.of(variants);
+        this.variants = List.of(ArrayUtils.addFirst(others, first));
     }
 
     @Override
@@ -85,7 +86,7 @@ public final class MultiVariantBuilder implements BlockStateGenerator
 
     public static MultiVariantBuilder builder(Block block)
     {
-        return new MultiVariantBuilder(block);
+        return builder(block, Variant.variant());
     }
 
     public static MultiVariantBuilder builder(Block block, Variant variant)
@@ -93,8 +94,8 @@ public final class MultiVariantBuilder implements BlockStateGenerator
         return new MultiVariantBuilder(block, variant);
     }
 
-    public static MultiVariantBuilder builder(Block block, Variant... variants)
+    public static MultiVariantBuilder builder(Block block, Variant first, Variant... others)
     {
-        return new MultiVariantBuilder(block, variants);
+        return new MultiVariantBuilder(block, first, others);
     }
 }

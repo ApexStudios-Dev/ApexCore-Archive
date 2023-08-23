@@ -22,9 +22,9 @@ public sealed interface Condition permits CompositeCondition, TerminalCondition
         return composite(Operation.OR, condition);
     }
 
-    static CompositeCondition or(Condition... conditions)
+    static CompositeCondition or(Condition first, Condition... others)
     {
-        return composite(Operation.OR, conditions);
+        return composite(Operation.OR, first, others);
     }
 
     static CompositeCondition and(Condition condition)
@@ -32,9 +32,9 @@ public sealed interface Condition permits CompositeCondition, TerminalCondition
         return composite(Operation.AND, condition);
     }
 
-    static CompositeCondition and(Condition... conditions)
+    static CompositeCondition and(Condition first, Condition... others)
     {
-        return composite(Operation.AND, conditions);
+        return composite(Operation.AND, first, others);
     }
 
     private static CompositeCondition composite(Operation operation, Condition condition)
@@ -42,9 +42,9 @@ public sealed interface Condition permits CompositeCondition, TerminalCondition
         return new CompositeCondition(operation, condition);
     }
 
-    private static CompositeCondition composite(Operation operation, Condition... conditions)
+    private static CompositeCondition composite(Operation operation, Condition first, Condition... others)
     {
-        return new CompositeCondition(operation, conditions);
+        return new CompositeCondition(operation, first, others);
     }
 
     enum Operation implements StringRepresentable
