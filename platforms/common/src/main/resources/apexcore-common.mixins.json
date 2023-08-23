@@ -3,8 +3,7 @@
     "package": "xyz.apex.minecraft.apexcore.common.mixin",
     "mixins": [
         "AccessorBlock",
-        "InvokerBlock",
-        "MixinEntity"
+        "InvokerBlock"
     ],
     "client": [
         "client.MixinBlockEntityWithoutLevelRenderer"

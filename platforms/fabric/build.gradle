@@ -20,6 +20,10 @@ loom {
     }
 }
 
+dependencies {
+    include "io.github.llamalad7:mixinextras-fabric:${MIXIN_EXTRAS_VERSION}"
+}
+
 processResources {
     from project(':common').sourceSets.main.resources
 }

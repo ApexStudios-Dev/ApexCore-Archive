@@ -1,3 +1,4 @@
+/*
 package xyz.apex.minecraft.apexcore.common.lib.event;
 
 import com.google.common.collect.Lists;
@@ -35,3 +36,4 @@ final class EventTypeImpl<T extends Event> implements EventType<T>
         return invoker.apply(invokable);
     }
 }
+*/

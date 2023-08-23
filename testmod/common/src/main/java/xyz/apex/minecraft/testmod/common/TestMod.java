@@ -36,7 +36,6 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import xyz.apex.lib.Services;
 import xyz.apex.minecraft.apexcore.common.core.ApexTags;
 import xyz.apex.minecraft.apexcore.common.lib.enchantment.SimpleEnchantment;
-import xyz.apex.minecraft.apexcore.common.lib.event.types.ServerEvents;
 import xyz.apex.minecraft.apexcore.common.lib.menu.SimpleContainerMenuScreen;
 import xyz.apex.minecraft.apexcore.common.lib.registry.Registrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.*;
@@ -58,8 +57,6 @@ import xyz.apex.minecraft.testmod.common.menu.TestMultiBlockMenu;
 
 import java.util.stream.Stream;
 
-import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
-import static net.minecraft.commands.Commands.literal;
 import static xyz.apex.minecraft.apexcore.common.lib.resgen.loot.EntityLootProvider.ENTITY_ON_FIRE;
 
 @ApiStatus.Internal
@@ -221,14 +218,6 @@ public interface TestMod
 
         REGISTRAR.register();
         registerGenerators();
-
-        ServerEvents.REGISTER_COMMANDS.addListener((dispatcher, environment, context) -> dispatcher.register(
-                literal("hello")
-                        .executes(ctx -> {
-                            ctx.getSource().sendSystemMessage(Component.literal("Hello %s".formatted(ctx.getSource().getTextName())));
-                            return SINGLE_SUCCESS;
-                        })
-        ));
     }
 
     private void registerGenerators()

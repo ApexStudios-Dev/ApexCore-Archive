@@ -3,7 +3,6 @@ package xyz.apex.minecraft.apexcore.common.core;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import xyz.apex.lib.Services;
-import xyz.apex.minecraft.apexcore.common.core.client.BlockPlacementRenderer;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
 import xyz.apex.minecraft.apexcore.common.lib.hook.ColorHandlerHooks;
@@ -26,6 +25,5 @@ public interface ApexCoreClient
     @MustBeInvokedByOverriders
     default void bootstrap()
     {
-        BlockPlacementRenderer.INSTANCE.register();
     }
 }

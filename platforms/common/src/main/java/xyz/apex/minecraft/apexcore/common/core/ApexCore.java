@@ -2,7 +2,7 @@ package xyz.apex.minecraft.apexcore.common.core;
 
 import com.google.errorprone.annotations.DoNotCall;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -13,12 +13,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.Nullable;
 import xyz.apex.lib.Services;
 import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.types.BlockEntityComponentTypes;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.types.BlockComponentTypes;
-import xyz.apex.minecraft.apexcore.common.lib.event.EventType;
-import xyz.apex.minecraft.apexcore.common.lib.event.types.EntityEvents;
 import xyz.apex.minecraft.apexcore.common.lib.hook.CreativeModeTabHooks;
 import xyz.apex.minecraft.apexcore.common.lib.hook.EntityHooks;
 import xyz.apex.minecraft.apexcore.common.lib.hook.GameRuleHooks;
@@ -50,15 +49,7 @@ public interface ApexCore
     @MustBeInvokedByOverriders
     default void bootstrap()
     {
-        // common check for every platform
-        // all fake players *should* extend the ServerPlayer class
-        // forge & fabric register their own listeners to check instanceof directly on their fake player classes
-        //
-        // platform listeners are registered before this one
-        // meaning the platform specific check should happen first before this one
-        EntityEvents.IS_FAKE_PLAYER.addListener(entity -> entity instanceof ServerPlayer && entity.getClass() != ServerPlayer.class);
         ApexTags.bootstrap();
-        EventType.bootstrap();
         BlockComponentTypes.bootstrap();
         BlockEntityComponentTypes.bootstrap();
         MultiBlockTypes.bootstrap();
@@ -95,4 +86,6 @@ public interface ApexCore
 
     @ApiStatus.Internal
     <T extends AbstractContainerMenu> MenuType<T> createMenuType(MenuFactory<T> menuFactory, Supplier<MenuType<T>> selfSupplier);
+
+    boolean isFakePlayer(@Nullable Entity entity);
 }

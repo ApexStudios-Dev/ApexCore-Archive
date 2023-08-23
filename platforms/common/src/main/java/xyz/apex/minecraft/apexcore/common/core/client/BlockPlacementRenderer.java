@@ -30,7 +30,6 @@ import xyz.apex.minecraft.apexcore.common.lib.PhysicalSide;
 import xyz.apex.minecraft.apexcore.common.lib.SideOnly;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.BlockComponentHolder;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.types.BlockComponentTypes;
-import xyz.apex.minecraft.apexcore.common.lib.event.types.LevelRendererEvents;
 import xyz.apex.minecraft.apexcore.common.lib.multiblock.MultiBlockComponent;
 
 import java.util.OptionalDouble;
@@ -91,7 +90,7 @@ public final class BlockPlacementRenderer
         );
     }
 
-    private void renderBlockPlacement(LevelRenderer renderer, PoseStack pose, MultiBufferSource buffer, float partialTick, Camera camera)
+    public void renderBlockPlacement(PoseStack pose, Camera camera)
     {
         var client = Minecraft.getInstance();
 
@@ -147,6 +146,7 @@ public final class BlockPlacementRenderer
         pose.translate(-camPosition.x, -camPosition.y, -camPosition.z);
 
         var canBePlaced = canBePlaced(placeContext, renderPos, blockState);
+        var buffer = client.renderBuffers().bufferSource();
 
         // render for every block in the multi block
         // TODO: maybe extract this out into some form of registry, to allow other mods to register their own placement visualizers and override the default rendering
@@ -164,6 +164,7 @@ public final class BlockPlacementRenderer
 
                 var worldPosition = MultiBlockComponent.worldPosition(multiBlockType, renderPos, newBlockState);
                 renderBlock(client, pose, buffer, stackFinal, newBlockState, worldPosition, canBePlaced);
+                rendered = true;
             }
 
             // render single block, if multi block did not render
@@ -297,14 +298,6 @@ public final class BlockPlacementRenderer
         if(!level.getWorldBorder().isWithinBounds(pos))
             return false;
         return !level.isEmptyBlock(pos);
-    }
-
-    public void register()
-    {
-        LevelRendererEvents.BLOCK_HIGHLIGHT.addListener((renderer, pose, buffer, partialTick, camera) -> {
-            renderBlockPlacement(renderer, pose, buffer, partialTick, camera);
-            return false;
-        });
     }
 
     private final class CustomOverlay extends OverlayStateShard
