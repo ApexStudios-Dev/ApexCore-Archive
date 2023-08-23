@@ -221,7 +221,7 @@ public abstract class PropertyDispatch<P extends PropertyDispatch<P>>
             return this;
         }
 
-        public C3<P1, P2, P3> generateList(TriFunction<P1, P2, P3, Variant> mapper)
+        public C3<P1, P2, P3> generateList(TriFunction<P1, P2, P3, List<Variant>> mapper)
         {
             property1.getPossibleValues()
                      .forEach(value1 -> property2
@@ -292,7 +292,7 @@ public abstract class PropertyDispatch<P extends PropertyDispatch<P>>
             return this;
         }
 
-        public C4<P1, P2, P3, P4> generateList(QuadFunction<P1, P2, P3, P4, Variant> mapper)
+        public C4<P1, P2, P3, P4> generateList(QuadFunction<P1, P2, P3, P4, List<Variant>> mapper)
         {
             property1.getPossibleValues()
                      .forEach(value1 -> property2
@@ -372,7 +372,7 @@ public abstract class PropertyDispatch<P extends PropertyDispatch<P>>
             return this;
         }
 
-        public C5<P1, P2, P3, P4, P5> generateList(PentaFunction<P1, P2, P3, P4, P5, Variant> mapper)
+        public C5<P1, P2, P3, P4, P5> generateList(PentaFunction<P1, P2, P3, P4, P5, List<Variant>> mapper)
         {
             property1.getPossibleValues()
                      .forEach(value1 -> property2
@@ -399,13 +399,13 @@ public abstract class PropertyDispatch<P extends PropertyDispatch<P>>
     }
 
     @FunctionalInterface
-    interface QuadFunction<P1, P2, P3, P4, R>
+    public interface QuadFunction<P1, P2, P3, P4, R>
     {
         R apply(P1 p1, P2 p2, P3 p3, P4 p4);
     }
 
     @FunctionalInterface
-    interface PentaFunction<P1, P2, P3, P4, P5, R>
+    public interface PentaFunction<P1, P2, P3, P4, P5, R>
     {
         R apply(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5);
     }
