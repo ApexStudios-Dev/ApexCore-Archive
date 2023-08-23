@@ -27,7 +27,7 @@ public sealed interface ProviderType<P extends DataProvider>
 
     @ApiStatus.Internal
     @DoNotCall
-    void provide(String ownerId, P provider, ProviderLookup lookup);
+    void gather(String ownerId, P provider, ProviderLookup lookup);
 
     @ApiStatus.Internal
     @DoNotCall
@@ -86,7 +86,7 @@ public sealed interface ProviderType<P extends DataProvider>
         }
 
         @Override
-        public void provide(String ownerId, P provider, ProviderLookup lookup)
+        public void gather(String ownerId, P provider, ProviderLookup lookup)
         {
             listeners.get(ownerId).forEach(listener -> listener.accept(provider, lookup));
         }

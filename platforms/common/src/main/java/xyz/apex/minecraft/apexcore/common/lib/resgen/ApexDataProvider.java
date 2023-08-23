@@ -21,6 +21,7 @@ public final class ApexDataProvider implements DataProvider, ProviderLookup
 {
     private final ProviderType.ProviderContext context;
     private final Set<ProviderType<?>> generated = Sets.newHashSet();
+    private final Set<ProviderType<?>> gathered = Sets.newHashSet();
     private final Map<ProviderType<?>, DataProvider> providerMap = Maps.newHashMap();
 
     private ApexDataProvider(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries, String ownerId)
@@ -41,9 +42,22 @@ public final class ApexDataProvider implements DataProvider, ProviderLookup
         return CompletableFuture.allOf(ProviderType
                 .providerTypes()
                 .stream()
+                .peek(this::gather)
                 .map(providerType -> provide(providerType, cache))
                 .toArray(CompletableFuture[]::new)
         );
+    }
+
+    private <P extends DataProvider> void gather(ProviderType<P> providerType)
+    {
+        var ownerId = context.ownerId();
+
+        if(!gathered.add(providerType) || !providerType.hasListeners(ownerId))
+            return;
+
+        providerType.parents().forEach(this::gather);
+        ApexCore.LOGGER.debug("Gather Generators for Provider: '{}'", providerType.providerName());
+        providerType.gather(ownerId, lookup(providerType), this);
     }
 
     private <P extends DataProvider> CompletableFuture<?> provide(ProviderType<P> providerType, CachedOutput cache)
@@ -59,7 +73,6 @@ public final class ApexDataProvider implements DataProvider, ProviderLookup
         providerType.parents().stream().map(parent -> provide(parent, cache)).forEach(futures::add);
 
         var provider = lookup(providerType);
-        providerType.provide(ownerId, provider, this);
         futures.addLast(provider.run(cache)); // run this provider last
         ApexCore.LOGGER.debug("Executing Provider: '{}'", providerType.providerName());
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
