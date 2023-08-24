@@ -89,14 +89,6 @@ public sealed interface BlockEntityComponent permits BaseBlockEntityComponent
 
     @DoNotCall
     @ForOverride
-    boolean hasAnalogOutputSignal();
-
-    @DoNotCall
-    @ForOverride
-    int getAnalogOutputSignal(Level level);
-
-    @DoNotCall
-    @ForOverride
     int getSignal(BlockGetter level, Direction direction);
     // endregion
     // endregion

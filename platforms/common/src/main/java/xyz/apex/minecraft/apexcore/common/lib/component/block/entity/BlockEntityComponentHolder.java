@@ -98,102 +98,102 @@ public sealed interface BlockEntityComponentHolder extends Nameable, WorldlyCont
     // region: Nameable
     Component getDefaultName();
 
-    @Deprecated
+    @DoNotCall
     @Override
     boolean hasCustomName();
 
-    @Deprecated
+    @DoNotCall
     @Override
     Component getDisplayName();
 
     @Nullable
-    @Deprecated
+    @DoNotCall
     @Override
     Component getCustomName();
 
-    @Deprecated
+    @DoNotCall
     @Override
     Component getName();
     // endregion
 
     // region: Container
-    boolean canPlaceItem(int slot, ItemStack stack, @Nullable Direction side);
-
-    boolean canTakeItem(int slot, ItemStack stack, @Nullable Direction side);
-
+    @DoNotCall
     @Override
     int getMaxStackSize();
 
+    @DoNotCall
     @Override
     void startOpen(Player player);
 
+    @DoNotCall
     @Override
     void stopOpen(Player player);
 
-    @Deprecated
+    @DoNotCall
     @Override
     boolean canPlaceItem(int slot, ItemStack stack);
 
-    @Deprecated
+    @DoNotCall
     @Override
     boolean canTakeItem(Container container, int slot, ItemStack stack);
 
-    @Deprecated
+    @DoNotCall
     @Override
     int countItem(Item item);
 
-    @Deprecated
+    @DoNotCall
     @Override
     boolean hasAnyOf(Set<Item> items);
 
-    @Deprecated
+    @DoNotCall
     @Override
     boolean hasAnyMatching(Predicate<ItemStack> predicate);
 
-    @Deprecated
+    @DoNotCall
     @Override
     int getContainerSize();
 
-    @Deprecated
+    @DoNotCall
     @Override
     boolean isEmpty();
 
-    @Deprecated
+    @DoNotCall
     @Override
     ItemStack getItem(int slot);
 
-    @Deprecated
+    @DoNotCall
     @Override
     ItemStack removeItem(int slot, int amount);
 
-    @Deprecated
+    @DoNotCall
     @Override
     ItemStack removeItemNoUpdate(int slot);
 
-    @Deprecated
+    @DoNotCall
     @Override
     void setItem(int slot, ItemStack stack);
 
-    @Deprecated
+    @DoNotCall
     @Override
     boolean stillValid(Player player);
     // endregion
 
     // region: WorldlyContainer
+    @DoNotCall
     @Override
     int[] getSlotsForFace(Direction side);
 
-    @Deprecated
+    @DoNotCall
     @Override
     boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side);
 
-    @Deprecated
+    @DoNotCall
     @Override
     boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side);
     // endregion
 
     // region: Clearable
-    @Deprecated
+    @DoNotCall
     @Override
     void clearContent();
     // endregion

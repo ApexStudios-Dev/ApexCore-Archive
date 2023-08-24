@@ -12,10 +12,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -31,8 +31,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.lib.block.entity.BaseBlockEntity;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.types.BlockEntityComponentTypes;
-import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.types.InventoryBlockEntityComponent;
+import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.types.LootTableBlockEntityComponent;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.types.NameableBlockEntityComponent;
+import xyz.apex.minecraft.apexcore.common.lib.container.CompositeContainer;
 import xyz.apex.minecraft.apexcore.common.lib.helper.InteractionResultHelper;
 
 import java.util.*;
@@ -44,13 +45,17 @@ public non-sealed class BaseBlockEntityComponentHolder extends BaseBlockEntity i
     private static final String NBT_COMPONENTS = "Components";
 
     private final Map<BlockEntityComponentType<?>, BlockEntityComponent> componentRegistry = registerComponents();
+    private final WorldlyContainer compositeContainer;
 
     public BaseBlockEntityComponentHolder(BlockEntityType<? extends BaseBlockEntityComponentHolder> blockEntityType, BlockPos pos, BlockState blockState)
     {
         super(blockEntityType, pos, blockState);
+
+        compositeContainer = new CompositeContainer(getComponents().stream().filter(Container.class::isInstance).map(Container.class::cast).toArray(Container[]::new));
     }
 
     // region: Components
+    @DoNotCall
     @OverridingMethodsMustInvokeSuper
     @ForOverride
     protected void registerComponents(BlockEntityComponentRegistrar registrar)
@@ -243,23 +248,15 @@ public non-sealed class BaseBlockEntityComponentHolder extends BaseBlockEntity i
     }
 
     @Override
-    public boolean hasAnalogOutputSignal()
+    public final boolean hasAnalogOutputSignal()
     {
-        return getComponents().stream().anyMatch(BlockEntityComponent::hasAnalogOutputSignal);
+        return compositeContainer.getContainerSize() > 0;
     }
 
     @Override
-    public int getAnalogOutputSignal(Level level)
+    public final int getAnalogOutputSignal(Level level)
     {
-        for(var component : getComponents())
-        {
-            var analogOutputSignal = component.getAnalogOutputSignal(level);
-
-            if(analogOutputSignal > 0)
-                return analogOutputSignal;
-        }
-
-        return 0;
+        return AbstractContainerMenu.getRedstoneSignalFromContainer(compositeContainer);
     }
 
     @Override
@@ -284,29 +281,28 @@ public non-sealed class BaseBlockEntityComponentHolder extends BaseBlockEntity i
         return getBlockState().getBlock().getName();
     }
 
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final boolean hasCustomName()
     {
         return findComponent(BlockEntityComponentTypes.NAMEABLE).map(NameableBlockEntityComponent::hasCustomName).orElse(false);
     }
 
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final Component getDisplayName()
     {
         return findComponent(BlockEntityComponentTypes.NAMEABLE).map(NameableBlockEntityComponent::getDisplayName).orElseGet(this::getDefaultName);
     }
 
-    @Nullable
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final Component getCustomName()
     {
         return findComponent(BlockEntityComponentTypes.NAMEABLE).map(NameableBlockEntityComponent::getCustomName).orElse(null);
     }
 
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final Component getName()
     {
@@ -315,147 +311,146 @@ public non-sealed class BaseBlockEntityComponentHolder extends BaseBlockEntity i
     // endregion
 
     // region: Container
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
-    public boolean canPlaceItem(int slot, ItemStack stack, @Nullable Direction side)
+    public final int getMaxStackSize()
     {
-        return true;
+        return compositeContainer.getMaxStackSize();
     }
 
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
-    public boolean canTakeItem(int slot, ItemStack stack, @Nullable Direction side)
+    public final void startOpen(Player player)
     {
-        return true;
+        compositeContainer.startOpen(player);
     }
 
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
-    public int getMaxStackSize()
+    public final void stopOpen(Player player)
     {
-        return Container.LARGE_MAX_STACK_SIZE;
+        compositeContainer.stopOpen(player);
     }
 
-    @Override
-    public void startOpen(Player player)
-    {
-    }
-
-    @Override
-    public void stopOpen(Player player)
-    {
-    }
-
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final boolean canPlaceItem(int slot, ItemStack stack)
     {
-        return canPlaceItem(slot, stack, null);
+        return compositeContainer.canPlaceItem(slot, stack);
     }
 
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final boolean canTakeItem(Container container, int slot, ItemStack stack)
     {
-        return canTakeItem(slot, stack, null);
+        return compositeContainer.canTakeItem(container, slot, stack);
     }
 
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final int countItem(Item item)
     {
-        return findComponent(BlockEntityComponentTypes.INVENTORY).map(inventory -> inventory.countItem(item)).orElse(0);
+        return compositeContainer.countItem(item);
     }
 
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final boolean hasAnyOf(Set<Item> items)
     {
-        return findComponent(BlockEntityComponentTypes.INVENTORY).map(inventory -> inventory.hasAnyOf(items)).orElse(false);
+        return compositeContainer.hasAnyOf(items);
     }
 
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final boolean hasAnyMatching(Predicate<ItemStack> predicate)
     {
-        return findComponent(BlockEntityComponentTypes.INVENTORY).map(inventory -> inventory.hasAnyMatching(predicate)).orElse(false);
+        return compositeContainer.hasAnyMatching(predicate);
     }
 
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final int getContainerSize()
     {
-        return findComponent(BlockEntityComponentTypes.INVENTORY).map(Container::getContainerSize).orElse(0);
+        return compositeContainer.getContainerSize();
     }
 
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final boolean isEmpty()
     {
-        return findComponent(BlockEntityComponentTypes.INVENTORY).map(InventoryBlockEntityComponent::isEmpty).orElse(true);
+        LootTableBlockEntityComponent.unpackLootTable(this, null);
+        return compositeContainer.isEmpty();
     }
 
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final ItemStack getItem(int slot)
     {
-        return findComponent(BlockEntityComponentTypes.INVENTORY).map(inventory -> inventory.getItem(slot)).orElse(ItemStack.EMPTY);
+        LootTableBlockEntityComponent.unpackLootTable(this, null);
+        return compositeContainer.getItem(slot);
     }
 
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final ItemStack removeItem(int slot, int amount)
     {
-        return findComponent(BlockEntityComponentTypes.INVENTORY).map(inventory -> inventory.removeItem(slot, amount)).orElse(ItemStack.EMPTY);
+        LootTableBlockEntityComponent.unpackLootTable(this, null);
+        return compositeContainer.removeItem(slot, amount);
     }
 
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final ItemStack removeItemNoUpdate(int slot)
     {
-        return findComponent(BlockEntityComponentTypes.INVENTORY).map(inventory -> inventory.removeItemNoUpdate(slot)).orElse(ItemStack.EMPTY);
+        LootTableBlockEntityComponent.unpackLootTable(this, null);
+        return compositeContainer.removeItemNoUpdate(slot);
     }
 
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final void setItem(int slot, ItemStack stack)
     {
-        findComponent(BlockEntityComponentTypes.INVENTORY).ifPresent(inventory -> inventory.setItem(slot, stack));
+        LootTableBlockEntityComponent.unpackLootTable(this, null);
+        compositeContainer.setItem(slot, stack);
     }
 
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final boolean stillValid(Player player)
     {
-        return findComponent(BlockEntityComponentTypes.INVENTORY).map(inventory -> inventory.stillValid(player)).orElse(false);
+        return compositeContainer.stillValid(player);
     }
     // endregion
 
     // region: WorldlyContainer
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
-    public int[] getSlotsForFace(Direction side)
+    public final int[] getSlotsForFace(Direction side)
     {
-        return new int[0];
+        return compositeContainer.getSlotsForFace(side);
     }
 
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side)
     {
-        return canPlaceItem(slot, stack, side);
+        return compositeContainer.canPlaceItemThroughFace(slot, stack, side);
     }
 
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side)
     {
-        return canTakeItem(slot, stack, side);
+        return compositeContainer.canTakeItemThroughFace(slot, stack, side);
     }
     // endregion
 
     // region: Clearable
-    @Deprecated
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     public final void clearContent()
     {
-        findComponent(BlockEntityComponentTypes.INVENTORY).ifPresent(Clearable::clearContent);
+        compositeContainer.clearContent();
     }
     // endregion
 
@@ -464,12 +459,12 @@ public non-sealed class BaseBlockEntityComponentHolder extends BaseBlockEntity i
     @Override
     public final AbstractContainerMenu createMenu(int windowId, Inventory playerInventory, Player player)
     {
-        var component = getComponent(BlockEntityComponentTypes.INVENTORY);
+        var lockCodeComponent = getComponent(BlockEntityComponentTypes.LOCK_CODE);
 
-        if(component == null || !component.canOpen(player))
+        if(lockCodeComponent != null && !lockCodeComponent.canUnlock(player))
             return null;
 
-        component.unpackLootTable(player);
+        LootTableBlockEntityComponent.unpackLootTable(this, player);
         return createMenu(windowId, playerInventory);
     }
 

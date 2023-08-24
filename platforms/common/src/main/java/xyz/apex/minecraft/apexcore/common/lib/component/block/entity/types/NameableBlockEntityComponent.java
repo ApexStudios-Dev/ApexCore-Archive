@@ -7,6 +7,7 @@ import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
 import xyz.apex.minecraft.apexcore.common.core.ApexCore;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.entity.BaseBlockEntityComponent;
@@ -77,5 +78,15 @@ public final class NameableBlockEntityComponent extends BaseBlockEntityComponent
     {
         if(stack.hasCustomHoverName())
             setCustomName(stack.getHoverName());
+    }
+
+    public static Component getDisplayName(BlockEntityComponentHolder componentHolder)
+    {
+        return componentHolder.findComponent(COMPONENT_TYPE).map(NameableBlockEntityComponent::getDisplayName).orElseGet(componentHolder::getDefaultName);
+    }
+
+    public static Component getDisplayName(BlockEntity blockEntity)
+    {
+        return blockEntity instanceof BlockEntityComponentHolder componentHolder ? getDisplayName(componentHolder) : blockEntity.getBlockState().getBlock().getName();
     }
 }

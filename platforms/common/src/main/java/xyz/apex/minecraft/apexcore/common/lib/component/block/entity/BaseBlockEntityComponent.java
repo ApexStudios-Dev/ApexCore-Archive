@@ -158,18 +158,6 @@ public non-sealed class BaseBlockEntityComponent implements BlockEntityComponent
     }
 
     @Override
-    public boolean hasAnalogOutputSignal()
-    {
-        return false;
-    }
-
-    @Override
-    public int getAnalogOutputSignal(Level level)
-    {
-        return 0;
-    }
-
-    @Override
     public int getSignal(BlockGetter level, Direction direction)
     {
         return 0;
