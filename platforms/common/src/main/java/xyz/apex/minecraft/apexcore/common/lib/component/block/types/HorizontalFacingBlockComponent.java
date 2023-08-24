@@ -2,6 +2,7 @@ package xyz.apex.minecraft.apexcore.common.lib.component.block.types;
 
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.Mirror;
@@ -15,7 +16,7 @@ import xyz.apex.minecraft.apexcore.common.lib.component.block.BaseBlockComponent
 import xyz.apex.minecraft.apexcore.common.lib.component.block.BlockComponentHolder;
 import xyz.apex.minecraft.apexcore.common.lib.component.block.BlockComponentType;
 
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 public final class HorizontalFacingBlockComponent extends BaseBlockComponent
 {
@@ -23,7 +24,7 @@ public final class HorizontalFacingBlockComponent extends BaseBlockComponent
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
     private Direction defaultFacing = Direction.NORTH;
-    private Function<BlockPlaceContext, Direction> placementDirection = context -> context.getHorizontalDirection().getOpposite();
+    private UnaryOperator<Direction> directionModifier = UnaryOperator.identity();
 
     private HorizontalFacingBlockComponent(BlockComponentHolder componentHolder)
     {
@@ -37,10 +38,10 @@ public final class HorizontalFacingBlockComponent extends BaseBlockComponent
         return this;
     }
 
-    public HorizontalFacingBlockComponent withPlacementDirection(Function<BlockPlaceContext, Direction> placementDirection)
+    public HorizontalFacingBlockComponent withDirectionModifier(UnaryOperator<Direction> directionModifier)
     {
-        Validate.isTrue(!isRegistered(), "Can only change default facing during registration");
-        this.placementDirection = placementDirection;
+        Validate.isTrue(!isRegistered(), "Can only change facing modifier during registration");
+        this.directionModifier = directionModifier;
         return this;
     }
 
@@ -59,7 +60,7 @@ public final class HorizontalFacingBlockComponent extends BaseBlockComponent
     @Override
     public BlockState getStateForPlacement(BlockState placementBlockState, BlockPlaceContext context)
     {
-        return placementBlockState.setValue(FACING, placementDirection.apply(context));
+        return placementBlockState.setValue(FACING, getFacing(context));
     }
 
     @Override
@@ -72,5 +73,20 @@ public final class HorizontalFacingBlockComponent extends BaseBlockComponent
     public BlockState mirror(BlockState blockState, Mirror mirror)
     {
         return blockState.rotate(mirror.getRotation(blockState.getValue(FACING)));
+    }
+
+    public Direction getFacing(UseOnContext context)
+    {
+        return directionModifier.apply(context.getHorizontalDirection().getOpposite());
+    }
+
+    public static Direction getFacing(BlockState blockState)
+    {
+        return BlockComponentHolder.mapAsComponent(blockState, COMPONENT_TYPE, component -> blockState.getValue(FACING)).orElse(Direction.NORTH);
+    }
+
+    public static Direction getFacing(BlockState blockState, UseOnContext context)
+    {
+        return BlockComponentHolder.mapAsComponent(blockState, COMPONENT_TYPE, component -> component.getFacing(context)).orElse(Direction.NORTH);
     }
 }
