@@ -15,7 +15,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -45,7 +44,7 @@ public non-sealed class BaseBlockEntityComponentHolder extends BaseBlockEntity i
     private static final String NBT_COMPONENTS = "Components";
 
     private final Map<BlockEntityComponentType<?>, BlockEntityComponent> componentRegistry = registerComponents();
-    private final WorldlyContainer compositeContainer;
+    private final CompositeContainer compositeContainer;
 
     public BaseBlockEntityComponentHolder(BlockEntityType<? extends BaseBlockEntityComponentHolder> blockEntityType, BlockPos pos, BlockState blockState)
     {
@@ -451,6 +450,29 @@ public non-sealed class BaseBlockEntityComponentHolder extends BaseBlockEntity i
     public final void clearContent()
     {
         compositeContainer.clearContent();
+    }
+    // endregion
+
+    // region: ContainerData
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
+    @Override
+    public final int get(int index)
+    {
+        return compositeContainer.get(index);
+    }
+
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
+    @Override
+    public final void set(int index, int value)
+    {
+        compositeContainer.set(index, value);
+    }
+
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
+    @Override
+    public final int getCount()
+    {
+        return compositeContainer.getCount();
     }
     // endregion
 

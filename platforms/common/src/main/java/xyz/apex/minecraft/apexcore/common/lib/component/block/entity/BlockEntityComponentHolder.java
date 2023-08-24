@@ -10,6 +10,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -34,7 +35,7 @@ import java.util.function.Predicate;
 // - Nameable -> NameableBlockEntityComponent
 // - Container -> InventoryBlockEntityComponent
 // - MenuProvider
-public sealed interface BlockEntityComponentHolder extends Nameable, WorldlyContainer, MenuProvider permits BaseBlockEntityComponentHolder
+public sealed interface BlockEntityComponentHolder extends Nameable, WorldlyContainer, MenuProvider, ContainerData permits BaseBlockEntityComponentHolder
 {
     // region: Components
     @Nullable
@@ -117,85 +118,99 @@ public sealed interface BlockEntityComponentHolder extends Nameable, WorldlyCont
     // endregion
 
     // region: Container
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     int getMaxStackSize();
 
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     void startOpen(Player player);
 
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     void stopOpen(Player player);
 
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     boolean canPlaceItem(int slot, ItemStack stack);
 
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     boolean canTakeItem(Container container, int slot, ItemStack stack);
 
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     int countItem(Item item);
 
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     boolean hasAnyOf(Set<Item> items);
 
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     boolean hasAnyMatching(Predicate<ItemStack> predicate);
 
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     int getContainerSize();
 
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     boolean isEmpty();
 
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     ItemStack getItem(int slot);
 
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     ItemStack removeItem(int slot, int amount);
 
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     ItemStack removeItemNoUpdate(int slot);
 
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     void setItem(int slot, ItemStack stack);
 
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     boolean stillValid(Player player);
     // endregion
 
     // region: WorldlyContainer
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     int[] getSlotsForFace(Direction side);
 
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side);
 
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side);
     // endregion
 
     // region: Clearable
-    @DoNotCall
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
     @Override
     void clearContent();
+    // endregion
+
+    // region: ContainerData
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
+    @Override
+    int get(int index);
+
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
+    @Override
+    void set(int index, int value);
+
+    @DoNotCall("Implemented on a per Component basis. Prefer calling Component implementations where possible.")
+    @Override
+    int getCount();
     // endregion
 
     // region: MenuProvider

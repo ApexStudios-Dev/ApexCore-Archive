@@ -8,6 +8,7 @@ import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,7 +20,7 @@ import xyz.apex.minecraft.apexcore.common.lib.container.EmptyContainer;
 import java.util.Iterator;
 import java.util.stream.IntStream;
 
-public class BaseContainerBlockEntityComponent<T extends BaseContainerBlockEntityComponent<T>> extends BaseBlockEntityComponent implements WorldlyContainer, Iterable<ItemStack>
+public class BaseContainerBlockEntityComponent<T extends BaseContainerBlockEntityComponent<T>> extends BaseBlockEntityComponent implements WorldlyContainer, ContainerData, Iterable<ItemStack>
 {
     private int slotCount = 0;
     @Nullable private NonNullList<ItemStack> items;
@@ -167,6 +168,23 @@ public class BaseContainerBlockEntityComponent<T extends BaseContainerBlockEntit
     public void clearContent()
     {
         getItems().clear();
+    }
+
+    @Override
+    public int get(int index)
+    {
+        return 0;
+    }
+
+    @Override
+    public void set(int index, int value)
+    {
+    }
+
+    @Override
+    public int getCount()
+    {
+        return 0;
     }
 
     @Override

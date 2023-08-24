@@ -4,6 +4,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -14,9 +15,9 @@ import java.util.function.Predicate;
 /**
  * Basic empty container implementation.
  */
-public final class EmptyContainer implements WorldlyContainer
+public final class EmptyContainer implements WorldlyContainer, ContainerData
 {
-    public static final Container INSTANCE = new EmptyContainer();
+    public static final EmptyContainer INSTANCE = new EmptyContainer();
     public static final int[] NO_SLOTS = new int[0];
 
     private EmptyContainer()
@@ -126,5 +127,22 @@ public final class EmptyContainer implements WorldlyContainer
     public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction direction)
     {
         return false;
+    }
+
+    @Override
+    public int get(int index)
+    {
+        return 0;
+    }
+
+    @Override
+    public void set(int index, int value)
+    {
+    }
+
+    @Override
+    public int getCount()
+    {
+        return 0;
     }
 }

@@ -6,6 +6,7 @@ import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -17,34 +18,54 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
-public final class CompositeContainer implements WorldlyContainer
+public final class CompositeContainer implements WorldlyContainer, ContainerData
 {
     private final List<Container> containers;
 
     // slot logic pulled directly from NeoForge's CombinedInvWrapper
     // https://github.com/neoforged/NeoForge/blob/eb25ba6224acf22c58869e852f77578817f42b82/src/main/java/net/minecraftforge/items/wrapper/CombinedInvWrapper.java#L16-L74
-    private final int[] baseIndices;
+    private final int[] baseSlotIndices;
+    private final int[] baseDataIndices;
     private final int slotCount;
+    private final int dataCount;
 
     public CompositeContainer(Container... containers)
     {
         this.containers = List.of(containers);
-        baseIndices = new int[containers.length];
 
-        var index = 0;
+        baseSlotIndices = new int[containers.length];
+        baseDataIndices = new int[containers.length];
+
+        var slotIndex = 0;
+        var dataIndex = 0;
 
         for(var i = 0; i < containers.length; i++)
         {
-            index += containers[i].getContainerSize();
-            baseIndices[i] = index;
+            slotIndex += containers[i].getContainerSize();
+            baseSlotIndices[i] = slotIndex;
+            baseDataIndices[i] = 0;
+
+            if(containers[i] instanceof ContainerData data)
+            {
+                dataIndex += data.getCount();
+                baseDataIndices[i] = dataIndex;
+            }
         }
 
-        slotCount = index;
+        slotCount = slotIndex;
+        dataCount = dataIndex;
     }
 
     public Container getContainer(int containerIndex)
     {
         return containerIndex < 0 || containerIndex >= containers.size() ? EmptyContainer.INSTANCE : containers.get(containerIndex);
+    }
+
+    public ContainerData getContainerData(int containerDataIndex)
+    {
+        if(containerDataIndex < 0 || containerDataIndex >= containers.size())
+            return EmptyContainer.INSTANCE;
+        return containers.get(containerDataIndex) instanceof ContainerData containerData ? containerData : EmptyContainer.INSTANCE;
     }
 
     public int getContainerCount()
@@ -164,14 +185,13 @@ public final class CompositeContainer implements WorldlyContainer
     {
         var slotsForSide = new IntOpenHashSet();
 
-        for(var i = 0; i < baseIndices.length; i++)
+        for(var containerIndex = 0; containerIndex < baseSlotIndices.length; containerIndex++)
         {
-            if(containers.get(i) instanceof WorldlyContainer worldy)
+            if(containers.get(containerIndex) instanceof WorldlyContainer worldy)
             {
                 for(var slotIndex : worldy.getSlotsForFace(side))
                 {
-                    // globalSlot - baseIndices[containerIndex - 1];
-                    slotsForSide.add(Math.abs(slotIndex - (baseIndices[i] - 1)));
+                    slotsForSide.add(getGlobalSlotForContainerSlotIndex(slotIndex, containerIndex));
                 }
             }
         }
@@ -211,6 +231,24 @@ public final class CompositeContainer implements WorldlyContainer
         });
     }
 
+    @Override
+    public int get(int globalData)
+    {
+        return withContainerData(globalData, ContainerData::get);
+    }
+
+    @Override
+    public void set(int globalData, int value)
+    {
+        asContainerData(globalData, (containerData, dataIndex) -> containerData.set(dataIndex, value));
+    }
+
+    @Override
+    public int getCount()
+    {
+        return dataCount;
+    }
+
     private void asContainer(int globalSlot, BiConsumer<Container, Integer> consumer)
     {
         var containerIndex = getContainerIndexForGlobalSlot(globalSlot);
@@ -218,6 +256,15 @@ public final class CompositeContainer implements WorldlyContainer
         var slotIndex = getSlotIndexForGlobalSlot(globalSlot, containerIndex);
 
         consumer.accept(container, slotIndex);
+    }
+
+    private void asContainerData(int globalData, BiConsumer<ContainerData, Integer> consumer)
+    {
+        var containerDataIndex = getContainerDataIndexForGlobalData(globalData);
+        var containerData = getContainerData(containerDataIndex);
+        var dataIndex = getDataIndexForGlobalData(globalData, containerDataIndex);
+
+        consumer.accept(containerData, dataIndex);
     }
 
     private <T> T withContainer(int globalSlot, BiFunction<Container, Integer, T> mapper)
@@ -229,15 +276,38 @@ public final class CompositeContainer implements WorldlyContainer
         return mapper.apply(container, slotIndex);
     }
 
+    private <T> T withContainerData(int globalData, BiFunction<ContainerData, Integer, T> mapper)
+    {
+        var containerDataIndex = getContainerDataIndexForGlobalData(globalData);
+        var containerData = getContainerData(containerDataIndex);
+        var dataIndex = getDataIndexForGlobalData(globalData, containerDataIndex);
+
+        return mapper.apply(containerData, dataIndex);
+    }
+
     private int getContainerIndexForGlobalSlot(int globalSlot)
     {
         if(globalSlot < 0)
             return -1;
 
-        for(var containerIndex = 0; containerIndex < baseIndices.length; containerIndex++)
+        for(var containerIndex = 0; containerIndex < baseSlotIndices.length; containerIndex++)
         {
-            if(globalSlot - baseIndices[containerIndex] < 0)
+            if(globalSlot - baseSlotIndices[containerIndex] < 0)
                 return containerIndex;
+        }
+
+        return -1;
+    }
+
+    private int getContainerDataIndexForGlobalData(int globalData)
+    {
+        if(globalData < 0)
+            return -1;
+
+        for(var dataIndex = 0; dataIndex < baseDataIndices.length; dataIndex++)
+        {
+            if(globalData - baseDataIndices[dataIndex] < 0)
+                return dataIndex;
         }
 
         return -1;
@@ -245,9 +315,27 @@ public final class CompositeContainer implements WorldlyContainer
 
     private int getSlotIndexForGlobalSlot(int globalSlot, int containerIndex)
     {
-        if(containerIndex <= 0 || containerIndex >= baseIndices.length)
+        if(containerIndex <= 0 || containerIndex >= baseSlotIndices.length)
             return globalSlot;
 
-        return globalSlot - baseIndices[containerIndex - 1];
+        return globalSlot - baseSlotIndices[containerIndex - 1];
+    }
+
+    private int getDataIndexForGlobalData(int globalData, int containerDataIndex)
+    {
+        if(containerDataIndex <= 0 || containerDataIndex >= baseDataIndices.length)
+            return globalData;
+
+        return globalData - baseDataIndices[containerDataIndex - 1];
+    }
+
+    private int getGlobalSlotForContainerSlotIndex(int slotIndex, int containerIndex)
+    {
+        return Math.abs(slotIndex - (baseSlotIndices[containerIndex] - 1));
+    }
+
+    private int getGlobalDataForContainerDataIndex(int dataIndex, int containerDataIndex)
+    {
+        return Math.abs(dataIndex - (baseDataIndices[containerDataIndex] - 1));
     }
 }
