@@ -19,23 +19,23 @@ import xyz.apex.minecraft.apexcore.common.lib.hook.ParticleHooks;
 import xyz.apex.minecraft.apexcore.common.lib.hook.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.lib.modloader.ModLoader;
 
-@ApiStatus.Internal
 @ApiStatus.NonExtendable
 @SideOnly(PhysicalSide.CLIENT)
 public interface ApexCoreClient
 {
-    ApexCoreClient INSTANCE = Services.singleton(ApexCoreClient.class);
+    @ApiStatus.Internal ApexCoreClient INSTANCE = Services.singleton(ApexCoreClient.class);
+    @ApiStatus.Internal ColorHandlerHooks COLOR_HANDLER_HOOKS = Services.singleton(ColorHandlerHooks.class);
+    @ApiStatus.Internal RendererHooks RENDERER_HOOKS = Services.singleton(RendererHooks.class);
+    @ApiStatus.Internal GenericHooks CLIENT_HOOKS = Services.singleton(GenericHooks.class);
+    @ApiStatus.Internal ParticleHooks PARTICLE_HOOKS = Services.singleton(ParticleHooks.class);
 
-    ColorHandlerHooks COLOR_HANDLER_HOOKS = Services.singleton(ColorHandlerHooks.class);
-    RendererHooks RENDERER_HOOKS = Services.singleton(RendererHooks.class);
-    GenericHooks CLIENT_HOOKS = Services.singleton(GenericHooks.class);
-    ParticleHooks PARTICLE_HOOKS = Services.singleton(ParticleHooks.class);
-
+    @ApiStatus.Internal
     @MustBeInvokedByOverriders
     default void bootstrap()
     {
     }
 
+    @ApiStatus.Internal
     default void renderEarlyBuildOverlay(GuiGraphics graphics, boolean hud)
     {
         if(!ApexCore.IS_EARLY_BUILD)

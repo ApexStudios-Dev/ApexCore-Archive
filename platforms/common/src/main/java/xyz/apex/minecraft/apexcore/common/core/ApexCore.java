@@ -31,22 +31,21 @@ import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
 
 import java.util.function.Supplier;
 
-@ApiStatus.Internal
 @ApiStatus.NonExtendable
 public interface ApexCore
 {
     String ID = "apexcore";
     boolean IS_EARLY_BUILD = true; // TODO: Can this be automated somehow?
     Logger LOGGER = LogManager.getLogger();
-    ApexCore INSTANCE = Services.singleton(ApexCore.class);
 
-    ModLoader MOD_LOADER = Services.singleton(ModLoader.class);
+    @ApiStatus.Internal ApexCore INSTANCE = Services.singleton(ApexCore.class);
+    @ApiStatus.Internal ModLoader MOD_LOADER = Services.singleton(ModLoader.class);
+    @ApiStatus.Internal CreativeModeTabHooks CREATIVE_MODE_TAB_HOOKS = Services.singleton(CreativeModeTabHooks.class);
+    @ApiStatus.Internal EntityHooks ENTITY_HOOKS = Services.singleton(EntityHooks.class);
+    @ApiStatus.Internal GameRuleHooks GAME_RULE_HOOKS = Services.singleton(GameRuleHooks.class);
+    @ApiStatus.Internal MenuHooks MENU_HOOKS = Services.singleton(MenuHooks.class);
 
-    CreativeModeTabHooks CREATIVE_MODE_TAB_HOOKS = Services.singleton(CreativeModeTabHooks.class);
-    EntityHooks ENTITY_HOOKS = Services.singleton(EntityHooks.class);
-    GameRuleHooks GAME_RULE_HOOKS = Services.singleton(GameRuleHooks.class);
-    MenuHooks MENU_HOOKS = Services.singleton(MenuHooks.class);
-
+    @ApiStatus.Internal
     @MustBeInvokedByOverriders
     default void bootstrap()
     {
@@ -74,8 +73,10 @@ public interface ApexCore
         ProviderTypes.registerDefaultMcMetaGenerator(ID, Component.translatable(descriptionKey));
     }
 
+    @ApiStatus.Internal
     PhysicalSide physicalSide();
 
+    @ApiStatus.Internal
     NetworkManager createNetworkManager(String ownerId);
 
     @DoNotCall
@@ -88,5 +89,6 @@ public interface ApexCore
     @ApiStatus.Internal
     <T extends AbstractContainerMenu> MenuType<T> createMenuType(MenuFactory<T> menuFactory, Supplier<MenuType<T>> selfSupplier);
 
+    @ApiStatus.Internal
     boolean isFakePlayer(@Nullable Entity entity);
 }

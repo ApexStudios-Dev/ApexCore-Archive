@@ -61,19 +61,18 @@ public abstract class AbstractBuilder<O extends AbstractRegistrar<O>, P, T, R ex
     }
 
     @ApiStatus.OverrideOnly
+    @DoNotCall
     protected void onRegister(R entry)
     {
     }
 
-    @ApiStatus.Internal
     @DoNotCall
     protected abstract E createRegistryEntry();
 
-    @ApiStatus.Internal
     @DoNotCall
     protected abstract R createEntry();
 
-    @ApiStatus.Internal
+    @DoNotCall
     protected abstract String getDescriptionId(E entry);
 
     @Override

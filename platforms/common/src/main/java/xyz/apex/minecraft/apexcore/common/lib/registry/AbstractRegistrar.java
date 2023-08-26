@@ -74,7 +74,6 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
     @Nullable private String currentName = null;
     private boolean skipErrors = false;
 
-    @ApiStatus.Internal
     protected AbstractRegistrar(String ownerId)
     {
         this.ownerId = ownerId;
