@@ -36,6 +36,7 @@ import java.util.function.Supplier;
 public interface ApexCore
 {
     String ID = "apexcore";
+    boolean IS_EARLY_BUILD = true; // TODO: Can this be automated somehow?
     Logger LOGGER = LogManager.getLogger();
     ApexCore INSTANCE = Services.singleton(ApexCore.class);
 
