@@ -18,6 +18,8 @@ import xyz.apex.minecraft.apexcore.common.lib.hook.GenericHooks;
 import xyz.apex.minecraft.apexcore.common.lib.hook.ParticleHooks;
 import xyz.apex.minecraft.apexcore.common.lib.hook.RendererHooks;
 import xyz.apex.minecraft.apexcore.common.lib.modloader.ModLoader;
+import xyz.apex.minecraft.apexcore.common.lib.support.SupportHelper;
+import xyz.apex.minecraft.apexcore.common.lib.support.SupportLevel;
 
 @ApiStatus.NonExtendable
 @SideOnly(PhysicalSide.CLIENT)
@@ -57,6 +59,11 @@ public interface ApexCoreClient
         var text = Component.literal("Early Alpha").withStyle(ChatFormatting.ITALIC);
         var width = graphics.guiWidth();
         var height = graphics.guiHeight();
+
+        var level = SupportHelper.get(client.getGameProfile());
+
+        if(level != SupportLevel.NONE)
+            text = text.append(" - ").append(level.displayName());
 
         var x = width - client.font.width(text) - 2;
         var y = height - client.font.lineHeight - 2;

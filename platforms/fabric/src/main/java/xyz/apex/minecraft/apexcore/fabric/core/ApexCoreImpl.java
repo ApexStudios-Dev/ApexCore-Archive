@@ -1,6 +1,8 @@
 package xyz.apex.minecraft.apexcore.fabric.core;
 
 import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
@@ -23,6 +25,7 @@ import xyz.apex.minecraft.apexcore.common.lib.network.NetworkManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryHelper;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.MenuFactory;
+import xyz.apex.minecraft.apexcore.common.lib.support.SupportManager;
 import xyz.apex.minecraft.apexcore.fabric.lib.network.NetworkManagerImpl;
 
 import java.util.List;
@@ -43,6 +46,15 @@ public final class ApexCoreImpl implements ApexCore, RegistryHelper
             Registries.BLOCK,
             Registries.ITEM
     );
+
+    @Override
+    public void bootstrap()
+    {
+        ApexCore.super.bootstrap();
+
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> SupportManager.INSTANCE.sync(handler.player));
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> SupportManager.INSTANCE.loadFromRemote());
+    }
 
     @Override
     public PhysicalSide physicalSide()
