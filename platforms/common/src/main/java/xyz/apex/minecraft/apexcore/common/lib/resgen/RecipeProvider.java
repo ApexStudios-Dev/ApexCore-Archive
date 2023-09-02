@@ -3,6 +3,7 @@ package xyz.apex.minecraft.apexcore.common.lib.resgen;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.*;
 import net.minecraft.data.CachedOutput;
@@ -35,9 +36,13 @@ public final class RecipeProvider implements DataProvider, RecipeOutput
         this.context = context;
     }
 
-    public EnterBlockTrigger.TriggerInstance insideOf(Block block, StatePropertiesPredicate statePropertiesPredicate)
+    public Criterion<EnterBlockTrigger.TriggerInstance> insideOf(Block block, StatePropertiesPredicate statePropertiesPredicate)
     {
-        return new EnterBlockTrigger.TriggerInstance(Optional.empty(), block, Optional.of(statePropertiesPredicate));
+        return CriteriaTriggers.ENTER_BLOCK.createCriterion(new EnterBlockTrigger.TriggerInstance(
+                Optional.empty(),
+                block,
+                Optional.of(statePropertiesPredicate)
+        ));
     }
 
     public Criterion<EnterBlockTrigger.TriggerInstance> insideOf(Block block)
@@ -45,27 +50,33 @@ public final class RecipeProvider implements DataProvider, RecipeOutput
         return EnterBlockTrigger.TriggerInstance.entersBlock(block);
     }
 
-    public InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate.Builder... builders)
+    public Criterion<InventoryChangeTrigger.TriggerInstance> inventoryTrigger(ItemPredicate.Builder... builders)
     {
         return inventoryTrigger(Stream.of(builders).map(ItemPredicate.Builder::build).toArray(ItemPredicate[]::new));
     }
 
-    public InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate... predicates)
+    public Criterion<InventoryChangeTrigger.TriggerInstance> inventoryTrigger(ItemPredicate... predicates)
     {
-        return new InventoryChangeTrigger.TriggerInstance(Optional.empty(), MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, List.of(predicates));
+        return CriteriaTriggers.INVENTORY_CHANGED.createCriterion(new InventoryChangeTrigger.TriggerInstance(
+                Optional.empty(),
+                MinMaxBounds.Ints.ANY,
+                MinMaxBounds.Ints.ANY,
+                MinMaxBounds.Ints.ANY,
+                List.of(predicates)
+        ));
     }
 
-    public InventoryChangeTrigger.TriggerInstance has(MinMaxBounds.Ints count, ItemLike item)
+    public Criterion<InventoryChangeTrigger.TriggerInstance> has(MinMaxBounds.Ints count, ItemLike item)
     {
         return inventoryTrigger(ItemPredicate.Builder.item().of(item).withCount(count));
     }
 
-    public InventoryChangeTrigger.TriggerInstance has(ItemLike item)
+    public Criterion<InventoryChangeTrigger.TriggerInstance> has(ItemLike item)
     {
         return inventoryTrigger(ItemPredicate.Builder.item().of(item));
     }
 
-    public InventoryChangeTrigger.TriggerInstance has(TagKey<Item> tag)
+    public Criterion<InventoryChangeTrigger.TriggerInstance> has(TagKey<Item> tag)
     {
         return inventoryTrigger(ItemPredicate.Builder.item().of(tag));
     }
