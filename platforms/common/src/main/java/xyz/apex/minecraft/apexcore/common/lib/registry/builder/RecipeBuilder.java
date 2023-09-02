@@ -1,9 +1,8 @@
 package xyz.apex.minecraft.apexcore.common.lib.registry.builder;
 
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import org.jetbrains.annotations.ApiStatus;
@@ -11,7 +10,7 @@ import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.entry.RecipeEntry;
 
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * Recipe Builder implementation.
@@ -24,16 +23,16 @@ import java.util.function.BiFunction;
  */
 public final class RecipeBuilder<O extends AbstractRegistrar<O>, T extends Recipe<?>, P> extends AbstractBuilder<O, P, RecipeSerializer<?>, RecipeSerializer<T>, RecipeBuilder<O, T, P>, RecipeEntry<T>>
 {
-    private final BiFunction<ResourceLocation, JsonObject, T> fromJson;
-    private final BiFunction<ResourceLocation, FriendlyByteBuf, T> fromNetwork;
+    private final Codec<T> codec;
+    private final Function<FriendlyByteBuf, T> fromNetwork;
     private final BiConsumer<FriendlyByteBuf, T> toNetwork;
 
     @ApiStatus.Internal
-    public RecipeBuilder(O registrar, P parent, String registrationName, BiFunction<ResourceLocation, JsonObject, T> fromJson, BiFunction<ResourceLocation, FriendlyByteBuf, T> fromNetwork, BiConsumer<FriendlyByteBuf, T> toNetwork)
+    public RecipeBuilder(O registrar, P parent, String registrationName, Codec<T> codec, Function<FriendlyByteBuf, T> fromNetwork, BiConsumer<FriendlyByteBuf, T> toNetwork)
     {
         super(registrar, parent, Registries.RECIPE_SERIALIZER, registrationName);
 
-        this.fromJson = fromJson;
+        this.codec = codec;
         this.fromNetwork = fromNetwork;
         this.toNetwork = toNetwork;
 
@@ -49,7 +48,7 @@ public final class RecipeBuilder<O extends AbstractRegistrar<O>, T extends Recip
     @Override
     protected RecipeSerializer<T> createEntry()
     {
-        return new RecipeSerializerImpl<>(fromJson, fromNetwork, toNetwork);
+        return new RecipeSerializerImpl<>(codec, fromNetwork, toNetwork);
     }
 
     @Override
@@ -59,21 +58,15 @@ public final class RecipeBuilder<O extends AbstractRegistrar<O>, T extends Recip
     }
 
     private record RecipeSerializerImpl<T extends Recipe<?>>(
-            BiFunction<ResourceLocation, JsonObject, T> fromJson,
-            BiFunction<ResourceLocation, FriendlyByteBuf, T> fromNetwork,
+            Codec<T> codec,
+            Function<FriendlyByteBuf, T> fromNetwork,
             BiConsumer<FriendlyByteBuf, T> toNetwork
     ) implements RecipeSerializer<T>
     {
         @Override
-        public T fromJson(ResourceLocation recipeId, JsonObject json)
+        public T fromNetwork(FriendlyByteBuf buffer)
         {
-            return fromJson.apply(recipeId, json);
-        }
-
-        @Override
-        public T fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer)
-        {
-            return fromNetwork.apply(recipeId, buffer);
+            return fromNetwork.apply(buffer);
         }
 
         @Override

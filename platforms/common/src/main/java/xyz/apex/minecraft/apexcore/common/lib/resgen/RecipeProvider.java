@@ -2,11 +2,15 @@ package xyz.apex.minecraft.apexcore.common.lib.resgen;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.*;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeBuilder;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -19,7 +23,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-public final class RecipeProvider implements DataProvider
+public final class RecipeProvider implements DataProvider, RecipeOutput
 {
     public static final ProviderType<RecipeProvider> PROVIDER_TYPE = ProviderType.register(new ResourceLocation(ApexCore.ID, "recipes"), RecipeProvider::new);
 
@@ -31,25 +35,19 @@ public final class RecipeProvider implements DataProvider
         this.context = context;
     }
 
-    public RecipeProvider add(FinishedRecipe recipe)
-    {
-        recipes.add(recipe);
-        return this;
-    }
-
     public EnterBlockTrigger.TriggerInstance insideOf(Block block, StatePropertiesPredicate statePropertiesPredicate)
     {
         return new EnterBlockTrigger.TriggerInstance(Optional.empty(), block, Optional.of(statePropertiesPredicate));
     }
 
-    public EnterBlockTrigger.TriggerInstance insideOf(Block block)
+    public Criterion<EnterBlockTrigger.TriggerInstance> insideOf(Block block)
     {
         return EnterBlockTrigger.TriggerInstance.entersBlock(block);
     }
 
     public InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate.Builder... builders)
     {
-        return inventoryTrigger(Stream.of(builders).map(ItemPredicate.Builder::build).flatMap(Optional::stream).toArray(ItemPredicate[]::new));
+        return inventoryTrigger(Stream.of(builders).map(ItemPredicate.Builder::build).toArray(ItemPredicate[]::new));
     }
 
     public InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate... predicates)
@@ -73,6 +71,18 @@ public final class RecipeProvider implements DataProvider
     }
 
     @Override
+    public void accept(FinishedRecipe recipe)
+    {
+        recipes.add(recipe);
+    }
+
+    @Override
+    public Advancement.Builder advancement()
+    {
+        return Advancement.Builder.recipeAdvancement().parent(RecipeBuilder.ROOT_RECIPE_ADVANCEMENT);
+    }
+
+    @Override
     public CompletableFuture<?> run(CachedOutput cache)
     {
         var futures = Lists.<CompletableFuture<?>>newArrayList();
@@ -83,18 +93,17 @@ public final class RecipeProvider implements DataProvider
         var advancementPaths = packOutput.createPathProvider(PackOutput.Target.DATA_PACK, "advancements");
 
         recipes.forEach(recipe -> {
-            var recipeId = recipe.getId();
+            var recipeId = recipe.id();
 
             if(!set.add(recipeId))
                 throw new IllegalStateException("Duplicate recipe: %s".formatted(recipeId));
 
             futures.add(DataProvider.saveStable(cache, recipe.serializeRecipe(), recipePaths.json(recipeId)));
 
-            var advancementJson = recipe.serializeAdvancement();
-            var advancementId = recipe.getAdvancementId();
+            var advancement = recipe.advancement();
 
-            if(advancementId != null && advancementJson != null)
-                futures.add(DataProvider.saveStable(cache, advancementJson, advancementPaths.json(recipe.getAdvancementId())));
+            if(advancement != null)
+                futures.add(DataProvider.saveStable(cache, advancement.value().serializeToJson(), advancementPaths.json(advancement.id())));
         });
 
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));

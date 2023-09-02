@@ -70,7 +70,7 @@ public interface ApexCoreClient
 
         var color = 0x40808080;
 
-        if(client.options.renderDebug)
+        if(client.getDebugOverlay().showDebugScreen())
         {
             for(var mod : ModLoader.get().getLoadedMods())
             {

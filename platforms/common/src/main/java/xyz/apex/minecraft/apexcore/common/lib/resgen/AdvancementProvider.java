@@ -2,7 +2,7 @@ package xyz.apex.minecraft.apexcore.common.lib.resgen;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -17,13 +17,13 @@ public final class AdvancementProvider implements DataProvider
     public static final ProviderType<AdvancementProvider> PROVIDER_TYPE = ProviderType.register(new ResourceLocation(ApexCore.ID, "advancements"), AdvancementProvider::new);
 
     private final ProviderType.ProviderContext context;
-    private final List<Advancement> advancements = Lists.newArrayList();
+    private final List<AdvancementHolder> advancements = Lists.newArrayList();
     private AdvancementProvider(ProviderType.ProviderContext context)
     {
         this.context = context;
     }
 
-    public AdvancementProvider add(Advancement advancement)
+    public AdvancementProvider add(AdvancementHolder advancement)
     {
         advancements.add(advancement);
         return this;
@@ -37,13 +37,13 @@ public final class AdvancementProvider implements DataProvider
         var seen = Sets.<ResourceLocation>newHashSet();
 
         advancements.forEach(advancement -> {
-            var advancementId = advancement.getId();
+            var advancementId = advancement.id();
 
             if(!seen.add(advancementId))
                 throw new IllegalStateException("Duplicate advancement: %s".formatted(advancementId));
 
             var path = pathProvider.json(advancementId);
-            futures.add(DataProvider.saveStable(cache, advancement.deconstruct().serializeToJson(), path));
+            futures.add(DataProvider.saveStable(cache, advancement.value().serializeToJson(), path));
         });
 
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));

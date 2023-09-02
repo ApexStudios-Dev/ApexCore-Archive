@@ -2,7 +2,7 @@ package xyz.apex.minecraft.apexcore.common.lib.registry;
 
 import com.google.common.collect.*;
 import com.google.errorprone.annotations.DoNotCall;
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.core.Registry;
@@ -45,8 +45,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -592,14 +592,14 @@ public abstract class AbstractRegistrar<O extends AbstractRegistrar<O>>
         return recipeType(self, currentName());
     }
 
-    public final <T extends Recipe<?>> RecipeEntry<T> recipe(String registrationName, BiFunction<ResourceLocation, JsonObject, T> fromJson, BiFunction<ResourceLocation, FriendlyByteBuf, T> fromNetwork, BiConsumer<FriendlyByteBuf, T> toNetwork)
+    public final <T extends Recipe<?>> RecipeEntry<T> recipe(String registrationName, Codec<T> codec, Function<FriendlyByteBuf, T> fromNetwork, BiConsumer<FriendlyByteBuf, T> toNetwork)
     {
-        return new RecipeBuilder<>(self, self, registrationName, fromJson, fromNetwork, toNetwork).register();
+        return new RecipeBuilder<>(self, self, registrationName, codec, fromNetwork, toNetwork).register();
     }
 
-    public final <T extends Recipe<?>> RecipeEntry<T> recipe(BiFunction<ResourceLocation, JsonObject, T> fromJson, BiFunction<ResourceLocation, FriendlyByteBuf, T> fromNetwork, BiConsumer<FriendlyByteBuf, T> toNetwork)
+    public final <T extends Recipe<?>> RecipeEntry<T> recipe(Codec<T> codec, Function<FriendlyByteBuf, T> fromNetwork, BiConsumer<FriendlyByteBuf, T> toNetwork)
     {
-        return recipe(currentName(), fromJson, fromNetwork, toNetwork);
+        return recipe(currentName(), codec, fromNetwork, toNetwork);
     }
     // endregion
 

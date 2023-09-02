@@ -1,10 +1,9 @@
 package xyz.apex.minecraft.apexcore.common.lib.registry.entry;
 
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -24,14 +23,14 @@ public final class RecipeEntry<T extends Recipe<?>> extends BaseRegistryEntry<Re
         return getSibling(Registries.RECIPE_TYPE);
     }
 
-    public T fromJson(ResourceLocation recipeId, JsonObject json)
+    public Codec<T> codec()
     {
-        return value().fromJson(recipeId, json);
+        return value().codec();
     }
 
-    public T fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer)
+    public T fromNetwork(FriendlyByteBuf buffer)
     {
-        return value().fromNetwork(recipeId, buffer);
+        return value().fromNetwork(buffer);
     }
 
     public void toNetwork(FriendlyByteBuf buffer, T recipe)
