@@ -1,20 +1,24 @@
-apply from: rootProject.file('scripts/fabric.gradle')
+apply from: rootProject.file('scripts/mcforge.gradle')
 apply plugin: 'me.modmuss50.mod-publish-plugin'
 
-loom {
+minecraft {
     runs {
         data {
-            server()
-            ideConfigGenerated true
-            vmArg '-Dfabric-api.datagen'
-            vmArg "-Dfabric-api.datagen.output-dir=${project(':common').file('src/generated/resources')}"
-            vmArg "-Dfabric-api.datagen.modid=${MOD_ID}"
+            workingDirectory file('run/client')
+
+            args '--mod', MOD_ID, '--client', '--server', '--validate'
+            args '--output', project(':common').file('src/generated/resources')
+            args '--existing', project(':common').file('src/main/resources/')
+            args '--existing', file('src/main/resources/')
         }
     }
 }
 
 dependencies {
-    include "io.github.llamalad7:mixinextras-fabric:${MIXIN_EXTRAS_VERSION}"
+    implementation "io.github.llamalad7:mixinextras-forge:${MIXIN_EXTRAS_VERSION}"
+    jarJar("io.github.llamalad7:mixinextras-forge:${MIXIN_EXTRAS_VERSION}") {
+        jarJar.ranged(it, "[${MIXIN_EXTRAS_VERSION},)")
+    }
 }
 
 processResources {
@@ -32,44 +36,33 @@ sourcesJar {
 publishing {
     publications {
         release(MavenPublication) {
-            loom.disableDeprecatedPomGeneration(it)
-
-            artifact remapJar
+            artifact jar
             artifact sourcesJar
+            artifact tasks.jarJar
         }
     }
 }
 
 publishMods {
-    file = remapJar.archiveFile
+    file = tasks.jarJar.archiveFile
     changelog = rootProject.file('changelogs/changelog.md').exists() ? rootProject.file('changelogs/changelog.md').getText('UTF-8') : ''
     type = me.modmuss50.mpp.ReleaseType.of("${MOD_RELEASE_TYPE}")
     maxRetries = 5
     version = "${MOD_FULL_VERSION}"
-    displayName = "[Fabric] ${MOD_NAME} - ${MOD_FULL_VERSION}+${MINECRAFT_VERSION}"
-    modLoaders.add('fabric')
-    additionalFiles.from(remapSourcesJar.archiveFile)
+    displayName = "[MinecraftForge] ${MOD_NAME} - ${MOD_FULL_VERSION}+${MINECRAFT_VERSION}"
+    modLoaders.add('forge')
+    additionalFiles.from(jar.archiveFile, sourcesJar.archiveFile)
     dryRun = !providers.environmentVariable('MODRINTH_TOKEN').isPresent() || !providers.environmentVariable('CURSEFORGE_TOKEN').isPresent()
 
     curseforge {
         projectId = "${MOD_CURSEFORGE_ID}"
         accessToken = providers.environmentVariable('CURSEFORGE_TOKEN').getOrNull()
-        // minecraftVersions.add("${MINECRAFT_VERSION}")
-        minecraftVersions.add('1.20.1') // TODO: REPLACE THIS
-
-        requires {
-            slug = 'fabric-api'
-        }
+        minecraftVersions.add("${MINECRAFT_VERSION}")
     }
 
     modrinth {
         projectId = "${MOD_MODRINTH_ID}"
         accessToken = providers.environmentVariable('MODRINTH_TOKEN').getOrNull()
-        // minecraftVersions.add("${MINECRAFT_VERSION}")
-        minecraftVersions.add('1.20.1') // TODO: REPLACE THIS
-
-        requires {
-            slug = 'fabric-api'
-        }
+        minecraftVersions.add("${MINECRAFT_VERSION}")
     }
 }

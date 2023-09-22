@@ -12,14 +12,8 @@ loom {
     }
 
     mods {
-        "${MOD_ID}" {
-            sourceSet project(':common').sourceSets.main
-            sourceSet sourceSets.main
-        }
-
         "${MOD_ID}_testmod" {
-            sourceSet project(':testmod-common').sourceSets.main
-            sourceSet project(':testmod-fabric').sourceSets.main
+            sourceSet sourceSets.main
         }
     }
 }

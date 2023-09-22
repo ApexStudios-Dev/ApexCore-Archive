@@ -25,6 +25,9 @@ pipeline {
                 // echo 'Generating Resources (NeoForge)'
                 // sh './gradlew neoforge:runData'
 
+                // echo 'Generating Resources (MinecraftForge)'
+                // sh './gradlew mcforge:runData'
+
                 echo 'Generating changelog files'
                 sh './gradlew generateChangelogs'
             }
