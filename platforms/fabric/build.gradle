@@ -57,7 +57,7 @@ publishMods {
         minecraftVersions.add("${MINECRAFT_VERSION}")
 
         requires {
-            id = "${FABRIC_CURSEFORGE_ID}"
+            slug = "${FABRIC_CURSEFORGE_SLUG}"
         }
     }
 
