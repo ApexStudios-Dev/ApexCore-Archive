@@ -54,22 +54,20 @@ publishMods {
     curseforge {
         projectId = "${MOD_CURSEFORGE_ID}"
         accessToken = providers.environmentVariable('CURSEFORGE_TOKEN').getOrNull()
-        // minecraftVersions.add("${MINECRAFT_VERSION}")
-        minecraftVersions.add('1.20.1') // TODO: REPLACE THIS
+        minecraftVersions.add("${MINECRAFT_VERSION}")
 
         requires {
-            slug = 'fabric-api'
+            id = "${FABRIC_CURSEFORGE_ID}"
         }
     }
 
     modrinth {
         projectId = "${MOD_MODRINTH_ID}"
         accessToken = providers.environmentVariable('MODRINTH_TOKEN').getOrNull()
-        // minecraftVersions.add("${MINECRAFT_VERSION}")
-        minecraftVersions.add('1.20.1') // TODO: REPLACE THIS
+        minecraftVersions.add("${MINECRAFT_VERSION}")
 
         requires {
-            slug = 'fabric-api'
+            id = "${FABRIC_MODRINTH_ID}"
         }
     }
 }
