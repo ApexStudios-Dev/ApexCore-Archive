@@ -28,6 +28,7 @@ import xyz.apex.minecraft.apexcore.common.lib.network.NetworkManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.MenuFactory;
 import xyz.apex.minecraft.apexcore.common.lib.resgen.ProviderTypes;
+import xyz.apex.minecraft.apexcore.common.lib.support.SupportManager;
 
 import java.util.function.Supplier;
 
@@ -53,6 +54,7 @@ public interface ApexCore
         BlockComponentTypes.bootstrap();
         BlockEntityComponentTypes.bootstrap();
         MultiBlockTypes.bootstrap();
+        SupportManager.INSTANCE.bootstrap();
 
         registerGenerators();
 

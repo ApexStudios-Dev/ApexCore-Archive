@@ -38,6 +38,10 @@ public final class SupportManager
         supportSync = network.registerClientBound("support_sync", SupportSyncPacket::encode, SupportSyncPacket::new, () -> () -> SupportSyncPacket::consume);
     }
 
+    public void bootstrap()
+    {
+    }
+
     public Set<SupportLevel> get(GameProfile profile)
     {
         if(!enabled)
