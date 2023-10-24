@@ -153,11 +153,11 @@ public final class MultiBlockComponent extends BaseBlockComponent
 
     public static BlockPos rotateLocalPosition(BlockPos localPosition, Direction facing)
     {
-        return localPosition.rotate(switch(facing.getOpposite()) {
+        return localPosition.rotate(switch(facing) {
             default -> Rotation.NONE;
-            case SOUTH -> Rotation.CLOCKWISE_180;
-            case EAST -> Rotation.CLOCKWISE_90;
-            case WEST -> Rotation.COUNTERCLOCKWISE_90;
+            case NORTH -> Rotation.CLOCKWISE_90;
+            case SOUTH -> Rotation.COUNTERCLOCKWISE_90;
+            case EAST -> Rotation.CLOCKWISE_180;
         });
     }
 

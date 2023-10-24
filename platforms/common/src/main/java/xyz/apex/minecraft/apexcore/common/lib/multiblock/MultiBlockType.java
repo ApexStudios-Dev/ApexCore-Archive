@@ -27,13 +27,13 @@ public final class MultiBlockType
         {
             var aisle = pattern.get(y);
 
-            for(var z = 0; z < aisle.length; z++)
+            for(var x = 0; x < aisle.length; x++)
             {
-                var str = aisle[z];
+                var str = aisle[x];
 
-                for(var x = 0; x < str.length(); x++)
+                for(var z = 0; z < str.length(); z++)
                 {
-                    var c = str.charAt(x);
+                    var c = str.charAt(z);
 
                     if(!Character.isWhitespace(c))
                         positions.add(new BlockPos(x, y, z));
