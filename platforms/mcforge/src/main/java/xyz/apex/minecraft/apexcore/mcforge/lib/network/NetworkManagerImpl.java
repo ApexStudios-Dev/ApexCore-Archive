@@ -96,8 +96,8 @@ public final class NetworkManagerImpl implements NetworkManager
         private DummyPacket(FriendlyByteBuf buffer)
         {
             client2server = buffer.readBoolean();
-            var packetId = buffer.readResourceLocation();
             var networkManager = (NetworkManagerImpl) getOrCreate(buffer.readUtf());
+            var packetId = buffer.readUtf();
             packet = (Packet<T>) (client2server ? networkManager.client2ServerPackets : networkManager.server2ClientPackets).get(packetId);
             packetData = packet.decoder().decode(buffer);
         }
@@ -105,8 +105,8 @@ public final class NetworkManagerImpl implements NetworkManager
         private void encode(FriendlyByteBuf buffer)
         {
             buffer.writeBoolean(client2server);
-            buffer.writeResourceLocation(packet.packetId());
             buffer.writeUtf(packet.manager().getOwnerId());
+            buffer.writeUtf(packet.packetId().getPath()); // TODO: change packet id to be a String
             packet.encoder().encode(packetData, buffer);
         }
 
