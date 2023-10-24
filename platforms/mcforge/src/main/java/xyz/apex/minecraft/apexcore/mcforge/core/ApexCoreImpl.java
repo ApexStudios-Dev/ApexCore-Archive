@@ -3,6 +3,7 @@ package xyz.apex.minecraft.apexcore.mcforge.core;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -12,7 +13,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.RegisterEvent;
@@ -94,6 +94,7 @@ public final class ApexCoreImpl implements ApexCore
     @Override
     public boolean isFakePlayer(@Nullable Entity entity)
     {
-        return entity instanceof FakePlayer;
+        // TODO: Add back instanceof check once FakePlayer system is reimplemented
+        return entity instanceof ServerPlayer && entity.getClass() != ServerPlayer.class;
     }
 }
