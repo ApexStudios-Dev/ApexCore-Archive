@@ -12,7 +12,10 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraftforge.common.ForgeSpawnEggItem;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.extensions.IForgeMenuType;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.RegisterEvent;
@@ -25,6 +28,7 @@ import xyz.apex.minecraft.apexcore.common.lib.network.NetworkManager;
 import xyz.apex.minecraft.apexcore.common.lib.registry.AbstractRegistrar;
 import xyz.apex.minecraft.apexcore.common.lib.registry.RegistryHelper;
 import xyz.apex.minecraft.apexcore.common.lib.registry.factory.MenuFactory;
+import xyz.apex.minecraft.apexcore.common.lib.support.SupportManager;
 import xyz.apex.minecraft.apexcore.mcforge.lib.EventBusHelper;
 import xyz.apex.minecraft.apexcore.mcforge.lib.EventBuses;
 import xyz.apex.minecraft.apexcore.mcforge.lib.network.NetworkManagerImpl;
@@ -47,6 +51,9 @@ public final class ApexCoreImpl implements ApexCore
         EventBuses.registerForJavaFML();
         MinecraftForgeEvents.register();
         PhysicalSide.CLIENT.runWhenOn(() -> ApexCoreClient.INSTANCE::bootstrap);
+
+        EventBusHelper.addListener(MinecraftForge.EVENT_BUS, PlayerEvent.PlayerLoggedInEvent.class, event -> SupportManager.INSTANCE.sync((ServerPlayer) event.getEntity()));
+        EventBusHelper.addListener(MinecraftForge.EVENT_BUS, ServerStartedEvent.class, event -> SupportManager.INSTANCE.loadFromRemote());
     }
 
     @Override
