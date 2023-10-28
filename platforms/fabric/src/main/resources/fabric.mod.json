@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "${MOD_ID}",
-    "version": "${MOD_VERSION}",
+    "version": "${MOD_VERSION_FULL}",
     "name": "${MOD_NAME}",
     "description": "${MOD_DESCRIPTION}",
     "authors": [

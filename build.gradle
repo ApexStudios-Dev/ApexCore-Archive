@@ -3,11 +3,19 @@ plugins {
     id 'dev.architectury.loom' version '1.4-SNAPSHOT' apply false
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1'
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
+    id 'com.palantir.git-version' version '1.0.0' apply false
+    id 'se.bjurr.gitchangelog.git-changelog-gradle-plugin' version '1.77.2' apply false
 }
 
 apply plugin: 'base'
+apply plugin: 'com.palantir.git-version'
+apply plugin: 'se.bjurr.gitchangelog.git-changelog-gradle-plugin'
+
+def repo = versionDetails()
+def lastGitTag = repo.commitDistance > 0 ? repo.lastTag : "git describe --abbrev=0 ${repo.lastTag}^".execute().text.trim()
 
 ext {
+    MOD_VERSION_FULL = "${MOD_VERSION}.${repo.commitDistance}"
     ACCESS_WIDENER_FILE = file("platforms/common/src/main/resources/${MOD_ID}.accesswidener")
 }
 
@@ -19,7 +27,13 @@ architectury {
 
 afterEvaluate {
     tasks.register('collectJars', Copy) {
-        def tasks = subprojects.findAll { !it.name.containsIgnoreCase('common') }.collect { it.tasks.named('remapJar') }
+        def tasks = [ ]
+
+        subprojects.each {
+            tasks += it.tasks.named('remapJar')
+            tasks += it.tasks.named('remapSourcesJar')
+        }
+
         dependsOn tasks
         from tasks
         into file('jars')
@@ -32,13 +46,41 @@ afterEvaluate {
 
 tasks.register('classes')
 
+tasks.register('generateChangelogPlain', se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
+    settingsFile = file('changelogs/settings.json')
+    fromRepo = projectDir
+    file = file('changelogs/changelog.txt')
+    fromRef = lastGitTag
+    templateContent = file('changelogs/changelog.txt.mustache').text
+}
+
+tasks.register('generateChangelogHtml', se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
+    settingsFile = file('changelogs/settings.json')
+    fromRepo = projectDir
+    file = file('changelogs/changelog.html')
+    fromRef = lastGitTag
+    templateContent = file('changelogs/changelog.html.mustache').text
+}
+
+tasks.register('generateChangelogMarkdown', se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
+    settingsFile = file('changelogs/settings.json')
+    fromRepo = projectDir
+    file = file('changelogs/changelog.md')
+    fromRef = lastGitTag
+    templateContent = file('changelogs/changelog.md.mustache').text
+}
+
+tasks.register('generateChangelogs') {
+    dependsOn([ tasks.named('generateChangelogPlain'), tasks.named('generateChangelogHtml'), tasks.named('generateChangelogMarkdown') ])
+}
+
 subprojects {
     apply plugin: 'dev.architectury.loom'
     apply plugin: 'architectury-plugin'
 
     group = "${MOD_GROUP}"
-    version = "${MOD_VERSION}.0+${MINECRAFT_VERSION}"
-    base.archivesName = "${MOD_ID}"
+    version = "${MOD_VERSION_FULL}"
+    base.archivesName = "${MOD_ID}-${project.name}"
 
     sourceSets {
         test {
@@ -134,7 +176,7 @@ subprojects {
     }
 
     remapJar {
-        archiveClassifier = project.name
+        archiveClassifier = ''
     }
 
     tasks.withType(AbstractArchiveTask).configureEach {

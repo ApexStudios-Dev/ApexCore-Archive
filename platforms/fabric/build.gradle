@@ -105,6 +105,10 @@ shadowJar {
     configurations = [ project.configurations.bundle ]
 }
 
+sourcesJar {
+    dependsOn copyAccessWidener
+}
+
 remapJar {
     dependsOn shadowJar
     inputFile.set shadowJar.archiveFile
