@@ -5,7 +5,7 @@ issueTrackerURL="https://discord.apexstudios.dev/"
 
 [[mods]]
 	modId="${MOD_ID}"
-	version="${MOD_VERSION}"
+	version="${MOD_VERSION_FULL}"
 	displayName="${MOD_NAME}"
 	updateJSONURL="https://api.modrinth.com/updates/apexcore/forge_updates.json"
 	displayURL="https://apexstudios.dev/apexcore"
