@@ -1,8 +1,51 @@
-apply from: rootProject.file('scripts/fabric.gradle')
-apply plugin: 'me.modmuss50.mod-publish-plugin'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+configurations {
+    bundle {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+}
+
+sourceSets {
+    main.resources.srcDirs += [ 'src/generated/resources' ]
+}
+
+architectury {
+    platformSetupLoomIde()
+    fabric()
+}
 
 loom {
     runs {
+        client {
+            client()
+            ideConfigGenerated true
+
+            // Some of these may require JBR
+            vmArg '-XX:+AllowEnhancedClassRedefinition'
+            vmArg '-XX:+IgnoreUnrecognizedVMOptions'
+            vmArg '-XX:+AllowRedefinitionToAddDeleteMethods'
+
+            afterEvaluate {
+                vmArg "-javaagent:${ configurations.compileClasspath.find { it.name.contains("sponge-mixin") } }"
+            }
+        }
+
+        server {
+            server()
+            ideConfigGenerated true
+
+            // Requires JBR
+            vmArg '-XX:+AllowEnhancedClassRedefinition'
+            vmArg '-XX:+IgnoreUnrecognizedVMOptions'
+            vmArg '-XX:+AllowRedefinitionToAddDeleteMethods'
+
+            afterEvaluate {
+                vmArg "-javaagent:${ configurations.compileClasspath.find { it.name.contains("sponge-mixin") } }"
+            }
+        }
+
         data {
             server()
             ideConfigGenerated true
@@ -11,63 +54,58 @@ loom {
             vmArg "-Dfabric-api.datagen.modid=${MOD_ID}"
         }
     }
+
+    mods {
+        main {
+            sourceSet project(':common').sourceSets.main
+            sourceSet sourceSets.main
+        }
+    }
 }
 
 dependencies {
+    modImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
+
+    if(rootProject.hasProperty('FABRIC_API_MINECRAFT_VERSION')) {
+        modApi "net.fabricmc.fabric-api:fabric-api:${FABRIC_API_VERSION}+${FABRIC_API_MINECRAFT_VERSION}"
+    } else {
+        modApi "net.fabricmc.fabric-api:fabric-api:${FABRIC_API_VERSION}+${MINECRAFT_VERSION}"
+    }
+
+    annotationProcessor "io.github.llamalad7:mixinextras-fabric:${MIXIN_EXTRAS_VERSION}"
+    implementation "io.github.llamalad7:mixinextras-fabric:${MIXIN_EXTRAS_VERSION}"
     include "io.github.llamalad7:mixinextras-fabric:${MIXIN_EXTRAS_VERSION}"
+
+    bundle(project(path: ':common', configuration: 'transformProductionFabric')) { transitive false }
+    implementation(project(path: ':common', configuration: 'namedElements')) { transitive false }
+
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+}
+
+tasks.register('copyAccessWidener', Copy) {
+    from ACCESS_WIDENER_FILE
+    into file('src/generated/resources')
 }
 
 processResources {
-    from project(':common').sourceSets.main.resources
-}
-
-compileJava {
-    source project(':common').sourceSets.main.allSource
-}
-
-sourcesJar {
-    from project(':common').sourceSets.main.allJava
-}
-
-publishing {
-    publications {
-        release(MavenPublication) {
-            loom.disableDeprecatedPomGeneration(it)
-
-            artifact remapJar
-            artifact sourcesJar
-        }
-    }
-}
-
-publishMods {
-    file = remapJar.archiveFile
-    changelog = rootProject.file('changelogs/changelog.md').exists() ? rootProject.file('changelogs/changelog.md').getText('UTF-8') : ''
-    type = me.modmuss50.mpp.ReleaseType.of("${MOD_RELEASE_TYPE}")
-    maxRetries = 5
-    version = "${MOD_FULL_VERSION}"
-    displayName = "[Fabric] ${MOD_NAME} - ${MOD_FULL_VERSION}+${MINECRAFT_VERSION}"
-    modLoaders.add('fabric')
-    additionalFiles.from(remapSourcesJar.archiveFile)
-    dryRun = !providers.environmentVariable('MODRINTH_TOKEN').isPresent() || !providers.environmentVariable('CURSEFORGE_TOKEN').isPresent()
-
-    curseforge {
-        projectId = "${MOD_CURSEFORGE_ID}"
-        accessToken = providers.environmentVariable('CURSEFORGE_TOKEN').getOrNull()
-        minecraftVersions.add("${MINECRAFT_VERSION}")
-
-        requires {
-            slug = "${FABRIC_CURSEFORGE_SLUG}"
-        }
+    filesMatching([ 'fabric.mod.json' ]) {
+        expand project.properties
     }
 
-    modrinth {
-        projectId = "${MOD_MODRINTH_ID}"
-        accessToken = providers.environmentVariable('MODRINTH_TOKEN').getOrNull()
-        minecraftVersions.add("${MINECRAFT_VERSION}")
+    dependsOn copyAccessWidener
+}
 
-        requires {
-            id = "${FABRIC_MODRINTH_ID}"
-        }
-    }
+jar {
+    archiveClassifier = 'dev-slim'
+}
+
+shadowJar {
+    exclude 'architectury.common.json'
+    archiveClassifier = 'dev-shadow'
+    configurations = [ project.configurations.bundle ]
+}
+
+remapJar {
+    dependsOn shadowJar
+    inputFile.set shadowJar.archiveFile
 }

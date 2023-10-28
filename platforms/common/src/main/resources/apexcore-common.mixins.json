@@ -9,6 +9,5 @@
         "client.MixinBlockEntityWithoutLevelRenderer"
     ],
     "server": [],
-    "minVersion": "${MIXIN_VERSION}",
-    "refmap": "${MOD_ID}.refmap.json"
+    "minVersion": "${MIXIN_VERSION}"
 }
