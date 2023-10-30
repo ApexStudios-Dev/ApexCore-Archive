@@ -2,12 +2,12 @@
 <h3>{{name}}</h3>
     {{#commits}}
 <ul>
-    <li>{{messageTitle}} [<em><a href="https://github.com/ApexStudios-Dev/ApexCore/commit{{hash}}">{{hash}}</a> - <b>{{authorName}}</b></em>]</li>
-    <ul>
+    <li>{{messageTitle}}</li>
     {{#messageBodyItems}}
+    <ul>
         <li>{{.}}</li>
-    {{/messageBodyItems}}
     </ul>
+    {{/messageBodyItems}}
 </ul>
     {{/commits}}
 {{/tags}}
