@@ -28,9 +28,10 @@ loom {
             vmArg '-XX:+IgnoreUnrecognizedVMOptions'
             vmArg '-XX:+AllowRedefinitionToAddDeleteMethods'
 
-            afterEvaluate {
+            // Does not work on forge
+            /*afterEvaluate {
                 vmArg "-javaagent:${ configurations.compileClasspath.find { it.name.contains("sponge-mixin") } }"
-            }
+            }*/
         }
 
         server {
@@ -42,9 +43,10 @@ loom {
             vmArg '-XX:+IgnoreUnrecognizedVMOptions'
             vmArg '-XX:+AllowRedefinitionToAddDeleteMethods'
 
-            afterEvaluate {
+            // Does not work on forge
+            /*afterEvaluate {
                 vmArg "-javaagent:${ configurations.compileClasspath.find { it.name.contains("sponge-mixin") } }"
-            }
+            }*/
         }
     }
 
