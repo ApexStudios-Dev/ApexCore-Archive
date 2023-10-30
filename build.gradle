@@ -276,6 +276,8 @@ subprojects {
     }
 
     jar {
+        dependsOn rootProject.tasks.named('generateChangelogs')
+
         manifest {
             attributes([
                     'Specification-Title': "${MOD_ID}",
