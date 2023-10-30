@@ -5,11 +5,13 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
     id 'com.palantir.git-version' version '1.0.0' apply false
     id 'se.bjurr.gitchangelog.git-changelog-gradle-plugin' version '1.77.2' apply false
+    id 'org.groovymc.modsdotgroovy' version '1.4.2' apply false
 }
 
 apply plugin: 'base'
 apply plugin: 'com.palantir.git-version'
 apply plugin: 'se.bjurr.gitchangelog.git-changelog-gradle-plugin'
+apply plugin: 'org.groovymc.modsdotgroovy'
 
 def repo = versionDetails()
 def lastGitTag = repo.commitDistance > 0 ? repo.lastTag : "git describe --abbrev=0 ${repo.lastTag}^".execute().text.trim()
@@ -23,6 +25,17 @@ architectury {
     minecraft = "${MINECRAFT_VERSION}"
     compileOnly()
     injectInjectables = false
+}
+
+modsDotGroovy {
+    dslVersion = '1.5.1'
+    platform = 'multiloader'
+
+    multiloader {
+        common = project(':common')
+        fabric = [ findProject(':fabric') ]
+        forge = [ findProject(':mcforge') ]
+    }
 }
 
 afterEvaluate {

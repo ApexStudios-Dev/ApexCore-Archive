@@ -88,10 +88,6 @@ tasks.register('copyAccessWidener', Copy) {
 }
 
 processResources {
-    filesMatching([ 'fabric.mod.json' ]) {
-        expand project.properties
-    }
-
     dependsOn copyAccessWidener
 }
 
