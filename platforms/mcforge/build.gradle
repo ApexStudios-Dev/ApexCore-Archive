@@ -52,7 +52,10 @@ loom {
 
     forge {
         convertAccessWideners = true
-        extraAccessWideners.add ACCESS_WIDENER_FILE.name
+
+        if(ACCESS_WIDENER_FILE.exists()) {
+            extraAccessWideners.add ACCESS_WIDENER_FILE.name
+        }
 
         if(getRootProject().file("platforms/common/src/main/resources/${MOD_ID}-common.mixins.json").exists()) {
             mixinConfig "${MOD_ID}-common.mixins.json"
