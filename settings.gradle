@@ -54,6 +54,6 @@ def includePlatform = { platform ->
 includePlatform 'common'
 // includePlatform 'neoforge'
 // includePlatform 'mcforge'
-// includePlatform 'fabric'
+includePlatform 'fabric'
 
 rootProject.name = "${MOD_NAME}"
