@@ -28,7 +28,7 @@ ModsDotGroovy.make {
     mod {
         modId = props.MOD_ID
         displayName = props.MOD_NAME
-        version = props.MOD_VERSION
+        version = this.version
         updateJsonUrl = "https://api.modrinth.com/updates/${props.MOD_ID}/forge_updates.json"
         displayUrl = "https://apexstudios.dev/${props.MOD_ID}"
         description = props.MOD_DESCRIPTION
