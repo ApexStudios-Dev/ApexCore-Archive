@@ -95,6 +95,28 @@ publishMods {
     def curseforgeKey = providers.environmentVariable('CURSEFORGE_TOKEN')
     def discordKey = providers.environmentVariable('DISCORD_CHANGELOG_WEBHOOK_URL')
 
+    // ApexStudios
+    def emojis = [
+            'modrinth': '<:modrinth:1087664953235869696>',
+            'curseforge': '<:curseforge:1087664975121752085>',
+            'minecraft': '<:minecraft:1087669093974421544>',
+            'mcforge': '<:forge:1087669091487195205>',
+            'neoforge': '<:neoforge:1138457156757241918>',
+            'fabric': '<:fabric:1107901914923925585>',
+            'github': '<:github:1087671203642216521>'
+    ]
+
+    // TestServer
+    /*def emojis = [
+            'modrinth': '<:modrinth:1087665302067740722>',
+            'curseforge': '<:curseforge:1087665287186366504>',
+            'minecraft': '<:minecraft:1087667250565226536>',
+            'mcforge': '<:forge:1087667248371605524>',
+            'neoforge': '<:neoforge:1138456184618242189>',
+            'fabric': '<:fabric:1138459723314769950>',
+            'github': '<:github:1087671103360614400>'
+    ]*/
+
     changelog = file('changelogs/changelog.md').text
     type = me.modmuss50.mpp.ReleaseType.of("${MOD_RELEASE_TYPE}")
     maxRetries = 5
@@ -115,6 +137,7 @@ publishMods {
                     additionalFiles.from(fabric.remapSourcesJar.archiveFile)
                     displayName = "[Fabric] ${MOD_NAME} - ${MOD_VERSION_FULL}"
                     modLoaders.add('fabric')
+                    announcementTitle = "Download from ${emojis['modrinth']} Modrinth for ${emojis['fabric']} Fabric ${FABRIC_API_VERSION}"
 
                     requires {
                         slug = "${FABRIC_MODRINTH_ID}"
@@ -131,6 +154,7 @@ publishMods {
                     additionalFiles.from(fabric.remapSourcesJar.archiveFile)
                     displayName = "[Fabric] ${MOD_NAME} - ${MOD_VERSION_FULL}"
                     modLoaders.add('fabric')
+                    announcementTitle = "Download from ${emojis['curseforge']} CurseForge for ${emojis['fabric']} Fabric ${FABRIC_API_VERSION}"
 
                     requires {
                         slug = "${FABRIC_CURSEFORGE_SLUG}"
@@ -151,6 +175,7 @@ publishMods {
                     additionalFiles.from(mcforge.remapSourcesJar.archiveFile)
                     displayName = "[MinecraftForge] ${MOD_NAME} - ${MOD_VERSION_FULL}"
                     modLoaders.add('forge')
+                    announcementTitle = "Download from ${emojis['modrinth']} Modrinth for ${emojis['mcforge']} MinecraftForge ${MCFORGE_VERSION}"
                 }
             }
 
@@ -163,6 +188,7 @@ publishMods {
                     additionalFiles.from(mcforge.remapSourcesJar.archiveFile)
                     displayName = "[MinecraftForge] ${MOD_NAME} - ${MOD_VERSION_FULL}"
                     modLoaders.add('forge')
+                    announcementTitle = "Download from ${emojis['curseforge']} CurseForge for ${emojis['mcforge']} MinecraftForge ${MCFORGE_VERSION}"
                 }
             }
         }
