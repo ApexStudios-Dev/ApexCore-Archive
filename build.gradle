@@ -12,6 +12,7 @@ plugins {
 apply plugin: 'base'
 apply plugin: 'com.palantir.git-version'
 apply plugin: 'se.bjurr.gitchangelog.git-changelog-gradle-plugin'
+apply plugin: 'org.groovymc.modsdotgroovy'
 apply plugin: 'me.modmuss50.mod-publish-plugin'
 
 def repo = versionDetails()
@@ -28,18 +29,28 @@ architectury {
     injectInjectables = false
 }
 
-if(findProject(':fabric') != null || findProject(':mcforge') != null || findProject(':neoforge') != null) {
-    apply plugin: 'org.groovymc.modsdotgroovy'
+modsDotGroovy {
+    dslVersion = '1.5.1'
+    platform = 'multiloader'
 
-    modsDotGroovy {
-        dslVersion = '1.5.1'
-        platform = 'multiloader'
+    def forgeProjects = [ ]
 
-        multiloader {
-            common = project(':common')
-            fabric = [ findProject(':fabric') ]
-            forge = [ findProject(':mcforge'), findProject(':neoforge') ]
+    if(findProject(':mcforge') != null) {
+        forgeProjects += project(':mcforge')
+    }
+
+    if(findProject(':neoforge') != null) {
+        forgeProjects += project(':neoforge')
+    }
+
+    multiloader {
+        common = project(':common')
+
+        if(findProject(':fabric') != null) {
+            fabric = [ project(':fabric') ]
         }
+
+        forge = forgeProjects
     }
 }
 
