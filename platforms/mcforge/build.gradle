@@ -82,12 +82,6 @@ dependencies {
     implementation(project(path: ':common', configuration: 'namedElements')) { transitive false }
 }
 
-processResources {
-    filesMatching([ 'META-INF/mods.toml' ]) {
-        expand project.properties
-    }
-}
-
 jar {
     archiveClassifier = 'dev-slim'
 }
