@@ -231,6 +231,7 @@ afterEvaluate {
 }
 
 subprojects {
+    apply plugin: 'maven-publish'
     apply plugin: 'dev.architectury.loom'
     apply plugin: 'architectury-plugin'
 
@@ -340,6 +341,31 @@ subprojects {
     tasks.withType(AbstractArchiveTask).configureEach {
         reproducibleFileOrder = true
         preserveFileTimestamps = false
+    }
+
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId = "${MOD_GROUP}"
+                artifactId = "${MOD_ID}-${project.name}"
+                version = "${MOD_VERSION_FULL}"
+                from components.java
+            }
+        }
+
+        repositories {
+            if(providers.environmentVariable('MAVEN_PASSWORD').isPresent()) {
+                maven {
+                    name 'releases'
+                    url 'https://nexus.covers1624.net/repository/apex-releases'
+
+                    credentials {
+                        username 'apex'
+                        password providers.environmentVariable('MAVEN_PASSWORD').get()
+                    }
+                }
+            }
+        }
     }
 }
 
