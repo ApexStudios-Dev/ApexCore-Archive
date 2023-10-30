@@ -12,7 +12,7 @@ ModsDotGroovy.make {
     onFabric {
         sourcesUrl = "https://github.com/ApexStudios-Dev/${props.MOD_NAME}"
         // .toString() cause does not like GString
-        mixin = [ "${props.MOD_ID}-common.mixins.json".toString() ]
+        // mixin = [ "${props.MOD_ID}-common.mixins.json".toString() ]
 
         custom = [
                 modmenu: [

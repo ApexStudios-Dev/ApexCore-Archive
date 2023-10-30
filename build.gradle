@@ -12,7 +12,6 @@ plugins {
 apply plugin: 'base'
 apply plugin: 'com.palantir.git-version'
 apply plugin: 'se.bjurr.gitchangelog.git-changelog-gradle-plugin'
-apply plugin: 'org.groovymc.modsdotgroovy'
 apply plugin: 'me.modmuss50.mod-publish-plugin'
 
 def repo = versionDetails()
@@ -29,14 +28,18 @@ architectury {
     injectInjectables = false
 }
 
-modsDotGroovy {
-    dslVersion = '1.5.1'
-    platform = 'multiloader'
+if(findProject(':fabric') != null || findProject(':mcforge') != null || findProject(':neoforge') != null) {
+    apply plugin: 'org.groovymc.modsdotgroovy'
 
-    multiloader {
-        common = project(':common')
-        fabric = [ findProject(':fabric') ]
-        forge = [ findProject(':mcforge') ]
+    modsDotGroovy {
+        dslVersion = '1.5.1'
+        platform = 'multiloader'
+
+        multiloader {
+            common = project(':common')
+            fabric = [ findProject(':fabric') ]
+            forge = [ findProject(':mcforge'), findProject(':neoforge') ]
+        }
     }
 }
 
@@ -108,6 +111,7 @@ tasks.register('publishChangelog') {
 publishMods {
     def fabric = findProject(':fabric')
     def mcforge = findProject(':mcforge')
+    def neoforge = findProject(':neoforge')
 
     def modrinthKey = providers.environmentVariable('MODRINTH_TOKEN')
     def curseforgeKey = providers.environmentVariable('CURSEFORGE_TOKEN')
@@ -207,6 +211,36 @@ publishMods {
                     displayName = "[MinecraftForge] ${MOD_NAME} - ${MOD_VERSION_FULL}"
                     modLoaders.add('forge')
                     announcementTitle = "Download from ${emojis['curseforge']} CurseForge for ${emojis['mcforge']} MinecraftForge ${MCFORGE_VERSION}"
+                }
+            }
+        }
+    }
+
+    if(neoforge != null) {
+        neoforge.afterEvaluate {
+            if(modrinthKey.isPresent()) {
+                modrinth('modrinthMinecraftForge') {
+                    minecraftVersions.add("${MINECRAFT_VERSION}")
+                    projectId = "${MOD_MODRINTH_ID}"
+                    accessToken = modrinthKey.get()
+                    file = neoforge.remapJar.archiveFile
+                    additionalFiles.from(neoforge.remapSourcesJar.archiveFile)
+                    displayName = "[NeoForge] ${MOD_NAME} - ${MOD_VERSION_FULL}"
+                    modLoaders.add('neoforge')
+                    announcementTitle = "Download from ${emojis['modrinth']} Modrinth for ${emojis['neoforge']} NeoForge ${NEOFORGE_VERSION}"
+                }
+            }
+
+            if(curseforgeKey.isPresent()) {
+                curseforge('curseforgeMinecraftForge') {
+                    minecraftVersions.add("${MINECRAFT_VERSION}")
+                    projectId = "${MOD_CURSEFORGE_ID}"
+                    accessToken = curseforgeKey.get()
+                    file = neoforge.remapJar.archiveFile
+                    additionalFiles.from(neoforge.remapSourcesJar.archiveFile)
+                    displayName = "[NeoForge] ${MOD_NAME} - ${MOD_VERSION_FULL}"
+                    modLoaders.add('neoforge')
+                    announcementTitle = "Download from ${emojis['curseforge']} CurseForge for ${emojis['neoforge']} NeoForge ${NEOFORGE_VERSION}"
                 }
             }
         }
