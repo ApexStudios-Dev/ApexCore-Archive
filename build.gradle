@@ -87,6 +87,24 @@ tasks.register('generateChangelogs') {
     dependsOn([ tasks.named('generateChangelogPlain'), tasks.named('generateChangelogHtml'), tasks.named('generateChangelogMarkdown') ])
 }
 
+tasks.register('publishChangelog') {
+    onlyIf {
+        providers.environmentVariable('APEXSTUDIOS_CHANGELOG_SERVER_KEY').isPresent()
+    }
+
+    dependsOn tasks.named('generateChangelogs')
+
+    doLast {
+        def req = new URL("https://updates.apexstudios.dev/${MOD_ID}/${MOD_VERSION_FULL}").openConnection() as HttpURLConnection
+        req.setRequestMethod('PUT')
+        req.setRequestProperty('Content-Type', 'text/plain; charset=UTF-8')
+        req.setRequestProperty('X-Api-Key', providers.environmentVariable('APEXSTUDIOS_CHANGELOG_SERVER_KEY').get())
+        req.setDoOutput(true)
+        req.getOutputStream().write(file('changelogs/changelog.txt').bytes)
+        logger.lifecycle(":publishChangelogResponse: '${req.responseMessage}'")
+    }
+}
+
 publishMods {
     def fabric = findProject(':fabric')
     def mcforge = findProject(':mcforge')
@@ -208,7 +226,7 @@ publishMods {
 
 afterEvaluate {
     tasks.withType(me.modmuss50.mpp.PublishModTask).configureEach {
-        dependsOn tasks.named('generateChangelogs')
+        dependsOn([ tasks.named('generateChangelogs'), tasks.named('publishChangelog') ])
     }
 }
 
