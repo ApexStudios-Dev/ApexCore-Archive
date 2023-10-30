@@ -80,11 +80,6 @@ dependencies {
 
     annotationProcessor "org.spongepowered:mixin:${MIXIN_VERSION}:processor"
 
-    annotationProcessor "io.github.llamalad7:mixinextras-common:${MIXIN_EXTRAS_VERSION}"
-    implementation "io.github.llamalad7:mixinextras-common:${MIXIN_EXTRAS_VERSION}"
-    implementation "io.github.llamalad7:mixinextras-forge:${MIXIN_EXTRAS_VERSION}"
-    include "io.github.llamalad7:mixinextras-forge:${MIXIN_EXTRAS_VERSION}"
-
     bundle(project(path: ':common', configuration: 'transformProductionForge')) { transitive false }
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
 }

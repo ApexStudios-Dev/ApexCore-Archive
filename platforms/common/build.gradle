@@ -20,9 +20,6 @@ dependencies {
     // compileOnly to not be included in maven pom
     compileOnly "org.spongepowered:mixin:${MIXIN_VERSION}"
 
-    annotationProcessor "io.github.llamalad7:mixinextras-common:${MIXIN_EXTRAS_VERSION}"
-    implementation "io.github.llamalad7:mixinextras-common:${MIXIN_EXTRAS_VERSION}"
-
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
     compileOnly 'com.google.errorprone:error_prone_annotations:2.11.0'
 }
