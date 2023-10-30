@@ -59,8 +59,6 @@ afterEvaluate {
     }
 }
 
-tasks.register('classes')
-
 tasks.register('generateChangelogPlain', se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
     settingsFile = file('changelogs/settings.json')
     fromRepo = projectDir
