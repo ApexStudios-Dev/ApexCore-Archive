@@ -252,7 +252,10 @@ subprojects {
     }
 
     loom {
-        accessWidenerPath = ACCESS_WIDENER_FILE
+        if(ACCESS_WIDENER_FILE.exists()) {
+            accessWidenerPath = ACCESS_WIDENER_FILE
+        }
+
         mixin.defaultRefmapName = "${MOD_ID}.refmap.json"
         silentMojangMappingsLicense()
     }
@@ -379,10 +382,6 @@ idea.module {
     [ 'fabric', 'neoforge', 'mcforge' ].forEach {
         if(findProject(":${it}") == null) {
             excludeDirs += [ file("platforms/${it}") ]
-        }
-
-        if(findProject(":testmod-${it}") == null) {
-            excludeDirs += [ file("testmod/${it}") ]
         }
     }
 }
