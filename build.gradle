@@ -5,6 +5,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
     id 'com.palantir.git-version' version '1.0.0' apply false
     id 'se.bjurr.gitchangelog.git-changelog-gradle-plugin' version '1.77.2' apply false
+    id 'me.modmuss50.mod-publish-plugin' version '0.+' apply false
     id 'org.groovymc.modsdotgroovy' version '1.4.2' apply false
 }
 
@@ -12,6 +13,7 @@ apply plugin: 'base'
 apply plugin: 'com.palantir.git-version'
 apply plugin: 'se.bjurr.gitchangelog.git-changelog-gradle-plugin'
 apply plugin: 'org.groovymc.modsdotgroovy'
+apply plugin: 'me.modmuss50.mod-publish-plugin'
 
 def repo = versionDetails()
 def lastGitTag = repo.commitDistance > 0 ? repo.lastTag : "git describe --abbrev=0 ${repo.lastTag}^".execute().text.trim()
@@ -85,6 +87,105 @@ tasks.register('generateChangelogMarkdown', se.bjurr.gitchangelog.plugin.gradle.
 
 tasks.register('generateChangelogs') {
     dependsOn([ tasks.named('generateChangelogPlain'), tasks.named('generateChangelogHtml'), tasks.named('generateChangelogMarkdown') ])
+}
+
+publishMods {
+    def fabric = findProject(':fabric')
+    def mcforge = findProject(':mcforge')
+
+    def modrinthKey = providers.environmentVariable('MODRINTH_TOKEN')
+    def curseforgeKey = providers.environmentVariable('CURSEFORGE_TOKEN')
+    def discordKey = providers.environmentVariable('DISCORD_CHANGELOG_WEBHOOK_URL')
+
+    changelog = file('changelogs/changelog.md').text
+    type = me.modmuss50.mpp.ReleaseType.of("${MOD_RELEASE_TYPE}")
+    maxRetries = 5
+    dryRun = !(discordKey.isPresent() && (modrinthKey.isPresent() || curseforgeKey.isPresent()))
+    version = "${MOD_VERSION_FULL}"
+
+    // use afterEvaluate as projects have not evaluated yet
+    // leading to missing remapJar / remapSourcesJar tasks
+
+    if(fabric != null) {
+        fabric.afterEvaluate {
+            if(modrinthKey.isPresent()) {
+                modrinth('modrinthFabric') {
+                    minecraftVersions.add("${MINECRAFT_VERSION}")
+                    projectId = "${MOD_MODRINTH_ID}"
+                    accessToken = modrinthKey.get()
+                    file = fabric.remapJar.archiveFile
+                    additionalFiles.from(fabric.remapSourcesJar.archiveFile)
+                    displayName = "[Fabric] ${MOD_NAME} - ${MOD_VERSION_FULL}"
+                    modLoaders.add('fabric')
+
+                    requires {
+                        slug = "${FABRIC_MODRINTH_ID}"
+                    }
+                }
+            }
+
+            if(curseforgeKey.isPresent()) {
+                curseforge('curseforgeFabric') {
+                    minecraftVersions.add("${MINECRAFT_VERSION}")
+                    projectId = "${MOD_CURSEFORGE_ID}"
+                    accessToken = curseforgeKey.get()
+                    file = fabric.remapJar.archiveFile
+                    additionalFiles.from(fabric.remapSourcesJar.archiveFile)
+                    displayName = "[Fabric] ${MOD_NAME} - ${MOD_VERSION_FULL}"
+                    modLoaders.add('fabric')
+
+                    requires {
+                        slug = "${FABRIC_CURSEFORGE_SLUG}"
+                    }
+                }
+            }
+        }
+    }
+
+    if(mcforge != null) {
+        mcforge.afterEvaluate {
+            if(modrinthKey.isPresent()) {
+                modrinth('modrinthMinecraftForge') {
+                    minecraftVersions.add("${MINECRAFT_VERSION}")
+                    projectId = "${MOD_MODRINTH_ID}"
+                    accessToken = modrinthKey.get()
+                    file = mcforge.remapJar.archiveFile
+                    additionalFiles.from(mcforge.remapSourcesJar.archiveFile)
+                    displayName = "[MinecraftForge] ${MOD_NAME} - ${MOD_VERSION_FULL}"
+                    modLoaders.add('forge')
+                }
+            }
+
+            if(curseforgeKey.isPresent()) {
+                curseforge('curseforgeMinecraftForge') {
+                    minecraftVersions.add("${MINECRAFT_VERSION}")
+                    projectId = "${MOD_CURSEFORGE_ID}"
+                    accessToken = curseforgeKey.get()
+                    file = mcforge.remapJar.archiveFile
+                    additionalFiles.from(mcforge.remapSourcesJar.archiveFile)
+                    displayName = "[MinecraftForge] ${MOD_NAME} - ${MOD_VERSION_FULL}"
+                    modLoaders.add('forge')
+                }
+            }
+        }
+    }
+
+    if(discordKey.isPresent() && (modrinthKey.isPresent() || curseforgeKey.isPresent())) {
+        def changelogText = file('changelogs/changelog.md').text.split('\n').take(8).join('\n')
+
+        discord {
+            webhookUrl = discordKey.get()
+            username = "${MOD_NAME}"
+            avatarUrl = "https://raw.githubusercontent.com/ApexStudios-Dev/.github/master/assets/minecraft/${MOD_ID}_logo.png"
+            content = "# ${MOD_NAME} - v${MOD_VERSION_FULL}\n${changelogText}\n[See here for full changelog](https://updates.apexstudios.dev/${MOD_ID}/${MOD_VERSION_FULL})\n"
+        }
+    }
+}
+
+afterEvaluate {
+    tasks.withType(me.modmuss50.mpp.PublishModTask).configureEach {
+        dependsOn tasks.named('generateChangelogs')
+    }
 }
 
 subprojects {
