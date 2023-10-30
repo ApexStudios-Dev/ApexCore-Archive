@@ -5,6 +5,11 @@ configurations {
         canBeConsumed = false
         canBeResolved = true
     }
+
+    common
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentForge.extendsFrom common
 }
 
 architectury {
@@ -79,7 +84,7 @@ dependencies {
     include "io.github.llamalad7:mixinextras-forge:${MIXIN_EXTRAS_VERSION}"
 
     bundle(project(path: ':common', configuration: 'transformProductionForge')) { transitive false }
-    implementation(project(path: ':common', configuration: 'namedElements')) { transitive false }
+    common(project(path: ':common', configuration: 'namedElements')) { transitive false }
 }
 
 jar {
@@ -95,4 +100,10 @@ shadowJar {
 remapJar {
     dependsOn shadowJar
     inputFile.set shadowJar.archiveFile
+}
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
+    }
 }
