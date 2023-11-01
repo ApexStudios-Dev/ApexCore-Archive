@@ -12,7 +12,6 @@ plugins {
 apply plugin: 'base'
 apply plugin: 'com.palantir.git-version'
 apply plugin: 'se.bjurr.gitchangelog.git-changelog-gradle-plugin'
-apply plugin: 'org.groovymc.modsdotgroovy'
 apply plugin: 'me.modmuss50.mod-publish-plugin'
 
 def repo = versionDetails()
@@ -29,38 +28,15 @@ architectury {
     injectInjectables = false
 }
 
-modsDotGroovy {
-    dslVersion = '1.5.1'
-    platform = 'multiloader'
-
-    def forgeProjects = [ ]
-
-    if(findProject(':mcforge') != null) {
-        forgeProjects += project(':mcforge')
-    }
-
-    if(findProject(':neoforge') != null) {
-        forgeProjects += project(':neoforge')
-    }
-
-    multiloader {
-        common = project(':common')
-
-        if(findProject(':fabric') != null) {
-            fabric = [ project(':fabric') ]
-        }
-
-        forge = forgeProjects
-    }
-}
-
 afterEvaluate {
     tasks.register('collectJars', Copy) {
         def tasks = [ ]
 
         subprojects.each {
-            tasks += it.tasks.named('remapJar')
-            tasks += it.tasks.named('remapSourcesJar')
+            if(!it.name.containsIgnoreCase('testmod')) {
+                tasks += it.tasks.named('remapJar')
+                tasks += it.tasks.named('remapSourcesJar')
+            }
         }
 
         dependsOn tasks
@@ -280,6 +256,12 @@ subprojects {
     apply plugin: 'dev.architectury.loom'
     apply plugin: 'architectury-plugin'
 
+    def isTestMod = project.name.containsIgnoreCase('testmod')
+    def isCommon = project.name.containsIgnoreCase('common')
+    def isFabric = project.name.containsIgnoreCase('fabric')
+    def isForge = project.name.containsIgnoreCase('mcforge')
+    def isNeo = project.name.containsIgnoreCase('neo')
+
     group = "${MOD_GROUP}"
     version = "${MOD_VERSION_FULL}"
     base.archivesName = "${MOD_ID}-${project.name}"
@@ -331,6 +313,8 @@ subprojects {
                 }
             }
         })
+
+        implementation "net.covers1624:Quack:${QUACK_VERSION}"
     }
 
     processResources {
@@ -391,25 +375,27 @@ subprojects {
         preserveFileTimestamps = false
     }
 
-    publishing {
-        publications {
-            release(MavenPublication) {
-                groupId = "${MOD_GROUP}"
-                artifactId = "${MOD_ID}-${project.name}"
-                version = "${MOD_VERSION_FULL}"
-                from components.java
+    if(!isTestMod) {
+        publishing {
+            publications {
+                release(MavenPublication) {
+                    groupId = "${MOD_GROUP}"
+                    artifactId = "${MOD_ID}-${project.name}"
+                    version = "${MOD_VERSION_FULL}"
+                    from components.java
+                }
             }
-        }
 
-        repositories {
-            if(providers.environmentVariable('MAVEN_PASSWORD').isPresent()) {
-                maven {
-                    name 'releases'
-                    url 'https://nexus.covers1624.net/repository/apex-releases'
+            repositories {
+                if(providers.environmentVariable('MAVEN_PASSWORD').isPresent()) {
+                    maven {
+                        name 'releases'
+                        url 'https://nexus.covers1624.net/repository/apex-releases'
 
-                    credentials {
-                        username 'apex'
-                        password providers.environmentVariable('MAVEN_PASSWORD').get()
+                        credentials {
+                            username 'apex'
+                            password providers.environmentVariable('MAVEN_PASSWORD').get()
+                        }
                     }
                 }
             }
@@ -427,6 +413,10 @@ idea.module {
     [ 'fabric', 'neoforge', 'mcforge' ].forEach {
         if(findProject(":${it}") == null) {
             excludeDirs += [ file("platforms/${it}") ]
+        }
+
+        if(findProject(":testmod-${it}") == null) {
+            excludeDirs += [ file("testmod/${it}") ]
         }
     }
 }
