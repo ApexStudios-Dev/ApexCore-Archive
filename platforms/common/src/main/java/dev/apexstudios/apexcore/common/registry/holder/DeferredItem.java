@@ -1,5 +1,6 @@
-package dev.apexstudios.apexcore.common.registry;
+package dev.apexstudios.apexcore.common.registry.holder;
 
+import dev.apexstudios.apexcore.common.registry.DeferredHolder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;

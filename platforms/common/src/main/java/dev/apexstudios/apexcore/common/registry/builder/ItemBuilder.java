@@ -1,7 +1,7 @@
 package dev.apexstudios.apexcore.common.registry.builder;
 
 import dev.apexstudios.apexcore.common.registry.AbstractRegister;
-import dev.apexstudios.apexcore.common.registry.DeferredItem;
+import dev.apexstudios.apexcore.common.registry.holder.DeferredItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.ApiStatus;
