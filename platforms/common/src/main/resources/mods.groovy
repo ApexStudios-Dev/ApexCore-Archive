@@ -12,7 +12,8 @@ ModsDotGroovy.make {
     onFabric {
         sourcesUrl = "https://github.com/ApexStudios-Dev/${props.MOD_NAME}"
         // .toString() cause does not like GString
-        mixin = [ "${props.MOD_ID}-common.mixins.json".toString() ]
+        // mixin = [ "${props.MOD_ID}-common.mixins.json".toString() ]
+        // accessWidener = "${props.MOD_ID}.accesswidener"
 
         custom = [
                 modmenu: [
@@ -50,10 +51,10 @@ ModsDotGroovy.make {
             }
 
             entrypoints {
-                setMain("${props.MOD_GROUP}.fabric.entrypoint.${props.MOD_NAME}ModInitializer")
-                setClient("${props.MOD_GROUP}.fabric.entrypoint.${props.MOD_NAME}ClientModInitializer")
+                setMain("${props.MOD_GROUP}.fabric.entrypoint.FabricModInitializer")
+                // setClient("${props.MOD_GROUP}.fabric.entrypoint.${props.MOD_NAME}ClientModInitializer")
                 // .toString() cause does not like GString
-                entrypoint('fabric-datagen', "${props.MOD_GROUP}.fabric.entrypoint.${props.MOD_NAME}ModInitializer".toString())
+                // entrypoint('fabric-datagen', "${props.MOD_GROUP}.fabric.entrypoint.${props.MOD_NAME}ModInitializer".toString())
             }
         }
 

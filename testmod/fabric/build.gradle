@@ -27,20 +27,26 @@ loom {
         data {
             server()
             vmArg '-Dfabric-api.datagen'
-            vmArg "-Dfabric-api.datagen.output-dir=${project(':common').file('src/generated/resources')}"
-            vmArg "-Dfabric-api.datagen.modid=${MOD_ID}"
+            vmArg "-Dfabric-api.datagen.output-dir=${project(':testmod-common').file('src/generated/resources')}"
+            vmArg "-Dfabric-api.datagen.modid=testmod"
         }
     }
 
     mods {
         main {
-            sourceSet project(':common').sourceSets.main
+            sourceSet project(':testmod-common').sourceSets.main
             sourceSet sourceSets.main
+        }
+
+        "${MOD_ID}" {
+            sourceSet project(':common').sourceSets.main
+            sourceSet project(':fabric').sourceSets.main
         }
     }
 }
 
 dependencies {
-    bundle(project(path: ':common', configuration: 'transformProductionFabric')) { transitive false }
-    include "net.covers1624:Quack:${QUACK_VERSION}"
+    common(project(path: ':fabric', configuration: 'namedElements')) { transitive false }
+    common(project(path: ':testmod-common', configuration: 'namedElements')) { transitive false }
+    bundle(project(path: ':testmod-common', configuration: 'transformProductionFabric')) { transitive false }
 }

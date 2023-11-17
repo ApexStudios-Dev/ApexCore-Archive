@@ -1,0 +1,70 @@
+apply plugin: 'org.groovymc.modsdotgroovy'
+
+def forgeProjs = [ ]
+def fabricProj
+
+if(project.name.containsIgnoreCase('testmod')) {
+    if(findProject(':testmod-fabric') != null) {
+        fabricProj = project(':testmod-fabric')
+    }
+
+    if(findProject(':testmod-mcforge') != null) {
+        forgeProjs += project(':testmod-mcforge')
+    }
+
+    if(findProject(':testmod-neoforge') != null) {
+        forgeProjs += project(':testmod-neoforge')
+    }
+} else {
+    if(findProject(':fabric') != null) {
+        fabricProj = project(':fabric')
+    }
+
+    if(findProject(':mcforge') != null) {
+        forgeProjs += project(':mcforge')
+    }
+
+    if(findProject(':neoforge') != null) {
+        forgeProjs += project(':neoforge')
+    }
+}
+
+modsDotGroovy {
+    dslVersion = '1.5.1'
+    platform = 'multiloader'
+
+    multiloader {
+        common = project
+        forge = forgeProjs
+
+        if(fabricProj != null) {
+            fabric = [ fabricProj ]
+        }
+    }
+}
+
+sourceSets {
+    main.resources.srcDirs += [ 'src/generated/resources' ]
+}
+
+architectury {
+    def enabledPlatforms = [ ]
+
+    if(fabricProj != null) {
+        enabledPlatforms += 'fabric'
+    }
+
+    if(!forgeProjs.isEmpty()) {
+        enabledPlatforms += 'forge'
+    }
+
+    common(enabledPlatforms)
+}
+
+dependencies {
+    // compileOnly to not be included in maven pom
+    compileOnly "org.spongepowered:mixin:${MIXIN_VERSION}"
+
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+    compileOnly 'com.google.errorprone:error_prone_annotations:2.11.0'
+}

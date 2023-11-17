@@ -1,0 +1,83 @@
+apply plugin: 'com.github.johnrengelman.shadow'
+
+configurations {
+    bundle {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+
+    common
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentFabric.extendsFrom common
+}
+
+sourceSets {
+    main.resources.srcDirs += [ 'src/generated/resources' ]
+}
+
+architectury {
+    platformSetupLoomIde()
+    fabric()
+}
+
+repositories {
+    maven {
+        url 'https://maven.terraformersmc.com/releases'
+        content {
+            includeGroup 'com.terraformersmc'
+        }
+    }
+}
+
+dependencies {
+    modImplementation "net.fabricmc:fabric-loader:${FABRIC_LOADER_VERSION}"
+
+    if(rootProject.hasProperty('FABRIC_API_MINECRAFT_VERSION')) {
+        modApi "net.fabricmc.fabric-api:fabric-api:${FABRIC_API_VERSION}+${FABRIC_API_MINECRAFT_VERSION}"
+    } else {
+        modApi "net.fabricmc.fabric-api:fabric-api:${FABRIC_API_VERSION}+${MINECRAFT_VERSION}"
+    }
+
+    common(project(path: ':common', configuration: 'namedElements')) { transitive false }
+
+    if(rootProject.hasProperty('MOD_MENU_VERSION')) {
+        modRuntimeOnly("com.terraformersmc:modmenu:${MOD_MENU_VERSION}") { transitive false }
+    }
+
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+}
+
+tasks.register('copyAccessWidener', Copy) {
+    from ACCESS_WIDENER_FILE
+    into file('src/generated/resources')
+}
+
+processResources {
+    dependsOn copyAccessWidener
+}
+
+jar {
+    archiveClassifier = 'dev-slim'
+}
+
+shadowJar {
+    exclude 'architectury.common.json'
+    archiveClassifier = 'dev-shadow'
+    configurations = [ project.configurations.bundle ]
+}
+
+sourcesJar {
+    dependsOn copyAccessWidener
+}
+
+remapJar {
+    dependsOn shadowJar
+    inputFile.set shadowJar.archiveFile
+}
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
+    }
+}

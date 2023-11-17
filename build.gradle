@@ -12,7 +12,6 @@ plugins {
 apply plugin: 'base'
 apply plugin: 'com.palantir.git-version'
 apply plugin: 'se.bjurr.gitchangelog.git-changelog-gradle-plugin'
-apply plugin: 'org.groovymc.modsdotgroovy'
 apply plugin: 'me.modmuss50.mod-publish-plugin'
 
 def repo = versionDetails()
@@ -29,24 +28,15 @@ architectury {
     injectInjectables = false
 }
 
-modsDotGroovy {
-    dslVersion = '1.5.1'
-    platform = 'multiloader'
-
-    multiloader {
-        common = project(':common')
-        fabric = [ findProject(':fabric') ]
-        forge = [ findProject(':mcforge') ]
-    }
-}
-
 afterEvaluate {
     tasks.register('collectJars', Copy) {
         def tasks = [ ]
 
         subprojects.each {
-            tasks += it.tasks.named('remapJar')
-            tasks += it.tasks.named('remapSourcesJar')
+            if(!it.name.containsIgnoreCase('testmod')) {
+                tasks += it.tasks.named('remapJar')
+                tasks += it.tasks.named('remapSourcesJar')
+            }
         }
 
         dependsOn tasks
@@ -108,6 +98,7 @@ tasks.register('publishChangelog') {
 publishMods {
     def fabric = findProject(':fabric')
     def mcforge = findProject(':mcforge')
+    def neoforge = findProject(':neoforge')
 
     def modrinthKey = providers.environmentVariable('MODRINTH_TOKEN')
     def curseforgeKey = providers.environmentVariable('CURSEFORGE_TOKEN')
@@ -212,6 +203,36 @@ publishMods {
         }
     }
 
+    if(neoforge != null) {
+        neoforge.afterEvaluate {
+            if(modrinthKey.isPresent()) {
+                modrinth('modrinthMinecraftForge') {
+                    minecraftVersions.add("${MINECRAFT_VERSION}")
+                    projectId = "${MOD_MODRINTH_ID}"
+                    accessToken = modrinthKey.get()
+                    file = neoforge.remapJar.archiveFile
+                    additionalFiles.from(neoforge.remapSourcesJar.archiveFile)
+                    displayName = "[NeoForge] ${MOD_NAME} - ${MOD_VERSION_FULL}"
+                    modLoaders.add('neoforge')
+                    announcementTitle = "Download from ${emojis['modrinth']} Modrinth for ${emojis['neoforge']} NeoForge ${NEOFORGE_VERSION}"
+                }
+            }
+
+            if(curseforgeKey.isPresent()) {
+                curseforge('curseforgeMinecraftForge') {
+                    minecraftVersions.add("${MINECRAFT_VERSION}")
+                    projectId = "${MOD_CURSEFORGE_ID}"
+                    accessToken = curseforgeKey.get()
+                    file = neoforge.remapJar.archiveFile
+                    additionalFiles.from(neoforge.remapSourcesJar.archiveFile)
+                    displayName = "[NeoForge] ${MOD_NAME} - ${MOD_VERSION_FULL}"
+                    modLoaders.add('neoforge')
+                    announcementTitle = "Download from ${emojis['curseforge']} CurseForge for ${emojis['neoforge']} NeoForge ${NEOFORGE_VERSION}"
+                }
+            }
+        }
+    }
+
     if(discordKey.isPresent() && (modrinthKey.isPresent() || curseforgeKey.isPresent())) {
         def changelogText = file('changelogs/changelog.md').text.split('\n').take(8).join('\n')
 
@@ -234,6 +255,12 @@ subprojects {
     apply plugin: 'maven-publish'
     apply plugin: 'dev.architectury.loom'
     apply plugin: 'architectury-plugin'
+
+    def isTestMod = project.name.containsIgnoreCase('testmod')
+    def isCommon = project.name.containsIgnoreCase('common')
+    def isFabric = project.name.containsIgnoreCase('fabric')
+    def isForge = project.name.containsIgnoreCase('mcforge')
+    def isNeo = project.name.containsIgnoreCase('neo')
 
     group = "${MOD_GROUP}"
     version = "${MOD_VERSION_FULL}"
@@ -286,6 +313,8 @@ subprojects {
                 }
             }
         })
+
+        implementation "net.covers1624:Quack:${QUACK_VERSION}"
     }
 
     processResources {
@@ -346,25 +375,27 @@ subprojects {
         preserveFileTimestamps = false
     }
 
-    publishing {
-        publications {
-            release(MavenPublication) {
-                groupId = "${MOD_GROUP}"
-                artifactId = "${MOD_ID}-${project.name}"
-                version = "${MOD_VERSION_FULL}"
-                from components.java
+    if(!isTestMod) {
+        publishing {
+            publications {
+                release(MavenPublication) {
+                    groupId = "${MOD_GROUP}"
+                    artifactId = "${MOD_ID}-${project.name}"
+                    version = "${MOD_VERSION_FULL}"
+                    from components.java
+                }
             }
-        }
 
-        repositories {
-            if(providers.environmentVariable('MAVEN_PASSWORD').isPresent()) {
-                maven {
-                    name 'releases'
-                    url 'https://nexus.covers1624.net/repository/apex-releases'
+            repositories {
+                if(providers.environmentVariable('MAVEN_PASSWORD').isPresent()) {
+                    maven {
+                        name 'releases'
+                        url 'https://nexus.covers1624.net/repository/apex-releases'
 
-                    credentials {
-                        username 'apex'
-                        password providers.environmentVariable('MAVEN_PASSWORD').get()
+                        credentials {
+                            username 'apex'
+                            password providers.environmentVariable('MAVEN_PASSWORD').get()
+                        }
                     }
                 }
             }
@@ -382,6 +413,10 @@ idea.module {
     [ 'fabric', 'neoforge', 'mcforge' ].forEach {
         if(findProject(":${it}") == null) {
             excludeDirs += [ file("platforms/${it}") ]
+        }
+
+        if(findProject(":testmod-${it}") == null) {
+            excludeDirs += [ file("testmod/${it}") ]
         }
     }
 }

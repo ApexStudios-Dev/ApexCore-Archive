@@ -35,13 +35,19 @@ loom {
 
     mods {
         main {
-            sourceSet project(':common').sourceSets.main
+            sourceSet project(':testmod-common').sourceSets.main
             sourceSet sourceSets.main
+        }
+
+        "${MOD_ID}" {
+            sourceSet project(':common').sourceSets.main
+            sourceSet project(':mcforge').sourceSets.main
         }
     }
 }
 
 dependencies {
-    bundle(project(path: ':common', configuration: 'transformProductionForge')) { transitive false }
-    // include "net.covers1624:Quack:${QUACK_VERSION}"
+    common(project(path: ':mcforge', configuration: 'namedElements')) { transitive false }
+    common(project(path: ':testmod-common', configuration: 'namedElements')) { transitive false }
+    bundle(project(path: ':testmod-common', configuration: 'transformProductionForge')) { transitive false }
 }

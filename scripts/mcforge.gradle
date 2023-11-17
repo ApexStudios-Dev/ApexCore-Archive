@@ -1,0 +1,69 @@
+apply plugin: 'com.github.johnrengelman.shadow'
+
+configurations {
+    bundle {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+
+    common
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentForge.extendsFrom common
+}
+
+architectury {
+    platformSetupLoomIde()
+    forge()
+}
+
+loom {
+    forge {
+        convertAccessWideners = true
+
+        if(ACCESS_WIDENER_FILE.exists()) {
+            extraAccessWideners.add ACCESS_WIDENER_FILE.name
+        }
+
+        if(getRootProject().file("platforms/common/src/main/resources/${MOD_ID}-common.mixins.json").exists()) {
+            mixinConfig "${MOD_ID}-common.mixins.json"
+        }
+
+        if(getRootProject().file("platforms/mcforge/src/main/resources/${MOD_ID}.mixins.json").exists()) {
+            mixinConfig "${MOD_ID}.mixins.json"
+        }
+    }
+}
+
+dependencies {
+    if(rootProject.hasProperty('MCFORGE_DEV_VERSION')) {
+        forge "net.minecraftforge:forge:${MINECRAFT_VERSION}-${MCFORGE_DEV_VERSION}"
+    } else {
+        forge "net.minecraftforge:forge:${MINECRAFT_VERSION}-${MCFORGE_VERSION}"
+    }
+
+    annotationProcessor "org.spongepowered:mixin:${MIXIN_VERSION}:processor"
+
+    common(project(path: ':common', configuration: 'namedElements')) { transitive false }
+}
+
+jar {
+    archiveClassifier = 'dev-slim'
+}
+
+shadowJar {
+    exclude 'architectury.common.json'
+    archiveClassifier = 'dev-shadow'
+    configurations = [ project.configurations.bundle ]
+}
+
+remapJar {
+    dependsOn shadowJar
+    inputFile.set shadowJar.archiveFile
+}
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
+    }
+}
