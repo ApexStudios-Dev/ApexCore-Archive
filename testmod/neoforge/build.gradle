@@ -1,0 +1,53 @@
+apply from: rootProject.file('scripts/neoforge.gradle')
+
+loom {
+    runs {
+        client {
+            client()
+            ideConfigGenerated true
+
+            // Some of these may require JBR
+            vmArg '-XX:+AllowEnhancedClassRedefinition'
+            vmArg '-XX:+IgnoreUnrecognizedVMOptions'
+            vmArg '-XX:+AllowRedefinitionToAddDeleteMethods'
+
+            // Does not work on forge
+            /*afterEvaluate {
+                vmArg "-javaagent:${ configurations.compileClasspath.find { it.name.contains("sponge-mixin") } }"
+            }*/
+        }
+
+        server {
+            server()
+            ideConfigGenerated true
+
+            // Requires JBR
+            vmArg '-XX:+AllowEnhancedClassRedefinition'
+            vmArg '-XX:+IgnoreUnrecognizedVMOptions'
+            vmArg '-XX:+AllowRedefinitionToAddDeleteMethods'
+
+            // Does not work on forge
+            /*afterEvaluate {
+                vmArg "-javaagent:${ configurations.compileClasspath.find { it.name.contains("sponge-mixin") } }"
+            }*/
+        }
+    }
+
+    mods {
+        main {
+            sourceSet project(':testmod-common').sourceSets.main
+            sourceSet sourceSets.main
+        }
+
+        "${MOD_ID}" {
+            sourceSet project(':common').sourceSets.main
+            sourceSet project(':neoforge').sourceSets.main
+        }
+    }
+}
+
+dependencies {
+    common(project(path: ':neoforge', configuration: 'namedElements')) { transitive false }
+    common(project(path: ':testmod-common', configuration: 'namedElements')) { transitive false }
+    bundle(project(path: ':testmod-common', configuration: 'transformProductionNeoForge')) { transitive false }
+}

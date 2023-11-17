@@ -1,7 +1,7 @@
 pluginManagement {
 	repositories {
 		maven {
-			url 'https://maven.neoforged.net'
+			url 'https://maven.neoforged.net/releases'
 			content {
 				includeGroupByRegex 'net\\.neoforged.*'
 			}
@@ -38,7 +38,15 @@ pluginManagement {
 			}
 		}
 
+        maven {
+            url 'https://libraries.minecraft.net/'
+            content {
+                includeGroup 'com.mojang'
+            }
+        }
+
 		gradlePluginPortal()
+        mavenLocal()
 	}
 }
 
@@ -57,7 +65,7 @@ def includePlatform = { platform ->
 }
 
 includePlatform 'common'
-// includePlatform 'neoforge'
+includePlatform 'neoforge'
 includePlatform 'mcforge'
 includePlatform 'fabric'
 

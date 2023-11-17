@@ -3,9 +3,16 @@ ModsDotGroovy.make {
 
     license = props.MOD_LICENSE
 
-    onForge {
+    onForgeAndNeo {
         modLoader = 'javafml'
+    }
+
+    onForge {
         loaderVersion = "[${props.MCFORGE_LOADER_VERSION},)"
+    }
+
+    onNeoForge {
+        loaderVersion = "[${props.NEOFORGE_LOADER_VERSION},)"
     }
 
     onFabric {
@@ -42,9 +49,11 @@ ModsDotGroovy.make {
             }
         }
 
-        onForge {
+        onForgeAndNeo {
             credits = 'ApexStudios'
+        }
 
+        onForge {
             dependencies {
                 minecraft {
                     versionRange = props.MINECRAFT_FORGE_VERSION_RANGE
@@ -52,6 +61,22 @@ ModsDotGroovy.make {
 
                 forge {
                     versionRange = props.MCFORGE_VERSION_RANGE
+                }
+
+                mod(props.MOD_ID) {
+                    versionRange = "[${this.version},)"
+                }
+            }
+        }
+
+        onNeoForge {
+            dependencies {
+                minecraft {
+                    versionRange = props.MINECRAFT_FORGE_VERSION_RANGE
+                }
+
+                neoforge {
+                    versionRange = props.NEOFORGE_VERSION_RANGE
                 }
 
                 mod(props.MOD_ID) {

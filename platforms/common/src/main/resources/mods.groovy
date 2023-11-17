@@ -3,16 +3,23 @@ ModsDotGroovy.make {
 
     license = props.MOD_LICENSE
     issueTrackerUrl = 'https://discord.apexstudios.dev/'
+    // .toString() cause does not like GString
+    // mixin = [ "${props.MOD_ID}-common.mixins.json".toString() ]
+
+    onForgeAndNeo {
+        modLoader = 'javafml'
+    }
 
     onForge {
-        modLoader = 'javafml'
         loaderVersion = "[${props.MCFORGE_LOADER_VERSION},)"
+    }
+
+    onNeoForge {
+        loaderVersion = "[${props.NEOFORGE_LOADER_VERSION},)"
     }
 
     onFabric {
         sourcesUrl = "https://github.com/ApexStudios-Dev/${props.MOD_NAME}"
-        // .toString() cause does not like GString
-        // mixin = [ "${props.MOD_ID}-common.mixins.json".toString() ]
         // accessWidener = "${props.MOD_ID}.accesswidener"
 
         custom = [
@@ -58,11 +65,13 @@ ModsDotGroovy.make {
             }
         }
 
-        onForge {
+        onForgeAndNeo {
             credits = 'ApexStudios'
             displayTest = DisplayTest.MATCH_VERSION
             logoFile = 'banner.png'
+        }
 
+        onForge {
             dependencies {
                 minecraft {
                     versionRange = props.MINECRAFT_FORGE_VERSION_RANGE
@@ -70,6 +79,18 @@ ModsDotGroovy.make {
 
                 forge {
                     versionRange = props.MCFORGE_VERSION_RANGE
+                }
+            }
+        }
+
+        onNeoForge {
+            dependencies {
+                minecraft {
+                    versionRange = props.MINECRAFT_FORGE_VERSION_RANGE
+                }
+
+                neoforge {
+                    versionRange = props.NEOFORGE_VERSION_RANGE
                 }
             }
         }

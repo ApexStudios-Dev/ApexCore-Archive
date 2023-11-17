@@ -1,6 +1,7 @@
 apply plugin: 'org.groovymc.modsdotgroovy'
 
-def forgeProjs = [ ]
+def forgeProj
+def neoProj
 def fabricProj
 
 if(project.name.containsIgnoreCase('testmod')) {
@@ -9,11 +10,11 @@ if(project.name.containsIgnoreCase('testmod')) {
     }
 
     if(findProject(':testmod-mcforge') != null) {
-        forgeProjs += project(':testmod-mcforge')
+        forgeProj = project(':testmod-mcforge')
     }
 
     if(findProject(':testmod-neoforge') != null) {
-        forgeProjs += project(':testmod-neoforge')
+        neoProj = project(':testmod-neoforge')
     }
 } else {
     if(findProject(':fabric') != null) {
@@ -21,21 +22,28 @@ if(project.name.containsIgnoreCase('testmod')) {
     }
 
     if(findProject(':mcforge') != null) {
-        forgeProjs += project(':mcforge')
+        forgeProj = project(':mcforge')
     }
 
     if(findProject(':neoforge') != null) {
-        forgeProjs += project(':neoforge')
+        neoProj = project(':neoforge')
     }
 }
 
 modsDotGroovy {
-    dslVersion = '1.5.1'
+    dslVersion = '1.5.1-apex'
     platform = 'multiloader'
 
     multiloader {
         common = project
-        forge = forgeProjs
+
+        if(forgeProj != null) {
+            forge = [ forgeProj ]
+        }
+
+        if(neoProj != null) {
+            neoforge = [ neoProj ]
+        }
 
         if(fabricProj != null) {
             fabric = [ fabricProj ]
@@ -54,8 +62,12 @@ architectury {
         enabledPlatforms += 'fabric'
     }
 
-    if(!forgeProjs.isEmpty()) {
+    if(forgeProj != null) {
         enabledPlatforms += 'forge'
+    }
+
+    if(neoProj != null) {
+        enabledPlatforms += 'neoforge'
     }
 
     common(enabledPlatforms)

@@ -1,0 +1,64 @@
+apply plugin: 'com.github.johnrengelman.shadow'
+
+configurations {
+    bundle {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+
+    common
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentNeoForge.extendsFrom common
+}
+
+architectury {
+    platformSetupLoomIde()
+    neoForge()
+}
+
+repositories {
+    maven {
+        url 'https://maven.neoforged.net/releases'
+        content {
+            includeGroupByRegex 'net\\.neoforged.*'
+        }
+    }
+}
+
+dependencies {
+    if(rootProject.hasProperty('NEOFORGE_DEV_VERSION')) {
+        neoForge "net.neoforged:neoforge:${NEOFORGE_DEV_VERSION}"
+    } else {
+        neoForge "net.neoforged:neoforge:${NEOFORGE_VERSION}"
+    }
+
+    annotationProcessor "org.spongepowered:mixin:${MIXIN_VERSION}:processor"
+
+    common(project(path: ':common', configuration: 'namedElements')) { transitive false }
+}
+
+jar {
+    archiveClassifier = 'dev-slim'
+}
+
+shadowJar {
+    exclude 'architectury.common.json'
+    archiveClassifier = 'dev-shadow'
+    configurations = [ project.configurations.bundle ]
+}
+
+remapJar {
+    dependsOn shadowJar
+    inputFile.set shadowJar.archiveFile
+
+    if(ACCESS_WIDENER_FILE.exists()) {
+        atAccessWideners.add ACCESS_WIDENER_FILE.name
+    }
+}
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
+    }
+}

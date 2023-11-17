@@ -1,0 +1,47 @@
+apply from: rootProject.file('scripts/neoforge.gradle')
+
+loom {
+    runs {
+        client {
+            client()
+            ideConfigGenerated true
+
+            // Some of these may require JBR
+            vmArg '-XX:+AllowEnhancedClassRedefinition'
+            vmArg '-XX:+IgnoreUnrecognizedVMOptions'
+            vmArg '-XX:+AllowRedefinitionToAddDeleteMethods'
+
+            // Does not work on forge
+            /*afterEvaluate {
+                vmArg "-javaagent:${ configurations.compileClasspath.find { it.name.contains("sponge-mixin") } }"
+            }*/
+        }
+
+        server {
+            server()
+            ideConfigGenerated true
+
+            // Requires JBR
+            vmArg '-XX:+AllowEnhancedClassRedefinition'
+            vmArg '-XX:+IgnoreUnrecognizedVMOptions'
+            vmArg '-XX:+AllowRedefinitionToAddDeleteMethods'
+
+            // Does not work on forge
+            /*afterEvaluate {
+                vmArg "-javaagent:${ configurations.compileClasspath.find { it.name.contains("sponge-mixin") } }"
+            }*/
+        }
+    }
+
+    mods {
+        main {
+            sourceSet project(':common').sourceSets.main
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+dependencies {
+    bundle(project(path: ':common', configuration: 'transformProductionNeoForge')) { transitive false }
+    // include "net.covers1624:Quack:${QUACK_VERSION}"
+}
