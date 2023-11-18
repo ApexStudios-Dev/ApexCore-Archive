@@ -1,8 +1,10 @@
 package dev.apexstudios.apexcore.common.registry.builder;
 
+import dev.apexstudios.apexcore.common.loader.Platform;
 import dev.apexstudios.apexcore.common.registry.AbstractRegister;
 import dev.apexstudios.apexcore.common.registry.holder.DeferredBlock;
 import dev.apexstudios.apexcore.common.util.OptionalLike;
+import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -20,6 +22,7 @@ public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Bloc
     private final Function<BlockBehaviour.Properties, T> blockFactory;
     private OptionalLike<BlockBehaviour.Properties> initialProperties = BlockBehaviour.Properties::of;
     private Function<BlockBehaviour.Properties, BlockBehaviour.Properties> propertiesModifier = Function.identity();
+    private OptionalLike<OptionalLike<BlockColor>> colorHandler = () -> null;
 
     @ApiStatus.Internal
     public BlockBuilder(O owner, P parent, String valueName, BuilderHelper helper, Function<BlockBehaviour.Properties, T> blockFactory)
@@ -27,6 +30,12 @@ public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Bloc
         super(owner, parent, Registries.BLOCK, valueName, DeferredBlock::createBlock, helper);
 
         this.blockFactory = blockFactory;
+    }
+
+    public BlockBuilder<O, P, T> color(OptionalLike<OptionalLike<BlockColor>> colorHandler)
+    {
+        this.colorHandler = OptionalLike.of(colorHandler);
+        return this;
     }
 
     public BlockBuilder<O, P, T> initialProperties(Supplier<BlockBehaviour.Properties> initialProperties)
@@ -65,5 +74,11 @@ public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Bloc
     protected T createValue()
     {
         return blockFactory.apply(propertiesModifier.apply(initialProperties.get()));
+    }
+
+    @Override
+    protected void onRegister(T value)
+    {
+        Platform.get().registerColorHandler(getOwnerId(), value, colorHandler);
     }
 }

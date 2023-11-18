@@ -5,10 +5,16 @@ import dev.apexstudios.apexcore.common.loader.PhysicalSide;
 import dev.apexstudios.apexcore.common.loader.Platform;
 import dev.apexstudios.apexcore.common.registry.AbstractRegister;
 import dev.apexstudios.apexcore.common.registry.RegistrationHelper;
+import dev.apexstudios.apexcore.common.util.OptionalLike;
+import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.data.loading.DatagenModLoader;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
@@ -62,5 +68,17 @@ public final class NeoForgePlatform implements Platform
         });
 
         ModEvents.addListener(register.getOwnerId(), EventPriority.LOW, RegisterEvent.class, event -> register.onRegisterLate(event.getRegistryKey()));
+    }
+
+    @Override
+    public void registerColorHandler(String ownerId, ItemLike item, OptionalLike<OptionalLike<ItemColor>> colorHandler)
+    {
+        PhysicalSide.CLIENT.runWhenOn(() -> () -> ModEvents.addListener(ownerId, RegisterColorHandlersEvent.Item.class, event -> colorHandler.ifPresent(c -> c.ifPresent(handler -> event.register(handler, item)))));
+    }
+
+    @Override
+    public void registerColorHandler(String ownerId, Block block, OptionalLike<OptionalLike<BlockColor>> colorHandler)
+    {
+        PhysicalSide.CLIENT.runWhenOn(() -> () -> ModEvents.addListener(ownerId, RegisterColorHandlersEvent.Block.class, event -> colorHandler.ifPresent(c -> c.ifPresent(handler -> event.register(handler, block)))));
     }
 }
