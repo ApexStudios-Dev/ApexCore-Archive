@@ -32,12 +32,12 @@ afterEvaluate {
     tasks.register('collectJars', Copy) {
         def tasks = [ ]
 
-//        subprojects.each {
-//            if(!it.name.containsIgnoreCase('testmod')) {
-//                tasks += it.tasks.named('remapJar')
-//                tasks += it.tasks.named('remapSourcesJar')
-//            }
-//        }
+        subprojects.each {
+            if(!it.name.containsIgnoreCase('testmod')) {
+                tasks += it.tasks.named('remapJar')
+                tasks += it.tasks.named('remapSourcesJar')
+            }
+        }
 
         dependsOn tasks
         from tasks
