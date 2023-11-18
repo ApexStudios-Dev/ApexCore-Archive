@@ -1,12 +1,8 @@
 package dev.apexstudios.apexcore.fabric.loader;
 
 import com.google.common.collect.Maps;
-import dev.apexstudios.apexcore.common.loader.ApexBootstrapper;
 import dev.apexstudios.apexcore.common.loader.Mod;
 import dev.apexstudios.apexcore.common.loader.ModLoader;
-import dev.apexstudios.apexcore.common.loader.PhysicalSide;
-import dev.apexstudios.apexcore.common.util.Services;
-import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.impl.FabricLoaderImpl;
 
@@ -15,20 +11,13 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-public final class FabricModLoader implements ModLoader, Services.BootStrapped
+final class FabricModLoader implements ModLoader
 {
-    private final ApexBootstrapper bootstrapper = new FabricApexBootstrapper();
     private final Map<String, Mod> mods = Maps.newHashMap();
     private final Set<String> modIdView = Collections.unmodifiableSet(mods.keySet());
     private final Collection<Mod> modView = Collections.unmodifiableCollection(mods.values());
-    private final PhysicalSide physicalSide = switch(FabricLoader.getInstance().getEnvironmentType())
-    {
-        case CLIENT -> PhysicalSide.CLIENT;
-        case SERVER -> PhysicalSide.DEDICATED_SERVER;
-    };
 
-    @Override
-    public void bootstrap()
+    FabricModLoader()
     {
         FabricLoader.getInstance().getAllMods().forEach(mod -> mods.put(mod.getMetadata().getId(), new FabricMod(mod)));
     }
@@ -58,24 +47,6 @@ public final class FabricModLoader implements ModLoader, Services.BootStrapped
     }
 
     @Override
-    public PhysicalSide physicalSide()
-    {
-        return physicalSide;
-    }
-
-    @Override
-    public boolean runningDataGen()
-    {
-        return FabricDataGenHelper.ENABLED;
-    }
-
-    @Override
-    public boolean isProduction()
-    {
-        return FabricLoader.getInstance().isDevelopmentEnvironment();
-    }
-
-    @Override
     public boolean isNeo()
     {
         return false;
@@ -94,32 +65,26 @@ public final class FabricModLoader implements ModLoader, Services.BootStrapped
     }
 
     @Override
-    public boolean isModLoaded(String id)
+    public boolean isLoaded(String id)
     {
         return mods.containsKey(id);
     }
 
     @Override
-    public Mod getMod(String id)
+    public Mod get(String id)
     {
         return mods.get(id);
     }
 
     @Override
-    public Set<String> getLoadedModIds()
+    public Set<String> getLoadedIds()
     {
         return modIdView;
     }
 
     @Override
-    public Collection<Mod> getLoadedMods()
+    public Collection<Mod> getLoaded()
     {
         return modView;
-    }
-
-    @Override
-    public ApexBootstrapper bootstrapper()
-    {
-        return bootstrapper;
     }
 }

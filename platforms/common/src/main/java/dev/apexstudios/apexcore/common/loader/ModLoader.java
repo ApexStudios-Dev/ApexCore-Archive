@@ -1,10 +1,7 @@
 package dev.apexstudios.apexcore.common.loader;
 
 import dev.apexstudios.apexcore.common.util.OptionalLike;
-import dev.apexstudios.apexcore.common.util.Services;
 import net.covers1624.quack.util.SneakyUtils;
-import net.minecraft.SharedConstants;
-import net.minecraft.server.packs.PackType;
 
 import java.util.Collection;
 import java.util.Set;
@@ -12,41 +9,11 @@ import java.util.function.Supplier;
 
 public interface ModLoader
 {
-    ModLoader INSTANCE = Services.singleton(ModLoader.class);
-
     String id();
 
     String displayName();
 
     String version();
-
-    PhysicalSide physicalSide();
-
-    default String gameVersion()
-    {
-        return SharedConstants.VERSION_STRING;
-    }
-
-    default int resourceVersion(PackType packType)
-    {
-        return switch(packType)
-        {
-            case CLIENT_RESOURCES -> SharedConstants.RESOURCE_PACK_FORMAT;
-            case SERVER_DATA -> SharedConstants.DATA_PACK_FORMAT;
-        };
-    }
-
-    default boolean isSnapshot()
-    {
-        return SharedConstants.SNAPSHOT;
-    }
-
-    default boolean isProduction()
-    {
-        return !SharedConstants.IS_RUNNING_IN_IDE;
-    }
-
-    boolean runningDataGen();
 
     boolean isNeo();
 
@@ -54,33 +21,31 @@ public interface ModLoader
 
     boolean isFabric();
 
-    boolean isModLoaded(String id);
+    boolean isLoaded(String id);
 
-    Mod getMod(String id);
+    Mod get(String id);
 
-    Set<String> getLoadedModIds();
+    Set<String> getLoadedIds();
 
-    Collection<Mod> getLoadedMods();
+    Collection<Mod> getLoaded();
 
-    ApexBootstrapper bootstrapper();
-
-    default <T> OptionalLike<T> callIfLoaded(String id, Supplier<SneakyUtils.ThrowingSupplier<T, Throwable>> toCall)
+    static <T> OptionalLike<T> callIfLoaded(String id, Supplier<SneakyUtils.ThrowingSupplier<T, Throwable>> toCall)
     {
-        if(isModLoaded(id))
+        if(get().isLoaded(id))
             return () -> SneakyUtils.sneaky(toCall.get());
 
         return OptionalLike.empty();
     }
 
-    default void runIfLoaded(String id, Supplier<SneakyUtils.ThrowingRunnable<Throwable>> toRun)
+    static void runIfLoaded(String id, Supplier<SneakyUtils.ThrowingRunnable<Throwable>> toRun)
     {
-        if(isModLoaded(id))
+        if(get().isLoaded(id))
             SneakyUtils.sneaky(toRun.get());
     }
 
     static <T> OptionalLike<T> callIfNeo(Supplier<SneakyUtils.ThrowingSupplier<T, Throwable>> toCall)
     {
-        if(INSTANCE.isNeo())
+        if(get().isNeo())
             return () -> SneakyUtils.sneaky(toCall.get());
 
         return OptionalLike.empty();
@@ -88,7 +53,7 @@ public interface ModLoader
 
     static <T> OptionalLike<T> callIfForge(Supplier<SneakyUtils.ThrowingSupplier<T, Throwable>> toCall)
     {
-        if(INSTANCE.isForge())
+        if(get().isForge())
             return () -> SneakyUtils.sneaky(toCall.get());
 
         return OptionalLike.empty();
@@ -96,7 +61,7 @@ public interface ModLoader
 
     static <T> OptionalLike<T> callIfFabric(Supplier<SneakyUtils.ThrowingSupplier<T, Throwable>> toCall)
     {
-        if(INSTANCE.isFabric())
+        if(get().isFabric())
             return () -> SneakyUtils.sneaky(toCall.get());
 
         return OptionalLike.empty();
@@ -104,19 +69,24 @@ public interface ModLoader
 
     static void runIfNeo(Supplier<SneakyUtils.ThrowingRunnable<Throwable>> toRun)
     {
-        if(INSTANCE.isNeo())
+        if(get().isNeo())
             SneakyUtils.sneaky(toRun.get());
     }
 
     static void runIfForge(Supplier<SneakyUtils.ThrowingRunnable<Throwable>> toRun)
     {
-        if(INSTANCE.isForge())
+        if(get().isForge())
             SneakyUtils.sneaky(toRun.get());
     }
 
     static void runIfFabric(Supplier<SneakyUtils.ThrowingRunnable<Throwable>> toRun)
     {
-        if(INSTANCE.isFabric())
+        if(get().isFabric())
             SneakyUtils.sneaky(toRun.get());
+    }
+
+    static ModLoader get()
+    {
+        return Platform.get().modLoader();
     }
 }

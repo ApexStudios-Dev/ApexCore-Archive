@@ -53,6 +53,6 @@ public enum PhysicalSide
 
     public static PhysicalSide current()
     {
-        return ModLoader.INSTANCE.physicalSide();
+        return Platform.get().physicalSide();
     }
 }

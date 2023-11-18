@@ -1,15 +1,50 @@
 package dev.apexstudios.apexcore.mcforge.loader;
 
-import dev.apexstudios.apexcore.common.loader.ApexBootstrapper;
+import dev.apexstudios.apexcore.common.loader.ModLoader;
+import dev.apexstudios.apexcore.common.loader.PhysicalSide;
+import dev.apexstudios.apexcore.common.loader.Platform;
 import dev.apexstudios.apexcore.common.registry.AbstractRegister;
 import dev.apexstudios.apexcore.common.registry.RegistrationHelper;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraftforge.data.loading.DatagenModLoader;
 import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.RegisterEvent;
 
-final class McForgeApexBootstrapper implements ApexBootstrapper
+public final class McForgePlatform implements Platform
 {
+    private final PhysicalSide physicalSide = switch(FMLEnvironment.dist)
+    {
+        case CLIENT -> PhysicalSide.CLIENT;
+        case DEDICATED_SERVER -> PhysicalSide.DEDICATED_SERVER;
+    };
+    private final ModLoader modLoader = new McForgeModLoader();
+
+    @Override
+    public ModLoader modLoader()
+    {
+        return modLoader;
+    }
+
+    @Override
+    public PhysicalSide physicalSide()
+    {
+        return physicalSide;
+    }
+
+    @Override
+    public boolean isProduction()
+    {
+        return FMLEnvironment.production;
+    }
+
+    @Override
+    public boolean runningDataGen()
+    {
+        return DatagenModLoader.isRunningDataGen();
+    }
+
     @Override
     public void register(AbstractRegister<?> register)
     {

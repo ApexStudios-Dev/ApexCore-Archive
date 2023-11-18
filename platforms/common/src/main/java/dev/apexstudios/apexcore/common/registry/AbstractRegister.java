@@ -3,7 +3,7 @@ package dev.apexstudios.apexcore.common.registry;
 import com.google.common.collect.*;
 import com.google.errorprone.annotations.DoNotCall;
 import dev.apexstudios.apexcore.common.ApexCore;
-import dev.apexstudios.apexcore.common.loader.ModLoader;
+import dev.apexstudios.apexcore.common.loader.Platform;
 import dev.apexstudios.apexcore.common.registry.builder.AbstractBuilder;
 import dev.apexstudios.apexcore.common.registry.builder.BuilderHelper;
 import dev.apexstudios.apexcore.common.registry.builder.ItemBuilder;
@@ -54,7 +54,7 @@ public class AbstractRegister<O extends AbstractRegister<O>>
 
     public final O skipErrors(boolean skipErrors)
     {
-        if(skipErrors && ModLoader.INSTANCE.isProduction())
+        if(skipErrors && Platform.get().isProduction())
             ApexCore.LOGGER.error("Ignoring skipErrors(true) as this is not a development environment!");
         else
             this.skipErrors = skipErrors;
@@ -178,7 +178,7 @@ public class AbstractRegister<O extends AbstractRegister<O>>
 
     public void register()
     {
-        ModLoader.INSTANCE.bootstrapper().register(this);
+        Platform.get().register(this);
     }
 
     private <T, R extends T, H extends DeferredHolder<T, R>> H register(ResourceKey<? extends Registry<T>> registryType, Supplier<H> holderFactory, Supplier<R> valueFactory)
@@ -218,7 +218,7 @@ public class AbstractRegister<O extends AbstractRegister<O>>
             registerListeners.asMap().forEach((k, v) -> ApexCore.LOGGER.warn(MARKER, "Found {} unused register callback(s) for entry {} [{}]. Was the entry ever registered?", v.size(), k.getLeft(), k.getRight().location()));
             registerListeners.clear();
 
-            if(!ModLoader.INSTANCE.isProduction())
+            if(!Platform.get().isProduction())
                 throw new IllegalStateException("Found unused register callbacks, see logs");
 
             return;
