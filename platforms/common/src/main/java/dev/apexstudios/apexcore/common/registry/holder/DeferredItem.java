@@ -1,6 +1,7 @@
 package dev.apexstudios.apexcore.common.registry.holder;
 
 import dev.apexstudios.apexcore.common.registry.DeferredHolder;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -56,5 +57,10 @@ public class DeferredItem<T extends Item> extends DeferredHolder<Item, T> implem
     public static <T extends Item> DeferredItem<T> createItem(ResourceKey<Item> valueKey)
     {
         return new DeferredItem<>(valueKey);
+    }
+
+    public static <T extends Item> DeferredItem<T> cast(Holder<T> holder)
+    {
+        return DeferredHolder.cast(DeferredItem.class, holder);
     }
 }
