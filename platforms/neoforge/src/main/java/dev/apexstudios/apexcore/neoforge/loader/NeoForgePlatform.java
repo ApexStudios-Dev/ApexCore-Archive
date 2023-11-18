@@ -8,11 +8,15 @@ import dev.apexstudios.apexcore.common.registry.RegistrationHelper;
 import dev.apexstudios.apexcore.common.util.OptionalLike;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.bus.api.EventPriority;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.data.loading.DatagenModLoader;
@@ -80,5 +84,17 @@ public final class NeoForgePlatform implements Platform
     public void registerColorHandler(String ownerId, Block block, OptionalLike<OptionalLike<BlockColor>> colorHandler)
     {
         PhysicalSide.CLIENT.runWhenOn(() -> () -> ModEvents.addListener(ownerId, RegisterColorHandlersEvent.Block.class, event -> colorHandler.ifPresent(c -> c.ifPresent(handler -> event.register(handler, block)))));
+    }
+
+    @Override
+    public void registerRenderType(String ownerId, Block block, OptionalLike<OptionalLike<RenderType>> renderType)
+    {
+        PhysicalSide.CLIENT.runWhenOn(() -> () -> ModEvents.addListener(ownerId, FMLClientSetupEvent.class, event -> renderType.ifPresent(r -> r.ifPresent(rt -> ItemBlockRenderTypes.setRenderLayer(block, rt)))));
+    }
+
+    @Override
+    public void registerRenderType(String ownerId, Fluid fluid, OptionalLike<OptionalLike<RenderType>> renderType)
+    {
+        PhysicalSide.CLIENT.runWhenOn(() -> () -> ModEvents.addListener(ownerId, FMLClientSetupEvent.class, event -> renderType.ifPresent(r -> r.ifPresent(rt -> ItemBlockRenderTypes.setRenderLayer(fluid, rt)))));
     }
 }

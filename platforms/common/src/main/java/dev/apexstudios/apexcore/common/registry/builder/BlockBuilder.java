@@ -5,6 +5,7 @@ import dev.apexstudios.apexcore.common.registry.AbstractRegister;
 import dev.apexstudios.apexcore.common.registry.holder.DeferredBlock;
 import dev.apexstudios.apexcore.common.util.OptionalLike;
 import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -22,6 +23,7 @@ public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Bloc
     private OptionalLike<BlockBehaviour.Properties> initialProperties = () -> null;
     private Function<BlockBehaviour.Properties, BlockBehaviour.Properties> propertiesModifier = Function.identity();
     private OptionalLike<OptionalLike<BlockColor>> colorHandler = () -> null;
+    private OptionalLike<OptionalLike<RenderType>> renderType = () -> null;
 
     @ApiStatus.Internal
     public BlockBuilder(O owner, P parent, String valueName, BuilderHelper helper, Function<BlockBehaviour.Properties, T> blockFactory)
@@ -34,6 +36,12 @@ public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Bloc
     public BlockBuilder<O, P, T> color(OptionalLike<OptionalLike<BlockColor>> colorHandler)
     {
         this.colorHandler = OptionalLike.of(colorHandler);
+        return this;
+    }
+
+    public BlockBuilder<O, P, T> renderType(OptionalLike<OptionalLike<RenderType>> renderType)
+    {
+        this.renderType = renderType;
         return this;
     }
 
@@ -78,6 +86,10 @@ public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Bloc
     @Override
     protected void onRegister(T value)
     {
-        Platform.get().registerColorHandler(getOwnerId(), value, colorHandler);
+        var platform = Platform.get();
+        var ownerId = getOwnerId();
+
+        platform.registerColorHandler(ownerId, value, colorHandler);
+        platform.registerRenderType(ownerId, value, renderType);
     }
 }

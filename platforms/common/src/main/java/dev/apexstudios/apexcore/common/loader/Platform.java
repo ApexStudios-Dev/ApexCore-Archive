@@ -6,9 +6,11 @@ import dev.apexstudios.apexcore.common.util.OptionalLike;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 
 public interface Platform
 {
@@ -47,6 +49,10 @@ public interface Platform
     void registerColorHandler(String ownerId, ItemLike item, OptionalLike<OptionalLike<ItemColor>> colorHandler);
 
     void registerColorHandler(String ownerId, Block block, OptionalLike<OptionalLike<BlockColor>> colorHandler);
+
+    void registerRenderType(String ownerId, Block block, OptionalLike<OptionalLike<RenderType>> renderType);
+
+    void registerRenderType(String ownerId, Fluid fluid, OptionalLike<OptionalLike<RenderType>> renderType);
 
     static Platform get()
     {
