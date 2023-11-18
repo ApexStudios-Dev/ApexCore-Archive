@@ -7,6 +7,7 @@ import dev.apexstudios.apexcore.common.loader.Platform;
 import dev.apexstudios.apexcore.common.registry.builder.AbstractBuilder;
 import dev.apexstudios.apexcore.common.registry.builder.BuilderHelper;
 import dev.apexstudios.apexcore.common.registry.builder.ItemBuilder;
+import dev.apexstudios.apexcore.common.registry.builder.NoConfigBuilder;
 import dev.apexstudios.apexcore.common.util.OptionalLike;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -129,6 +130,66 @@ public class AbstractRegister<O extends AbstractRegister<O>>
     protected final <P, T, R extends T, H extends DeferredHolder<T, R>, B extends AbstractBuilder<O, P, T, R, H, B>> B entry(Function<BuilderHelper, B> builderFactory)
     {
         return builderFactory.apply(this::register);
+    }
+
+    public final <P, T, R extends T, H extends DeferredHolder<T, R>> NoConfigBuilder<O, P, T, R, H> noConfig(P parent, String valueName, ResourceKey<? extends Registry<T>> registryType, Function<ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
+    {
+        return entry(helper -> new NoConfigBuilder<>(self(), parent, registryType, valueName, holderFactory, helper, valueFactory));
+    }
+
+    public final <P, T, R extends T> NoConfigBuilder<O, P, T, R, DeferredHolder<T, R>> noConfig(P parent, String valueName, ResourceKey<? extends Registry<T>> registryType, Supplier<R> valueFactory)
+    {
+        return noConfig(parent, valueName, registryType, DeferredHolder::create, valueFactory);
+    }
+
+    public final <P, T, R extends T, H extends DeferredHolder<T, R>> NoConfigBuilder<O, P, T, R, H> noConfig(P parent, ResourceKey<? extends Registry<T>> registryType, Function<ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
+    {
+        return noConfig(parent, currentName(), registryType, holderFactory, valueFactory);
+    }
+
+    public final <P, T, R extends T> NoConfigBuilder<O, P, T, R, DeferredHolder<T, R>> noConfig(P parent, ResourceKey<? extends Registry<T>> registryType, Supplier<R> valueFactory)
+    {
+        return noConfig(parent, currentName(), registryType, DeferredHolder::create, valueFactory);
+    }
+
+    public final <T, R extends T, H extends DeferredHolder<T, R>> NoConfigBuilder<O, O, T, R, H> noConfig(String valueName, ResourceKey<? extends Registry<T>> registryType, Function<ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
+    {
+        return noConfig(self(), valueName, registryType, holderFactory, valueFactory);
+    }
+
+    public final <T, R extends T> NoConfigBuilder<O, O, T, R, DeferredHolder<T, R>> noConfig(String valueName, ResourceKey<? extends Registry<T>> registryType, Supplier<R> valueFactory)
+    {
+        return noConfig(self(), valueName, registryType, DeferredHolder::create, valueFactory);
+    }
+
+    public final <T, R extends T, H extends DeferredHolder<T, R>> NoConfigBuilder<O, O, T, R, H> noConfig(ResourceKey<? extends Registry<T>> registryType, Function<ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
+    {
+        return noConfig(self(), currentName(), registryType, holderFactory, valueFactory);
+    }
+
+    public final <T, R extends T> NoConfigBuilder<O, O, T, R, DeferredHolder<T, R>> noConfig(ResourceKey<? extends Registry<T>> registryType, Supplier<R> valueFactory)
+    {
+        return noConfig(self(), currentName(), registryType, DeferredHolder::create, valueFactory);
+    }
+
+    public final <T, R extends T, H extends DeferredHolder<T, R>> H simple(String valueName, ResourceKey<? extends Registry<T>> registryType, Function<ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
+    {
+        return noConfig(valueName, registryType, holderFactory, valueFactory).register();
+    }
+
+    public final <T, R extends T> DeferredHolder<T, R> simple(String valueName, ResourceKey<? extends Registry<T>> registryType, Supplier<R> valueFactory)
+    {
+        return simple(valueName, registryType, DeferredHolder::create, valueFactory);
+    }
+
+    public final <T, R extends T> DeferredHolder<T, R> simple(ResourceKey<? extends Registry<T>> registryType, Supplier<R> valueFactory)
+    {
+        return simple(currentName(), registryType, DeferredHolder::create, valueFactory);
+    }
+
+    public final <T, R extends T, H extends DeferredHolder<T, R>> H simple(ResourceKey<? extends Registry<T>> registryType, Function<ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
+    {
+        return simple(currentName(), registryType, holderFactory, valueFactory);
     }
 
     public final <P, T extends Item> ItemBuilder<O, P, T> item(P parent, String itemName, Function<Item.Properties, T> itemFactory)
