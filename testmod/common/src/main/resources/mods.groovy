@@ -3,16 +3,9 @@ ModsDotGroovy.make {
 
     license = props.MOD_LICENSE
 
-    onForgeAndNeo {
-        modLoader = 'javafml'
-    }
-
     onForge {
-        loaderVersion = "[${props.MCFORGE_LOADER_VERSION},)"
-    }
-
-    onNeoForge {
-        loaderVersion = "[${props.NEOFORGE_LOADER_VERSION},)"
+        modLoader = 'javafml'
+        loaderVersion = "[${props['loom.platform'] == 'neoforge' ? props.NEOFORGE_LOADER_VERSION : props.MCFORGE_LOADER_VERSION},)"
     }
 
     onFabric {
@@ -49,34 +42,21 @@ ModsDotGroovy.make {
             }
         }
 
-        onForgeAndNeo {
-            credits = 'ApexStudios'
-        }
-
         onForge {
+            credits = 'ApexStudios'
+
             dependencies {
                 minecraft {
                     versionRange = props.MINECRAFT_FORGE_VERSION_RANGE
                 }
 
                 forge {
-                    versionRange = props.MCFORGE_VERSION_RANGE
-                }
-
-                mod(props.MOD_ID) {
-                    versionRange = "[${this.version},)"
-                }
-            }
-        }
-
-        onNeoForge {
-            dependencies {
-                minecraft {
-                    versionRange = props.MINECRAFT_FORGE_VERSION_RANGE
-                }
-
-                neoforge {
-                    versionRange = props.NEOFORGE_VERSION_RANGE
+                    if(props['loom.platform'] == 'neoforge') {
+                        versionRange = props.NEOFORGE_VERSION_RANGE
+                        modId = 'neoforge'
+                    } else {
+                        versionRange = props.MCFORGE_VERSION_RANGE
+                    }
                 }
 
                 mod(props.MOD_ID) {

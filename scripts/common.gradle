@@ -31,19 +31,30 @@ if(project.name.containsIgnoreCase('testmod')) {
 }
 
 modsDotGroovy {
-    dslVersion = '1.5.1-apex'
+    dslVersion = '1.5.1'
     platform = 'multiloader'
+
+    def forgeProjs = [ ]
+
+    if(forgeProj != null) {
+        forgeProjs += forgeProj
+    }
+
+    if(neoProj != null) {
+        forgeProjs += neoProj
+    }
 
     multiloader {
         common = project
+        forge = forgeProjs
 
-        if(forgeProj != null) {
+        /*if(forgeProj != null) {
             forge = [ forgeProj ]
         }
 
         if(neoProj != null) {
             neoforge = [ neoProj ]
-        }
+        }*/
 
         if(fabricProj != null) {
             fabric = [ fabricProj ]
