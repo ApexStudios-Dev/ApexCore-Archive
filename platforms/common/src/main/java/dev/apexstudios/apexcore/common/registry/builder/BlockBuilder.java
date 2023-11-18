@@ -14,13 +14,12 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Block> extends AbstractBuilder<O, P, Block, T, DeferredBlock<T>, BlockBuilder<O, P, T>>
 {
     private final Function<BlockBehaviour.Properties, T> blockFactory;
-    private OptionalLike<BlockBehaviour.Properties> initialProperties = BlockBehaviour.Properties::of;
+    private OptionalLike<BlockBehaviour.Properties> initialProperties = () -> null;
     private Function<BlockBehaviour.Properties, BlockBehaviour.Properties> propertiesModifier = Function.identity();
     private OptionalLike<OptionalLike<BlockColor>> colorHandler = () -> null;
 
@@ -38,15 +37,15 @@ public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Bloc
         return this;
     }
 
-    public BlockBuilder<O, P, T> initialProperties(Supplier<BlockBehaviour.Properties> initialProperties)
+    public BlockBuilder<O, P, T> initialProperties(OptionalLike<BlockBehaviour.Properties> initialProperties)
     {
-        this.initialProperties = OptionalLike.of(initialProperties);
+        this.initialProperties = initialProperties;
         return this;
     }
 
-    public BlockBuilder<O, P, T> copyPropertiesFrom(Supplier<BlockBehaviour> copyFrom)
+    public BlockBuilder<O, P, T> copyPropertiesFrom(OptionalLike<BlockBehaviour> copyFrom)
     {
-        return initialProperties(() -> BlockBehaviour.Properties.copy(copyFrom.get()));
+        return initialProperties(() -> copyFrom.map(BlockBehaviour.Properties::copy).getRaw());
     }
 
     public BlockBuilder<O, P, T> properties(UnaryOperator<BlockBehaviour.Properties> propertiesModifier)
@@ -73,7 +72,7 @@ public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Bloc
     @Override
     protected T createValue()
     {
-        return blockFactory.apply(propertiesModifier.apply(initialProperties.get()));
+        return blockFactory.apply(propertiesModifier.apply(initialProperties.orElseGet(BlockBehaviour.Properties::of)));
     }
 
     @Override
