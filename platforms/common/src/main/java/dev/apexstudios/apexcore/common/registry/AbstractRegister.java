@@ -4,15 +4,14 @@ import com.google.common.collect.*;
 import com.google.errorprone.annotations.DoNotCall;
 import dev.apexstudios.apexcore.common.ApexCore;
 import dev.apexstudios.apexcore.common.loader.Platform;
-import dev.apexstudios.apexcore.common.registry.builder.AbstractBuilder;
-import dev.apexstudios.apexcore.common.registry.builder.BuilderHelper;
-import dev.apexstudios.apexcore.common.registry.builder.ItemBuilder;
-import dev.apexstudios.apexcore.common.registry.builder.NoConfigBuilder;
+import dev.apexstudios.apexcore.common.registry.builder.*;
 import dev.apexstudios.apexcore.common.util.OptionalLike;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
@@ -230,6 +229,46 @@ public class AbstractRegister<O extends AbstractRegister<O>>
     public final ItemBuilder<O, O, Item> item()
     {
         return item(self(), currentName(), Item::new);
+    }
+
+    public final <P, T extends Block> BlockBuilder<O, P, T> block(P parent, String blockName, Function<BlockBehaviour.Properties, T> blockFactory)
+    {
+        return entry(helper -> new BlockBuilder<>(self(), parent, blockName, helper, blockFactory));
+    }
+
+    public final <P> BlockBuilder<O, P, Block> block(P parent, String blockName)
+    {
+        return block(parent, blockName, Block::new);
+    }
+
+    public final <P, T extends Block> BlockBuilder<O, P, T> block(P parent, Function<BlockBehaviour.Properties, T> blockFactory)
+    {
+        return block(parent, currentName(), blockFactory);
+    }
+
+    public final <P> BlockBuilder<O, P, Block> block(P parent)
+    {
+        return block(parent, currentName(), Block::new);
+    }
+
+    public final <T extends Block> BlockBuilder<O, O, T> block(String blockName, Function<BlockBehaviour.Properties, T> blockFactory)
+    {
+        return block(self(), blockName, blockFactory);
+    }
+
+    public final <T extends Block> BlockBuilder<O, O, T> block(Function<BlockBehaviour.Properties, T> blockFactory)
+    {
+        return block(self(), currentName(), blockFactory);
+    }
+
+    public final BlockBuilder<O, O, Block> block(String blockName)
+    {
+        return block(self(), blockName, Block::new);
+    }
+
+    public final BlockBuilder<O, O, Block> block()
+    {
+        return block(self(), currentName(), Block::new);
     }
 
     protected final O self()
