@@ -1,0 +1,8 @@
+{
+    "required": true,
+    "package": "dev.apexstudios.apexcore.common.mixin",
+    "mixins": [
+        "MixinSpawnEggItem"
+    ],
+    "minVersion": "${MIXIN_VERSION}"
+}

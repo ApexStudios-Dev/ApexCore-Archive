@@ -20,7 +20,6 @@ public abstract class AbstractBuilder<O extends AbstractRegister<O>, P, T, R ext
     protected final ResourceKey<? extends Registry<T>> registryType;
     protected final ResourceKey<T> valueKey;
     private final Supplier<H> holderFactory;
-    private final Supplier<R> safeSupplier;
     private final BuilderHelper helper;
 
     protected AbstractBuilder(O owner, P parent, ResourceKey<? extends Registry<T>> registryType, String valueName, Function<ResourceKey<T>, H> holderFactory, BuilderHelper helper)
@@ -30,9 +29,8 @@ public abstract class AbstractBuilder<O extends AbstractRegister<O>, P, T, R ext
         this.registryType = registryType;
         this.helper = helper;
 
-        valueKey = ResourceKey.create(registryType, new ResourceLocation(owner.getOwnerId(), valueName));
+        valueKey = ResourceKey.create(registryType, new ResourceLocation(owner.ownerId(), valueName));
         this.holderFactory = new LazyValue<>(() -> holderFactory.apply(valueKey));
-        safeSupplier = () -> owner.<T, R>get(registryType, valueName).value();
 
         onRegister(this::onRegister);
     }
@@ -64,12 +62,12 @@ public abstract class AbstractBuilder<O extends AbstractRegister<O>, P, T, R ext
 
     public final String getOwnerId()
     {
-        return owner.getOwnerId();
+        return owner.ownerId();
     }
 
-    public final Supplier<R> asSupplier()
+    public final H asHolder()
     {
-        return safeSupplier;
+        return holderFactory.get();
     }
 
     public final H register()

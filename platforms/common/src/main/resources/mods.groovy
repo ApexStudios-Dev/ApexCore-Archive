@@ -4,7 +4,7 @@ ModsDotGroovy.make {
     license = props.MOD_LICENSE
     issueTrackerUrl = 'https://discord.apexstudios.dev/'
     // .toString() cause does not like GString
-    // mixin = [ "${props.MOD_ID}-common.mixins.json".toString() ]
+    mixin = [ "${props.MOD_ID}-common.mixins.json".toString() ]
 
     onForge {
         modLoader = 'javafml'

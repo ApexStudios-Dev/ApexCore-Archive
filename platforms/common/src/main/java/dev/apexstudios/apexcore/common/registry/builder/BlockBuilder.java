@@ -1,6 +1,5 @@
 package dev.apexstudios.apexcore.common.registry.builder;
 
-import dev.apexstudios.apexcore.common.loader.Platform;
 import dev.apexstudios.apexcore.common.registry.AbstractRegister;
 import dev.apexstudios.apexcore.common.registry.holder.DeferredBlock;
 import dev.apexstudios.apexcore.common.util.OptionalLike;
@@ -64,7 +63,7 @@ public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Bloc
 
     public <I extends Item> ItemBuilder<O, BlockBuilder<O, P, T>, I> item(BiFunction<T, Item.Properties, I> itemFactory)
     {
-        return owner.item(this, getValueName().getPath(), properties -> itemFactory.apply(asSupplier().get(), properties));
+        return owner.item(this, getValueName().getPath(), properties -> itemFactory.apply(asHolder().value(), properties));
     }
 
     public ItemBuilder<O, BlockBuilder<O, P, T>, BlockItem> item()
@@ -86,10 +85,7 @@ public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Bloc
     @Override
     protected void onRegister(T value)
     {
-        var platform = Platform.get();
-        var ownerId = getOwnerId();
-
-        platform.registerColorHandler(ownerId, value, colorHandler);
-        platform.registerRenderType(ownerId, value, renderType);
+        owner.registerColorHandler(value, colorHandler);
+        owner.registerRenderType(value, renderType);
     }
 }

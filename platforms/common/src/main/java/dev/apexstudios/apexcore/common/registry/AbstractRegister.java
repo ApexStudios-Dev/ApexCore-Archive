@@ -4,14 +4,26 @@ import com.google.common.collect.*;
 import com.google.errorprone.annotations.DoNotCall;
 import dev.apexstudios.apexcore.common.ApexCore;
 import dev.apexstudios.apexcore.common.loader.Platform;
+import dev.apexstudios.apexcore.common.loader.RegistryHelper;
 import dev.apexstudios.apexcore.common.registry.builder.*;
 import dev.apexstudios.apexcore.common.util.OptionalLike;
+import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.Fluid;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
@@ -25,7 +37,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class AbstractRegister<O extends AbstractRegister<O>>
+public class AbstractRegister<O extends AbstractRegister<O>> implements RegistryHelper
 {
     public static final Marker MARKER = MarkerManager.getMarker("Registries");
 
@@ -42,7 +54,8 @@ public class AbstractRegister<O extends AbstractRegister<O>>
         this.ownerId = ownerId;
     }
 
-    public final String getOwnerId()
+    @Override
+    public final String ownerId()
     {
         return ownerId;
     }
@@ -271,14 +284,84 @@ public class AbstractRegister<O extends AbstractRegister<O>>
         return block(self(), currentName(), Block::new);
     }
 
+    public final <P, T extends Entity> EntityBuilder<O, P, T> entity(P parent, String entityName, MobCategory category, EntityType.EntityFactory<T> entityFactory)
+    {
+        return entry(helper -> new EntityBuilder<>(self(), parent, entityName, helper, category, entityFactory));
+    }
+
+    public final <P, T extends Entity> EntityBuilder<O, P, T> entity(P parent, MobCategory category, EntityType.EntityFactory<T> entityFactory)
+    {
+        return entity(parent, currentName(), category, entityFactory);
+    }
+
+    public final <T extends Entity> EntityBuilder<O, O, T> entity(String entityName, MobCategory category, EntityType.EntityFactory<T> entityFactory)
+    {
+        return entity(self(), entityName, category, entityFactory);
+    }
+
+    public final <T extends Entity> EntityBuilder<O, O, T> entity(MobCategory category, EntityType.EntityFactory<T> entityFactory)
+    {
+        return entity(self(), currentName(), category, entityFactory);
+    }
+
     protected final O self()
     {
         return (O) this;
     }
 
-    public void register()
+    public final void register()
     {
-        Platform.get().register(this);
+        RegistryHelper.get(ownerId).register(this);
+    }
+
+    @Deprecated
+    @DoNotCall
+    @Override
+    public final void register(AbstractRegister<?> register)
+    {
+        throw new IllegalStateException("It is illegal to call AbstractRegister.register(AbstractRegister<?>)");
+    }
+
+    @Override
+    public final void registerColorHandler(ItemLike item, OptionalLike<OptionalLike<ItemColor>> colorHandler)
+    {
+        RegistryHelper.get(ownerId).registerColorHandler(item, colorHandler);
+    }
+
+    @Override
+    public final void registerColorHandler(Block block, OptionalLike<OptionalLike<BlockColor>> colorHandler)
+    {
+        RegistryHelper.get(ownerId).registerColorHandler(block, colorHandler);
+    }
+
+    @Override
+    public final void registerRenderType(Block block, OptionalLike<OptionalLike<RenderType>> renderType)
+    {
+        RegistryHelper.get(ownerId).registerRenderType(block, renderType);
+    }
+
+    @Override
+    public final void registerRenderType(Fluid fluid, OptionalLike<OptionalLike<RenderType>> renderType)
+    {
+        RegistryHelper.get(ownerId).registerRenderType(fluid, renderType);
+    }
+
+    @Override
+    public final <T extends Entity> void registerEntityAttributes(EntityType<T> entityType, OptionalLike<AttributeSupplier.Builder> attributes)
+    {
+        RegistryHelper.get(ownerId).registerEntityAttributes(entityType, attributes);
+    }
+
+    @Override
+    public final <T extends Entity> void registerEntityRenderer(EntityType<T> entityType, OptionalLike<OptionalLike<EntityRendererProvider<T>>> rendererProvider)
+    {
+        RegistryHelper.get(ownerId).registerEntityRenderer(entityType, rendererProvider);
+    }
+
+    @Override
+    public final void registerItemDispenseBehavior(ItemLike item, OptionalLike<DispenseItemBehavior> dispenseBehavior)
+    {
+        RegistryHelper.get(ownerId).registerItemDispenseBehavior(item, dispenseBehavior);
     }
 
     private <T, R extends T, H extends DeferredHolder<T, R>> H register(ResourceKey<? extends Registry<T>> registryType, Supplier<H> holderFactory, Supplier<R> valueFactory)
