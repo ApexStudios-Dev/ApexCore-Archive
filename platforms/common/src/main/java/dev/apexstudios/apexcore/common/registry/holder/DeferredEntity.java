@@ -2,7 +2,6 @@ package dev.apexstudios.apexcore.common.registry.holder;
 
 import dev.apexstudios.apexcore.common.registry.DeferredHolder;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
@@ -69,10 +68,5 @@ public class DeferredEntity<T extends Entity> extends DeferredHolder<EntityType<
     public static <T extends Entity> DeferredEntity<T> createEntity(ResourceKey<EntityType<?>> valueKey)
     {
         return new DeferredEntity<>(valueKey);
-    }
-
-    public static <T extends Entity> DeferredEntity<T> cast(Holder<T> holder)
-    {
-        return DeferredHolder.cast(DeferredEntity.class, holder);
     }
 }

@@ -200,12 +200,4 @@ public class DeferredHolder<T, R extends T> implements Holder<T>, OptionalLike<R
     {
         return new DeferredHolder<>(valueKey);
     }
-
-    public static <E extends DeferredHolder<?, ?>> E cast(Class<? super E> clazz, Holder<?> holder)
-    {
-        if(clazz.isInstance(holder))
-            return (E) holder;
-
-        return holder.unwrapKey().map(key -> (E) create(key)).orElseThrow(() -> new IllegalArgumentException("Could not convert Holder expecting: %s, found %s".formatted(clazz, holder.getClass())));
-    }
 }
