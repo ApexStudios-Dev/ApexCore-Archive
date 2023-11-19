@@ -31,9 +31,9 @@ public final class EntityTypeBuilder<O extends AbstractRegister<O>, P, T extends
     private OptionalLike<SpawnPlacements.SpawnPredicate<T>> spawnPredicate = () -> null;
 
     @ApiStatus.Internal
-    public EntityTypeBuilder(O owner, P parent, String valueName, BuilderHelper helper, MobCategory category, EntityType.EntityFactory<T> entityFactory)
+    public EntityTypeBuilder(O owner, P parent, String entityName, BuilderHelper helper, MobCategory category, EntityType.EntityFactory<T> entityFactory)
     {
-        super(owner, parent, Registries.ENTITY_TYPE, valueName, DeferredEntityType::createEntity, helper);
+        super(owner, parent, Registries.ENTITY_TYPE, entityName, DeferredEntityType::createEntity, helper);
 
         this.category = category;
         this.entityFactory = entityFactory;
@@ -77,7 +77,7 @@ public final class EntityTypeBuilder<O extends AbstractRegister<O>, P, T extends
 
     public <I extends DeferredSpawnEggItem> ItemBuilder<O, EntityTypeBuilder<O, P, T>, I> spawnEgg(DeferredSpawnEggItem.Factory<I> itemFactory, int backgroundColor, int highlightColor)
     {
-        return owner.item(this, getValueName().getPath(), properties -> itemFactory.create(asHolder(), backgroundColor, highlightColor, properties))
+        return owner.item(this, registrationName(), properties -> itemFactory.create(holder(), backgroundColor, highlightColor, properties))
                     .color(() -> () -> (stack, tintIndex) -> ((DeferredSpawnEggItem) stack.getItem()).getColor(tintIndex))
                     .dispenseBehavior(DeferredSpawnEggItem.DEFAULT_DISPENSE_BEHAVIOR)
                     .onRegisterAfter(Registries.ENTITY_TYPE, DeferredSpawnEggItem::injectSpawnEggEntry);
@@ -103,7 +103,7 @@ public final class EntityTypeBuilder<O extends AbstractRegister<O>, P, T extends
     {
         var builder = EntityType.Builder.of(entityFactory, category);
         builder = propertiesModifier.apply(builder);
-        return builder.build(getValueName().toString());
+        return builder.build(registryName().toString());
     }
 
     @Override

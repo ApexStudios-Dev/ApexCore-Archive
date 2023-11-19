@@ -28,9 +28,9 @@ public final class BlockEntityTypeBuilder<O extends AbstractRegister<O>, P, T ex
     private OptionalLike<OptionalLike<BlockEntityRendererProvider<T>>> renderer = () -> null;
 
     @ApiStatus.Internal
-    public BlockEntityTypeBuilder(O owner, P parent, String valueName, BuilderHelper helper, Factory<T> blockEntityFactory)
+    public BlockEntityTypeBuilder(O owner, P parent, String blockEntityName, BuilderHelper helper, Factory<T> blockEntityFactory)
     {
-        super(owner, parent, Registries.BLOCK_ENTITY_TYPE, valueName, DeferredBlockEntityType::createBlockEntityType, helper);
+        super(owner, parent, Registries.BLOCK_ENTITY_TYPE, blockEntityName, DeferredBlockEntityType::createBlockEntityType, helper);
 
         this.blockEntityFactory = blockEntityFactory;
     }
@@ -74,8 +74,8 @@ public final class BlockEntityTypeBuilder<O extends AbstractRegister<O>, P, T ex
     protected BlockEntityType<T> createValue()
     {
         var validBlocks = this.validBlocks.stream().filter(OptionalLike::isPresent).map(OptionalLike::get).toArray(Block[]::new);
-        var dfuType = Util.fetchChoiceType(References.BLOCK_ENTITY, getValueName().toString());
-        return BlockEntityType.Builder.of(blockEntityFactory.toVanilla(asHolder()), validBlocks).build(dfuType);
+        var dfuType = Util.fetchChoiceType(References.BLOCK_ENTITY, registryName().toString());
+        return BlockEntityType.Builder.of(blockEntityFactory.toVanilla(holder()), validBlocks).build(dfuType);
     }
 
     @Override

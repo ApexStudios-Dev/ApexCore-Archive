@@ -46,7 +46,7 @@ public interface TestMod
             .defaultSpawnEgg(0x00FF00, 0xFF0000)
     .register();
 
-    DeferredItem<DeferredSpawnEggItem> TEST_ENTITY_SPAWN_EGG = DeferredItem.createItem(TEST_ENTITY.getValueId());
+    DeferredItem<DeferredSpawnEggItem> TEST_ENTITY_SPAWN_EGG = DeferredItem.createItem(TEST_ENTITY.registryName());
 
     DeferredBlock<BlockWithEntity> BLOCK_WITH_ENTITY = REGISTER
             .object("block_with_entity")
@@ -56,7 +56,7 @@ public interface TestMod
             .defaultBlockEntity((blockEntityType, pos, blockState) -> new BlockEntity(blockEntityType, pos, blockState) { })
     .register();
 
-    DeferredBlockEntityType<BlockEntity> TEST_BLOCK_ENTITY = DeferredBlockEntityType.createBlockEntityType(BLOCK_WITH_ENTITY.getValueId());
+    DeferredBlockEntityType<BlockEntity> TEST_BLOCK_ENTITY = DeferredBlockEntityType.createBlockEntityType(BLOCK_WITH_ENTITY.registryName());
 
     default void bootstrap()
     {

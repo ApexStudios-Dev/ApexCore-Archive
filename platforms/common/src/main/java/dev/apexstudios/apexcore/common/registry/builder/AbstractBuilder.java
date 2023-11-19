@@ -9,8 +9,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class AbstractBuilder<O extends AbstractRegister<O>, P, T, R extends T, H extends DeferredHolder<T, R>, B extends AbstractBuilder<O, P, T, R, H, B>>
@@ -18,54 +18,59 @@ public abstract class AbstractBuilder<O extends AbstractRegister<O>, P, T, R ext
     protected final O owner;
     protected final P parent;
     protected final ResourceKey<? extends Registry<T>> registryType;
-    protected final ResourceKey<T> valueKey;
+    protected final ResourceKey<T> registryKey;
     private final Supplier<H> holderFactory;
     private final BuilderHelper helper;
 
-    protected AbstractBuilder(O owner, P parent, ResourceKey<? extends Registry<T>> registryType, String valueName, Function<ResourceKey<T>, H> holderFactory, BuilderHelper helper)
+    protected AbstractBuilder(O owner, P parent, ResourceKey<? extends Registry<T>> registryType, String registrationName, BiFunction<String, ResourceKey<T>, H> holderFactory, BuilderHelper helper)
     {
         this.owner = owner;
         this.parent = parent;
         this.registryType = registryType;
         this.helper = helper;
 
-        valueKey = ResourceKey.create(registryType, new ResourceLocation(owner.ownerId(), valueName));
-        this.holderFactory = new LazyValue<>(() -> holderFactory.apply(valueKey));
+        registryKey = ResourceKey.create(registryType, new ResourceLocation(owner.ownerId(), registrationName));
+        this.holderFactory = new LazyValue<>(() -> holderFactory.apply(owner.ownerId(), registryKey));
 
         onRegister(this::onRegister);
     }
 
-    public final O getOwner()
+    public final O owner()
     {
         return owner;
     }
 
-    public final P getParent()
+    public final P parent()
     {
         return parent;
     }
 
-    public final ResourceKey<? extends Registry<T>> getRegistryType()
+    public final ResourceKey<? extends Registry<T>> registryType()
     {
         return registryType;
     }
 
-    public final ResourceKey<T> getValueKey()
+    public final ResourceKey<T> registryKey()
     {
-        return valueKey;
+        return registryKey;
     }
 
-    public final ResourceLocation getValueName()
+    public final ResourceLocation registryName()
     {
-        return valueKey.location();
+        return registryKey.location();
     }
 
-    public final String getOwnerId()
+    public final String registrationName()
+    {
+        return registryName().getPath();
+    }
+
+    public final String ownerId()
     {
         return owner.ownerId();
     }
 
-    public final H asHolder()
+    public final H holder()
     {
         return holderFactory.get();
     }
@@ -83,7 +88,7 @@ public abstract class AbstractBuilder<O extends AbstractRegister<O>, P, T, R ext
 
     public final B onRegister(Consumer<R> listener)
     {
-        owner.addRegisterListener(registryType, getValueName().getPath(), listener);
+        owner.addRegisterListener(registryType, registryName().getPath(), listener);
         return self();
     }
 

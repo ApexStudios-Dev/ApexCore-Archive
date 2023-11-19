@@ -5,16 +5,17 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class DeferredBlock<T extends Block> extends DeferredHolder<Block, T> implements ItemLike
+public final class DeferredBlock<T extends Block> extends DeferredHolder<Block, T> implements ItemLike
 {
-    protected DeferredBlock(ResourceKey<Block> valueKey)
+    private DeferredBlock(String ownerId, ResourceKey<Block> registryKey)
     {
-        super(valueKey);
+        super(ownerId, registryKey);
     }
 
     public BlockState defaultBlockState()
@@ -24,22 +25,37 @@ public class DeferredBlock<T extends Block> extends DeferredHolder<Block, T> imp
 
     public boolean is(BlockState blockState)
     {
-        return isPresent() && blockState.is(value());
+        return map(blockState::is).orElse(false);
     }
 
     @Override
     public Item asItem()
     {
-        return value().asItem();
+        return map(Block::asItem).orElse(Items.AIR);
     }
 
-    public static <T extends Block> DeferredBlock<T> createBlock(ResourceLocation valueId)
+    public static ResourceKey<Block> createRegistryKey(ResourceLocation registryName)
     {
-        return createBlock(ResourceKey.create(Registries.BLOCK, valueId));
+        return ResourceKey.create(Registries.BLOCK, registryName);
     }
 
-    public static <T extends Block> DeferredBlock<T> createBlock(ResourceKey<Block> valueKey)
+    public static <T extends Block> DeferredBlock<T> createBlock(String ownerId, ResourceLocation registryName)
     {
-        return new DeferredBlock<>(valueKey);
+        return createBlock(ownerId, createRegistryKey(registryName));
+    }
+
+    public static <T extends Block> DeferredBlock<T> createBlock(ResourceLocation registryName)
+    {
+        return createBlock(registryName.getNamespace(), registryName);
+    }
+
+    public static <T extends Block> DeferredBlock<T> createBlock(String ownerId, ResourceKey<Block> registryKey)
+    {
+        return new DeferredBlock<>(ownerId, registryKey);
+    }
+
+    public static <T extends Block> DeferredBlock<T> createBlock(ResourceKey<Block> registryKey)
+    {
+        return createBlock(registryKey.location().getNamespace(), registryKey);
     }
 }

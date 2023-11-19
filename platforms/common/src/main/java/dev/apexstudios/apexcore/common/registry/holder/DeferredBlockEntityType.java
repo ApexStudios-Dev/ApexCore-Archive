@@ -14,32 +14,32 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-public class DeferredBlockEntityType<T extends BlockEntity> extends DeferredHolder<BlockEntityType<?>, BlockEntityType<T>>
+public final class DeferredBlockEntityType<T extends BlockEntity> extends DeferredHolder<BlockEntityType<?>, BlockEntityType<T>>
 {
-    protected DeferredBlockEntityType(ResourceKey<BlockEntityType<?>> valueKey)
+    private DeferredBlockEntityType(String ownerId, ResourceKey<BlockEntityType<?>> registryKey)
     {
-        super(valueKey);
+        super(ownerId, registryKey);
     }
 
     @Nullable
     public T create(BlockPos pos, BlockState blockState)
     {
-        return value().create(pos, blockState);
+        return tryAndCreate(pos, blockState).getRaw();
     }
 
     public OptionalLike<T> tryAndCreate(BlockPos pos, BlockState blockState)
     {
-        return () -> create(pos, blockState);
+        return map(value -> value.create(pos, blockState));
     }
 
     public boolean isValid(BlockState blockState)
     {
-        return value().isValid(blockState);
+        return map(value -> value.isValid(blockState)).orElse(false);
     }
 
     public boolean isValid(Block block)
     {
-        return value().validBlocks.contains(block);
+        return map(value -> value.validBlocks.contains(block)).orElse(false);
     }
 
     public boolean isValid(Holder<Block> holder)
@@ -50,21 +50,36 @@ public class DeferredBlockEntityType<T extends BlockEntity> extends DeferredHold
     @Nullable
     public T get(BlockGetter level, BlockPos pos)
     {
-        return value().getBlockEntity(level, pos);
+        return getOptional(level, pos).getRaw();
     }
 
     public OptionalLike<T> getOptional(BlockGetter level, BlockPos pos)
     {
-        return () -> get(level, pos);
+        return map(value -> value.getBlockEntity(level, pos));
     }
 
-    public static <T extends BlockEntity> DeferredBlockEntityType<T> createBlockEntityType(ResourceLocation valueId)
+    public static ResourceKey<BlockEntityType<?>> createRegistryKey(ResourceLocation registryName)
     {
-        return createBlockEntityType(ResourceKey.create(Registries.BLOCK_ENTITY_TYPE, valueId));
+        return ResourceKey.create(Registries.BLOCK_ENTITY_TYPE, registryName);
     }
 
-    public static <T extends BlockEntity> DeferredBlockEntityType<T> createBlockEntityType(ResourceKey<BlockEntityType<?>> valueKey)
+    public static <T extends BlockEntity> DeferredBlockEntityType<T> createBlockEntityType(String ownerId, ResourceLocation registryName)
     {
-        return new DeferredBlockEntityType<>(valueKey);
+        return createBlockEntityType(ownerId, createRegistryKey(registryName));
+    }
+
+    public static <T extends BlockEntity> DeferredBlockEntityType<T> createBlockEntityType(ResourceLocation registryName)
+    {
+        return createBlockEntityType(registryName.getNamespace(), registryName);
+    }
+
+    public static <T extends BlockEntity> DeferredBlockEntityType<T> createBlockEntityType(String ownerId, ResourceKey<BlockEntityType<?>> registryKey)
+    {
+        return new DeferredBlockEntityType<>(ownerId, registryKey);
+    }
+
+    public static <T extends BlockEntity> DeferredBlockEntityType<T> createBlockEntityType(ResourceKey<BlockEntityType<?>> registryKey)
+    {
+        return new DeferredBlockEntityType<>(registryKey.location().getNamespace(), registryKey);
     }
 }

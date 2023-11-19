@@ -16,18 +16,18 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-public class DeferredEntityType<T extends Entity> extends DeferredHolder<EntityType<?>, EntityType<T>> implements EntityTypeTest<Entity, T>
+public final class DeferredEntityType<T extends Entity> extends DeferredHolder<EntityType<?>, EntityType<T>> implements EntityTypeTest<Entity, T>
 {
-    protected DeferredEntityType(ResourceKey<EntityType<?>> valueKey)
+    private DeferredEntityType(String ownerId, ResourceKey<EntityType<?>> registryKey)
     {
-        super(valueKey);
+        super(ownerId, registryKey);
     }
 
     @Nullable
     @Override
     public T tryCast(Entity entity)
     {
-        return value().tryCast(entity);
+        return map(value -> value.tryCast(entity)).getRaw();
     }
 
     @Override
@@ -39,34 +39,49 @@ public class DeferredEntityType<T extends Entity> extends DeferredHolder<EntityT
     @Nullable
     public T spawn(ServerLevel level, BlockPos pos, MobSpawnType spawnType)
     {
-        return value().spawn(level, pos, spawnType);
+        return map(value -> value.spawn(level, pos, spawnType)).getRaw();
     }
 
     @Nullable
     public T spawn(ServerLevel level, @Nullable CompoundTag tag, @Nullable Consumer<T> consumer, BlockPos pos, MobSpawnType spawnType, boolean shouldOffsetY, boolean shouldOffsetYMore)
     {
-        return value().spawn(level, tag, consumer, pos, spawnType, shouldOffsetY, shouldOffsetYMore);
+        return map(value -> value.spawn(level, tag, consumer, pos, spawnType, shouldOffsetY, shouldOffsetYMore)).getRaw();
     }
 
     @Nullable
     public T create(ServerLevel level, @Nullable CompoundTag tag, @Nullable Consumer<T> consumer, BlockPos pos, MobSpawnType spawnType, boolean shouldOffsetY, boolean shouldOffsetYMore)
     {
-        return value().create(level, tag, consumer, pos, spawnType, shouldOffsetY, shouldOffsetYMore);
+        return map(value -> value.spawn(level, tag, consumer, pos, spawnType, shouldOffsetY, shouldOffsetYMore)).getRaw();
     }
 
     @Nullable
     public T create(Level level)
     {
-        return value().create(level);
+        return map(value -> value.create(level)).getRaw();
     }
 
-    public static <T extends Entity> DeferredEntityType<T> createEntity(ResourceLocation valueId)
+    public static ResourceKey<EntityType<?>> createRegistryKey(ResourceLocation registryName)
     {
-        return createEntity(ResourceKey.create(Registries.ENTITY_TYPE, valueId));
+        return ResourceKey.create(Registries.ENTITY_TYPE, registryName);
     }
 
-    public static <T extends Entity> DeferredEntityType<T> createEntity(ResourceKey<EntityType<?>> valueKey)
+    public static <T extends Entity> DeferredEntityType<T> createEntity(String ownerId, ResourceLocation registryName)
     {
-        return new DeferredEntityType<>(valueKey);
+        return createEntity(ownerId, createRegistryKey(registryName));
+    }
+
+    public static <T extends Entity> DeferredEntityType<T> createEntity(ResourceLocation registryName)
+    {
+        return createEntity(registryName.getNamespace(), registryName);
+    }
+
+    public static <T extends Entity> DeferredEntityType<T> createEntity(String ownerId, ResourceKey<EntityType<?>> registryKey)
+    {
+        return new DeferredEntityType<>(ownerId, registryKey);
+    }
+
+    public static <T extends Entity> DeferredEntityType<T> createEntity(ResourceKey<EntityType<?>> registryKey)
+    {
+        return new DeferredEntityType<>(registryKey.location().getNamespace(), registryKey);
     }
 }

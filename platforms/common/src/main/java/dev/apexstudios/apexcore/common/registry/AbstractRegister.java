@@ -35,7 +35,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -147,7 +149,7 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
         return builderFactory.apply(this::register);
     }
 
-    public final <P, T, R extends T, H extends DeferredHolder<T, R>> NoConfigBuilder<O, P, T, R, H> noConfig(P parent, String valueName, ResourceKey<? extends Registry<T>> registryType, Function<ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
+    public final <P, T, R extends T, H extends DeferredHolder<T, R>> NoConfigBuilder<O, P, T, R, H> noConfig(P parent, String valueName, ResourceKey<? extends Registry<T>> registryType, BiFunction<String, ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
     {
         return entry(helper -> new NoConfigBuilder<>(self(), parent, registryType, valueName, holderFactory, helper, valueFactory));
     }
@@ -157,7 +159,7 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
         return noConfig(parent, valueName, registryType, DeferredHolder::create, valueFactory);
     }
 
-    public final <P, T, R extends T, H extends DeferredHolder<T, R>> NoConfigBuilder<O, P, T, R, H> noConfig(P parent, ResourceKey<? extends Registry<T>> registryType, Function<ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
+    public final <P, T, R extends T, H extends DeferredHolder<T, R>> NoConfigBuilder<O, P, T, R, H> noConfig(P parent, ResourceKey<? extends Registry<T>> registryType, BiFunction<String, ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
     {
         return noConfig(parent, currentName(), registryType, holderFactory, valueFactory);
     }
@@ -167,7 +169,7 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
         return noConfig(parent, currentName(), registryType, DeferredHolder::create, valueFactory);
     }
 
-    public final <T, R extends T, H extends DeferredHolder<T, R>> NoConfigBuilder<O, O, T, R, H> noConfig(String valueName, ResourceKey<? extends Registry<T>> registryType, Function<ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
+    public final <T, R extends T, H extends DeferredHolder<T, R>> NoConfigBuilder<O, O, T, R, H> noConfig(String valueName, ResourceKey<? extends Registry<T>> registryType, BiFunction<String, ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
     {
         return noConfig(self(), valueName, registryType, holderFactory, valueFactory);
     }
@@ -177,7 +179,7 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
         return noConfig(self(), valueName, registryType, DeferredHolder::create, valueFactory);
     }
 
-    public final <T, R extends T, H extends DeferredHolder<T, R>> NoConfigBuilder<O, O, T, R, H> noConfig(ResourceKey<? extends Registry<T>> registryType, Function<ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
+    public final <T, R extends T, H extends DeferredHolder<T, R>> NoConfigBuilder<O, O, T, R, H> noConfig(ResourceKey<? extends Registry<T>> registryType, BiFunction<String, ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
     {
         return noConfig(self(), currentName(), registryType, holderFactory, valueFactory);
     }
@@ -187,7 +189,7 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
         return noConfig(self(), currentName(), registryType, DeferredHolder::create, valueFactory);
     }
 
-    public final <T, R extends T, H extends DeferredHolder<T, R>> H simple(String valueName, ResourceKey<? extends Registry<T>> registryType, Function<ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
+    public final <T, R extends T, H extends DeferredHolder<T, R>> H simple(String valueName, ResourceKey<? extends Registry<T>> registryType, BiFunction<String, ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
     {
         return noConfig(valueName, registryType, holderFactory, valueFactory).register();
     }
@@ -202,7 +204,7 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
         return simple(currentName(), registryType, DeferredHolder::create, valueFactory);
     }
 
-    public final <T, R extends T, H extends DeferredHolder<T, R>> H simple(ResourceKey<? extends Registry<T>> registryType, Function<ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
+    public final <T, R extends T, H extends DeferredHolder<T, R>> H simple(ResourceKey<? extends Registry<T>> registryType, BiFunction<String, ResourceKey<T>, H> holderFactory, Supplier<R> valueFactory)
     {
         return simple(currentName(), registryType, holderFactory, valueFactory);
     }
@@ -366,6 +368,12 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
     }
 
     @Override
+    public final <T> Optional<Holder.Reference<T>> getDelegate(ResourceKey<T> registryKey)
+    {
+        return RegistryHelper.get(ownerId).getDelegate(registryKey);
+    }
+
+    @Override
     public final void registerColorHandler(ItemLike item, OptionalLike<OptionalLike<ItemColor>> colorHandler)
     {
         RegistryHelper.get(ownerId).registerColorHandler(item, colorHandler);
@@ -416,9 +424,9 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
     private <T, R extends T, H extends DeferredHolder<T, R>> H register(ResourceKey<? extends Registry<T>> registryType, Supplier<H> holderFactory, Supplier<R> valueFactory)
     {
         var registration = new Registration<>(registryType, valueFactory, holderFactory);
-        ApexCore.LOGGER.debug(MARKER, "Captured registration for entry {} of type {}", registration.delegate.valueKey.location(), registryType.location());
-        registerListeners.removeAll(Pair.of(registration.delegate.valueKey.location().getPath(), registryType)).forEach(listener -> registration.addListener((Consumer<R>) listener));
-        registrations.put(registryType, registration.delegate.valueKey.location().getPath(), registration);
+        ApexCore.LOGGER.debug(MARKER, "Captured registration for entry {} of type {}", registration.delegate.registryKey.location(), registryType.location());
+        registerListeners.removeAll(Pair.of(registration.delegate.registryKey.location().getPath(), registryType)).forEach(listener -> registration.addListener((Consumer<R>) listener));
+        registrations.put(registryType, registration.delegate.registryKey.location().getPath(), registration);
         return (H) registration.delegate;
     }
 
@@ -467,11 +475,11 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
                 try
                 {
                     registration.register(helper);
-                    ApexCore.LOGGER.debug(MARKER, "Registered {} to registry {}", registration.delegate.valueKey.location(), registryType);
+                    ApexCore.LOGGER.debug(MARKER, "Registered {} to registry {}", registration.delegate.registryKey.location(), registryType);
                 }
                 catch(Exception e)
                 {
-                    var msg = ApexCore.LOGGER.getMessageFactory().newMessage("Unexpected error while registering entry {} to registry {}", registration.delegate.valueKey.location(), registryType);
+                    var msg = ApexCore.LOGGER.getMessageFactory().newMessage("Unexpected error while registering entry {} to registry {}", registration.delegate.registryKey.location(), registryType);
 
                     if(skipErrors)
                         ApexCore.LOGGER.error(MARKER, msg, e);

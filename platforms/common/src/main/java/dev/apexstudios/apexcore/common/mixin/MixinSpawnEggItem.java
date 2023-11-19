@@ -1,6 +1,5 @@
 package dev.apexstudios.apexcore.common.mixin;
 
-import com.google.common.collect.Iterables;
 import dev.apexstudios.apexcore.common.registry.generic.DeferredSpawnEggItem;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.SpawnEggItem;
@@ -26,7 +25,9 @@ public abstract class MixinSpawnEggItem
             cir.setReturnValue(deferred);
     }
 
-    @Inject(
+    // why does McForge crash saying `Iterables` class can not be found?
+    // its in a vanilla library and forge uses it themselves
+    /*@Inject(
             method = "eggs",
             at = @At("RETURN"),
             cancellable = true
@@ -34,5 +35,5 @@ public abstract class MixinSpawnEggItem
     private static void ApexCore$eggs(CallbackInfoReturnable<Iterable<SpawnEggItem>> cir)
     {
         cir.setReturnValue(Iterables.concat(cir.getReturnValue(), DeferredSpawnEggItem.deferredOnly()));
-    }
+    }*/
 }

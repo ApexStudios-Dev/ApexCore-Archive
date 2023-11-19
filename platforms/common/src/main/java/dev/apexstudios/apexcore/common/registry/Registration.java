@@ -24,7 +24,7 @@ final class Registration<T, R extends T>
 
     void register(RegistrationHelper helper)
     {
-        helper.register(registryType, delegate.valueKey, valueFactory.get());
+        helper.register(registryType, delegate.registryKey, valueFactory.get());
         delegate.bind(true);
         listeners.forEach(listener -> listener.accept(delegate.value()));
         listeners.clear();

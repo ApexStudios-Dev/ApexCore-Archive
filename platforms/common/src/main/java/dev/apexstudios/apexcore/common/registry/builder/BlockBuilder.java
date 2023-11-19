@@ -27,9 +27,9 @@ public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Bloc
     private OptionalLike<OptionalLike<RenderType>> renderType = () -> null;
 
     @ApiStatus.Internal
-    public BlockBuilder(O owner, P parent, String valueName, BuilderHelper helper, Function<BlockBehaviour.Properties, T> blockFactory)
+    public BlockBuilder(O owner, P parent, String blockName, BuilderHelper helper, Function<BlockBehaviour.Properties, T> blockFactory)
     {
-        super(owner, parent, Registries.BLOCK, valueName, DeferredBlock::createBlock, helper);
+        super(owner, parent, Registries.BLOCK, blockName, DeferredBlock::createBlock, helper);
 
         this.blockFactory = blockFactory;
     }
@@ -65,7 +65,7 @@ public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Bloc
 
     public <I extends Item> ItemBuilder<O, BlockBuilder<O, P, T>, I> item(BiFunction<T, Item.Properties, I> itemFactory)
     {
-        return owner.item(this, getValueName().getPath(), properties -> itemFactory.apply(asHolder().value(), properties));
+        return owner.item(this, registrationName(), properties -> itemFactory.apply(holder().value(), properties));
     }
 
     public ItemBuilder<O, BlockBuilder<O, P, T>, BlockItem> item()
@@ -80,7 +80,7 @@ public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Bloc
 
     public <B extends BlockEntity> BlockEntityTypeBuilder<O, BlockBuilder<O, P, T>, B> blockEntity(BlockEntityTypeBuilder.Factory<B> blockEntityFactory)
     {
-        return owner.blockEntity(this, getValueName().getPath(), blockEntityFactory).validBlock(asHolder());
+        return owner.blockEntity(this, registrationName(), blockEntityFactory).validBlock(holder());
     }
 
     public <B extends BlockEntity> BlockEntityTypeBuilder<O, BlockBuilder<O, P, T>, B> blockEntity(BlockEntityType.BlockEntitySupplier<B> blockEntityFactory)

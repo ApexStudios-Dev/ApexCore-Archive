@@ -22,9 +22,9 @@ public final class ItemBuilder<O extends AbstractRegister<O>, P, T extends Item>
     private OptionalLike<DispenseItemBehavior> dispenseBehavior = () -> null;
 
     @ApiStatus.Internal
-    public ItemBuilder(O owner, P parent, String valueName, BuilderHelper helper, Function<Item.Properties, T> itemFactory)
+    public ItemBuilder(O owner, P parent, String itemName, BuilderHelper helper, Function<Item.Properties, T> itemFactory)
     {
-        super(owner, parent, Registries.ITEM, valueName, DeferredItem::createItem, helper);
+        super(owner, parent, Registries.ITEM, itemName, DeferredItem::createItem, helper);
 
         this.itemFactory = itemFactory;
     }

@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.resources.ResourceKey;
@@ -31,9 +32,12 @@ import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegisterEvent;
+import net.minecraftforge.registries.RegistryManager;
 
 import java.util.Map;
+import java.util.Optional;
 
 final class McForgeRegistryHelper implements RegistryHelper
 {
@@ -65,6 +69,13 @@ final class McForgeRegistryHelper implements RegistryHelper
         }));
 
         ModEvents.addListener(ownerId, EventPriority.LOW, RegisterEvent.class, event -> register.onRegisterLate(event.getRegistryKey()));
+    }
+
+    @Override
+    public <T> Optional<Holder.Reference<T>> getDelegate(ResourceKey<T> registryKey)
+    {
+        var registry = RegistryManager.ACTIVE.getRegistry(registryKey.registry());
+        return registry == null ? RegistryHelper.super.getDelegate(registryKey) : ((IForgeRegistry<T>) registry).getDelegate(registryKey);
     }
 
     @Override

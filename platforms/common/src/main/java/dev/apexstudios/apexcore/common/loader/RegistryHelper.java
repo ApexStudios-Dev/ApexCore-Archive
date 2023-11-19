@@ -8,8 +8,11 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -25,11 +28,19 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
+
 public interface RegistryHelper
 {
     String ownerId();
 
     void register(AbstractRegister<?> register);
+
+    default <T> Optional<Holder.Reference<T>> getDelegate(ResourceKey<T> registryKey)
+    {
+        var registry = BuiltInRegistries.REGISTRY.get(registryKey.registry());
+        return registry == null ? Optional.empty() : ((Registry<T>) registry).getHolder(registryKey);
+    }
 
     void registerColorHandler(ItemLike item, OptionalLike<OptionalLike<ItemColor>> colorHandler);
 

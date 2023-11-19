@@ -6,20 +6,25 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 
+import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-public class DeferredItem<T extends Item> extends DeferredHolder<Item, T> implements ItemLike
+public final class DeferredItem<T extends Item> extends DeferredHolder<Item, T> implements ItemLike
 {
-    protected DeferredItem(ResourceKey<Item> valueKey)
+    private DeferredItem(String ownerId, ResourceKey<Item> registryKey)
     {
-        super(valueKey);
+        super(ownerId, registryKey);
     }
 
     public ItemStack asStack(int count, UnaryOperator<ItemStack> modifier)
     {
-        return isPresent() ? modifier.apply(new ItemStack((ItemLike) this, count)) : ItemStack.EMPTY;
+        return map(Item::getDefaultInstance).map(stack -> {
+            stack.setCount(count);
+            return stack;
+        }).map(modifier).orElse(ItemStack.EMPTY);
     }
 
     public ItemStack asStack(int count)
@@ -39,22 +44,37 @@ public class DeferredItem<T extends Item> extends DeferredHolder<Item, T> implem
 
     public boolean is(ItemStack stack)
     {
-        return isPresent() && stack.is(asItem());
+        return map(stack::is).orElse(false);
     }
 
     @Override
     public Item asItem()
     {
-        return value();
+        return this.<Item>map(Function.identity()).orElse(Items.AIR);
     }
 
-    public static <T extends Item> DeferredItem<T> createItem(ResourceLocation valueId)
+    public static ResourceKey<Item> createRegistryKey(ResourceLocation registryName)
     {
-        return createItem(ResourceKey.create(Registries.ITEM, valueId));
+        return ResourceKey.create(Registries.ITEM, registryName);
     }
 
-    public static <T extends Item> DeferredItem<T> createItem(ResourceKey<Item> valueKey)
+    public static <T extends Item> DeferredItem<T> createItem(String ownerId, ResourceLocation registryName)
     {
-        return new DeferredItem<>(valueKey);
+        return createItem(ownerId, ResourceKey.create(Registries.ITEM, registryName));
+    }
+
+    public static <T extends Item> DeferredItem<T> createItem(ResourceLocation registryName)
+    {
+        return createItem(registryName.getNamespace(), registryName);
+    }
+
+    public static <T extends Item> DeferredItem<T> createItem(String ownerId, ResourceKey<Item> registryKey)
+    {
+        return new DeferredItem<>(ownerId, registryKey);
+    }
+
+    public static <T extends Item> DeferredItem<T> createItem(ResourceKey<Item> registryKey)
+    {
+        return new DeferredItem<>(registryKey.location().getNamespace(), registryKey);
     }
 }
