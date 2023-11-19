@@ -10,6 +10,7 @@ import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.Registry;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
@@ -21,6 +22,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
@@ -104,6 +107,12 @@ final class McForgeRegistryHelper implements RegistryHelper
     public void registerItemDispenseBehavior(ItemLike item, OptionalLike<DispenseItemBehavior> dispenseBehavior)
     {
         dispenseBehavior.ifPresent(behavior -> ModEvents.addListener(ownerId, FMLCommonSetupEvent.class, event -> event.enqueueWork(() -> DispenserBlock.registerBehavior(item, behavior))));
+    }
+
+    @Override
+    public <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<T> blockEntityType, OptionalLike<OptionalLike<BlockEntityRendererProvider<T>>> rendererProvider)
+    {
+        PhysicalSide.CLIENT.runWhenOn(() -> () -> rendererProvider.ifPresent(r -> r.ifPresent(provider -> ModEvents.addListener(ownerId, EntityRenderersEvent.RegisterRenderers.class, event -> event.registerBlockEntityRenderer(blockEntityType, provider)))));
     }
 
     static RegistryHelper get(String ownerId)

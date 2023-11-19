@@ -10,6 +10,7 @@ import dev.apexstudios.apexcore.common.util.OptionalLike;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -22,6 +23,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Fluid;
 import org.apache.commons.lang3.tuple.Pair;
@@ -304,6 +307,46 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
         return entity(self(), currentName(), category, entityFactory);
     }
 
+    public final <P, T extends BlockEntity> BlockEntityTypeBuilder<O, P, T> blockEntity(P parent, String blockEntityName, BlockEntityTypeBuilder.Factory<T> blockEntityFactory)
+    {
+        return entry(helper -> new BlockEntityTypeBuilder<>(self(), parent, blockEntityName, helper, blockEntityFactory));
+    }
+
+    public final <P, T extends BlockEntity> BlockEntityTypeBuilder<O, P, T> blockEntity(P parent, BlockEntityTypeBuilder.Factory<T> blockEntityFactory)
+    {
+        return blockEntity(parent, currentName(), blockEntityFactory);
+    }
+
+    public final <T extends BlockEntity> BlockEntityTypeBuilder<O, O, T> blockEntity(String blockEntityName, BlockEntityTypeBuilder.Factory<T> blockEntityFactory)
+    {
+        return blockEntity(self(), blockEntityName, blockEntityFactory);
+    }
+
+    public final <T extends BlockEntity> BlockEntityTypeBuilder<O, O, T> blockEntity(BlockEntityTypeBuilder.Factory<T> blockEntityFactory)
+    {
+        return blockEntity(self(), currentName(), blockEntityFactory);
+    }
+
+    public final <P, T extends BlockEntity> BlockEntityTypeBuilder<O, P, T> blockEntity(P parent, String blockEntityName, BlockEntityType.BlockEntitySupplier<T> blockEntityFactory)
+    {
+        return blockEntity(parent, blockEntityName, BlockEntityTypeBuilder.Factory.fromVanilla(blockEntityFactory));
+    }
+
+    public final <P, T extends BlockEntity> BlockEntityTypeBuilder<O, P, T> blockEntity(P parent, BlockEntityType.BlockEntitySupplier<T> blockEntityFactory)
+    {
+        return blockEntity(parent, currentName(), blockEntityFactory);
+    }
+
+    public final <T extends BlockEntity> BlockEntityTypeBuilder<O, O, T> blockEntity(String blockEntityName, BlockEntityType.BlockEntitySupplier<T> blockEntityFactory)
+    {
+        return blockEntity(self(), blockEntityName, blockEntityFactory);
+    }
+
+    public final <T extends BlockEntity> BlockEntityTypeBuilder<O, O, T> blockEntity(BlockEntityType.BlockEntitySupplier<T> blockEntityFactory)
+    {
+        return blockEntity(self(), currentName(), blockEntityFactory);
+    }
+
     protected final O self()
     {
         return (O) this;
@@ -362,6 +405,12 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
     public final void registerItemDispenseBehavior(ItemLike item, OptionalLike<DispenseItemBehavior> dispenseBehavior)
     {
         RegistryHelper.get(ownerId).registerItemDispenseBehavior(item, dispenseBehavior);
+    }
+
+    @Override
+    public final <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<T> blockEntityType, OptionalLike<OptionalLike<BlockEntityRendererProvider<T>>> rendererProvider)
+    {
+        RegistryHelper.get(ownerId).registerBlockEntityRenderer(blockEntityType, rendererProvider);
     }
 
     private <T, R extends T, H extends DeferredHolder<T, R>> H register(ResourceKey<? extends Registry<T>> registryType, Supplier<H> holderFactory, Supplier<R> valueFactory)

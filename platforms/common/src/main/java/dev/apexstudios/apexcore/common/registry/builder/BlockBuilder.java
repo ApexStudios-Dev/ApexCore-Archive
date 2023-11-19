@@ -9,6 +9,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -74,6 +76,26 @@ public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Bloc
     public BlockBuilder<O, P, T> defaultItem()
     {
         return item().build();
+    }
+
+    public <B extends BlockEntity> BlockEntityTypeBuilder<O, BlockBuilder<O, P, T>, B> blockEntity(BlockEntityTypeBuilder.Factory<B> blockEntityFactory)
+    {
+        return owner.blockEntity(this, getValueName().getPath(), blockEntityFactory).validBlock(asHolder());
+    }
+
+    public <B extends BlockEntity> BlockEntityTypeBuilder<O, BlockBuilder<O, P, T>, B> blockEntity(BlockEntityType.BlockEntitySupplier<B> blockEntityFactory)
+    {
+        return blockEntity(BlockEntityTypeBuilder.Factory.fromVanilla(blockEntityFactory));
+    }
+
+    public BlockBuilder<O, P, T> defaultBlockEntity(BlockEntityTypeBuilder.Factory<?> blockEntityFactory)
+    {
+        return blockEntity(blockEntityFactory).build();
+    }
+
+    public BlockBuilder<O, P, T> defaultBlockEntity(BlockEntityType.BlockEntitySupplier<?> blockEntityFactory)
+    {
+        return blockEntity(blockEntityFactory).build();
     }
 
     @Override

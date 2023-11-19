@@ -1,5 +1,6 @@
 package dev.apexstudios.apexcore.common.util;
 
+import net.minecraft.core.Holder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.NoSuchElementException;
@@ -112,6 +113,11 @@ public interface OptionalLike<T> extends Supplier<T>
     static <T> OptionalLike<T> of(@Nullable T value)
     {
         return () -> value;
+    }
+
+    static <T> OptionalLike<T> of(Holder<T> holder)
+    {
+        return () -> holder.isBound() ? holder.value() : null;
     }
 
     static <T> OptionalLike<T> empty()

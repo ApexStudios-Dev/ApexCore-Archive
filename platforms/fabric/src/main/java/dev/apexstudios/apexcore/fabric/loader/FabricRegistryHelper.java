@@ -13,6 +13,8 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRe
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.Registry;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
@@ -25,6 +27,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
 
 import java.util.Map;
@@ -100,6 +104,12 @@ final class FabricRegistryHelper implements RegistryHelper, RegistrationHelper
     public void registerItemDispenseBehavior(ItemLike item, OptionalLike<DispenseItemBehavior> dispenseBehavior)
     {
         dispenseBehavior.ifPresent(behavior -> DispenserBlock.registerBehavior(item, behavior));
+    }
+
+    @Override
+    public <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<T> blockEntityType, OptionalLike<OptionalLike<BlockEntityRendererProvider<T>>> rendererProvider)
+    {
+        rendererProvider.ifPresent(r -> r.ifPresent(provider -> BlockEntityRenderers.register(blockEntityType, provider)));
     }
 
     static RegistryHelper get(String ownerId)
