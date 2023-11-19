@@ -3,7 +3,7 @@ package dev.apexstudios.apexcore.common.registry.builder;
 import dev.apexstudios.apexcore.common.loader.RegistryHelper;
 import dev.apexstudios.apexcore.common.registry.AbstractRegister;
 import dev.apexstudios.apexcore.common.registry.generic.DeferredSpawnEggItem;
-import dev.apexstudios.apexcore.common.registry.holder.DeferredEntity;
+import dev.apexstudios.apexcore.common.registry.holder.DeferredEntityType;
 import dev.apexstudios.apexcore.common.util.OptionalLike;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.registries.Registries;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-public final class EntityBuilder<O extends AbstractRegister<O>, P, T extends Entity> extends AbstractBuilder<O, P, EntityType<?>, EntityType<T>, DeferredEntity<T>, EntityBuilder<O, P, T>>
+public final class EntityTypeBuilder<O extends AbstractRegister<O>, P, T extends Entity> extends AbstractBuilder<O, P, EntityType<?>, EntityType<T>, DeferredEntityType<T>, EntityTypeBuilder<O, P, T>>
 {
     private final MobCategory category;
     private final EntityType.EntityFactory<T> entityFactory;
@@ -31,51 +31,51 @@ public final class EntityBuilder<O extends AbstractRegister<O>, P, T extends Ent
     private OptionalLike<SpawnPlacements.SpawnPredicate<T>> spawnPredicate = () -> null;
 
     @ApiStatus.Internal
-    public EntityBuilder(O owner, P parent, String valueName, BuilderHelper helper, MobCategory category, EntityType.EntityFactory<T> entityFactory)
+    public EntityTypeBuilder(O owner, P parent, String valueName, BuilderHelper helper, MobCategory category, EntityType.EntityFactory<T> entityFactory)
     {
-        super(owner, parent, Registries.ENTITY_TYPE, valueName, DeferredEntity::createEntity, helper);
+        super(owner, parent, Registries.ENTITY_TYPE, valueName, DeferredEntityType::createEntity, helper);
 
         this.category = category;
         this.entityFactory = entityFactory;
     }
 
-    public EntityBuilder<O, P, T> renderer(OptionalLike<OptionalLike<EntityRendererProvider<T>>> renderer)
+    public EntityTypeBuilder<O, P, T> renderer(OptionalLike<OptionalLike<EntityRendererProvider<T>>> renderer)
     {
         this.renderer = renderer;
         return this;
     }
 
-    public EntityBuilder<O, P, T> attributes(OptionalLike<AttributeSupplier.Builder> attributes)
+    public EntityTypeBuilder<O, P, T> attributes(OptionalLike<AttributeSupplier.Builder> attributes)
     {
         this.attributes = attributes;
         return this;
     }
 
-    public EntityBuilder<O, P, T> spawnPlacement(@Nullable SpawnPlacements.Type spawnPlacement)
+    public EntityTypeBuilder<O, P, T> spawnPlacement(@Nullable SpawnPlacements.Type spawnPlacement)
     {
         this.spawnPlacement = () -> spawnPlacement;
         return this;
     }
 
-    public EntityBuilder<O, P, T> spawnHeightmap(@Nullable Heightmap.Types heightmap)
+    public EntityTypeBuilder<O, P, T> spawnHeightmap(@Nullable Heightmap.Types heightmap)
     {
         this.heightmap = () -> heightmap;
         return this;
     }
 
-    public EntityBuilder<O, P, T> spawnPredicate(SpawnPlacements.SpawnPredicate<T> spawnPredicate)
+    public EntityTypeBuilder<O, P, T> spawnPredicate(SpawnPlacements.SpawnPredicate<T> spawnPredicate)
     {
         this.spawnPredicate = () -> spawnPredicate;
         return this;
     }
 
-    public EntityBuilder<O, P, T> properties(UnaryOperator<EntityType.Builder<T>> propertiesModifier)
+    public EntityTypeBuilder<O, P, T> properties(UnaryOperator<EntityType.Builder<T>> propertiesModifier)
     {
         this.propertiesModifier = this.propertiesModifier.andThen(propertiesModifier);
         return this;
     }
 
-    public <I extends DeferredSpawnEggItem> ItemBuilder<O, EntityBuilder<O, P, T>, I> spawnEgg(DeferredSpawnEggItem.Factory<I> itemFactory, int backgroundColor, int highlightColor)
+    public <I extends DeferredSpawnEggItem> ItemBuilder<O, EntityTypeBuilder<O, P, T>, I> spawnEgg(DeferredSpawnEggItem.Factory<I> itemFactory, int backgroundColor, int highlightColor)
     {
         return owner.item(this, getValueName().getPath(), properties -> itemFactory.create(asHolder(), backgroundColor, highlightColor, properties))
                     .color(() -> () -> (stack, tintIndex) -> ((DeferredSpawnEggItem) stack.getItem()).getColor(tintIndex))
@@ -83,17 +83,17 @@ public final class EntityBuilder<O extends AbstractRegister<O>, P, T extends Ent
                     .onRegisterAfter(Registries.ENTITY_TYPE, DeferredSpawnEggItem::injectSpawnEggEntry);
     }
 
-    public ItemBuilder<O, EntityBuilder<O, P, T>, DeferredSpawnEggItem> spawnEgg(int backgroundColor, int highlightColor)
+    public ItemBuilder<O, EntityTypeBuilder<O, P, T>, DeferredSpawnEggItem> spawnEgg(int backgroundColor, int highlightColor)
     {
         return spawnEgg(DeferredSpawnEggItem::new, backgroundColor, highlightColor);
     }
 
-    public EntityBuilder<O, P, T> defaultSpawnEgg(DeferredSpawnEggItem.Factory<?> itemFactory, int backgroundColor, int highlightColor)
+    public EntityTypeBuilder<O, P, T> defaultSpawnEgg(DeferredSpawnEggItem.Factory<?> itemFactory, int backgroundColor, int highlightColor)
     {
         return spawnEgg(itemFactory, backgroundColor, highlightColor).build();
     }
 
-    public EntityBuilder<O, P, T> defaultSpawnEgg(int backgroundColor, int highlightColor)
+    public EntityTypeBuilder<O, P, T> defaultSpawnEgg(int backgroundColor, int highlightColor)
     {
         return spawnEgg(backgroundColor, highlightColor).build();
     }

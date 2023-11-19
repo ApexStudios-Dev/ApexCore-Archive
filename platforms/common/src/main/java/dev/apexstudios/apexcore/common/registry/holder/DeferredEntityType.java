@@ -16,9 +16,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-public class DeferredEntity<T extends Entity> extends DeferredHolder<EntityType<?>, EntityType<T>> implements EntityTypeTest<Entity, T>
+public class DeferredEntityType<T extends Entity> extends DeferredHolder<EntityType<?>, EntityType<T>> implements EntityTypeTest<Entity, T>
 {
-    protected DeferredEntity(ResourceKey<EntityType<?>> valueKey)
+    protected DeferredEntityType(ResourceKey<EntityType<?>> valueKey)
     {
         super(valueKey);
     }
@@ -60,13 +60,13 @@ public class DeferredEntity<T extends Entity> extends DeferredHolder<EntityType<
         return value().create(level);
     }
 
-    public static <T extends Entity> DeferredEntity<T> createEntity(ResourceLocation valueId)
+    public static <T extends Entity> DeferredEntityType<T> createEntity(ResourceLocation valueId)
     {
         return createEntity(ResourceKey.create(Registries.ENTITY_TYPE, valueId));
     }
 
-    public static <T extends Entity> DeferredEntity<T> createEntity(ResourceKey<EntityType<?>> valueKey)
+    public static <T extends Entity> DeferredEntityType<T> createEntity(ResourceKey<EntityType<?>> valueKey)
     {
-        return new DeferredEntity<>(valueKey);
+        return new DeferredEntityType<>(valueKey);
     }
 }

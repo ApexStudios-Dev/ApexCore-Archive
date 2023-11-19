@@ -284,22 +284,22 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
         return block(self(), currentName(), Block::new);
     }
 
-    public final <P, T extends Entity> EntityBuilder<O, P, T> entity(P parent, String entityName, MobCategory category, EntityType.EntityFactory<T> entityFactory)
+    public final <P, T extends Entity> EntityTypeBuilder<O, P, T> entity(P parent, String entityName, MobCategory category, EntityType.EntityFactory<T> entityFactory)
     {
-        return entry(helper -> new EntityBuilder<>(self(), parent, entityName, helper, category, entityFactory));
+        return entry(helper -> new EntityTypeBuilder<>(self(), parent, entityName, helper, category, entityFactory));
     }
 
-    public final <P, T extends Entity> EntityBuilder<O, P, T> entity(P parent, MobCategory category, EntityType.EntityFactory<T> entityFactory)
+    public final <P, T extends Entity> EntityTypeBuilder<O, P, T> entity(P parent, MobCategory category, EntityType.EntityFactory<T> entityFactory)
     {
         return entity(parent, currentName(), category, entityFactory);
     }
 
-    public final <T extends Entity> EntityBuilder<O, O, T> entity(String entityName, MobCategory category, EntityType.EntityFactory<T> entityFactory)
+    public final <T extends Entity> EntityTypeBuilder<O, O, T> entity(String entityName, MobCategory category, EntityType.EntityFactory<T> entityFactory)
     {
         return entity(self(), entityName, category, entityFactory);
     }
 
-    public final <T extends Entity> EntityBuilder<O, O, T> entity(MobCategory category, EntityType.EntityFactory<T> entityFactory)
+    public final <T extends Entity> EntityTypeBuilder<O, O, T> entity(MobCategory category, EntityType.EntityFactory<T> entityFactory)
     {
         return entity(self(), currentName(), category, entityFactory);
     }
