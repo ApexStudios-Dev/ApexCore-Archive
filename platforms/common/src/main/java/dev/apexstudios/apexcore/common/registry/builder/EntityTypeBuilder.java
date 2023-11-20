@@ -24,11 +24,11 @@ public final class EntityTypeBuilder<O extends AbstractRegister<O>, P, T extends
     private final MobCategory category;
     private final EntityType.EntityFactory<T> entityFactory;
     private Function<EntityType.Builder<T>, EntityType.Builder<T>> propertiesModifier = Function.identity();
-    private OptionalLike<OptionalLike<EntityRendererProvider<T>>> renderer = () -> null;
-    private OptionalLike<AttributeSupplier.Builder> attributes = () -> null;
-    private OptionalLike<SpawnPlacements.Type> spawnPlacement = () -> null;
-    private OptionalLike<Heightmap.Types> heightmap = () -> null;
-    private OptionalLike<SpawnPlacements.SpawnPredicate<T>> spawnPredicate = () -> null;
+    private OptionalLike<OptionalLike<EntityRendererProvider<T>>> renderer = OptionalLike.empty();
+    private OptionalLike<AttributeSupplier.Builder> attributes = OptionalLike.empty();
+    private OptionalLike<SpawnPlacements.Type> spawnPlacement = OptionalLike.empty();
+    private OptionalLike<Heightmap.Types> heightmap = OptionalLike.empty();
+    private OptionalLike<SpawnPlacements.SpawnPredicate<T>> spawnPredicate = OptionalLike.empty();
 
     @ApiStatus.Internal
     public EntityTypeBuilder(O owner, P parent, String entityName, BuilderHelper helper, MobCategory category, EntityType.EntityFactory<T> entityFactory)
@@ -53,13 +53,13 @@ public final class EntityTypeBuilder<O extends AbstractRegister<O>, P, T extends
 
     public EntityTypeBuilder<O, P, T> spawnPlacement(@Nullable SpawnPlacements.Type spawnPlacement)
     {
-        this.spawnPlacement = () -> spawnPlacement;
+        this.spawnPlacement = OptionalLike.of(spawnPlacement);
         return this;
     }
 
     public EntityTypeBuilder<O, P, T> spawnHeightmap(@Nullable Heightmap.Types heightmap)
     {
-        this.heightmap = () -> heightmap;
+        this.heightmap = OptionalLike.of(heightmap);
         return this;
     }
 

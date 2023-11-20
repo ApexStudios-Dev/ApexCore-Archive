@@ -16,10 +16,10 @@ import java.util.function.UnaryOperator;
 public final class ItemBuilder<O extends AbstractRegister<O>, P, T extends Item> extends AbstractBuilder<O, P, Item, T, DeferredItem<T>, ItemBuilder<O, P, T>>
 {
     private final Function<Item.Properties, T> itemFactory;
-    private OptionalLike<Item.Properties> propertiesFactory = () -> null;
+    private OptionalLike<Item.Properties> propertiesFactory = OptionalLike.empty();
     private Function<Item.Properties, Item.Properties> propertiesModifier = Function.identity();
-    private OptionalLike<OptionalLike<ItemColor>> colorHandler = () -> null;
-    private OptionalLike<DispenseItemBehavior> dispenseBehavior = () -> null;
+    private OptionalLike<OptionalLike<ItemColor>> colorHandler = OptionalLike.empty();
+    private OptionalLike<DispenseItemBehavior> dispenseBehavior = OptionalLike.empty();
 
     @ApiStatus.Internal
     public ItemBuilder(O owner, P parent, String itemName, BuilderHelper helper, Function<Item.Properties, T> itemFactory)
@@ -49,7 +49,7 @@ public final class ItemBuilder<O extends AbstractRegister<O>, P, T extends Item>
 
     public ItemBuilder<O, P, T> dispenseBehavior(@Nullable DispenseItemBehavior dispenseBehavior)
     {
-        return dispenseBehavior(() -> dispenseBehavior);
+        return dispenseBehavior(OptionalLike.of(dispenseBehavior));
     }
 
     public ItemBuilder<O, P, T> initialProperties(OptionalLike<Item.Properties> propertiesFactory)

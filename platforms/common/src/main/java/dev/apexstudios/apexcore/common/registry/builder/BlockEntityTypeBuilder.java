@@ -25,7 +25,7 @@ public final class BlockEntityTypeBuilder<O extends AbstractRegister<O>, P, T ex
 {
     private final Set<OptionalLike<Block>> validBlocks = Sets.newHashSet();
     private final Factory<T> blockEntityFactory;
-    private OptionalLike<OptionalLike<BlockEntityRendererProvider<T>>> renderer = () -> null;
+    private OptionalLike<OptionalLike<BlockEntityRendererProvider<T>>> renderer = OptionalLike.empty();
 
     @ApiStatus.Internal
     public BlockEntityTypeBuilder(O owner, P parent, String blockEntityName, BuilderHelper helper, Factory<T> blockEntityFactory)
@@ -54,7 +54,7 @@ public final class BlockEntityTypeBuilder<O extends AbstractRegister<O>, P, T ex
 
     public BlockEntityTypeBuilder<O, P, T> validBlock(@Nullable Block validBlock)
     {
-        return validBlock(() -> validBlock);
+        return validBlock(OptionalLike.of(validBlock));
     }
 
     @SafeVarargs

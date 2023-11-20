@@ -14,14 +14,14 @@ public final class BlockSetTypeBuilder
 {
     private boolean canOpenByHand = true;
     private SoundType soundType = SoundType.WOOD;
-    private OptionalLike<SoundEvent> doorClose = () -> SoundEvents.WOODEN_DOOR_CLOSE;
-    private OptionalLike<SoundEvent> doorOpen = () -> SoundEvents.WOODEN_DOOR_OPEN;
-    private OptionalLike<SoundEvent> trapdoorClose = () -> SoundEvents.WOODEN_TRAPDOOR_CLOSE;
-    private OptionalLike<SoundEvent> trapdoorOpen = () -> SoundEvents.WOODEN_TRAPDOOR_OPEN;
-    private OptionalLike<SoundEvent> pressurePlateClickOff = () -> SoundEvents.WOODEN_PRESSURE_PLATE_CLICK_OFF;
-    private OptionalLike<SoundEvent> pressurePlateClickOn = () -> SoundEvents.WOODEN_PRESSURE_PLATE_CLICK_ON;
-    private OptionalLike<SoundEvent> buttonClickOff = () -> SoundEvents.WOODEN_BUTTON_CLICK_OFF;
-    private OptionalLike<SoundEvent> buttonClickOn = () -> SoundEvents.WOODEN_BUTTON_CLICK_ON;
+    private OptionalLike<SoundEvent> doorClose = OptionalLike.empty();
+    private OptionalLike<SoundEvent> doorOpen = OptionalLike.empty();
+    private OptionalLike<SoundEvent> trapdoorClose = OptionalLike.empty();
+    private OptionalLike<SoundEvent> trapdoorOpen = OptionalLike.empty();
+    private OptionalLike<SoundEvent> pressurePlateClickOff = OptionalLike.empty();
+    private OptionalLike<SoundEvent> pressurePlateClickOn = OptionalLike.empty();
+    private OptionalLike<SoundEvent> buttonClickOff = OptionalLike.empty();
+    private OptionalLike<SoundEvent> buttonClickOn = OptionalLike.empty();
 
     public BlockSetTypeBuilder canOpenByHand(boolean canOpenByHand)
     {

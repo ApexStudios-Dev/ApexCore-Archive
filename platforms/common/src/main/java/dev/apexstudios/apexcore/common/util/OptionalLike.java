@@ -112,7 +112,7 @@ public interface OptionalLike<T> extends Supplier<T>
 
     static <T> OptionalLike<T> of(@Nullable T value)
     {
-        return () -> value;
+        return value == null ? empty() : () -> value;
     }
 
     static <T> OptionalLike<T> of(Holder<T> holder)

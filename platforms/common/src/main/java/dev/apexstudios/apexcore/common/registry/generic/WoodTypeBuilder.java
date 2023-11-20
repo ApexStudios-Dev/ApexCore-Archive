@@ -17,8 +17,8 @@ public final class WoodTypeBuilder
     private Supplier<BlockSetTypeBuilder> blockSetType = BlockSetTypeBuilder::builder;
     private SoundType soundType = SoundType.WOOD;
     private SoundType hangingSignSoundType = SoundType.HANGING_SIGN;
-    private OptionalLike<SoundEvent> fenceGateClose = () -> SoundEvents.FENCE_GATE_CLOSE;
-    private OptionalLike<SoundEvent> fenceGateOpen = () -> SoundEvents.FENCE_GATE_OPEN;
+    private OptionalLike<SoundEvent> fenceGateClose = OptionalLike.empty();
+    private OptionalLike<SoundEvent> fenceGateOpen = OptionalLike.empty();
 
     public WoodTypeBuilder blockSetType(BlockSetTypeBuilder copyFrom, UnaryOperator<BlockSetTypeBuilder> builder)
     {

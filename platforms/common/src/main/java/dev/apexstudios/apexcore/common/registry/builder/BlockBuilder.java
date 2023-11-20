@@ -21,10 +21,10 @@ import java.util.function.UnaryOperator;
 public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Block> extends AbstractBuilder<O, P, Block, T, DeferredBlock<T>, BlockBuilder<O, P, T>>
 {
     private final Function<BlockBehaviour.Properties, T> blockFactory;
-    private OptionalLike<BlockBehaviour.Properties> initialProperties = () -> null;
+    private OptionalLike<BlockBehaviour.Properties> initialProperties = OptionalLike.empty();
     private Function<BlockBehaviour.Properties, BlockBehaviour.Properties> propertiesModifier = Function.identity();
-    private OptionalLike<OptionalLike<BlockColor>> colorHandler = () -> null;
-    private OptionalLike<OptionalLike<RenderType>> renderType = () -> null;
+    private OptionalLike<OptionalLike<BlockColor>> colorHandler = OptionalLike.empty();
+    private OptionalLike<OptionalLike<RenderType>> renderType = OptionalLike.empty();
 
     @ApiStatus.Internal
     public BlockBuilder(O owner, P parent, String blockName, BuilderHelper helper, Function<BlockBehaviour.Properties, T> blockFactory)
