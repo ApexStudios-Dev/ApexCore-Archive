@@ -4,6 +4,7 @@ import dev.apexstudios.apexcore.common.loader.ModLoader;
 import dev.apexstudios.apexcore.common.loader.PhysicalSide;
 import dev.apexstudios.apexcore.common.loader.Platform;
 import dev.apexstudios.apexcore.common.loader.RegistryHelper;
+import dev.apexstudios.apexcore.common.network.NetworkManager;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.data.loading.DatagenModLoader;
 
@@ -44,5 +45,11 @@ public final class NeoForgePlatform implements Platform
     public RegistryHelper registryHelper(String ownerId)
     {
         return NeoForgeRegistryHelper.get(ownerId);
+    }
+
+    @Override
+    public NetworkManager networkManager(String ownerId)
+    {
+        return NeoForgeNetworkManager.get(ownerId);
     }
 }

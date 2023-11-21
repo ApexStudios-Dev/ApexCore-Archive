@@ -4,6 +4,7 @@ import dev.apexstudios.apexcore.common.loader.ModLoader;
 import dev.apexstudios.apexcore.common.loader.PhysicalSide;
 import dev.apexstudios.apexcore.common.loader.Platform;
 import dev.apexstudios.apexcore.common.loader.RegistryHelper;
+import dev.apexstudios.apexcore.common.network.NetworkManager;
 import net.minecraftforge.data.loading.DatagenModLoader;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
@@ -44,5 +45,11 @@ public final class McForgePlatform implements Platform
     public RegistryHelper registryHelper(String ownerId)
     {
         return McForgeRegistryHelper.get(ownerId);
+    }
+
+    @Override
+    public NetworkManager networkManager(String ownerId)
+    {
+        return McForgeNetworkManager.get(ownerId);
     }
 }

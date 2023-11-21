@@ -4,6 +4,7 @@ import dev.apexstudios.apexcore.common.loader.ModLoader;
 import dev.apexstudios.apexcore.common.loader.PhysicalSide;
 import dev.apexstudios.apexcore.common.loader.Platform;
 import dev.apexstudios.apexcore.common.loader.RegistryHelper;
+import dev.apexstudios.apexcore.common.network.NetworkManager;
 import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -44,5 +45,11 @@ public final class FabricPlatform implements Platform
     public RegistryHelper registryHelper(String ownerId)
     {
         return FabricRegistryHelper.get(ownerId);
+    }
+
+    @Override
+    public NetworkManager networkManager(String ownerId)
+    {
+        return FabricNetworkManager.get(ownerId);
     }
 }

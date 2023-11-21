@@ -1,6 +1,7 @@
 package dev.apexstudios.apexcore.common.loader;
 
 import dev.apexstudios.apexcore.common.ApexCore;
+import dev.apexstudios.apexcore.common.network.NetworkManager;
 import net.minecraft.SharedConstants;
 import net.minecraft.server.packs.PackType;
 
@@ -37,6 +38,8 @@ public interface Platform
     boolean runningDataGen();
 
     RegistryHelper registryHelper(String ownerId);
+
+    NetworkManager networkManager(String ownerId);
 
     static Platform get()
     {
