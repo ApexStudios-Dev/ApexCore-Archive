@@ -15,11 +15,13 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -37,10 +39,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 public class AbstractRegister<O extends AbstractRegister<O>> implements RegistryHelper
 {
@@ -349,6 +348,26 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
         return blockEntity(self(), currentName(), blockEntityFactory);
     }
 
+    public final ResourceKey<CreativeModeTab> creativeModeTab(String creativeModeTabName, UnaryOperator<CreativeModeTab.Builder> properties)
+    {
+        return simple(creativeModeTabName, Registries.CREATIVE_MODE_TAB, () -> properties.apply(RegistryHelper.defaultCreativeModeTab(ownerId, creativeModeTabName)).build()).registryKey;
+    }
+
+    public final ResourceKey<CreativeModeTab> creativeModeTab(String creativeModeTabName)
+    {
+        return creativeModeTab(creativeModeTabName, UnaryOperator.identity());
+    }
+
+    public final ResourceKey<CreativeModeTab> creativeModeTab(UnaryOperator<CreativeModeTab.Builder> properties)
+    {
+        return creativeModeTab(currentName(), properties);
+    }
+
+    public final ResourceKey<CreativeModeTab> creativeModeTab()
+    {
+        return creativeModeTab(currentName(), UnaryOperator.identity());
+    }
+
     protected final O self()
     {
         return (O) this;
@@ -419,6 +438,12 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
     public final <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<T> blockEntityType, OptionalLike<OptionalLike<BlockEntityRendererProvider<T>>> rendererProvider)
     {
         RegistryHelper.get(ownerId).registerBlockEntityRenderer(blockEntityType, rendererProvider);
+    }
+
+    @Override
+    public final void registerCreativeModeTabItemGenerator(ResourceKey<CreativeModeTab> creativeModeTab, CreativeModeTab.DisplayItemsGenerator generator)
+    {
+        RegistryHelper.get(ownerId).registerCreativeModeTabItemGenerator(creativeModeTab, generator);
     }
 
     private <T, R extends T, H extends DeferredHolder<T, R>> H register(ResourceKey<? extends Registry<T>> registryType, Supplier<H> holderFactory, Supplier<R> valueFactory)

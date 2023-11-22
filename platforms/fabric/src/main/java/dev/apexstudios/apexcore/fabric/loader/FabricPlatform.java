@@ -3,8 +3,7 @@ package dev.apexstudios.apexcore.fabric.loader;
 import dev.apexstudios.apexcore.common.loader.ModLoader;
 import dev.apexstudios.apexcore.common.loader.PhysicalSide;
 import dev.apexstudios.apexcore.common.loader.Platform;
-import dev.apexstudios.apexcore.common.loader.RegistryHelper;
-import dev.apexstudios.apexcore.common.network.NetworkManager;
+import dev.apexstudios.apexcore.common.loader.PlatformFactory;
 import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -16,6 +15,7 @@ public final class FabricPlatform implements Platform
         case SERVER -> PhysicalSide.DEDICATED_SERVER;
     };
     private final ModLoader modLoader = new FabricModLoader();
+    private final PlatformFactory factory = new FabricFactory();
 
     @Override
     public ModLoader modLoader()
@@ -42,14 +42,8 @@ public final class FabricPlatform implements Platform
     }
 
     @Override
-    public RegistryHelper registryHelper(String ownerId)
+    public PlatformFactory factory()
     {
-        return FabricRegistryHelper.get(ownerId);
-    }
-
-    @Override
-    public NetworkManager networkManager(String ownerId)
-    {
-        return FabricNetworkManager.get(ownerId);
+        return factory;
     }
 }

@@ -11,8 +11,10 @@ import dev.apexstudios.apexcore.common.registry.holder.DeferredItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.PigRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -22,6 +24,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
@@ -77,6 +80,11 @@ public interface TestMod
     DeferredBlockEntityType<BlockEntity> TEST_BLOCK_ENTITY = DeferredBlockEntityType.createBlockEntityType(BLOCK_WITH_ENTITY.registryName());
 
     GameRules.Key<GameRules.BooleanValue> TEST_GAMERULE = GameRules.register("test", GameRules.Category.MISC, GameRules.BooleanValue.create(false));
+
+    ResourceKey<CreativeModeTab> TEST_TAB = REGISTER.creativeModeTab("test_tab", builder -> builder
+            .icon(TEST_ITEM::asStack)
+            .displayItems((parameters, output) -> REGISTER.getAll(Registries.ITEM).stream().map(DeferredItem.class::cast).forEach(output::accept))
+    );
 
     default void bootstrap()
     {

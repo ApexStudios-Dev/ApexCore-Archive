@@ -12,6 +12,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -80,6 +81,11 @@ public final class EntityTypeBuilder<O extends AbstractRegister<O>, P, T extends
         return owner.item(this, registrationName(), properties -> itemFactory.create(holder(), backgroundColor, highlightColor, properties))
                     .color(() -> () -> (stack, tintIndex) -> ((DeferredSpawnEggItem) stack.getItem()).getColor(tintIndex))
                     .dispenseBehavior(DeferredSpawnEggItem.DEFAULT_DISPENSE_BEHAVIOR)
+                    // TODO: add api to add following
+                    //  - queue up creative tab registrations
+                    //  - allow removal of previously queued up registration
+                    //  - set default creative tab in `owner` instance and inherit for very ItemBuilder
+                    .onRegister(item -> owner.registerCreativeModeTabItemGenerator(CreativeModeTabs.SPAWN_EGGS, (parameters, output) -> output.accept(item)))
                     .onRegisterAfter(Registries.ENTITY_TYPE, DeferredSpawnEggItem::injectSpawnEggEntry);
     }
 

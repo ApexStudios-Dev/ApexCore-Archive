@@ -3,8 +3,7 @@ package dev.apexstudios.apexcore.neoforge.loader;
 import dev.apexstudios.apexcore.common.loader.ModLoader;
 import dev.apexstudios.apexcore.common.loader.PhysicalSide;
 import dev.apexstudios.apexcore.common.loader.Platform;
-import dev.apexstudios.apexcore.common.loader.RegistryHelper;
-import dev.apexstudios.apexcore.common.network.NetworkManager;
+import dev.apexstudios.apexcore.common.loader.PlatformFactory;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.data.loading.DatagenModLoader;
 
@@ -16,6 +15,7 @@ public final class NeoForgePlatform implements Platform
         case DEDICATED_SERVER -> PhysicalSide.DEDICATED_SERVER;
     };
     private final ModLoader modLoader = new NeoForgeModLoader();
+    private final PlatformFactory factory = new NeoForgeFactory();
 
     @Override
     public ModLoader modLoader()
@@ -42,14 +42,8 @@ public final class NeoForgePlatform implements Platform
     }
 
     @Override
-    public RegistryHelper registryHelper(String ownerId)
+    public PlatformFactory factory()
     {
-        return NeoForgeRegistryHelper.get(ownerId);
-    }
-
-    @Override
-    public NetworkManager networkManager(String ownerId)
-    {
-        return NeoForgeNetworkManager.get(ownerId);
+        return factory;
     }
 }

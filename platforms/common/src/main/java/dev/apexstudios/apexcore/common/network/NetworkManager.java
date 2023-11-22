@@ -1,6 +1,6 @@
 package dev.apexstudios.apexcore.common.network;
 
-import dev.apexstudios.apexcore.common.loader.Platform;
+import dev.apexstudios.apexcore.common.loader.PlatformFactory;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -34,6 +34,6 @@ public interface NetworkManager
 
     static NetworkManager get(String ownerId)
     {
-        return Platform.get().networkManager(ownerId);
+        return PlatformFactory.get().networkManager(ownerId);
     }
 }

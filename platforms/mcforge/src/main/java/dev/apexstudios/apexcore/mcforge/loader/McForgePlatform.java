@@ -3,8 +3,7 @@ package dev.apexstudios.apexcore.mcforge.loader;
 import dev.apexstudios.apexcore.common.loader.ModLoader;
 import dev.apexstudios.apexcore.common.loader.PhysicalSide;
 import dev.apexstudios.apexcore.common.loader.Platform;
-import dev.apexstudios.apexcore.common.loader.RegistryHelper;
-import dev.apexstudios.apexcore.common.network.NetworkManager;
+import dev.apexstudios.apexcore.common.loader.PlatformFactory;
 import net.minecraftforge.data.loading.DatagenModLoader;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
@@ -16,6 +15,7 @@ public final class McForgePlatform implements Platform
         case DEDICATED_SERVER -> PhysicalSide.DEDICATED_SERVER;
     };
     private final ModLoader modLoader = new McForgeModLoader();
+    private final PlatformFactory factory = new McForgeFactory();
 
     @Override
     public ModLoader modLoader()
@@ -42,14 +42,8 @@ public final class McForgePlatform implements Platform
     }
 
     @Override
-    public RegistryHelper registryHelper(String ownerId)
+    public PlatformFactory factory()
     {
-        return McForgeRegistryHelper.get(ownerId);
-    }
-
-    @Override
-    public NetworkManager networkManager(String ownerId)
-    {
-        return McForgeNetworkManager.get(ownerId);
+        return factory;
     }
 }
