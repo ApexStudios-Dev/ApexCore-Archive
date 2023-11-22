@@ -6,10 +6,12 @@ import com.google.common.collect.MultimapBuilder;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public final class ModEvents
@@ -24,6 +26,17 @@ public final class ModEvents
 
         LISTENERS.removeAll(ownerId).forEach(listener -> listener.accept(modBus));
         return modBus;
+    }
+
+    public static IEventBus registerForModContainer(ModContainer modContainer)
+    {
+        var ownerId = modContainer.getModId();
+        return register(ownerId, Objects.requireNonNull(modContainer.getEventBus(), () -> "Could obtain EventBus for ModContainer[%s]".formatted(ownerId)));
+    }
+
+    public static IEventBus registerForActiveContext()
+    {
+        return registerForModContainer(ModLoadingContext.get().getActiveContainer());
     }
 
     public static IEventBus registerForJavaFML()
