@@ -52,6 +52,7 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
     private final Set<ResourceKey<? extends Registry<?>>> completedRegistrations = Sets.newHashSet();
     @Nullable private String currentName = null;
     private boolean skipErrors = false;
+    private OptionalLike<ResourceKey<CreativeModeTab>> defaultCreativeModeTab = () -> null;
 
     protected AbstractRegister(String ownerId)
     {
@@ -366,6 +367,50 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
     public final ResourceKey<CreativeModeTab> creativeModeTab()
     {
         return creativeModeTab(currentName(), UnaryOperator.identity());
+    }
+
+    public final ResourceKey<CreativeModeTab> defaultCreativeModeTab(String creativeModeTabName, UnaryOperator<CreativeModeTab.Builder> properties)
+    {
+        var creativeModeTab = creativeModeTab(creativeModeTabName, properties);
+        defaultCreativeModeTab(creativeModeTab);
+        return creativeModeTab;
+    }
+
+    public final ResourceKey<CreativeModeTab> defaultCreativeModeTab(String creativeModeTabName)
+    {
+        return defaultCreativeModeTab(creativeModeTabName, UnaryOperator.identity());
+    }
+
+    public final ResourceKey<CreativeModeTab> defaultCreativeModeTab(UnaryOperator<CreativeModeTab.Builder> properties)
+    {
+        return defaultCreativeModeTab(currentName(), properties);
+    }
+
+    public final ResourceKey<CreativeModeTab> defaultCreativeModeTab()
+    {
+        return defaultCreativeModeTab(currentName(), UnaryOperator.identity());
+    }
+
+    // this must be called prior to any `item()` calls
+    // in which you want to inherit this creative tab as the default one
+    // this is due to the check being in the ItemBuilder constructor
+    // to allow the removal api to work with the default tab
+    public final O defaultCreativeModeTab(ResourceKey<CreativeModeTab> defaultCreativeModeTab)
+    {
+        this.defaultCreativeModeTab = () -> defaultCreativeModeTab;
+        return self();
+    }
+
+    @Nullable
+    public final ResourceKey<CreativeModeTab> getDefaultCreativeModeTab()
+    {
+        return defaultCreativeModeTab.getRaw();
+    }
+
+    public final O withDefaultCreativeModeTab(Consumer<ResourceKey<CreativeModeTab>> consumer)
+    {
+        defaultCreativeModeTab.ifPresent(consumer);
+        return self();
     }
 
     protected final O self()

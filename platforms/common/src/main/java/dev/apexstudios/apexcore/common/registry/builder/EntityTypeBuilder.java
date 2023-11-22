@@ -81,11 +81,7 @@ public final class EntityTypeBuilder<O extends AbstractRegister<O>, P, T extends
         return owner.item(this, registrationName(), properties -> itemFactory.create(holder(), backgroundColor, highlightColor, properties))
                     .color(() -> () -> (stack, tintIndex) -> ((DeferredSpawnEggItem) stack.getItem()).getColor(tintIndex))
                     .dispenseBehavior(DeferredSpawnEggItem.DEFAULT_DISPENSE_BEHAVIOR)
-                    // TODO: add api to add following
-                    //  - queue up creative tab registrations
-                    //  - allow removal of previously queued up registration
-                    //  - set default creative tab in `owner` instance and inherit for very ItemBuilder
-                    .onRegister(item -> owner.registerCreativeModeTabItemGenerator(CreativeModeTabs.SPAWN_EGGS, (parameters, output) -> output.accept(item)))
+                    .creativeModeTab(CreativeModeTabs.SPAWN_EGGS)
                     .onRegisterAfter(Registries.ENTITY_TYPE, DeferredSpawnEggItem::injectSpawnEggEntry);
     }
 
