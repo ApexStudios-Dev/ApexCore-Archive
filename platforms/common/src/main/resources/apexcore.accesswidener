@@ -74,3 +74,8 @@ transitive-accessible method net/minecraft/world/item/CreativeModeTabs generateS
 transitive-accessible method net/minecraft/world/item/CreativeModeTabs generateFireworksAllDurations (Lnet/minecraft/world/item/CreativeModeTab$Output;Lnet/minecraft/world/item/CreativeModeTab$TabVisibility;)V
 transitive-accessible method net/minecraft/world/item/CreativeModeTabs generatePresetPaintings (Lnet/minecraft/world/item/CreativeModeTab$Output;Lnet/minecraft/core/HolderLookup$RegistryLookup;Ljava/util/function/Predicate;Lnet/minecraft/world/item/CreativeModeTab$TabVisibility;)V
 transitive-accessible method net/minecraft/world/item/CreativeModeTabs streamAllTabs ()Ljava/util/stream/Stream;
+
+accessible class net/minecraft/client/gui/screens/MenuScreens$ScreenConstructor
+accessible method net/minecraft/client/gui/screens/MenuScreens register (Lnet/minecraft/world/inventory/MenuType;Lnet/minecraft/client/gui/screens/MenuScreens$ScreenConstructor;)V
+transitive-accessible class net/minecraft/client/gui/screens/MenuScreens$ScreenConstructor
+transitive-accessible method net/minecraft/client/gui/screens/MenuScreens register (Lnet/minecraft/world/inventory/MenuType;Lnet/minecraft/client/gui/screens/MenuScreens$ScreenConstructor;)V

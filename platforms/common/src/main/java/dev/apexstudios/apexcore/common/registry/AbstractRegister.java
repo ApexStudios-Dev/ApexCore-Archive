@@ -6,9 +6,13 @@ import dev.apexstudios.apexcore.common.ApexCore;
 import dev.apexstudios.apexcore.common.loader.Platform;
 import dev.apexstudios.apexcore.common.loader.RegistryHelper;
 import dev.apexstudios.apexcore.common.registry.builder.*;
+import dev.apexstudios.apexcore.common.registry.generic.MenuFactory;
 import dev.apexstudios.apexcore.common.util.OptionalLike;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -21,6 +25,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
@@ -347,6 +353,18 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
     public final <T extends BlockEntity> BlockEntityTypeBuilder<O, O, T> blockEntity(BlockEntityType.BlockEntitySupplier<T> blockEntityFactory)
     {
         return blockEntity(self(), currentName(), blockEntityFactory);
+    }
+
+    public final <T extends AbstractContainerMenu, S extends Screen & MenuAccess<T>> DeferredHolder<MenuType<?>, MenuType<T>> menu(String menuName, MenuFactory<T> menuFactory, OptionalLike<OptionalLike<MenuScreens.ScreenConstructor<T, S>>> screenFactory)
+    {
+        return noConfig(menuName, Registries.MENU, () -> Platform.get().factory().menuType(menuFactory))
+                .onRegister(menuType -> RegistryHelper.registerMenuScreenFactory(menuType, screenFactory))
+        .register();
+    }
+
+    public final <T extends AbstractContainerMenu, S extends Screen & MenuAccess<T>> DeferredHolder<MenuType<?>, MenuType<T>> menu(MenuFactory<T> menuFactory, OptionalLike<OptionalLike<MenuScreens.ScreenConstructor<T, S>>> screenFactory)
+    {
+        return menu(currentName(), menuFactory, screenFactory);
     }
 
     public final ResourceKey<CreativeModeTab> creativeModeTab(String creativeModeTabName, UnaryOperator<CreativeModeTab.Builder> properties)

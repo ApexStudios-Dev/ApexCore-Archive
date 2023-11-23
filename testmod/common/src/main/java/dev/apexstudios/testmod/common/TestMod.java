@@ -1,7 +1,9 @@
 package dev.apexstudios.testmod.common;
 
+import dev.apexstudios.apexcore.common.loader.Platform;
 import dev.apexstudios.apexcore.common.network.NetworkManager;
 import dev.apexstudios.apexcore.common.network.Packet;
+import dev.apexstudios.apexcore.common.registry.DeferredHolder;
 import dev.apexstudios.apexcore.common.registry.Register;
 import dev.apexstudios.apexcore.common.registry.generic.DeferredSpawnEggItem;
 import dev.apexstudios.apexcore.common.registry.holder.DeferredBlock;
@@ -9,6 +11,8 @@ import dev.apexstudios.apexcore.common.registry.holder.DeferredBlockEntityType;
 import dev.apexstudios.apexcore.common.registry.holder.DeferredEntityType;
 import dev.apexstudios.apexcore.common.registry.holder.DeferredItem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.entity.PigRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -17,12 +21,16 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Pig;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -80,6 +88,7 @@ public interface TestMod
     .register();
 
     DeferredBlockEntityType<BlockEntity> TEST_BLOCK_ENTITY = DeferredBlockEntityType.createBlockEntityType(BLOCK_WITH_ENTITY.registryName());
+    DeferredHolder<MenuType<?>, MenuType<TestMenu>> TEST_MENU_TYPE = REGISTER.menu("test_menu", TestMenu::new, () -> () -> TestMenuScreen::new);
 
     GameRules.Key<GameRules.BooleanValue> TEST_GAMERULE = GameRules.register("test", GameRules.Category.MISC, GameRules.BooleanValue.create(false));
 
@@ -113,9 +122,55 @@ public interface TestMod
                 player.displayClientMessage(Component.literal("Server Counter: %s".formatted(count)), false);
                 TEST_PACKET_S2C.sendTo(count, server);
                 counter++;
+                Platform.get().openMenu(server, Component.literal("Test Menu"), (windowId, inventory, opener) -> new TestMenu(windowId, inventory), buffer -> { });
             }
 
             return InteractionResult.sidedSuccess(level.isClientSide);
+        }
+
+        @Nullable
+        @Override
+        public MenuProvider getMenuProvider(BlockState blockState, Level level, BlockPos pos)
+        {
+            return Platform.get().menuProvider(Component.literal("Test Menu"), (windowId, inventory, player) -> new TestMenu(windowId, inventory), buffer -> { });
+        }
+    }
+
+    final class TestMenu extends AbstractContainerMenu
+    {
+        private TestMenu(int containerId, Inventory inventory, FriendlyByteBuf buffer)
+        {
+            super(TEST_MENU_TYPE.value(), containerId);
+        }
+
+        private TestMenu(int containerId, Inventory inventory)
+        {
+            super(TEST_MENU_TYPE.value(), containerId);
+        }
+
+        @Override
+        public ItemStack quickMoveStack(Player player, int index)
+        {
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public boolean stillValid(Player player)
+        {
+            return true;
+        }
+    }
+
+    final class TestMenuScreen extends AbstractContainerScreen<TestMenu>
+    {
+        private TestMenuScreen(TestMenu menu, Inventory playerInventory, Component title)
+        {
+            super(menu, playerInventory, title);
+        }
+
+        @Override
+        protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY)
+        {
         }
     }
 }

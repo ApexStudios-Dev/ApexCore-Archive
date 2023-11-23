@@ -5,6 +5,9 @@ import dev.apexstudios.apexcore.common.util.OptionalLike;
 import net.minecraft.Util;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -22,6 +25,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -63,6 +68,11 @@ public interface RegistryHelper
     <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<T> blockEntityType, OptionalLike<OptionalLike<BlockEntityRendererProvider<T>>> rendererProvider);
 
     void registerCreativeModeTabItemGenerator(ResourceKey<CreativeModeTab> creativeModeTab, CreativeModeTab.DisplayItemsGenerator generator);
+
+    static <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>> void registerMenuScreenFactory(MenuType<M> menuType, OptionalLike<OptionalLike<MenuScreens.ScreenConstructor<M, S>>> screenFactory)
+    {
+        PhysicalSide.CLIENT.runWhenOn(() -> () -> screenFactory.ifPresent(f -> f.ifPresent(factory -> MenuScreens.register(menuType, factory))));
+    }
 
     static <T extends Entity> void registerEntitySpawnPlacement(EntityType<T> entityType, @Nullable SpawnPlacements.Type spawnPlacement, @Nullable Heightmap.Types heightmap, @Nullable SpawnPlacements.SpawnPredicate<T> spawnPredicate)
     {

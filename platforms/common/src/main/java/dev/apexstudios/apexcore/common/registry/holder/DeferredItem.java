@@ -60,7 +60,7 @@ public final class DeferredItem<T extends Item> extends DeferredHolder<Item, T> 
 
     public static <T extends Item> DeferredItem<T> createItem(String ownerId, ResourceLocation registryName)
     {
-        return createItem(ownerId, ResourceKey.create(Registries.ITEM, registryName));
+        return createItem(ownerId, createRegistryKey(registryName));
     }
 
     public static <T extends Item> DeferredItem<T> createItem(ResourceLocation registryName)
@@ -75,6 +75,6 @@ public final class DeferredItem<T extends Item> extends DeferredHolder<Item, T> 
 
     public static <T extends Item> DeferredItem<T> createItem(ResourceKey<Item> registryKey)
     {
-        return new DeferredItem<>(registryKey.location().getNamespace(), registryKey);
+        return createItem(registryKey.location().getNamespace(), registryKey);
     }
 }
