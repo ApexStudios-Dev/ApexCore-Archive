@@ -120,7 +120,10 @@ final class NeoForgeRegistryHelper implements RegistryHelper
     @Override
     public void registerCreativeModeTabItemGenerator(ResourceKey<CreativeModeTab> creativeModeTab, CreativeModeTab.DisplayItemsGenerator generator)
     {
-        ModEvents.addListener(ownerId, BuildCreativeModeTabContentsEvent.class, event -> generator.accept(event.getParameters(), event));
+        ModEvents.addListener(ownerId, BuildCreativeModeTabContentsEvent.class, event -> {
+            if(event.getTabKey() == creativeModeTab)
+                generator.accept(event.getParameters(), event);
+        });
     }
 
     static RegistryHelper get(String ownerId)
