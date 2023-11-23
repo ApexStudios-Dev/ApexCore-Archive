@@ -17,29 +17,7 @@ public interface Platform
 
     PhysicalSide physicalSide();
 
-    default String gameVersion()
-    {
-        return SharedConstants.VERSION_STRING;
-    }
-
-    default int resourceVersion(PackType packType)
-    {
-        return switch(packType)
-        {
-            case CLIENT_RESOURCES -> SharedConstants.RESOURCE_PACK_FORMAT;
-            case SERVER_DATA -> SharedConstants.DATA_PACK_FORMAT;
-        };
-    }
-
-    default boolean isSnapshot()
-    {
-        return SharedConstants.SNAPSHOT;
-    }
-
-    default boolean isProduction()
-    {
-        return !SharedConstants.IS_RUNNING_IN_IDE;
-    }
+    boolean isProduction();
 
     boolean runningDataGen();
 
@@ -57,5 +35,20 @@ public interface Platform
     static Platform get()
     {
         return ApexCore.INSTANCE;
+    }
+
+    static String gameVersion()
+    {
+        return SharedConstants.getCurrentVersion().getName();
+    }
+
+    static int resourceVersion(PackType packType)
+    {
+        return SharedConstants.getCurrentVersion().getPackVersion(packType);
+    }
+
+    static boolean isSnapshot()
+    {
+        return !SharedConstants.getCurrentVersion().isStable();
     }
 }
