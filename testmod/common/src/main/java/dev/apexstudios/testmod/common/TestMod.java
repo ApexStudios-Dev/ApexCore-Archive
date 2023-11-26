@@ -1,6 +1,5 @@
 package dev.apexstudios.testmod.common;
 
-import dev.apexstudios.apexcore.common.loader.Platform;
 import dev.apexstudios.apexcore.common.network.NetworkManager;
 import dev.apexstudios.apexcore.common.network.Packet;
 import dev.apexstudios.apexcore.common.registry.DeferredHolder;
@@ -10,6 +9,7 @@ import dev.apexstudios.apexcore.common.registry.holder.DeferredBlock;
 import dev.apexstudios.apexcore.common.registry.holder.DeferredBlockEntityType;
 import dev.apexstudios.apexcore.common.registry.holder.DeferredEntityType;
 import dev.apexstudios.apexcore.common.registry.holder.DeferredItem;
+import dev.apexstudios.apexcore.common.util.MenuHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -30,6 +30,7 @@ import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -97,7 +98,7 @@ public interface TestMod
         REGISTER.register();
     }
 
-    final class BlockWithEntity extends BaseEntityBlock
+    final class BlockWithEntity extends BaseEntityBlock implements MenuConstructor
     {
         private int counter = 0;
 
@@ -122,7 +123,7 @@ public interface TestMod
                 player.displayClientMessage(Component.literal("Server Counter: %s".formatted(count)), false);
                 TEST_PACKET_S2C.sendTo(count, server);
                 counter++;
-                Platform.get().openMenu(server, Component.literal("Test Menu"), (windowId, inventory, opener) -> new TestMenu(windowId, inventory), buffer -> { });
+                MenuHelper.openMenu(server, Component.literal("Test Menu"), this, this::encodeExtraMenuData);
             }
 
             return InteractionResult.sidedSuccess(level.isClientSide);
@@ -132,7 +133,18 @@ public interface TestMod
         @Override
         public MenuProvider getMenuProvider(BlockState blockState, Level level, BlockPos pos)
         {
-            return Platform.get().menuProvider(Component.literal("Test Menu"), (windowId, inventory, player) -> new TestMenu(windowId, inventory), buffer -> { });
+            return MenuHelper.menuProvider(Component.literal("Test Menu"), this, this::encodeExtraMenuData);
+        }
+
+        @Nullable
+        @Override
+        public AbstractContainerMenu createMenu(int windowId, Inventory inventory, Player player)
+        {
+            return new TestMenu(windowId, inventory);
+        }
+
+        private void encodeExtraMenuData(FriendlyByteBuf buffer)
+        {
         }
     }
 
