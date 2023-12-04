@@ -1,5 +1,8 @@
 package dev.apexstudios.testmod.common;
 
+import dev.apexstudios.apexcore.common.inventory.BlockEntityItemHandlerProvider;
+import dev.apexstudios.apexcore.common.inventory.ItemHandler;
+import dev.apexstudios.apexcore.common.inventory.SimpleItemHandler;
 import dev.apexstudios.apexcore.common.network.NetworkManager;
 import dev.apexstudios.apexcore.common.network.Packet;
 import dev.apexstudios.apexcore.common.registry.DeferredHolder;
@@ -10,11 +13,13 @@ import dev.apexstudios.apexcore.common.registry.holder.DeferredBlockEntityType;
 import dev.apexstudios.apexcore.common.registry.holder.DeferredEntityType;
 import dev.apexstudios.apexcore.common.registry.holder.DeferredItem;
 import dev.apexstudios.apexcore.common.util.MenuHelper;
+import net.covers1624.quack.util.LazyValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.entity.PigRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -41,11 +46,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Supplier;
 
 public interface TestMod
 {
@@ -84,8 +92,7 @@ public interface TestMod
             .object("block_with_entity")
             .block(BlockWithEntity::new)
             .defaultItem()
-            // why are you abstract?
-            .defaultBlockEntity((blockEntityType, pos, blockState) -> new BlockEntity(blockEntityType, pos, blockState) { })
+            .defaultBlockEntity(TestBlockEntity::new)
     .register();
 
     DeferredBlockEntityType<BlockEntity> TEST_BLOCK_ENTITY = DeferredBlockEntityType.createBlockEntityType(BLOCK_WITH_ENTITY.registryName());
@@ -183,6 +190,23 @@ public interface TestMod
         @Override
         protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY)
         {
+        }
+    }
+
+    final class TestBlockEntity extends BlockEntity implements BlockEntityItemHandlerProvider
+    {
+        private final Supplier<ItemHandler> inventory = new LazyValue<>(() -> new SimpleItemHandler(1));
+
+        private TestBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState)
+        {
+            super(type, pos, blockState);
+        }
+
+        @Nullable
+        @Override
+        public ItemHandler getItemHandler(@Nullable Direction side)
+        {
+            return inventory.get();
         }
     }
 }
