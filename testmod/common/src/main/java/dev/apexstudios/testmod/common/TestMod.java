@@ -3,6 +3,9 @@ package dev.apexstudios.testmod.common;
 import dev.apexstudios.apexcore.common.inventory.BlockEntityItemHandlerProvider;
 import dev.apexstudios.apexcore.common.inventory.ItemHandler;
 import dev.apexstudios.apexcore.common.inventory.SimpleItemHandler;
+import dev.apexstudios.apexcore.common.menu.BaseMenu;
+import dev.apexstudios.apexcore.common.menu.BaseMenuScreen;
+import dev.apexstudios.apexcore.common.menu.SlotManager;
 import dev.apexstudios.apexcore.common.network.NetworkManager;
 import dev.apexstudios.apexcore.common.network.Packet;
 import dev.apexstudios.apexcore.common.registry.DeferredHolder;
@@ -15,8 +18,6 @@ import dev.apexstudios.apexcore.common.registry.holder.DeferredItem;
 import dev.apexstudios.apexcore.common.util.MenuHelper;
 import net.covers1624.quack.util.LazyValue;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.entity.PigRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,6 +28,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -96,7 +98,7 @@ public interface TestMod
     .register();
 
     DeferredBlockEntityType<BlockEntity> TEST_BLOCK_ENTITY = DeferredBlockEntityType.createBlockEntityType(BLOCK_WITH_ENTITY.registryName());
-    DeferredHolder<MenuType<?>, MenuType<TestMenu>> TEST_MENU_TYPE = REGISTER.menu("test_menu", TestMenu::new, () -> () -> TestMenuScreen::new);
+    DeferredHolder<MenuType<?>, MenuType<TestMenu>> TEST_MENU_TYPE = REGISTER.<TestMenu, BaseMenuScreen<TestMenu>>menu("test_menu", TestMenu::new, () -> () -> BaseMenuScreen::new);
 
     GameRules.Key<GameRules.BooleanValue> TEST_GAMERULE = GameRules.register("test", GameRules.Category.MISC, GameRules.BooleanValue.create(false));
 
@@ -155,41 +157,23 @@ public interface TestMod
         }
     }
 
-    final class TestMenu extends AbstractContainerMenu
+    final class TestMenu extends BaseMenu
     {
         private TestMenu(int containerId, Inventory inventory, FriendlyByteBuf buffer)
         {
-            super(TEST_MENU_TYPE.value(), containerId);
+            this(containerId, inventory);
         }
 
         private TestMenu(int containerId, Inventory inventory)
         {
-            super(TEST_MENU_TYPE.value(), containerId);
-        }
+            super(TEST_MENU_TYPE.value(), containerId, 176, 166);
 
-        @Override
-        public ItemStack quickMoveStack(Player player, int index)
-        {
-            return ItemStack.EMPTY;
-        }
-
-        @Override
-        public boolean stillValid(Player player)
-        {
-            return true;
-        }
-    }
-
-    final class TestMenuScreen extends AbstractContainerScreen<TestMenu>
-    {
-        private TestMenuScreen(TestMenu menu, Inventory playerInventory, Component title)
-        {
-            super(menu, playerInventory, title);
-        }
-
-        @Override
-        protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY)
-        {
+            slotManager.addPlayerSlots(inventory);
+            slotManager.addSlot(new SimpleContainer(1), "oak", 20, 20, 0);
+            slotManager.addSlots(new SimpleContainer(4), "birch", 40, 20, 2, 2);
+            slotManager.addGhostSlot("ghost", 80, 20).ghosting(Items.DIAMOND);
+            slotManager.addShiftTarget(SlotManager.GROUP_PLAYER, "oak", true);
+            slotManager.addShiftTarget("birch", "oak", false);
         }
     }
 
