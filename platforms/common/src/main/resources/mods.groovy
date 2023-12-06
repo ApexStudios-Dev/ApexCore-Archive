@@ -8,7 +8,7 @@ ModsDotGroovy.make {
 
     onForge {
         modLoader = 'javafml'
-        loaderVersion = "[${props['loom.platform'] == 'neoforge' ? props.NEOFORGE_LOADER_VERSION : props.MCFORGE_LOADER_VERSION},)"
+        loaderVersion = "[${props.NEOFORGE_LOADER_VERSION},)"
     }
 
     onFabric {
@@ -69,12 +69,8 @@ ModsDotGroovy.make {
                 }
 
                 forge {
-                    if(props['loom.platform'] == 'neoforge') {
-                        versionRange = props.NEOFORGE_VERSION_RANGE
-                        modId = 'neoforge'
-                    } else {
-                        versionRange = props.MCFORGE_VERSION_RANGE
-                    }
+                    versionRange = props.NEOFORGE_VERSION_RANGE
+                    modId = 'neoforge'
                 }
             }
         }
