@@ -1,6 +1,6 @@
 package dev.apexstudios.apexcore.fabric.loader;
 
-import dev.apexstudios.apexcore.common.inventory.BlockEntityItemHandlerProvider;
+import dev.apexstudios.apexcore.common.inventory.ItemHandlerProvider;
 import dev.apexstudios.apexcore.common.loader.ModLoader;
 import dev.apexstudios.apexcore.common.loader.PhysicalSide;
 import dev.apexstudios.apexcore.common.loader.Platform;
@@ -24,17 +24,8 @@ public final class FabricPlatform implements Platform
     public FabricPlatform()
     {
         ItemStorage.SIDED.registerFallback((level, pos, blockState, blockEntity, side) ->
-        {
-            if(blockEntity instanceof BlockEntityItemHandlerProvider provider)
-            {
-                var itemHandler = provider.getItemHandler(side);
-
-                if(itemHandler != null)
-                    return new FabricItemHandler(itemHandler);
-            }
-
-            return null;
-        });
+                blockEntity instanceof ItemHandlerProvider.Directional provider ? provider.getItemHandler(side).map(FabricItemHandler::new).getRaw() : null
+        );
     }
 
     @Override

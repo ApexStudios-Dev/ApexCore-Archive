@@ -1,11 +1,11 @@
 package dev.apexstudios.apexcore.neoforge.loader;
 
-import dev.apexstudios.apexcore.common.inventory.BlockEntityItemHandlerProvider;
 import dev.apexstudios.apexcore.common.inventory.ItemHandler;
-import dev.apexstudios.apexcore.common.inventory.ItemStackHandlerProvider;
+import dev.apexstudios.apexcore.common.inventory.ItemHandlerProvider;
 import dev.apexstudios.apexcore.common.inventory.SimpleItemHandler;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -14,10 +14,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.util.INBTSerializable;
-import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
-
-import javax.annotation.Nullable;
 
 public final class NeoForgeItemHandler implements IItemHandlerModifiable, INBTSerializable<CompoundTag>
 {
@@ -84,37 +81,43 @@ public final class NeoForgeItemHandler implements IItemHandlerModifiable, INBTSe
 
     public static void registerForBlocks(RegisterCapabilitiesEvent event, Block... blocks)
     {
-        event.registerBlock(Capabilities.ItemHandler.BLOCK, (level, pos, blockState, blockEntity, side) -> lookup(blockEntity, side), blocks);
+        event.registerBlock(
+                Capabilities.ItemHandler.BLOCK,
+                (level, pos, blockState, blockEntity, side) -> blockEntity instanceof ItemHandlerProvider.Directional provider ? provider.getItemHandler(side).map(NeoForgeItemHandler::new).getRaw() : null,
+                blocks
+        );
     }
 
-    public static <T extends BlockEntity & BlockEntityItemHandlerProvider> void registerForBlockEntity(RegisterCapabilitiesEvent event, BlockEntityType<T> blockEntityType)
+    public static <T extends BlockEntity & ItemHandlerProvider.Directional> void registerForBlockEntity(RegisterCapabilitiesEvent event, BlockEntityType<T> blockEntityType)
     {
-        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, blockEntityType, NeoForgeItemHandler::lookup);
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                blockEntityType,
+                (blockEntity, side) -> blockEntity.getItemHandler(side).map(NeoForgeItemHandler::new).getRaw()
+        );
+    }
+
+    public static <T extends Entity & ItemHandlerProvider.Directional> void registerForEntity(RegisterCapabilitiesEvent event, EntityType<T> entityType)
+    {
+        event.registerEntity(
+                Capabilities.ItemHandler.ENTITY,
+                entityType,
+                (entity, $) -> entity.getItemHandler().map(NeoForgeItemHandler::new).getRaw()
+        );
+
+        event.registerEntity(
+                Capabilities.ItemHandler.ENTITY_AUTOMATION,
+                entityType,
+                (entity, side) -> entity.getItemHandler(side).map(NeoForgeItemHandler::new).getRaw()
+        );
     }
 
     public static void registerForItems(RegisterCapabilitiesEvent event, ItemLike... items)
     {
-        event.registerItem(Capabilities.ItemHandler.ITEM, (stack, $) ->
-        {
-            if(stack.getItem() instanceof ItemStackHandlerProvider provider)
-            {
-                var itemHandler = provider.getItemHandler(stack);
-                return itemHandler == null ? null : new NeoForgeItemHandler(itemHandler);
-            }
-
-            return null;
-        }, items);
-    }
-
-    @Nullable
-    private static IItemHandler lookup(@Nullable BlockEntity blockEntity, @Nullable Direction side)
-    {
-        if(blockEntity instanceof BlockEntityItemHandlerProvider provider)
-        {
-            var itemHandler = provider.getItemHandler(side);
-            return itemHandler == null ? null : new NeoForgeItemHandler(itemHandler);
-        }
-
-        return null;
+        event.registerItem(
+                Capabilities.ItemHandler.ITEM,
+                (stack, $) -> stack.getItem() instanceof ItemHandlerProvider.Item provider ? provider.getItemHandler(stack).map(NeoForgeItemHandler::new).getRaw() : null,
+                items
+        );
     }
 }

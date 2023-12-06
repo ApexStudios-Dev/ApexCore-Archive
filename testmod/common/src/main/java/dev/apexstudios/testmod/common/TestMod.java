@@ -1,8 +1,8 @@
 package dev.apexstudios.testmod.common;
 
 import com.mojang.serialization.MapCodec;
-import dev.apexstudios.apexcore.common.inventory.BlockEntityItemHandlerProvider;
 import dev.apexstudios.apexcore.common.inventory.ItemHandler;
+import dev.apexstudios.apexcore.common.inventory.ItemHandlerProvider;
 import dev.apexstudios.apexcore.common.inventory.SimpleItemHandler;
 import dev.apexstudios.apexcore.common.menu.BaseMenu;
 import dev.apexstudios.apexcore.common.menu.BaseMenuScreen;
@@ -17,6 +17,7 @@ import dev.apexstudios.apexcore.common.registry.holder.DeferredBlockEntityType;
 import dev.apexstudios.apexcore.common.registry.holder.DeferredEntityType;
 import dev.apexstudios.apexcore.common.registry.holder.DeferredItem;
 import dev.apexstudios.apexcore.common.util.MenuHelper;
+import dev.apexstudios.apexcore.common.util.OptionalLike;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.PigRenderer;
 import net.minecraft.core.BlockPos;
@@ -212,11 +213,11 @@ public interface TestMod
             var plrLevel = inventory.player.level();
             var level = plrLevel.dimension() == dimension ? plrLevel : inventory.player.getServer().getLevel(globalPos.dimension());
             var blockEntity = TEST_BLOCK_ENTITY.getOptional(level, globalPos.pos()).orElseThrow();
-            return new TestMenu(windowId, inventory, blockEntity.getItemHandler(), blockEntity.getItemHandler(Direction.NORTH));
+            return new TestMenu(windowId, inventory, blockEntity.getItemHandler().orElseThrow(), blockEntity.getItemHandler(Direction.NORTH).orElseThrow());
         }
     }
 
-    final class TestBlockEntity extends BlockEntity implements BlockEntityItemHandlerProvider, MenuProvider, Consumer<FriendlyByteBuf>, Nameable
+    final class TestBlockEntity extends BlockEntity implements ItemHandlerProvider.Directional, MenuProvider, Consumer<FriendlyByteBuf>, Nameable
     {
         private static final String NBT_OAK = "Oak";
         private static final String NBT_BIRCH = "Birch";
@@ -261,15 +262,9 @@ public interface TestMod
         }
 
         @Override
-        public ItemHandler getItemHandler(@Nullable Direction side)
+        public OptionalLike<ItemHandler> getItemHandler(@Nullable Direction side)
         {
-            return side == null ? oakInventory : birchInventory;
-        }
-
-        @Override
-        public ItemHandler getItemHandler()
-        {
-            return oakInventory;
+            return side == null || side == Direction.UP ? OptionalLike.of(oakInventory) : OptionalLike.of(birchInventory);
         }
 
         @Override
