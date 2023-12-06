@@ -88,6 +88,11 @@ dependencies {
     // compileOnly to not be included in maven pom
     compileOnly "org.spongepowered:mixin:${MIXIN_VERSION}"
 
+    // MixinExtras is now included with both Fabric (0.3.0) & NeoForge (0.3.1)
+    // we include 0.3.0 in common as its the lowest version compatible on both Fabric & NeoForge
+    annotationProcessor 'io.github.llamalad7:mixinextras-common:0.3.0'
+    implementation 'io.github.llamalad7:mixinextras-common:0.3.0'
+
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
     compileOnly 'com.google.errorprone:error_prone_annotations:2.11.0'
 }
