@@ -13,7 +13,6 @@ configurations {
 }
 
 architectury {
-    platformSetupLoomIde()
     neoForge()
 }
 
