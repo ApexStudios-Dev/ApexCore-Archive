@@ -13,6 +13,9 @@ import java.util.function.Supplier;
 public final class BlockSetTypeBuilder
 {
     private boolean canOpenByHand = true;
+    private boolean canOpenByWindCharge = true;
+    private boolean canButtonBeActivatedByArrows = true;
+    private BlockSetType.PressurePlateSensitivity pressurePlateSensitivity = BlockSetType.PressurePlateSensitivity.EVERYTHING;
     private SoundType soundType = SoundType.WOOD;
     private OptionalLike<SoundEvent> doorClose = OptionalLike.empty();
     private OptionalLike<SoundEvent> doorOpen = OptionalLike.empty();
@@ -26,6 +29,24 @@ public final class BlockSetTypeBuilder
     public BlockSetTypeBuilder canOpenByHand(boolean canOpenByHand)
     {
         this.canOpenByHand = canOpenByHand;
+        return this;
+    }
+
+    public BlockSetTypeBuilder canOpenByWindCharge(boolean canOpenByWindCharge)
+    {
+        this.canOpenByWindCharge = canOpenByWindCharge;
+        return this;
+    }
+
+    public BlockSetTypeBuilder canButtonBeActivatedByArrows(boolean canButtonBeActivatedByArrows)
+    {
+        this.canButtonBeActivatedByArrows = canButtonBeActivatedByArrows;
+        return this;
+    }
+
+    public BlockSetTypeBuilder pressurePlateSensitivity(BlockSetType.PressurePlateSensitivity pressurePlateSensitivity)
+    {
+        this.pressurePlateSensitivity = pressurePlateSensitivity;
         return this;
     }
 
@@ -86,6 +107,9 @@ public final class BlockSetTypeBuilder
     public BlockSetTypeBuilder copyFrom(BlockSetTypeBuilder copyFrom)
     {
         return canOpenByHand(copyFrom.canOpenByHand)
+                .canOpenByWindCharge(copyFrom.canOpenByWindCharge)
+                .canButtonBeActivatedByArrows(copyFrom.canButtonBeActivatedByArrows)
+                .pressurePlateSensitivity(copyFrom.pressurePlateSensitivity)
                 .soundType(copyFrom.soundType)
                 .doorClose(copyFrom.doorClose)
                 .doorOpen(copyFrom.doorOpen)
@@ -100,6 +124,9 @@ public final class BlockSetTypeBuilder
     public BlockSetTypeBuilder copyFrom(BlockSetType copyFrom)
     {
         return canOpenByHand(copyFrom.canOpenByHand())
+                .canOpenByWindCharge(copyFrom.canOpenByWindCharge())
+                .canButtonBeActivatedByArrows(copyFrom.canButtonBeActivatedByArrows())
+                .pressurePlateSensitivity(copyFrom.pressurePlateSensitivity())
                 .soundType(copyFrom.soundType())
                 .doorClose(copyFrom::doorClose)
                 .doorOpen(copyFrom::doorOpen)
@@ -122,6 +149,9 @@ public final class BlockSetTypeBuilder
         return BlockSetType.register(new BlockSetType(
                 registryName.toString(),
                 canOpenByHand,
+                canOpenByWindCharge,
+                canButtonBeActivatedByArrows,
+                pressurePlateSensitivity,
                 soundType,
                 // default to wooden sounds if unset
                 doorClose.orElseGet(() -> SoundEvents.WOODEN_DOOR_CLOSE),

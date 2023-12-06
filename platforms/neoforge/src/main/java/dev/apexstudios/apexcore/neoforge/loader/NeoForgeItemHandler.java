@@ -1,6 +1,5 @@
 package dev.apexstudios.apexcore.neoforge.loader;
 
-import com.google.common.collect.Maps;
 import dev.apexstudios.apexcore.common.inventory.BlockEntityItemHandlerProvider;
 import dev.apexstudios.apexcore.common.inventory.ItemHandler;
 import dev.apexstudios.apexcore.common.inventory.ItemStackHandlerProvider;
@@ -8,18 +7,19 @@ import dev.apexstudios.apexcore.common.inventory.SimpleItemHandler;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.util.INBTSerializable;
-import net.neoforged.neoforge.common.util.LazyOptional;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
+import javax.annotation.Nullable;
 
-final class NeoForgeItemHandler implements IItemHandlerModifiable, INBTSerializable<CompoundTag>
+public final class NeoForgeItemHandler implements IItemHandlerModifiable, INBTSerializable<CompoundTag>
 {
     private ItemHandler itemHandler;
 
@@ -82,101 +82,39 @@ final class NeoForgeItemHandler implements IItemHandlerModifiable, INBTSerializa
         return itemHandler.isItemValid(slotIndex, stack);
     }
 
-    static CapabilityProvider forBlockEntity(BlockEntityItemHandlerProvider provider)
+    public static void registerForBlocks(RegisterCapabilitiesEvent event, Block... blocks)
     {
-        return new CapabilityProvider()
-        {
-            @Nullable private Map<Direction, LazyOptional<IItemHandler>> sidedHandlers;
-            @Nullable private LazyOptional<IItemHandler> defaultHandler;
-
-            @Override
-            public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction side)
-            {
-                if(capability == Capabilities.ITEM_HANDLER)
-                    return (side == null ? forNull() : forSide(side)).cast();
-
-                return LazyOptional.empty();
-            }
-
-            @Override
-            public void invalidate()
-            {
-                if(sidedHandlers != null)
-                {
-                    sidedHandlers.values().forEach(LazyOptional::invalidate);
-                    sidedHandlers.clear();
-                    sidedHandlers = null;
-                }
-
-                if(defaultHandler != null)
-                {
-                    defaultHandler.invalidate();
-                    defaultHandler = null;
-                }
-            }
-
-            private LazyOptional<IItemHandler> forSide(Direction side)
-            {
-                if(sidedHandlers == null)
-                    sidedHandlers = Maps.newEnumMap(Direction.class);
-
-                return sidedHandlers.computeIfAbsent(side, $ ->
-                {
-                    var itemHandler = provider.getItemHandler($);
-                    return itemHandler == null ? LazyOptional.empty() : LazyOptional.of(() -> new NeoForgeItemHandler(itemHandler));
-                });
-            }
-
-            private LazyOptional<IItemHandler> forNull()
-            {
-                if(defaultHandler == null)
-                {
-                    var itemHandler = provider.getItemHandler();
-                    defaultHandler = itemHandler == null ? LazyOptional.empty() : LazyOptional.of(() -> new NeoForgeItemHandler(itemHandler));
-                }
-
-                return defaultHandler;
-            }
-        };
+        event.registerBlock(Capabilities.ItemHandler.BLOCK, (level, pos, blockState, blockEntity, side) -> lookup(blockEntity, side), blocks);
     }
 
-    static CapabilityProvider forItemStack(ItemStack stack, ItemStackHandlerProvider provider)
+    public static <T extends BlockEntity & BlockEntityItemHandlerProvider> void registerForBlockEntity(RegisterCapabilitiesEvent event, BlockEntityType<T> blockEntityType)
     {
-        return new CapabilityProvider()
-        {
-            @Nullable private LazyOptional<IItemHandler> handler;
-
-            @Override
-            public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction side)
-            {
-                return capability == Capabilities.ITEM_HANDLER ? capability().cast() : LazyOptional.empty();
-            }
-
-            @Override
-            public void invalidate()
-            {
-                if(handler != null)
-                {
-                    handler.invalidate();
-                    handler = null;
-                }
-            }
-
-            private LazyOptional<IItemHandler> capability()
-            {
-                if(handler == null)
-                {
-                    var itemHandler = provider.getItemHandler(stack);
-                    return itemHandler == null ? LazyOptional.empty() : LazyOptional.of(() -> new NeoForgeItemHandler(itemHandler));
-                }
-
-                return handler;
-            }
-        };
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, blockEntityType, NeoForgeItemHandler::lookup);
     }
 
-    interface CapabilityProvider extends ICapabilityProvider
+    public static void registerForItems(RegisterCapabilitiesEvent event, ItemLike... items)
     {
-        void invalidate();
+        event.registerItem(Capabilities.ItemHandler.ITEM, (stack, $) ->
+        {
+            if(stack.getItem() instanceof ItemStackHandlerProvider provider)
+            {
+                var itemHandler = provider.getItemHandler(stack);
+                return itemHandler == null ? null : new NeoForgeItemHandler(itemHandler);
+            }
+
+            return null;
+        }, items);
+    }
+
+    @Nullable
+    private static IItemHandler lookup(@Nullable BlockEntity blockEntity, @Nullable Direction side)
+    {
+        if(blockEntity instanceof BlockEntityItemHandlerProvider provider)
+        {
+            var itemHandler = provider.getItemHandler(side);
+            return itemHandler == null ? null : new NeoForgeItemHandler(itemHandler);
+        }
+
+        return null;
     }
 }

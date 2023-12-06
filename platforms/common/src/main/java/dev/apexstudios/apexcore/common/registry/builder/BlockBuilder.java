@@ -54,7 +54,7 @@ public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Bloc
 
     public BlockBuilder<O, P, T> copyPropertiesFrom(OptionalLike<BlockBehaviour> copyFrom)
     {
-        return initialProperties(() -> copyFrom.map(BlockBehaviour.Properties::copy).getRaw());
+        return initialProperties(() -> copyFrom.map(BlockBehaviour.Properties::ofFullCopy).getRaw());
     }
 
     public BlockBuilder<O, P, T> properties(UnaryOperator<BlockBehaviour.Properties> propertiesModifier)

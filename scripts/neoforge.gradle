@@ -22,6 +22,7 @@ repositories {
         url 'https://maven.neoforged.net/releases'
         content {
             includeGroupByRegex 'net\\.neoforged.*'
+            includeGroupByRegex 'cpw\\.mods.*'
         }
     }
 }

@@ -1,5 +1,6 @@
 package dev.apexstudios.testmod.common;
 
+import com.mojang.serialization.MapCodec;
 import dev.apexstudios.apexcore.common.inventory.BlockEntityItemHandlerProvider;
 import dev.apexstudios.apexcore.common.inventory.ItemHandler;
 import dev.apexstudios.apexcore.common.inventory.SimpleItemHandler;
@@ -108,11 +109,19 @@ public interface TestMod
 
     final class BlockWithEntity extends BaseEntityBlock
     {
+        private static final MapCodec<BlockWithEntity> CODEC = simpleCodec(BlockWithEntity::new);
+
         private int counter = 0;
 
         private BlockWithEntity(Properties properties)
         {
             super(properties);
+        }
+
+        @Override
+        protected MapCodec<? extends BaseEntityBlock> codec()
+        {
+            return CODEC;
         }
 
         @Override
