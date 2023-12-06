@@ -245,7 +245,6 @@ subprojects {
             accessWidenerPath = ACCESS_WIDENER_FILE
         }
 
-//        mixin.defaultRefmapName = "${MOD_ID}.refmap.json"
         silentMojangMappingsLicense()
     }
 

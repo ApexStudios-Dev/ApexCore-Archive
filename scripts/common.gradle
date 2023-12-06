@@ -1,6 +1,5 @@
 apply plugin: 'org.groovymc.modsdotgroovy'
 
-def forgeProj
 def neoProj
 def fabricProj
 
@@ -9,20 +8,12 @@ if(project.name.containsIgnoreCase('testmod')) {
         fabricProj = project(':testmod-fabric')
     }
 
-    if(findProject(':testmod-mcforge') != null) {
-        forgeProj = project(':testmod-mcforge')
-    }
-
     if(findProject(':testmod-neoforge') != null) {
         neoProj = project(':testmod-neoforge')
     }
 } else {
     if(findProject(':fabric') != null) {
         fabricProj = project(':fabric')
-    }
-
-    if(findProject(':mcforge') != null) {
-        forgeProj = project(':mcforge')
     }
 
     if(findProject(':neoforge') != null) {
@@ -34,27 +25,12 @@ modsDotGroovy {
     dslVersion = '1.5.1'
     platform = 'multiloader'
 
-    def forgeProjs = [ ]
-
-    if(forgeProj != null) {
-        forgeProjs += forgeProj
-    }
-
-    if(neoProj != null) {
-        forgeProjs += neoProj
-    }
-
     multiloader {
         common = project
-        forge = forgeProjs
-
-        /*if(forgeProj != null) {
-            forge = [ forgeProj ]
-        }
 
         if(neoProj != null) {
-            neoforge = [ neoProj ]
-        }*/
+            forge = [ neoProj ]
+        }
 
         if(fabricProj != null) {
             fabric = [ fabricProj ]
@@ -67,21 +43,17 @@ sourceSets {
 }
 
 architectury {
-    def enabledPlatforms = [ ]
+    def platforms = [ ]
 
     if(fabricProj != null) {
-        enabledPlatforms += 'fabric'
-    }
-
-    if(forgeProj != null) {
-        enabledPlatforms += 'forge'
+        platforms += 'fabric'
     }
 
     if(neoProj != null) {
-        enabledPlatforms += 'neoforge'
+        platforms += 'neoforge'
     }
 
-    common(enabledPlatforms)
+    common(platforms)
 }
 
 dependencies {
