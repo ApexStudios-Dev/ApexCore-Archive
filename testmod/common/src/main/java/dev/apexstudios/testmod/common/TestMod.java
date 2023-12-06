@@ -171,7 +171,7 @@ public interface TestMod
             slotManager.addPlayerSlots(inventory);
             slotManager.addSlot(new SimpleContainer(1), "oak", 20, 20, 0);
             slotManager.addSlots(new SimpleContainer(4), "birch", 40, 20, 2, 2);
-            slotManager.addGhostSlot("ghost", 80, 20).ghosting(Items.DIAMOND);
+            slotManager.addGhostSlot(80, 20).ghosting(Items.DIAMOND);
             slotManager.addShiftTarget(SlotManager.GROUP_PLAYER, "oak", true);
             slotManager.addShiftTarget("birch", "oak", false);
         }

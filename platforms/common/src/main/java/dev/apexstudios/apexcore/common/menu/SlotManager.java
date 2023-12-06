@@ -22,6 +22,7 @@ import java.util.function.UnaryOperator;
 public final class SlotManager implements Iterable<Slot>
 {
     public static final String GROUP_PLAYER = "player";
+    public static final String GROUP_GHOST = "ghosts";
 
     private final Int2ObjectMap<String> slotGroups = new Int2ObjectOpenHashMap<>();
     private final ArrayListMultimap<String, Slot> byGroup = ArrayListMultimap.create();
@@ -73,6 +74,11 @@ public final class SlotManager implements Iterable<Slot>
         return getForGroup(GROUP_PLAYER);
     }
 
+    public List<Slot> getGhostSlots()
+    {
+        return getForGroup(GROUP_GHOST);
+    }
+
     public void addShiftTarget(String group, String targetGroup, boolean bidirectional)
     {
         shiftTargets.put(group, targetGroup);
@@ -81,24 +87,24 @@ public final class SlotManager implements Iterable<Slot>
             shiftTargets.put(targetGroup, group);
     }
 
-    public void addGhostSlots(String group, int x, int y, int rows, int columns, UnaryOperator<GhostSlot> modifier)
+    public void addGhostSlots(int x, int y, int rows, int columns, UnaryOperator<GhostSlot> modifier)
     {
-        addSlots(group, x, y, rows, columns, (slotX, slotY, slotIndex) -> modifier.apply(new GhostSlot(slotX, slotY)));
+        addSlots(GROUP_GHOST, x, y, rows, columns, (slotX, slotY, slotIndex) -> modifier.apply(new GhostSlot(slotX, slotY)));
     }
 
-    public void addGhostSlots(String group, int x, int y, int rows, int columns)
+    public void addGhostSlots(int x, int y, int rows, int columns)
     {
-        addGhostSlots(group, x, y, rows, columns, UnaryOperator.identity());
+        addGhostSlots(x, y, rows, columns, UnaryOperator.identity());
     }
 
-    public GhostSlot addGhostSlot(String group, int x, int y)
+    public GhostSlot addGhostSlot(int x, int y)
     {
-        return addSlot(new GhostSlot(x, y), group);
+        return addGhostSlot(new GhostSlot(x, y));
     }
 
-    public GhostSlot addGhostSlot(GhostSlot slot, String group)
+    public GhostSlot addGhostSlot(GhostSlot slot)
     {
-        return addSlot(slot, group);
+        return addSlot(slot, GROUP_GHOST);
     }
 
     public void addSlots(Container container, String group, int x, int y, int rows, int columns)
