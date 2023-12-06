@@ -12,10 +12,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
@@ -50,6 +47,16 @@ public final class SlotManager implements Iterable<Slot>
     {
         Objects.checkIndex(slotIndex, size());
         return menu.getSlot(slotIndex);
+    }
+
+    public Set<String> groups()
+    {
+        return byGroup.keySet();
+    }
+
+    public Collection<String> shiftTargets(String group)
+    {
+        return shiftTargets.get(group);
     }
 
     @Nullable
