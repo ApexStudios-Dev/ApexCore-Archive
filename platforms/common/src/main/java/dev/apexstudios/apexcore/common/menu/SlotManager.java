@@ -3,6 +3,8 @@ package dev.apexstudios.apexcore.common.menu;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import dev.apexstudios.apexcore.common.inventory.ItemHandler;
+import dev.apexstudios.apexcore.common.inventory.ItemHandlerSlot;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.world.Container;
@@ -124,6 +126,16 @@ public final class SlotManager implements Iterable<Slot>
         addSlots(group, x, y, rows, columns, slotIndexOffset, (slotX, slotY, slotIndex) -> new Slot(container, slotIndex, slotX, slotY));
     }
 
+    public void addSlots(ItemHandler itemHandler, String group, int x, int y, int rows, int columns)
+    {
+        addSlots(itemHandler, group, x, y, rows, columns, 0);
+    }
+
+    public void addSlots(ItemHandler itemHandler, String group, int x, int y, int rows, int columns, int slotIndexOffset)
+    {
+        addSlots(group, x, y, rows, columns, slotIndexOffset, (slotX, slotY, slotIndex) -> new ItemHandlerSlot(itemHandler, slotIndex, slotX, slotY));
+    }
+
     public void addSlots(String group, int x, int y, int rows, int columns, Factory factory)
     {
         addSlots(group, x, y, rows, columns, 0, factory);
@@ -143,6 +155,11 @@ public final class SlotManager implements Iterable<Slot>
     public Slot addSlot(Container container, String group, int x, int y, int slotIndex)
     {
         return addSlot(new Slot(container, slotIndex, x, y), group);
+    }
+
+    public ItemHandlerSlot addSlot(ItemHandler itemHandler, String group, int x, int y, int slotIndex)
+    {
+        return addSlot(new ItemHandlerSlot(itemHandler, slotIndex, x, y), group);
     }
 
     public <T extends Slot> T addSlot(T slot, String group)
