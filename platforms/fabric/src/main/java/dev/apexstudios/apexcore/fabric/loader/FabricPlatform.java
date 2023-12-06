@@ -1,10 +1,12 @@
 package dev.apexstudios.apexcore.fabric.loader;
 
+import dev.apexstudios.apexcore.common.inventory.BlockEntityItemHandlerProvider;
 import dev.apexstudios.apexcore.common.loader.ModLoader;
 import dev.apexstudios.apexcore.common.loader.PhysicalSide;
 import dev.apexstudios.apexcore.common.loader.Platform;
 import dev.apexstudios.apexcore.common.loader.PlatformFactory;
 import dev.apexstudios.apexcore.common.util.MenuHelper;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -18,6 +20,22 @@ public final class FabricPlatform implements Platform
     private final ModLoader modLoader = new FabricModLoader();
     private final PlatformFactory factory = new FabricFactory();
     private final MenuHelper menuHelper = new FabricMenuHelper();
+
+    public FabricPlatform()
+    {
+        ItemStorage.SIDED.registerFallback((level, pos, blockState, blockEntity, side) ->
+        {
+            if(blockEntity instanceof BlockEntityItemHandlerProvider provider)
+            {
+                var itemHandler = provider.getItemHandler(side);
+
+                if(itemHandler != null)
+                    return new FabricItemHandler(itemHandler);
+            }
+
+            return null;
+        });
+    }
 
     @Override
     public ModLoader modLoader()

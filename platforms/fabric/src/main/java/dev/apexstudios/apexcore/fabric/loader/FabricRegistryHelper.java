@@ -1,7 +1,6 @@
 package dev.apexstudios.apexcore.fabric.loader;
 
 import com.google.common.collect.Maps;
-import dev.apexstudios.apexcore.common.inventory.BlockEntityItemHandlerProvider;
 import dev.apexstudios.apexcore.common.loader.PhysicalSide;
 import dev.apexstudios.apexcore.common.loader.RegistryHelper;
 import dev.apexstudios.apexcore.common.registry.AbstractRegister;
@@ -12,7 +11,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.renderer.RenderType;
@@ -46,19 +44,6 @@ final class FabricRegistryHelper implements RegistryHelper, RegistrationHelper
     private FabricRegistryHelper(String ownerId)
     {
         this.ownerId = ownerId;
-
-        ItemStorage.SIDED.registerFallback((level, pos, blockState, blockEntity, side) ->
-        {
-            if(blockEntity instanceof BlockEntityItemHandlerProvider provider)
-            {
-                var itemHandler = provider.getItemHandler(side);
-
-                if(itemHandler != null)
-                    return new FabricItemHandler(itemHandler);
-            }
-
-            return null;
-        });
     }
 
     @Override
