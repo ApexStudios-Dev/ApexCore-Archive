@@ -39,6 +39,7 @@ ModsDotGroovy.make {
 
             entrypoints {
                 setMain('dev.apexstudios.testmod.fabric.entrypoint.FabricModInitializer')
+                entrypoint('fabric-datagen', "${props.MOD_GROUP}.fabric.loader.FabricResourceGeneration::generate".toString())
             }
         }
 

@@ -1,6 +1,7 @@
 package dev.apexstudios.apexcore.neoforge.loader;
 
 import com.google.common.collect.Maps;
+import dev.apexstudios.apexcore.common.generator.ResourceGeneration;
 import dev.apexstudios.apexcore.common.loader.PhysicalSide;
 import dev.apexstudios.apexcore.common.loader.RegistryHelper;
 import dev.apexstudios.apexcore.common.registry.AbstractRegister;
@@ -31,6 +32,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
@@ -46,6 +48,16 @@ final class NeoForgeRegistryHelper implements RegistryHelper
     private NeoForgeRegistryHelper(String ownerId)
     {
         this.ownerId = ownerId;
+
+        ModEvents.addListener(ownerId, GatherDataEvent.class, event -> {
+            var generator = event.getGenerator();
+            var output = generator.getPackOutput();
+            var lookupProvider = event.getLookupProvider();
+            var fileHelper = event.getExistingFileHelper();
+            var validationEnabled = fileHelper.isEnabled();
+
+            ResourceGeneration.generate(ownerId, validationEnabled, consumer -> generator.addProvider(true, consumer.apply(output, lookupProvider)));
+        });
     }
 
     @Override

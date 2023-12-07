@@ -19,6 +19,16 @@ loom {
             vmArg '-XX:+IgnoreUnrecognizedVMOptions'
             vmArg '-XX:+AllowRedefinitionToAddDeleteMethods'
         }
+
+        data {
+            server()
+            ideConfigGenerated true
+
+            vmArg '-Dfabric-api.datagen'
+            vmArg "-Dfabric-api.datagen.output-dir=${project(':testmod-common').file('src/generated/resources')}"
+            vmArg '-Dfabric-api.datagen.modid=testmod'
+            vmArg '-Dfabric-api.datagen.strict-validation'
+        }
     }
 
     mods {

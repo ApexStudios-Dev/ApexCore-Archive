@@ -3,6 +3,7 @@ package dev.apexstudios.apexcore.common.registry;
 import com.mojang.datafixers.util.Either;
 import dev.apexstudios.apexcore.common.loader.RegistryHelper;
 import dev.apexstudios.apexcore.common.util.OptionalLike;
+import dev.apexstudios.apexcore.common.util.PlatformTag;
 import net.covers1624.quack.annotation.ReplaceWith;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderOwner;
@@ -55,6 +56,17 @@ public class DeferredHolder<T, R extends T> implements Holder<T>, OptionalLike<R
     {
         bind(false);
         return delegate != null && delegate.value() == value;
+    }
+
+    public final boolean is(PlatformTag<T> tag, Predicate<R> filter)
+    {
+        return is(tag) && filter.test((R) delegate.value());
+    }
+
+    public final boolean is(PlatformTag<T> tag)
+    {
+        bind(false);
+        return delegate != null && tag.contains(delegate);
     }
 
     public final boolean is(TagKey<T> tag, Predicate<R> filter)

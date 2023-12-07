@@ -52,9 +52,8 @@ ModsDotGroovy.make {
 
             entrypoints {
                 setMain("${props.MOD_GROUP}.fabric.entrypoint.FabricModInitializer")
-                // setClient("${props.MOD_GROUP}.fabric.entrypoint.${props.MOD_NAME}ClientModInitializer")
                 // .toString() cause does not like GString
-                // entrypoint('fabric-datagen', "${props.MOD_GROUP}.fabric.entrypoint.${props.MOD_NAME}ModInitializer".toString())
+                entrypoint('fabric-datagen', "${props.MOD_GROUP}.fabric.loader.FabricResourceGeneration::generate".toString())
             }
         }
 

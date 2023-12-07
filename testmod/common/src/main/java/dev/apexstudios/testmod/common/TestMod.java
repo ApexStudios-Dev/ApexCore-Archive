@@ -1,6 +1,7 @@
 package dev.apexstudios.testmod.common;
 
 import com.mojang.serialization.MapCodec;
+import dev.apexstudios.apexcore.common.generator.ProviderTypes;
 import dev.apexstudios.apexcore.common.inventory.ItemHandler;
 import dev.apexstudios.apexcore.common.inventory.ItemHandlerProvider;
 import dev.apexstudios.apexcore.common.inventory.SimpleItemHandler;
@@ -18,6 +19,7 @@ import dev.apexstudios.apexcore.common.registry.holder.DeferredEntityType;
 import dev.apexstudios.apexcore.common.registry.holder.DeferredItem;
 import dev.apexstudios.apexcore.common.util.MenuHelper;
 import dev.apexstudios.apexcore.common.util.OptionalLike;
+import dev.apexstudios.apexcore.common.util.TagHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.PigRenderer;
 import net.minecraft.core.BlockPos;
@@ -106,6 +108,23 @@ public interface TestMod
     default void bootstrap()
     {
         REGISTER.register();
+
+        // register listener to generate `apexcore:diamond_like` item tag
+        // this tag consits of the following entries
+        // - `minecraft:diamond` -> vanilla diamond item
+        // - `#forge:gems/diamond` -> mcforge diamonds tag (optional)
+        // - `#neoforge:gems/diamond` -> neoforge diamonds tag (optional)
+        // - `#c:diamonds` -> fabric diamonds tag (optional)
+        ProviderTypes.TAG_ITEM.addListener(ID, tags -> tags
+                .tag(TagHelper.ITEM
+                             .platformBuilder(ID, "diamond_like")
+                             .withForgeLike("gems/diamond")
+                             .withFabric("diamonds")
+                             .create()
+                )
+                .addElement(Items.DIAMOND)
+                .end()
+        );
     }
 
     final class BlockWithEntity extends BaseEntityBlock
