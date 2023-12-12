@@ -31,7 +31,7 @@ final class NeoForgeModLoader implements ModLoader
     @Override
     public String displayName()
     {
-        return "MinecraftForge";
+        return "NeoForge";
     }
 
     @Override
@@ -42,12 +42,6 @@ final class NeoForgeModLoader implements ModLoader
 
     @Override
     public boolean isNeo()
-    {
-        return false;
-    }
-
-    @Override
-    public boolean isForge()
     {
         return true;
     }

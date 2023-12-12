@@ -53,12 +53,6 @@ final class FabricModLoader implements ModLoader
     }
 
     @Override
-    public boolean isForge()
-    {
-        return false;
-    }
-
-    @Override
     public boolean isFabric()
     {
         return true;

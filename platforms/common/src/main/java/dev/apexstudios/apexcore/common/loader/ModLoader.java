@@ -17,8 +17,6 @@ public interface ModLoader
 
     boolean isNeo();
 
-    boolean isForge();
-
     boolean isFabric();
 
     boolean isLoaded(String id);
@@ -51,14 +49,6 @@ public interface ModLoader
         return OptionalLike.empty();
     }
 
-    static <T> OptionalLike<T> callIfForge(Supplier<SneakyUtils.ThrowingSupplier<T, Throwable>> toCall)
-    {
-        if(get().isForge())
-            return () -> SneakyUtils.sneaky(toCall.get());
-
-        return OptionalLike.empty();
-    }
-
     static <T> OptionalLike<T> callIfFabric(Supplier<SneakyUtils.ThrowingSupplier<T, Throwable>> toCall)
     {
         if(get().isFabric())
@@ -70,12 +60,6 @@ public interface ModLoader
     static void runIfNeo(Supplier<SneakyUtils.ThrowingRunnable<Throwable>> toRun)
     {
         if(get().isNeo())
-            SneakyUtils.sneaky(toRun.get());
-    }
-
-    static void runIfForge(Supplier<SneakyUtils.ThrowingRunnable<Throwable>> toRun)
-    {
-        if(get().isForge())
             SneakyUtils.sneaky(toRun.get());
     }
 
