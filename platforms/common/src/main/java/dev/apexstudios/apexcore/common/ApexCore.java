@@ -1,5 +1,6 @@
 package dev.apexstudios.apexcore.common;
 
+import dev.apexstudios.apexcore.common.generator.ProviderTypes;
 import dev.apexstudios.apexcore.common.loader.Platform;
 import dev.apexstudios.apexcore.common.registry.Register;
 import dev.apexstudios.apexcore.common.util.Services;
@@ -20,5 +21,6 @@ public interface ApexCore
     default void bootstrap()
     {
         REGISTER.register();
+        ProviderTypes.addDefaultPackMetadata(ID, "ApexCore - Client/Server Resources");
     }
 }

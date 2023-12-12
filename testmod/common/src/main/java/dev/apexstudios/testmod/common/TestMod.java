@@ -109,6 +109,8 @@ public interface TestMod
     {
         REGISTER.register();
 
+        ProviderTypes.addDefaultPackMetadata(ID, "TestMod - Client/Server Resources");
+
         // register listener to generate `apexcore:diamond_like` item tag
         // this tag consits of the following entries
         // - `minecraft:diamond` -> vanilla diamond item

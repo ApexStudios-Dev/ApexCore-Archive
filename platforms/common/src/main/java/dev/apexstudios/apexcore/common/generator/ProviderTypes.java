@@ -1,9 +1,12 @@
 package dev.apexstudios.apexcore.common.generator;
 
 import dev.apexstudios.apexcore.common.ApexCore;
+import dev.apexstudios.apexcore.common.generator.common.LanguageGenerator;
+import dev.apexstudios.apexcore.common.generator.common.PackMetaGenerator;
 import dev.apexstudios.apexcore.common.generator.tag.TagGenerator;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
@@ -24,6 +27,10 @@ import net.minecraft.world.level.material.Fluid;
 
 public interface ProviderTypes
 {
+    ProviderType<PackMetaGenerator> PACK_META = PackMetaGenerator.PROVIDER_TYPE;
+
+    ProviderType<LanguageGenerator> LANGUAGE = LanguageGenerator.PROVIDER_TYPE;
+
     ProviderType<TagGenerator<BannerPattern>> TAG_BANNER_PATTERN = tag(ApexCore.ID, Registries.BANNER_PATTERN);
     ProviderType<TagGenerator<Biome>> TAG_BIOME = tag(ApexCore.ID, Registries.BIOME);
     ProviderType<TagGenerator<Block>> TAG_BLOCK = tag(ApexCore.ID, Registries.BLOCK);
@@ -49,5 +56,22 @@ public interface ProviderTypes
     static <T> ProviderType<TagGenerator<T>> tag(String ownerId, ResourceKey<? extends Registry<T>> registryType)
     {
         return TagGenerator.register(ownerId, registryType);
+    }
+
+    static void addDefaultPackMetadata(String ownerId, String packName)
+    {
+        var description = ProviderTypes.addTranslation(ownerId, "pack.%s.description".formatted(ownerId), packName);
+        ProviderTypes.PACK_META.addListener(ownerId, pack -> pack.with(builder -> builder.description(description)));
+    }
+
+    static void addDefaultPackMetadata(String ownerId)
+    {
+        addDefaultPackMetadata(ownerId, "Client/Server resources for mod: %s".formatted(ownerId));
+    }
+
+    static Component addTranslation(String ownerId, String key, String value)
+    {
+        LANGUAGE.addListener(ownerId, lang -> lang.with(key, value));
+        return Component.translatable(key);
     }
 }
