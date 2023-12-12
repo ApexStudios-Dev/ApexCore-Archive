@@ -24,16 +24,4 @@ public abstract class MixinSpawnEggItem
         if(deferred != null)
             cir.setReturnValue(deferred);
     }
-
-    // why does McForge crash saying `Iterables` class can not be found?
-    // its in a vanilla library and forge uses it themselves
-    /*@Inject(
-            method = "eggs",
-            at = @At("RETURN"),
-            cancellable = true
-    )
-    private static void ApexCore$eggs(CallbackInfoReturnable<Iterable<SpawnEggItem>> cir)
-    {
-        cir.setReturnValue(Iterables.concat(cir.getReturnValue(), DeferredSpawnEggItem.deferredOnly()));
-    }*/
 }
