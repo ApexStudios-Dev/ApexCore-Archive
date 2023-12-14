@@ -3,6 +3,7 @@ package dev.apexstudios.apexcore.common.generator;
 import dev.apexstudios.apexcore.common.ApexCore;
 import dev.apexstudios.apexcore.common.generator.common.LanguageGenerator;
 import dev.apexstudios.apexcore.common.generator.common.PackMetaGenerator;
+import dev.apexstudios.apexcore.common.generator.sound.SoundGenerator;
 import dev.apexstudios.apexcore.common.generator.tag.TagGenerator;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -28,8 +29,8 @@ import net.minecraft.world.level.material.Fluid;
 public interface ProviderTypes
 {
     ProviderType<PackMetaGenerator> PACK_META = PackMetaGenerator.PROVIDER_TYPE;
-
     ProviderType<LanguageGenerator> LANGUAGE = LanguageGenerator.PROVIDER_TYPE;
+    ProviderType<SoundGenerator> SOUND = SoundGenerator.PROVIDER_TYPE;
 
     ProviderType<TagGenerator<BannerPattern>> TAG_BANNER_PATTERN = tag(ApexCore.ID, Registries.BANNER_PATTERN);
     ProviderType<TagGenerator<Biome>> TAG_BIOME = tag(ApexCore.ID, Registries.BIOME);
