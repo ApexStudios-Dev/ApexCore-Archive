@@ -33,6 +33,9 @@ public final class BlockEntityTypeBuilder<O extends AbstractRegister<O>, P, T ex
         super(owner, parent, Registries.BLOCK_ENTITY_TYPE, blockEntityName, DeferredBlockEntityType::createBlockEntityType, helper);
 
         this.blockEntityFactory = blockEntityFactory;
+
+        // block entities dont have translations by default
+        noLang();
     }
 
     public BlockEntityTypeBuilder<O, P, T> renderer(OptionalLike<OptionalLike<BlockEntityRendererProvider<T>>> renderer)
@@ -82,6 +85,12 @@ public final class BlockEntityTypeBuilder<O extends AbstractRegister<O>, P, T ex
     protected void onRegister(BlockEntityType<T> value)
     {
         owner.registerBlockEntityRenderer(value, renderer);
+    }
+
+    @Override
+    protected String translationKeyLookup(BlockEntityType<T> value)
+    {
+        return registryName().toLanguageKey("block_entity");
     }
 
     @FunctionalInterface

@@ -2,7 +2,6 @@ package dev.apexstudios.apexcore.common.loader;
 
 import dev.apexstudios.apexcore.common.registry.AbstractRegister;
 import dev.apexstudios.apexcore.common.util.OptionalLike;
-import net.minecraft.Util;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -16,9 +15,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -135,20 +132,5 @@ public interface RegistryHelper
     static RegistryHelper get(String ownerId)
     {
         return PlatformFactory.get().registryHelper(ownerId);
-    }
-
-    // fabric crashes if there is no title set
-    // this sets the default title to a translatable component using the key `itemGroup.$ownerId.$creativeModeTabName`
-    // if `$creativeModeTab` contains any `/` characters they are replaced with `.`
-    //
-    // called automatically if using AbstractRegister
-    static CreativeModeTab.Builder defaultCreativeModeTab(String ownerId, String creativeModeTabName)
-    {
-        return defaultCreativeModeTabProperties(ownerId, creativeModeTabName, PlatformFactory.get().creativeModeTabBuilder());
-    }
-
-    static CreativeModeTab.Builder defaultCreativeModeTabProperties(String ownerId, String creativeModeTabName, CreativeModeTab.Builder builder)
-    {
-        return builder.title(Component.translatable(Util.makeDescriptionId("itemGroup", new ResourceLocation(ownerId, creativeModeTabName))));
     }
 }

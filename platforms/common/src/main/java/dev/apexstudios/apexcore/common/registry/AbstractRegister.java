@@ -358,6 +358,8 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
     public final <T extends AbstractContainerMenu, S extends Screen & MenuAccess<T>> DeferredHolder<MenuType<?>, MenuType<T>> menu(String menuName, MenuFactory<T> menuFactory, OptionalLike<OptionalLike<MenuScreens.ScreenConstructor<T, S>>> screenFactory)
     {
         return noConfig(menuName, Registries.MENU, () -> Platform.get().factory().menuType(menuFactory))
+                .defaultLang()
+                .langKey("container")
                 .onRegister(menuType -> RegistryHelper.registerMenuScreenFactory(menuType, screenFactory))
         .register();
     }
@@ -367,46 +369,26 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
         return menu(currentName(), menuFactory, screenFactory);
     }
 
-    public final ResourceKey<CreativeModeTab> creativeModeTab(String creativeModeTabName, UnaryOperator<CreativeModeTab.Builder> properties)
+    public final <P> CreativeModeTabBuilder<O, P> creativeModeTab(P parent, String creativeModeTabName)
     {
-        return simple(creativeModeTabName, Registries.CREATIVE_MODE_TAB, () -> properties.apply(RegistryHelper.defaultCreativeModeTab(ownerId, creativeModeTabName)).build()).registryKey;
-    }
-
-    public final ResourceKey<CreativeModeTab> creativeModeTab(String creativeModeTabName)
-    {
-        return creativeModeTab(creativeModeTabName, UnaryOperator.identity());
-    }
-
-    public final ResourceKey<CreativeModeTab> creativeModeTab(UnaryOperator<CreativeModeTab.Builder> properties)
-    {
-        return creativeModeTab(currentName(), properties);
-    }
-
-    public final ResourceKey<CreativeModeTab> creativeModeTab()
-    {
-        return creativeModeTab(currentName(), UnaryOperator.identity());
-    }
-
-    public final ResourceKey<CreativeModeTab> defaultCreativeModeTab(String creativeModeTabName, UnaryOperator<CreativeModeTab.Builder> properties)
-    {
-        var creativeModeTab = creativeModeTab(creativeModeTabName, properties);
-        defaultCreativeModeTab(creativeModeTab);
+        var creativeModeTab = entry(helper -> new CreativeModeTabBuilder<>(self(), parent, creativeModeTabName, helper));
+        defaultCreativeModeTab(creativeModeTab.registryKey());
         return creativeModeTab;
     }
 
-    public final ResourceKey<CreativeModeTab> defaultCreativeModeTab(String creativeModeTabName)
+    public final CreativeModeTabBuilder<O, O> creativeModeTab(String creativeModeTabName)
     {
-        return defaultCreativeModeTab(creativeModeTabName, UnaryOperator.identity());
+        return creativeModeTab(self(), creativeModeTabName);
     }
 
-    public final ResourceKey<CreativeModeTab> defaultCreativeModeTab(UnaryOperator<CreativeModeTab.Builder> properties)
+    public final <P> CreativeModeTabBuilder<O, P> creativeModeTab(P parent)
     {
-        return defaultCreativeModeTab(currentName(), properties);
+        return creativeModeTab(parent, currentName());
     }
 
-    public final ResourceKey<CreativeModeTab> defaultCreativeModeTab()
+    public final CreativeModeTabBuilder<O, O> creativeModeTab()
     {
-        return defaultCreativeModeTab(currentName(), UnaryOperator.identity());
+        return creativeModeTab(self(), currentName());
     }
 
     // this must be called prior to any `item()` calls
@@ -417,6 +399,16 @@ public class AbstractRegister<O extends AbstractRegister<O>> implements Registry
     {
         this.defaultCreativeModeTab = () -> defaultCreativeModeTab;
         return self();
+    }
+
+    public final O defaultCreativeModeTab(Holder<CreativeModeTab> defaultCreativeModeTab)
+    {
+        return defaultCreativeModeTab(defaultCreativeModeTab.unwrapKey().orElseThrow());
+    }
+
+    public final O defaultCreativeModeTab(DeferredHolder<CreativeModeTab, ? super CreativeModeTab> defaultCreativeModeTab)
+    {
+        return defaultCreativeModeTab(defaultCreativeModeTab.registryKey);
     }
 
     @Nullable

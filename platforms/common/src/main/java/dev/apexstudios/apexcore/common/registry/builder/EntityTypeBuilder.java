@@ -117,4 +117,10 @@ public final class EntityTypeBuilder<O extends AbstractRegister<O>, P, T extends
         owner.registerEntityAttributes(value, attributes);
         owner.registerEntityRenderer(value, renderer);
     }
+
+    @Override
+    protected String translationKeyLookup(EntityType<T> value)
+    {
+        return value.getDescriptionId();
+    }
 }

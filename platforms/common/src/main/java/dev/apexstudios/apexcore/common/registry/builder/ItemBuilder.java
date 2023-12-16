@@ -106,4 +106,10 @@ public final class ItemBuilder<O extends AbstractRegister<O>, P, T extends Item>
                 )
         );
     }
+
+    @Override
+    protected String translationKeyLookup(T value)
+    {
+        return value.getDescriptionId();
+    }
 }

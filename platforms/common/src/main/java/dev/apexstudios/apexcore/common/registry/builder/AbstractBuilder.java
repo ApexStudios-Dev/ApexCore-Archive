@@ -1,8 +1,11 @@
 package dev.apexstudios.apexcore.common.registry.builder;
 
 import com.google.errorprone.annotations.DoNotCall;
+import dev.apexstudios.apexcore.common.generator.ProviderTypes;
+import dev.apexstudios.apexcore.common.generator.common.LanguageGenerator;
 import dev.apexstudios.apexcore.common.registry.AbstractRegister;
 import dev.apexstudios.apexcore.common.registry.DeferredHolder;
+import dev.apexstudios.apexcore.common.util.OptionalLike;
 import net.covers1624.quack.util.LazyValue;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -21,6 +24,8 @@ public abstract class AbstractBuilder<O extends AbstractRegister<O>, P, T, R ext
     protected final ResourceKey<T> registryKey;
     private final Supplier<H> holderFactory;
     private final BuilderHelper helper;
+    // null to not have any translation
+    private OptionalLike<String> translationValue = () -> LanguageGenerator.toEnglishName(registrationName());
 
     protected AbstractBuilder(O owner, P parent, ResourceKey<? extends Registry<T>> registryType, String registrationName, BiFunction<String, ResourceKey<T>, H> holderFactory, BuilderHelper helper)
     {
@@ -32,7 +37,10 @@ public abstract class AbstractBuilder<O extends AbstractRegister<O>, P, T, R ext
         registryKey = ResourceKey.create(registryType, new ResourceLocation(owner.ownerId(), registrationName));
         this.holderFactory = new LazyValue<>(() -> holderFactory.apply(owner.ownerId(), registryKey));
 
-        onRegister(this::onRegister);
+        onRegister(value -> {
+            ProviderTypes.LANGUAGE.addListener(ownerId(), lang -> translationValue.ifPresent(translation -> lang.with(translationKeyLookup(value), translation)));
+            onRegister(value);
+        });
     }
 
     public final O owner()
@@ -102,6 +110,23 @@ public abstract class AbstractBuilder<O extends AbstractRegister<O>, P, T, R ext
         });
     }
 
+    public final B noLang()
+    {
+        this.translationValue = OptionalLike.empty();
+        return self();
+    }
+
+    public final B defaultLang()
+    {
+        return lang(LanguageGenerator.toEnglishName(registrationName()));
+    }
+
+    public final B lang(String translationValue)
+    {
+        this.translationValue = OptionalLike.of(translationValue);
+        return self();
+    }
+
     @ApiStatus.OverrideOnly
     @DoNotCall
     protected void onRegister(R value)
@@ -114,4 +139,11 @@ public abstract class AbstractBuilder<O extends AbstractRegister<O>, P, T, R ext
     }
 
     @DoNotCall protected abstract R createValue();
+
+    @DoNotCall protected abstract String translationKeyLookup(R value);
+
+    protected final OptionalLike<String> translationValue()
+    {
+        return translationValue;
+    }
 }

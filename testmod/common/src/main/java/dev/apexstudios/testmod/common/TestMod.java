@@ -6,9 +6,8 @@ import dev.apexstudios.apexcore.common.network.NetworkManager;
 import dev.apexstudios.apexcore.common.registry.Register;
 import dev.apexstudios.apexcore.common.util.TagHelper;
 import dev.apexstudios.testmod.common.ref.*;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import org.apache.logging.log4j.LogManager;
@@ -20,7 +19,7 @@ public interface TestMod
     Logger LOGGER = LogManager.getLogger();
     Register REGISTER = Register.create(ID);
     NetworkManager NETWORK = NetworkManager.get(ID);
-    ResourceKey<CreativeModeTab> TEST_TAB = REGISTER.defaultCreativeModeTab("test_tab", builder -> builder.icon(() -> new ItemStack(Items.DIAMOND)));
+    Holder<CreativeModeTab> TEST_TAB = REGISTER.creativeModeTab("test_tab").icon(Items.DIAMOND).register();
     GameRules.Key<GameRules.BooleanValue> TEST_GAMERULE = GameRules.register("test", GameRules.Category.MISC, GameRules.BooleanValue.create(false));
 
     default void bootstrap()
@@ -29,7 +28,7 @@ public interface TestMod
                 TestBlocks.class,
                 TestItems.class,
                 TestEntities.class,
-                TestMod.class,
+                TestMenus.class,
                 TestBlockEntities.class,
                 TestPackets.class
         );

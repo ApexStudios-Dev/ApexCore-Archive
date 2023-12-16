@@ -110,4 +110,10 @@ public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Bloc
         owner.registerColorHandler(value, colorHandler);
         owner.registerRenderType(value, renderType);
     }
+
+    @Override
+    protected String translationKeyLookup(T value)
+    {
+        return value.getDescriptionId();
+    }
 }
