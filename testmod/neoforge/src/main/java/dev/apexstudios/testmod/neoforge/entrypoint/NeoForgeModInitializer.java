@@ -3,6 +3,7 @@ package dev.apexstudios.testmod.neoforge.entrypoint;
 import dev.apexstudios.apexcore.neoforge.loader.ModEvents;
 import dev.apexstudios.apexcore.neoforge.loader.NeoForgeItemHandler;
 import dev.apexstudios.testmod.common.TestMod;
+import dev.apexstudios.testmod.common.ref.TestBlockEntities;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
@@ -15,6 +16,6 @@ public final class NeoForgeModInitializer implements TestMod
         ModEvents.registerForJavaFML()
                  // must be done for every block/item that has a item handler
                  // stupid and i dont like it, but there is no fallback registration like fabric
-                 .addListener(RegisterCapabilitiesEvent.class, event -> NeoForgeItemHandler.registerForBlockEntity(event, TEST_BLOCK_ENTITY.value()));
+                 .addListener(RegisterCapabilitiesEvent.class, event -> NeoForgeItemHandler.registerForBlockEntity(event, TestBlockEntities.TEST_BLOCK_ENTITY.value()));
     }
 }
