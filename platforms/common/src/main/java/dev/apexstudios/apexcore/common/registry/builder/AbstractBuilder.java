@@ -8,6 +8,7 @@ import dev.apexstudios.apexcore.common.registry.AbstractRegister;
 import dev.apexstudios.apexcore.common.registry.DeferredHolder;
 import dev.apexstudios.apexcore.common.util.OptionalLike;
 import dev.apexstudios.apexcore.common.util.PlatformTag;
+import net.covers1624.quack.collection.FastStream;
 import net.covers1624.quack.util.LazyValue;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -15,7 +16,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -32,7 +32,6 @@ public abstract class AbstractBuilder<O extends AbstractRegister<O>, P, T, R ext
     // null to not have any translation
     private OptionalLike<String> translationValue = () -> LanguageGenerator.toEnglishName(registrationName());
     private final Set<TagKey<T>> tags = Sets.newHashSet();
-    private final Set<PlatformTag<T>> platformTags = Sets.newHashSet();
 
     protected AbstractBuilder(O owner, P parent, ResourceKey<? extends Registry<T>> registryType, String registrationName, BiFunction<String, ResourceKey<T>, H> holderFactory, BuilderHelper helper)
     {
@@ -46,11 +45,7 @@ public abstract class AbstractBuilder<O extends AbstractRegister<O>, P, T, R ext
 
         onRegister(value -> {
             ProviderTypes.LANGUAGE.addListener(ownerId(), lang -> translationValue.ifPresent(translation -> lang.with(translationKeyLookup(value), translation)));
-
-            ProviderTypes.tag(registryType).addListener(ownerId(), tags -> {
-                this.tags.forEach(tag -> tags.tag(tag).addElement(value));
-                platformTags.forEach(tag -> tags.tag(tag).addElement(value));
-            });
+            ProviderTypes.tag(registryType).addListener(ownerId(), tags -> this.tags.forEach(tag -> tags.tag(tag).addElement(value)));
 
             onRegister(value);
         });
@@ -149,9 +144,8 @@ public abstract class AbstractBuilder<O extends AbstractRegister<O>, P, T, R ext
     @SafeVarargs
     public final B tag(TagKey<T> tag, TagKey<T>... tags)
     {
-        this.tags.add(tag);
-        Collections.addAll(this.tags, tags);
-        return self();
+        FastStream.of(tags).forEach(this::tag);
+        return tag(tag);
     }
 
     public final B removeTag(TagKey<T> tag)
@@ -163,47 +157,32 @@ public abstract class AbstractBuilder<O extends AbstractRegister<O>, P, T, R ext
     @SafeVarargs
     public final B removeTag(TagKey<T> tag, TagKey<T>... tags)
     {
-        this.tags.remove(tag);
-
-        for(var tag1 : tags)
-        {
-            this.tags.remove(tag1);
-        }
-
-        return self();
+        FastStream.of(tags).forEach(this::removeTag);
+        return removeTag(tag);
     }
 
     public final B tag(PlatformTag<T> tag)
     {
-        platformTags.add(tag);
-        return self();
+        return tag(tag.defaultTag());
     }
 
     @SafeVarargs
     public final B tag(PlatformTag<T> tag, PlatformTag<T>... tags)
     {
-        platformTags.add(tag);
-        Collections.addAll(platformTags, tags);
-        return self();
+        FastStream.of(tags).forEach(this::tag);
+        return tag(tag);
     }
 
     public final B removeTag(PlatformTag<T> tag)
     {
-        platformTags.remove(tag);
-        return self();
+        return removeTag(tag.defaultTag());
     }
 
     @SafeVarargs
     public final B removeTag(PlatformTag<T> tag, PlatformTag<T>... tags)
     {
-        platformTags.remove(tag);
-
-        for(var tag1 : tags)
-        {
-            platformTags.remove(tag1);
-        }
-
-        return self();
+        FastStream.of(tags).forEach(this::removeTag);
+        return removeTag(tag);
     }
 
     @ApiStatus.OverrideOnly

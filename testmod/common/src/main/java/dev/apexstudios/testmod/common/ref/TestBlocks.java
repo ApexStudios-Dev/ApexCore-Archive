@@ -1,6 +1,7 @@
 package dev.apexstudios.testmod.common.ref;
 
 import dev.apexstudios.apexcore.common.registry.holder.DeferredBlock;
+import dev.apexstudios.apexcore.common.util.ApexTags;
 import dev.apexstudios.testmod.common.TestMod;
 import dev.apexstudios.testmod.common.block.BlockWithEntity;
 import dev.apexstudios.testmod.common.block.entity.TestBlockEntity;
@@ -21,8 +22,11 @@ public interface TestBlocks
     DeferredBlock<BlockWithEntity> BLOCK_WITH_ENTITY = TestMod.REGISTER
             .object("block_with_entity")
             .block(BlockWithEntity::new)
+            .tag(ApexTags.BLOCK_IMMOVABLE)
             .defaultItem()
-            .defaultBlockEntity(TestBlockEntity::new)
+            .blockEntity(TestBlockEntity::new)
+                .tag(ApexTags.BLOCK_ENTITY_IMMOVABLE)
+            .build()
     .register();
     // @formatter:on
 }

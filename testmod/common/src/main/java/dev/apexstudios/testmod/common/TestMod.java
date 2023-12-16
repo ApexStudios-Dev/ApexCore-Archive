@@ -4,7 +4,6 @@ import com.google.common.reflect.Reflection;
 import dev.apexstudios.apexcore.common.generator.ProviderTypes;
 import dev.apexstudios.apexcore.common.network.NetworkManager;
 import dev.apexstudios.apexcore.common.registry.Register;
-import dev.apexstudios.apexcore.common.util.TagHelper;
 import dev.apexstudios.testmod.common.ref.*;
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.CreativeModeTab;
@@ -36,22 +35,5 @@ public interface TestMod
         REGISTER.register();
 
         ProviderTypes.addDefaultPackMetadata(ID, "TestMod - Client/Server Resources");
-
-        // register listener to generate `apexcore:diamond_like` item tag
-        // this tag consits of the following entries
-        // - `minecraft:diamond` -> vanilla diamond item
-        // - `#forge:gems/diamond` -> mcforge diamonds tag (optional)
-        // - `#neoforge:gems/diamond` -> neoforge diamonds tag (optional)
-        // - `#c:diamonds` -> fabric diamonds tag (optional)
-        ProviderTypes.TAG_ITEM.addListener(ID, tags -> tags
-                .tag(TagHelper.ITEM
-                             .platformBuilder(ID, "diamond_like")
-                             .withForgeLike("gems/diamond")
-                             .withFabric("diamonds")
-                             .create()
-                )
-                .addElement(Items.DIAMOND)
-                .end()
-        );
     }
 }

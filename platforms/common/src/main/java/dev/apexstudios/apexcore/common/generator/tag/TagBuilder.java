@@ -2,7 +2,6 @@ package dev.apexstudios.apexcore.common.generator.tag;
 
 import com.google.common.collect.Lists;
 import dev.apexstudios.apexcore.common.registry.DeferredHolder;
-import dev.apexstudios.apexcore.common.util.PlatformTag;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceKey;
@@ -158,12 +157,5 @@ public final class TagBuilder<T>
     public TagBuilder<T> addOptionalTag(ResourceLocation tagName)
     {
         return add(TagEntry.optionalTag(tagName));
-    }
-
-    public TagBuilder<T> addPlatformTag(PlatformTag<T> tag)
-    {
-        addOptionalTag(tag.defaultTag());
-        tag.platformTags().forEach(this::addOptionalTag);
-        return this;
     }
 }

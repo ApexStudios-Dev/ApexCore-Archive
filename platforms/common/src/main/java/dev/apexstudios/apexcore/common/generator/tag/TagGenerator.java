@@ -19,7 +19,6 @@ import net.minecraft.tags.TagManager;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public final class TagGenerator<T> extends AbstractResourceGenerator<TagGenerator<T>>
 {
@@ -48,33 +47,12 @@ public final class TagGenerator<T> extends AbstractResourceGenerator<TagGenerato
     @Override
     protected void generate(CachedOutput cache, HolderLookup.Provider registries)
     {
-        var lookup = registries.lookupOrThrow(registryType);
-
-        tags.forEach((tagName, tagBuilder) -> encodeTag(cache, tagName, tagBuilder, lookup));
-    }
-
-    private void encodeTag(CachedOutput cache, ResourceLocation tagName, TagBuilder<T> tagBuilder, HolderLookup.RegistryLookup<T> registryLookup)
-    {
-        var missing = tagBuilder.entries
-                .stream()
-                .filter(entry -> !entry.verifyIfPresent(
-                        registryName -> registryLookup.get(ResourceKey.create(registryType, registryName)).isPresent(),
-                        tags::containsKey
-                ))
-                .toList();
-
-        if(!missing.isEmpty())
-        {
-            var refNames = missing.stream().map(Objects::toString).collect(Collectors.joining(","));
-            throw new IllegalArgumentException("Couldn't define tag %s as it is missing following references: %s".formatted(tagName, refNames));
-        }
-
-        ResourceGenerator.save(
+        tags.forEach((tagName, tagBuilder) -> ResourceGenerator.save(
                 cache,
                 TagFile.CODEC,
                 new TagFile(tagBuilder.entries, tagBuilder.replace),
                 pathProvider.json(tagName)
-        );
+        ));
     }
 
     public TagBuilder<T> tag(TagKey<T> tag)
@@ -92,11 +70,10 @@ public final class TagGenerator<T> extends AbstractResourceGenerator<TagGenerato
         return tag(new ResourceLocation(namespace, tagName));
     }
 
-    public TagBuilder<T> tag(PlatformTag<T> tag)
+    public TagGenerator<T> platformTag(PlatformTag<T> tag)
     {
-        var builder = tag(tag.defaultTag());
-        tag.platformTags().forEach(builder::addOptionalTag);
-        return builder;
+        tag.platformTags().forEach(t -> tag(t).addTag(tag.defaultTag()));
+        return this;
     }
 
     public static <T> ProviderType<TagGenerator<T>> getOrRegister(ResourceKey<? extends Registry<T>> registryType)
