@@ -1,6 +1,7 @@
 package dev.apexstudios.apexcore.common.generator.tag;
 
 import com.google.common.collect.Maps;
+import dev.apexstudios.apexcore.common.ApexCore;
 import dev.apexstudios.apexcore.common.generator.AbstractResourceGenerator;
 import dev.apexstudios.apexcore.common.generator.ProviderType;
 import dev.apexstudios.apexcore.common.generator.ResourceGenerator;
@@ -22,6 +23,8 @@ import java.util.stream.Collectors;
 
 public final class TagGenerator<T> extends AbstractResourceGenerator<TagGenerator<T>>
 {
+    private static final Map<ResourceKey<? extends Registry<?>>, ProviderType<? extends TagGenerator<?>>> GENERATORS = Maps.newHashMap();
+
     private final ResourceKey<? extends Registry<T>> registryType;
     private final Registry<T> registry;
     private final Map<ResourceLocation, TagBuilder<T>> tags = Maps.newHashMap();
@@ -96,8 +99,12 @@ public final class TagGenerator<T> extends AbstractResourceGenerator<TagGenerato
         return builder;
     }
 
-    public static <T> ProviderType<TagGenerator<T>> register(String providerOwnerId, ResourceKey<? extends Registry<T>> registryType)
+    public static <T> ProviderType<TagGenerator<T>> getOrRegister(ResourceKey<? extends Registry<T>> registryType)
     {
-        return ProviderType.register(providerOwnerId, "tags/%s".formatted(registryType.location().getPath()), (ownerId, output) -> new TagGenerator<>(ownerId, output, registryType));
+        return (ProviderType<TagGenerator<T>>) GENERATORS.computeIfAbsent(registryType, $ -> ProviderType.register(
+                ApexCore.ID,
+                "tags/%s".formatted(registryType.location().getPath()),
+                (ownerId, output) -> new TagGenerator<>(ownerId, output, registryType)
+        ));
     }
 }

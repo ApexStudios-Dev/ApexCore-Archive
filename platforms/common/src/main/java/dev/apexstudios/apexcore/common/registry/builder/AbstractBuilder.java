@@ -1,17 +1,22 @@
 package dev.apexstudios.apexcore.common.registry.builder;
 
+import com.google.common.collect.Sets;
 import com.google.errorprone.annotations.DoNotCall;
 import dev.apexstudios.apexcore.common.generator.ProviderTypes;
 import dev.apexstudios.apexcore.common.generator.common.LanguageGenerator;
 import dev.apexstudios.apexcore.common.registry.AbstractRegister;
 import dev.apexstudios.apexcore.common.registry.DeferredHolder;
 import dev.apexstudios.apexcore.common.util.OptionalLike;
+import dev.apexstudios.apexcore.common.util.PlatformTag;
 import net.covers1624.quack.util.LazyValue;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Collections;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -26,6 +31,8 @@ public abstract class AbstractBuilder<O extends AbstractRegister<O>, P, T, R ext
     private final BuilderHelper helper;
     // null to not have any translation
     private OptionalLike<String> translationValue = () -> LanguageGenerator.toEnglishName(registrationName());
+    private final Set<TagKey<T>> tags = Sets.newHashSet();
+    private final Set<PlatformTag<T>> platformTags = Sets.newHashSet();
 
     protected AbstractBuilder(O owner, P parent, ResourceKey<? extends Registry<T>> registryType, String registrationName, BiFunction<String, ResourceKey<T>, H> holderFactory, BuilderHelper helper)
     {
@@ -39,6 +46,12 @@ public abstract class AbstractBuilder<O extends AbstractRegister<O>, P, T, R ext
 
         onRegister(value -> {
             ProviderTypes.LANGUAGE.addListener(ownerId(), lang -> translationValue.ifPresent(translation -> lang.with(translationKeyLookup(value), translation)));
+
+            ProviderTypes.tag(registryType).addListener(ownerId(), tags -> {
+                this.tags.forEach(tag -> tags.tag(tag).addElement(value));
+                platformTags.forEach(tag -> tags.tag(tag).addElement(value));
+            });
+
             onRegister(value);
         });
     }
@@ -124,6 +137,72 @@ public abstract class AbstractBuilder<O extends AbstractRegister<O>, P, T, R ext
     public final B lang(String translationValue)
     {
         this.translationValue = OptionalLike.of(translationValue);
+        return self();
+    }
+
+    public final B tag(TagKey<T> tag)
+    {
+        tags.add(tag);
+        return self();
+    }
+
+    @SafeVarargs
+    public final B tag(TagKey<T> tag, TagKey<T>... tags)
+    {
+        this.tags.add(tag);
+        Collections.addAll(this.tags, tags);
+        return self();
+    }
+
+    public final B removeTag(TagKey<T> tag)
+    {
+        tags.remove(tag);
+        return self();
+    }
+
+    @SafeVarargs
+    public final B removeTag(TagKey<T> tag, TagKey<T>... tags)
+    {
+        this.tags.remove(tag);
+
+        for(var tag1 : tags)
+        {
+            this.tags.remove(tag1);
+        }
+
+        return self();
+    }
+
+    public final B tag(PlatformTag<T> tag)
+    {
+        platformTags.add(tag);
+        return self();
+    }
+
+    @SafeVarargs
+    public final B tag(PlatformTag<T> tag, PlatformTag<T>... tags)
+    {
+        platformTags.add(tag);
+        Collections.addAll(platformTags, tags);
+        return self();
+    }
+
+    public final B removeTag(PlatformTag<T> tag)
+    {
+        platformTags.remove(tag);
+        return self();
+    }
+
+    @SafeVarargs
+    public final B removeTag(PlatformTag<T> tag, PlatformTag<T>... tags)
+    {
+        platformTags.remove(tag);
+
+        for(var tag1 : tags)
+        {
+            platformTags.remove(tag1);
+        }
+
         return self();
     }
 

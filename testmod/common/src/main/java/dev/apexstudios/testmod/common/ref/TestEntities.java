@@ -3,6 +3,7 @@ package dev.apexstudios.testmod.common.ref;
 import dev.apexstudios.apexcore.common.registry.holder.DeferredEntityType;
 import dev.apexstudios.testmod.common.TestMod;
 import net.minecraft.client.renderer.entity.PigRenderer;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -24,6 +25,7 @@ public interface TestEntities
             .spawnPredicate(Animal::checkAnimalSpawnRules)
             .attributes(() -> Pig.createAttributes().add(Attributes.MOVEMENT_SPEED, .75D))
             .renderer(() -> () -> PigRenderer::new)
+            .tag(EntityTypeTags.DISMOUNTS_UNDERWATER)
             .defaultSpawnEgg(0x00FF00, 0xFF0000)
     .register();
     // @formatter:on
