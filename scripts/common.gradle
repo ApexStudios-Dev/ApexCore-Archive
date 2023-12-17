@@ -1,4 +1,4 @@
-apply plugin: 'org.groovymc.modsdotgroovy'
+// apply plugin: 'org.groovymc.modsdotgroovy'
 
 def neoProj
 def fabricProj
@@ -21,7 +21,7 @@ if(project.name.containsIgnoreCase('testmod')) {
     }
 }
 
-modsDotGroovy {
+/*modsDotGroovy {
     dslVersion = '1.5.1'
     platform = 'multiloader'
 
@@ -36,7 +36,7 @@ modsDotGroovy {
             fabric = [ fabricProj ]
         }
     }
-}
+}*/
 
 sourceSets {
     main.resources.srcDirs += [ 'src/generated/resources' ]
@@ -67,4 +67,8 @@ dependencies {
 
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
     compileOnly 'com.google.errorprone:error_prone_annotations:2.11.0'
+}
+
+processResources {
+    exclude 'mods.groovy'
 }

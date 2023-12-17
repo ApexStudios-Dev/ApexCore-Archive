@@ -1,0 +1,29 @@
+{
+    "schemaVersion": 1,
+    "id": "testmod",
+    "version": "${MOD_VERSION_FULL}",
+    "name": "TestMod",
+    "description": "TestMod",
+    "license": "${MOD_LICENSE}",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "dev.apexstudios.testmod.fabric.entrypoint.FabricModInitializer"
+        ],
+        "fabric-datagen": [
+            "${MOD_GROUP}.fabric.loader.FabricResourceGeneration::generate"
+        ]
+    },
+    "depends": {
+        "minecraft": "${MINECRAFT_FABRIC_VERSION_RANGE}",
+        "fabricloader": ">=${FABRIC_LOADER_VERSION}",
+        "fabric-api": ">=${FABRIC_API_VERSION}",
+        "${MOD_ID}": ">=${MOD_VERSION}"
+    },
+    "custom": {
+        "modmenu": {
+            "update_checker": true,
+            "parent": "${MOD_ID}"
+        }
+    }
+}

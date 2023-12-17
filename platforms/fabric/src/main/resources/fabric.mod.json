@@ -1,0 +1,41 @@
+{
+    "schemaVersion": 1,
+    "id": "${MOD_ID}",
+    "version": "${MOD_VERSION_FULL}",
+    "name": "${MOD_NAME}",
+    "description": "${MOD_DESCRIPTION}",
+    "icon": "logo.png",
+    "license": "${MOD_LICENSE}",
+    "accessWidener": "${MOD_ID}.accesswidener",
+    "environment": "*",
+    "mixins": [ "${MOD_ID}-common.mixins.json" ],
+    "authors": [ "ApexStudios" ],
+    "contributors": [ "Apex", "FantasyGaming", "RudySPG", "TobiSPG" ],
+    "contact": {
+        "issues": "https://discord.apexstudios.dev/",
+        "sources": "https://github.com/ApexStudios-Dev/${MOD_NAME}",
+        "homepage": "https://apexstudios.dev/${MOD_ID}"
+    },
+    "entrypoints": {
+        "main": [
+            "${MOD_GROUP}.fabric.entrypoint.FabricModInitializer"
+        ],
+        "fabric-datagen": [
+            "${MOD_GROUP}.fabric.loader.FabricResourceGeneration::generate"
+        ]
+    },
+    "depends": {
+        "minecraft": "${MINECRAFT_FABRIC_VERSION_RANGE}",
+        "fabricloader": ">=${FABRIC_LOADER_VERSION}",
+        "fabric-api": ">=${FABRIC_API_VERSION}"
+    },
+    "custom": {
+        "modmenu": {
+            "links": {
+                "modmenu.discord": "https://discord.apexstudios.dev"
+            },
+            "badges": [ "library" ],
+            "update_checker": true
+        }
+    }
+}

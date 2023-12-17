@@ -1,0 +1,31 @@
+license = "${MOD_LICENSE}"
+issueTrackerURL = "https://discord.apexstudios.dev/"
+modLoader = "javafml"
+loaderVersion = "[${NEOFORGE_LOADER_VERSION},)"
+
+[[mods]]
+    modId = "${MOD_ID}"
+    displayName = "${MOD_NAME}"
+    version = "${MOD_VERSION_FULL}"
+    displayURL = "https://apexstudios.dev/${MOD_ID}"
+    updateJSONURL = "https://api.modrinth.com/updates/${MOD_ID}/forge_updates.json"
+    credits = "ApexStudios"
+    logoFile = "banner.png"
+    description = "${MOD_DESCRIPTION}"
+    authors = "Apex, FantasyGaming, RudySPG and TobiSPG"
+
+    [["dependencies.${MOD_ID}"]]
+        modId = "minecraft"
+        versionRange = "${MINECRAFT_FORGE_VERSION_RANGE}"
+        type = "required"
+        ordering = "NONE"
+        side = "BOTH"
+    [["dependencies.${MOD_ID}"]]
+        modId = "neoforge"
+        versionRange = "${NEOFORGE_VERSION_RANGE}"
+        type = "required"
+        ordering = "NONE"
+        side = "BOTH"
+
+    [[mixins]]
+        config = "${MOD_ID}-common.mixins.json"

@@ -1,0 +1,29 @@
+license = "${MOD_LICENSE}"
+issueTrackerURL = "https://discord.apexstudios.dev/"
+modLoader = "javafml"
+loaderVersion = "[${NEOFORGE_LOADER_VERSION},)"
+
+[[mods]]
+    modId = "testmod"
+    displayName = "TestMod"
+    version = "${MOD_VERSION_FULL}"
+    description = "TestMod"
+
+    [[dependencies.testmod]]
+        modId = "minecraft"
+        versionRange = "${MINECRAFT_FORGE_VERSION_RANGE}"
+        type = "required"
+        ordering = "NONE"
+        side = "BOTH"
+    [[dependencies.testmod]]
+        modId = "neoforge"
+        versionRange = "${NEOFORGE_VERSION_RANGE}"
+        type="required"
+        ordering = "NONE"
+        side = "BOTH"
+    [[dependencies.testmod]]
+        modId = "${MOD_ID}"
+        versionRange = "[${MOD_VERSION},)"
+        type = "required"
+        ordering = "BEFORE"
+        side = "BOTH"
