@@ -6,7 +6,7 @@
     "description": "${MOD_DESCRIPTION}",
     "icon": "logo.png",
     "license": "${MOD_LICENSE}",
-    "accessWidener": "${MOD_ID}.accesswidener",
+    "accessWidener": "apexcore.accesswidener",
     "environment": "*",
     "mixins": [ "${MOD_ID}-common.mixins.json" ],
     "authors": [ "ApexStudios" ],
