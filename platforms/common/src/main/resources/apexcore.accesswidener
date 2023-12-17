@@ -79,3 +79,6 @@ accessible class net/minecraft/client/gui/screens/MenuScreens$ScreenConstructor
 accessible method net/minecraft/client/gui/screens/MenuScreens register (Lnet/minecraft/world/inventory/MenuType;Lnet/minecraft/client/gui/screens/MenuScreens$ScreenConstructor;)V
 transitive-accessible class net/minecraft/client/gui/screens/MenuScreens$ScreenConstructor
 transitive-accessible method net/minecraft/client/gui/screens/MenuScreens register (Lnet/minecraft/world/inventory/MenuType;Lnet/minecraft/client/gui/screens/MenuScreens$ScreenConstructor;)V
+
+accessible field net/minecraft/data/models/ItemModelGenerators GENERATED_TRIM_MODELS Ljava/util/List;
+accessible class net/minecraft/data/models/ItemModelGenerators$TrimModelData

@@ -2,6 +2,10 @@ package dev.apexstudios.apexcore.common.registry.builder;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import dev.apexstudios.apexcore.common.generator.ProviderTypes;
+import dev.apexstudios.apexcore.common.generator.model.ItemModelBuilder;
+import dev.apexstudios.apexcore.common.generator.model.ModelFile;
+import dev.apexstudios.apexcore.common.generator.model.ModelGenerator;
 import dev.apexstudios.apexcore.common.registry.AbstractRegister;
 import dev.apexstudios.apexcore.common.registry.holder.DeferredItem;
 import dev.apexstudios.apexcore.common.util.OptionalLike;
@@ -14,6 +18,8 @@ import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
@@ -25,6 +31,7 @@ public final class ItemBuilder<O extends AbstractRegister<O>, P, T extends Item>
     private OptionalLike<OptionalLike<ItemColor>> colorHandler = OptionalLike.empty();
     private OptionalLike<DispenseItemBehavior> dispenseBehavior = OptionalLike.empty();
     private final Multimap<ResourceKey<CreativeModeTab>, OptionalLike<CreativeModeTab.DisplayItemsGenerator>> creativeModeTabs = MultimapBuilder.hashKeys().linkedListValues().build();
+    private OptionalLike<BiConsumer<ModelGenerator<Item, ItemModelBuilder>, ItemModelBuilder>> modelBuilder = OptionalLike.empty();
 
     @ApiStatus.Internal
     public ItemBuilder(O owner, P parent, String itemName, BuilderHelper helper, Function<Item.Properties, T> itemFactory)
@@ -33,6 +40,7 @@ public final class ItemBuilder<O extends AbstractRegister<O>, P, T extends Item>
 
         this.itemFactory = itemFactory;
         owner.withDefaultCreativeModeTab(this::creativeModeTab);
+        defaultModel();
     }
 
     public ItemBuilder<O, P, T> creativeModeTab(ResourceKey<CreativeModeTab> creativeModeTab)
@@ -86,6 +94,33 @@ public final class ItemBuilder<O extends AbstractRegister<O>, P, T extends Item>
         return initialProperties(() -> initialProperties);
     }
 
+    public ItemBuilder<O, P, T> noModel()
+    {
+        modelBuilder = OptionalLike.empty();
+        return this;
+    }
+
+    public ItemBuilder<O, P, T> model(BiConsumer<ModelGenerator<Item, ItemModelBuilder>, ItemModelBuilder> modelBuilder)
+    {
+        if(this.modelBuilder.isPresent())
+            this.modelBuilder = this.modelBuilder.map(current -> current.andThen(modelBuilder));
+        else
+            this.modelBuilder = OptionalLike.of(modelBuilder);
+
+        return this;
+    }
+
+    public ItemBuilder<O, P, T> model(Consumer<ItemModelBuilder> modelBuilder)
+    {
+        return model((models, model) -> modelBuilder.accept(model));
+    }
+
+    public ItemBuilder<O, P, T> defaultModel()
+    {
+        noModel();
+        return model((models, model) -> model.parent(ModelFile.ITEM_GENERATED).textureLayer(0, models.withModelDir(registryName())));
+    }
+
     @Override
     protected T createValue()
     {
@@ -95,6 +130,14 @@ public final class ItemBuilder<O extends AbstractRegister<O>, P, T extends Item>
     @Override
     protected void onRegister(T value)
     {
+        modelBuilder.ifPresent(consumer -> ProviderTypes.MODEL_ITEM.addListener(
+                ownerId(),
+                models -> models.model(
+                        models.withModelDir(registryName()),
+                        model -> consumer.accept(models, model)
+                ))
+        );
+
         owner.registerColorHandler(value, colorHandler);
         owner.registerItemDispenseBehavior(value, dispenseBehavior);
 

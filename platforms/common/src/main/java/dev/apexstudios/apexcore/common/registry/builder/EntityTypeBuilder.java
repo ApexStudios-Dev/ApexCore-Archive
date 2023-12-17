@@ -1,5 +1,6 @@
 package dev.apexstudios.apexcore.common.registry.builder;
 
+import dev.apexstudios.apexcore.common.generator.model.ModelFile;
 import dev.apexstudios.apexcore.common.loader.RegistryHelper;
 import dev.apexstudios.apexcore.common.registry.AbstractRegister;
 import dev.apexstudios.apexcore.common.registry.generic.DeferredSpawnEggItem;
@@ -82,7 +83,9 @@ public final class EntityTypeBuilder<O extends AbstractRegister<O>, P, T extends
                     .color(() -> () -> (stack, tintIndex) -> ((DeferredSpawnEggItem) stack.getItem()).getColor(tintIndex))
                     .dispenseBehavior(DeferredSpawnEggItem.DEFAULT_DISPENSE_BEHAVIOR)
                     .creativeModeTab(CreativeModeTabs.SPAWN_EGGS)
-                    .onRegisterAfter(Registries.ENTITY_TYPE, DeferredSpawnEggItem::injectSpawnEggEntry);
+                    .onRegisterAfter(Registries.ENTITY_TYPE, DeferredSpawnEggItem::injectSpawnEggEntry)
+                    .noModel() // wipe out existing model
+                    .model(model -> model.parent(ModelFile.ITEM_TEMPLATE_SPAWN_EGG));
     }
 
     public ItemBuilder<O, EntityTypeBuilder<O, P, T>, DeferredSpawnEggItem> spawnEgg(int backgroundColor, int highlightColor)

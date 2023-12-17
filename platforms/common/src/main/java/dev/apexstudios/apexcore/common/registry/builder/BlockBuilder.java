@@ -65,7 +65,10 @@ public final class BlockBuilder<O extends AbstractRegister<O>, P, T extends Bloc
 
     public <I extends Item> ItemBuilder<O, BlockBuilder<O, P, T>, I> item(BiFunction<T, Item.Properties, I> itemFactory)
     {
-        return owner.item(this, registrationName(), properties -> itemFactory.apply(holder().value(), properties));
+        return owner
+                .item(this, registrationName(), properties -> itemFactory.apply(holder().value(), properties))
+                .noModel() // wipe out existing model
+                .model(model -> model.parentBlock(registryKey));
     }
 
     public ItemBuilder<O, BlockBuilder<O, P, T>, BlockItem> item()

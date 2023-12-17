@@ -2,6 +2,9 @@ package dev.apexstudios.apexcore.common.generator;
 
 import dev.apexstudios.apexcore.common.generator.common.LanguageGenerator;
 import dev.apexstudios.apexcore.common.generator.common.PackMetaGenerator;
+import dev.apexstudios.apexcore.common.generator.model.BlockModelBuilder;
+import dev.apexstudios.apexcore.common.generator.model.ItemModelBuilder;
+import dev.apexstudios.apexcore.common.generator.model.ModelGenerator;
 import dev.apexstudios.apexcore.common.generator.sound.SoundGenerator;
 import dev.apexstudios.apexcore.common.generator.tag.TagGenerator;
 import net.minecraft.core.Registry;
@@ -30,6 +33,9 @@ public interface ProviderTypes
     ProviderType<PackMetaGenerator> PACK_META = PackMetaGenerator.PROVIDER_TYPE;
     ProviderType<LanguageGenerator> LANGUAGE = LanguageGenerator.PROVIDER_TYPE;
     ProviderType<SoundGenerator> SOUND = SoundGenerator.PROVIDER_TYPE;
+
+    ProviderType<ModelGenerator<Block, BlockModelBuilder>> MODEL_BLOCK = ModelGenerator.BLOCK;
+    ProviderType<ModelGenerator<Item, ItemModelBuilder>> MODEL_ITEM = ModelGenerator.ITEM;
 
     ProviderType<TagGenerator<BannerPattern>> TAG_BANNER_PATTERN = tag(Registries.BANNER_PATTERN);
     ProviderType<TagGenerator<Biome>> TAG_BIOME = tag(Registries.BIOME);
