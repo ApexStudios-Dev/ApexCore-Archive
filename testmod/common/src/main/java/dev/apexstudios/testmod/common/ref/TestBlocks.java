@@ -4,6 +4,7 @@ import dev.apexstudios.apexcore.common.registry.holder.DeferredBlock;
 import dev.apexstudios.apexcore.common.util.ApexTags;
 import dev.apexstudios.testmod.common.TestMod;
 import dev.apexstudios.testmod.common.block.BlockWithEntity;
+import dev.apexstudios.testmod.common.block.FacingBlock;
 import dev.apexstudios.testmod.common.block.entity.TestBlockEntity;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
@@ -28,5 +29,7 @@ public interface TestBlocks
                 .tag(ApexTags.BLOCK_ENTITY_IMMOVABLE)
             .build()
     .register();
+
+    DeferredBlock<FacingBlock> FACING = TestMod.REGISTER.object("facing").block(FacingBlock::new).defaultItem().register();
     // @formatter:on
 }

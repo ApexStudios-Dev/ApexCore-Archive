@@ -11,5 +11,6 @@ public interface TestItems
     DeferredItem<Item> TEST_ITEM = TestMod.REGISTER.object("test_item").item().color(() -> () -> (stack, tintIndex) -> -1).register();
     DeferredItem<BlockItem> TEST_BLOCK = DeferredItem.createItem(TestBlocks.TEST_BLOCK.registryName());
     DeferredItem<BlockItem> TEST_BLOCK_WITH_ENTITY = DeferredItem.createItem(TestBlocks.BLOCK_WITH_ENTITY.registryName());
+    DeferredItem<BlockItem> FACING_BLOCK_ITEM = DeferredItem.createItem(TestBlocks.FACING.registryName());
     DeferredItem<DeferredSpawnEggItem> TEST_ENTITY_SPAWN_EGG = DeferredItem.createItem(TestEntities.TEST_ENTITY.registryName());
 }
